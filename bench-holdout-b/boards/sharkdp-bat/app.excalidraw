@@ -1,0 +1,2636 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "bat-cli-to-controller-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 356.40000000000003,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 907076061,
+      "version": 1,
+      "versionNonce": 362450759,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Bat: CLI to Controller Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Bat: CLI to Controller Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1413530820,
+      "version": 1,
+      "versionNonce": 683945680,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-node-0-label"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "node": "main",
+        "ref": "src/bin/bat/main.rs#main"
+      }
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-1",
+      "type": "rectangle",
+      "x": 20,
+      "y": 400,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 596186717,
+      "version": 1,
+      "versionNonce": 1775580359,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-node-1-label"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "node": "run",
+        "ref": "src/bin/bat/main.rs#run"
+      }
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-2",
+      "type": "rectangle",
+      "x": 260,
+      "y": 780,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1172868930,
+      "version": 1,
+      "versionNonce": 43551158,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-node-2-label"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "node": "app_new",
+        "ref": "src/bin/bat/app.rs#new"
+      }
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-3",
+      "type": "rectangle",
+      "x": 460,
+      "y": 1160,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 121492723,
+      "version": 1,
+      "versionNonce": 1629444045,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-node-3-label"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "node": "build_app",
+        "ref": "src/bin/bat/clap_app.rs#build_app"
+      }
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-4",
+      "type": "rectangle",
+      "x": 300,
+      "y": 1560,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 972113032,
+      "version": 1,
+      "versionNonce": 1966632164,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-node-4-label"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "node": "argmatches",
+        "ref": "clap",
+        "state": "external"
+      }
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-5",
+      "type": "rectangle",
+      "x": 120,
+      "y": 1960,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 246045105,
+      "version": 1,
+      "versionNonce": 857834811,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-node-5-label"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "node": "app_config",
+        "ref": "src/bin/bat/app.rs#config"
+      }
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-6",
+      "type": "rectangle",
+      "x": 460,
+      "y": 1960,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 918736998,
+      "version": 1,
+      "versionNonce": 1716411210,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-node-6-label"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "node": "app_inputs",
+        "ref": "src/bin/bat/app.rs#inputs"
+      }
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-7",
+      "type": "rectangle",
+      "x": 80,
+      "y": 2360,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1522419639,
+      "version": 1,
+      "versionNonce": 1030054929,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-node-7-label"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "node": "run_controller",
+        "ref": "src/bin/bat/main.rs#run_controller"
+      }
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-8",
+      "type": "rectangle",
+      "x": 80,
+      "y": 2760,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1761838204,
+      "version": 1,
+      "versionNonce": 1925612296,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-node-8-label"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-12",
+          "type": "arrow"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-13",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "node": "controller_new",
+        "ref": "src/controller.rs#new"
+      }
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-9",
+      "type": "rectangle",
+      "x": 80,
+      "y": 3160,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1686824725,
+      "version": 1,
+      "versionNonce": 1446380575,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-node-9-label"
+        },
+        {
+          "id": "bat-cli-to-controller-flow-edge-13",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "node": "controller_run",
+        "ref": "src/controller.rs#run"
+      }
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-0",
+      "type": "arrow",
+      "x": 152.8,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 2072929307,
+      "version": 1,
+      "versionNonce": 701900053,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "main",
+          "to": "run",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-0",
+        "focus": -0.02153846153846161,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-1",
+        "focus": 0.021538461538461673,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-1",
+      "type": "arrow",
+      "x": 178.8,
+      "y": 472.8,
+      "width": 256.1333333333334,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1311110346,
+      "version": 1,
+      "versionNonce": 1386930718,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "run",
+          "to": "app_new",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          55.99999999999994
+        ],
+        [
+          222.4666666666667,
+          55.99999999999994
+        ],
+        [
+          256.1333333333334,
+          55.99999999999994
+        ],
+        [
+          256.1333333333334,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-1",
+        "focus": -0.2215384615384617,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-2",
+        "focus": 0.029019607843137233,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-2",
+      "type": "arrow",
+      "x": 491.6,
+      "y": 853.5999999999999,
+      "width": 107.66666666666663,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 317742501,
+      "version": 1,
+      "versionNonce": 225337647,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "app_new",
+          "to": "build_app",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          107.66666666666663,
+          32
+        ],
+        [
+          107.66666666666663,
+          96.5666666666666
+        ],
+        [
+          107.66666666666663,
+          147.625
+        ],
+        [
+          107.66666666666663,
+          198.6833333333334
+        ],
+        [
+          107.66666666666663,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-2",
+        "focus": -0.36235294117647066,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-3",
+        "focus": -0.0052380952380954564,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-3",
+      "type": "arrow",
+      "x": 599.2666666666667,
+      "y": 1254.3999999999999,
+      "width": 141.00000000000006,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 177853324,
+      "version": 1,
+      "versionNonce": 396882520,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "build_app",
+          "to": "argmatches",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          1.1368683772161603e-13,
+          192.79999999999995
+        ],
+        [
+          -28.09999999999991,
+          192.79999999999995
+        ],
+        [
+          -140.99999999999994,
+          192.79999999999995
+        ],
+        [
+          -140.99999999999994,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-3",
+        "focus": 0.0052380952380954564,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-4",
+        "focus": 0.3188888888888893,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-4",
+      "type": "arrow",
+      "x": 378.2666666666667,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 701.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 255508031,
+      "version": 1,
+      "versionNonce": 62997849,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "app_new",
+          "to": "argmatches",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          350.79999999999995
+        ],
+        [
+          0,
+          701.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-2",
+        "focus": 0.30431372549019575,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-4",
+        "focus": -0.3477777777777775,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-5",
+      "type": "arrow",
+      "x": 230.8,
+      "y": 472.8,
+      "width": 588.4666666666667,
+      "height": 1483.1999999999998,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 725593006,
+      "version": 1,
+      "versionNonce": 1429348050,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "run",
+          "to": "app_inputs",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          588.4666666666667,
+          32
+        ],
+        [
+          588.4666666666667,
+          535.7666666666664
+        ],
+        [
+          588.4666666666667,
+          1375.1999999999998
+        ],
+        [
+          411.6666666666667,
+          1375.1999999999998
+        ],
+        [
+          411.6666666666667,
+          1482.6999999999998
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-1",
+        "focus": -0.6215384615384617,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-6",
+        "focus": 0.3033333333333327,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-6",
+      "type": "arrow",
+      "x": 126.80000000000001,
+      "y": 472.8,
+      "width": 75.66666666666669,
+      "height": 1483.1999999999998,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1123714073,
+      "version": 1,
+      "versionNonce": 1666665827,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "run",
+          "to": "app_config",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          79.99999999999994
+        ],
+        [
+          75.66666666666669,
+          79.99999999999994
+        ],
+        [
+          75.66666666666669,
+          703.7666666666664
+        ],
+        [
+          75.66666666666669,
+          898.6249999999998
+        ],
+        [
+          75.66666666666669,
+          1093.4833333333331
+        ],
+        [
+          75.66666666666669,
+          1482.6999999999998
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-1",
+        "focus": 0.17846153846153842,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-5",
+        "focus": -0.36564102564102535,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-7",
+      "type": "arrow",
+      "x": 458.2666666666667,
+      "y": 1655.1999999999998,
+      "width": 90.86666666666662,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1852685072,
+      "version": 1,
+      "versionNonce": 2069742572,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "argmatches",
+          "to": "app_inputs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          90.86666666666662,
+          32
+        ],
+        [
+          90.86666666666662,
+          104.9666666666667
+        ],
+        [
+          90.86666666666662,
+          202.8833333333332
+        ],
+        [
+          90.86666666666662,
+          251.8416666666667
+        ],
+        [
+          90.86666666666662,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-4",
+        "focus": -0.3188888888888893,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-6",
+        "focus": -0.3633333333333328,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-8",
+      "type": "arrow",
+      "x": 378.2666666666667,
+      "y": 1655.1999999999998,
+      "width": 89.13333333333338,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1727524995,
+      "version": 1,
+      "versionNonce": 880085149,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "argmatches",
+          "to": "app_config"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          -2.1666666666666856,
+          192.79999999999995
+        ],
+        [
+          -89.13333333333338,
+          192.79999999999995
+        ],
+        [
+          -89.13333333333338,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-4",
+        "focus": 0.3477777777777775,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-5",
+        "focus": 0.30102564102564117,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-9",
+      "type": "arrow",
+      "x": 595.8,
+      "y": 2056,
+      "width": 269.99999999999994,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 962802962,
+      "version": 1,
+      "versionNonce": 1666736454,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "app_inputs",
+          "to": "run_controller",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.80000000000018
+        ],
+        [
+          -92.59999999999991,
+          192.80000000000018
+        ],
+        [
+          -269.99999999999994,
+          192.80000000000018
+        ],
+        [
+          -269.99999999999994,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-6",
+        "focus": 0.03000000000000029,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-7",
+        "focus": 0.5362500000000001,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-10",
+      "type": "arrow",
+      "x": 245.8,
+      "y": 2056,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 291385364,
+      "version": 1,
+      "versionNonce": 363526496,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "app_config",
+          "to": "run_controller",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-5",
+        "focus": 0.032307692307692,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-7",
+        "focus": 0.03625000000000007,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-11",
+      "type": "arrow",
+      "x": 74.80000000000001,
+      "y": 472.8,
+      "width": 91,
+      "height": 1884.0000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 228721645,
+      "version": 1,
+      "versionNonce": 1173291351,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "run",
+          "to": "run_controller",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          493.75000000000006
+        ],
+        [
+          0,
+          740.6250000000002
+        ],
+        [
+          0,
+          987.5000000000002
+        ],
+        [
+          0,
+          1776.0000000000002
+        ],
+        [
+          91,
+          1776.0000000000002
+        ],
+        [
+          91,
+          1883.5000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-1",
+        "focus": 0.5784615384615384,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-7",
+        "focus": -0.46375,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-12",
+      "type": "arrow",
+      "x": 245.8,
+      "y": 2456.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1551570898,
+      "version": 1,
+      "versionNonce": 2109254150,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-12-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "run_controller",
+          "to": "controller_new",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-7",
+        "focus": -0.03625000000000007,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-8",
+        "focus": 0.03625000000000007,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-13",
+      "type": "arrow",
+      "x": 245.8,
+      "y": 2857.6000000000004,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1891835459,
+      "version": 1,
+      "versionNonce": 898248541,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "bat-cli-to-controller-flow-edge-13-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow",
+        "edge": {
+          "from": "controller_new",
+          "to": "controller_run",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-8",
+        "focus": -0.03625000000000007,
+        "gap": 2.399999999999636
+      },
+      "endBinding": {
+        "elementId": "bat-cli-to-controller-flow-node-9",
+        "focus": -0.02470588235294078,
+        "gap": 1.5999999999994543
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-0-label",
+      "type": "text",
+      "x": 89.5,
+      "y": 35,
+      "width": 121.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 129159889,
+      "version": 1,
+      "versionNonce": 460836315,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "main()\nEntry point",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-node-0",
+      "originalText": "main()\nEntry point",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-1-label",
+      "type": "text",
+      "x": 84,
+      "y": 415,
+      "width": 132,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 296632468,
+      "version": 1,
+      "versionNonce": 330625760,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "run()\nOrchestrator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-node-1",
+      "originalText": "run()\nOrchestrator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-2-label",
+      "type": "text",
+      "x": 353,
+      "y": 795,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 537152803,
+      "version": 1,
+      "versionNonce": 917304765,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "App::new()\nParse CLI args",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-node-2",
+      "originalText": "App::new()\nParse CLI args",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-3-label",
+      "type": "text",
+      "x": 484.5,
+      "y": 1185,
+      "width": 231.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 500787918,
+      "version": 1,
+      "versionNonce": 531890802,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "clap_app::build_app()\nBuild clap Command",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-node-3",
+      "originalText": "clap_app::build_app()\nBuild clap Command",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-4-label",
+      "type": "text",
+      "x": 332,
+      "y": 1585,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1641030485,
+      "version": 1,
+      "versionNonce": 1945615199,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "ArgMatches\nParsed arguments",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-node-4",
+      "originalText": "ArgMatches\nParsed arguments",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-5-label",
+      "type": "text",
+      "x": 178.5,
+      "y": 1985,
+      "width": 143,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 250420872,
+      "version": 1,
+      "versionNonce": 1034984164,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "App::config()\nBuild Config",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-node-5",
+      "originalText": "App::config()\nBuild Config",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-6-label",
+      "type": "text",
+      "x": 528.5,
+      "y": 1985,
+      "width": 143,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 183142871,
+      "version": 1,
+      "versionNonce": 1506042545,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "App::inputs()\nExtract files",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-node-6",
+      "originalText": "App::inputs()\nExtract files",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-7-label",
+      "type": "text",
+      "x": 152,
+      "y": 2385,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1793863858,
+      "version": 1,
+      "versionNonce": 1039931750,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "run_controller()\nDisplay files",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-node-7",
+      "originalText": "run_controller()\nDisplay files",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-8-label",
+      "type": "text",
+      "x": 146.5,
+      "y": 2785,
+      "width": 187.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1795022361,
+      "version": 1,
+      "versionNonce": 1620966243,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "Controller::new()\nCreate controller",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-node-8",
+      "originalText": "Controller::new()\nCreate controller",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-node-9-label",
+      "type": "text",
+      "x": 156.5,
+      "y": 3185,
+      "width": 187.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1669430460,
+      "version": 1,
+      "versionNonce": 1482296392,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "Controller::run()\nExecute output",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-node-9",
+      "originalText": "Controller::run()\nExecute output",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-0-label",
+      "type": "text",
+      "x": 126.4,
+      "y": 232.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 796224582,
+      "version": 1,
+      "versionNonce": 125444522,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-1-label",
+      "type": "text",
+      "x": 374.86666666666673,
+      "y": 518.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 406920187,
+      "version": 1,
+      "versionNonce": 1575045749,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-2-label",
+      "type": "text",
+      "x": 572.8666666666667,
+      "y": 940.1666666666665,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1308241548,
+      "version": 1,
+      "versionNonce": 676803416,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-3-label",
+      "type": "text",
+      "x": 540.3666666666668,
+      "y": 1437.1999999999998,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1939556649,
+      "version": 1,
+      "versionNonce": 1850331443,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-3",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-4-label",
+      "type": "text",
+      "x": 307.8666666666667,
+      "y": 1194.3999999999999,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1413998538,
+      "version": 1,
+      "versionNonce": 2048682782,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "returns @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-4",
+      "originalText": "returns @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-5-label",
+      "type": "text",
+      "x": 792.8666666666667,
+      "y": 998.5666666666664,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1543077327,
+      "version": 1,
+      "versionNonce": 1051065257,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-6-label",
+      "type": "text",
+      "x": 176.0666666666667,
+      "y": 1166.5666666666664,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 714363936,
+      "version": 1,
+      "versionNonce": 1887852156,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-7-label",
+      "type": "text",
+      "x": 509.5333333333333,
+      "y": 1750.1666666666665,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 446319597,
+      "version": 1,
+      "versionNonce": 818436439,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "passed to",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-7",
+      "originalText": "passed to",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-8-label",
+      "type": "text",
+      "x": 336.5,
+      "y": 1837.9999999999998,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 993439262,
+      "version": 1,
+      "versionNonce": 22014018,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "passed to",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-8",
+      "originalText": "passed to",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-9-label",
+      "type": "text",
+      "x": 476.80000000000007,
+      "y": 2238.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1040742195,
+      "version": 1,
+      "versionNonce": 1604526861,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-9",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-10-label",
+      "type": "text",
+      "x": 219.4,
+      "y": 2196.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1739085281,
+      "version": 1,
+      "versionNonce": 260355755,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-10",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-11-label",
+      "type": "text",
+      "x": 48.400000000000006,
+      "y": 1450.3000000000002,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1395699748,
+      "version": 1,
+      "versionNonce": 477268144,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-11",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-12-label",
+      "type": "text",
+      "x": 219.4,
+      "y": 2597.2000000000003,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 1485471091,
+      "version": 1,
+      "versionNonce": 1556912461,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-12",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bat-cli-to-controller-flow-edge-13-label",
+      "type": "text",
+      "x": 219.4,
+      "y": 2998.0000000000005,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "am",
+      "roundness": null,
+      "seed": 949035358,
+      "version": 1,
+      "versionNonce": 62926978,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "bat-cli-to-controller-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bat-cli-to-controller-flow-edge-13",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

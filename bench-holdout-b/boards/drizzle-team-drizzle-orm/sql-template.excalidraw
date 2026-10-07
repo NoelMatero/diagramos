@@ -1,0 +1,1776 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "sql-template-tag-processing-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 422.40000000000003,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 312347540,
+      "version": 1,
+      "versionNonce": 221348832,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "SQL Template Tag Processing Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "SQL Template Tag Processing Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-0",
+      "type": "rectangle",
+      "x": 320,
+      "y": 20,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 700847043,
+      "version": 1,
+      "versionNonce": 1966254045,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-node-0-label"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "node": "sql_tag",
+        "ref": "drizzle-orm/src/sql/sql.ts#sql"
+      }
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-1",
+      "type": "rectangle",
+      "x": 400,
+      "y": 780,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 360582482,
+      "version": 1,
+      "versionNonce": 1029776006,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-node-1-label"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "node": "sql_class",
+        "ref": "drizzle-orm/src/sql/sql.ts#SQL"
+      }
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-2",
+      "type": "rectangle",
+      "x": 120,
+      "y": 400,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1185216877,
+      "version": 1,
+      "versionNonce": 93813207,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-node-2-label"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "node": "string_chunk",
+        "ref": "drizzle-orm/src/sql/sql.ts#StringChunk"
+      }
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-3",
+      "type": "rectangle",
+      "x": 380,
+      "y": 400,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1247880596,
+      "version": 1,
+      "versionNonce": 1431532000,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-node-3-label"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "node": "query_chunks",
+        "ref": "drizzle-orm/src/sql/sql.ts#SQLChunk"
+      }
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-4",
+      "type": "rectangle",
+      "x": 400,
+      "y": 1160,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 2091431367,
+      "version": 1,
+      "versionNonce": 1273741281,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-node-4-label"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "node": "to_query",
+        "ref": "drizzle-orm/src/sql/sql.ts#SQL.toQuery"
+      }
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-5",
+      "type": "rectangle",
+      "x": 300,
+      "y": 1540,
+      "width": 360,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1922548790,
+      "version": 1,
+      "versionNonce": 200031130,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-node-5-label"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "node": "build_query",
+        "ref": "drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams",
+        "claim": {
+          "handles": true,
+          "cases": [
+            "StringChunk",
+            "Param",
+            "Table",
+            "Column",
+            "SQL",
+            "Name",
+            "Placeholder"
+          ],
+          "of": "chunk type"
+        }
+      }
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-6",
+      "type": "rectangle",
+      "x": 160,
+      "y": 1920,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 815056833,
+      "version": 1,
+      "versionNonce": 2034365963,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-node-6-label"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "node": "param_class",
+        "ref": "drizzle-orm/src/sql/sql.ts#Param"
+      }
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-7",
+      "type": "rectangle",
+      "x": 440,
+      "y": 1920,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 476929816,
+      "version": 1,
+      "versionNonce": 77720052,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-node-7-label"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "node": "merge_queries",
+        "ref": "drizzle-orm/src/sql/sql.ts#mergeQueries"
+      }
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-8",
+      "type": "rectangle",
+      "x": 420,
+      "y": 2300,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1004674651,
+      "version": 1,
+      "versionNonce": 65042773,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-node-8-label"
+        },
+        {
+          "id": "sql-template-tag-processing-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "node": "query_result",
+        "ref": "drizzle-orm/src/sql/sql.ts#Query"
+      }
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-0",
+      "type": "arrow",
+      "x": 485.6,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1600597652,
+      "version": 1,
+      "versionNonce": 1842584800,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "edge": {
+          "from": "sql_tag",
+          "to": "query_chunks",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-0",
+        "focus": -0.3800000000000001,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-3",
+        "focus": 0.05600000000000024,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-1",
+      "type": "arrow",
+      "x": 405.6,
+      "y": 92,
+      "width": 190,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1537933933,
+      "version": 1,
+      "versionNonce": 504866007,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "edge": {
+          "from": "sql_tag",
+          "to": "string_chunk",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -190,
+          32
+        ],
+        [
+          -190,
+          55.400000000000006
+        ],
+        [
+          -190,
+          116.75
+        ],
+        [
+          -190,
+          178.10000000000002
+        ],
+        [
+          -190,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-0",
+        "focus": 0.2866666666666665,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-2",
+        "focus": 0.0622222222222224,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-2",
+      "type": "arrow",
+      "x": 485.6,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 713299538,
+      "version": 1,
+      "versionNonce": 1440828806,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "edge": {
+          "from": "query_chunks",
+          "to": "sql_class",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-3",
+        "focus": -0.05600000000000024,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-1",
+        "focus": 0.06999999999999999,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-3",
+      "type": "arrow",
+      "x": 485.6,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1053564099,
+      "version": 1,
+      "versionNonce": 229823197,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "edge": {
+          "from": "sql_class",
+          "to": "to_query",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-1",
+        "focus": -0.06999999999999999,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-4",
+        "focus": 0.06999999999999999,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-4",
+      "type": "arrow",
+      "x": 485.6,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 829646872,
+      "version": 1,
+      "versionNonce": 488772852,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "edge": {
+          "from": "to_query",
+          "to": "build_query",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-4",
+        "focus": -0.06999999999999999,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-5",
+        "focus": 0.031111111111111325,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-5",
+      "type": "arrow",
+      "x": 425.6,
+      "y": 1615.1999999999998,
+      "width": 170,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1167773889,
+      "version": 1,
+      "versionNonce": 297935115,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "edge": {
+          "from": "build_query",
+          "to": "param_class",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -170,
+          32
+        ],
+        [
+          -170,
+          65.40000000000009
+        ],
+        [
+          -170,
+          183.0999999999999
+        ],
+        [
+          -170,
+          241.94999999999982
+        ],
+        [
+          -170,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-5",
+        "focus": 0.30222222222222217,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-6",
+        "focus": -0.04399999999999978,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-6",
+      "type": "arrow",
+      "x": 545.6,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 127782198,
+      "version": 1,
+      "versionNonce": 611083930,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "edge": {
+          "from": "build_query",
+          "to": "merge_queries",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-5",
+        "focus": -0.3644444444444446,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-7",
+        "focus": -0.040000000000000216,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-7",
+      "type": "arrow",
+      "x": 545.6,
+      "y": 1995.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 296664775,
+      "version": 1,
+      "versionNonce": 1684794081,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sql-template-tag-processing-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow",
+        "edge": {
+          "from": "merge_queries",
+          "to": "query_result",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-7",
+        "focus": 0.03999999999999955,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "sql-template-tag-processing-flow-node-8",
+        "focus": -0.03384615384615337,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-0-label",
+      "type": "text",
+      "x": 352,
+      "y": 47.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 181431006,
+      "version": 1,
+      "versionNonce": 2103502082,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "sql template tag",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-node-0",
+      "originalText": "sql template tag",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-1-label",
+      "type": "text",
+      "x": 430.5,
+      "y": 807.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 717866739,
+      "version": 1,
+      "versionNonce": 1450003917,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "SQL class",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-node-1",
+      "originalText": "SQL class",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-2-label",
+      "type": "text",
+      "x": 149.5,
+      "y": 427.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 628095396,
+      "version": 1,
+      "versionNonce": 370359600,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "StringChunk",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-node-2",
+      "originalText": "StringChunk",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-3-label",
+      "type": "text",
+      "x": 408.5,
+      "y": 427.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 971480929,
+      "version": 1,
+      "versionNonce": 153447211,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "queryChunks[]",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-node-3",
+      "originalText": "queryChunks[]",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-4-label",
+      "type": "text",
+      "x": 430.5,
+      "y": 1187.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 381222082,
+      "version": 1,
+      "versionNonce": 984934966,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "toQuery()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-node-4",
+      "originalText": "toQuery()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-5-label",
+      "type": "text",
+      "x": 326,
+      "y": 1567.5,
+      "width": 308,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 2121308519,
+      "version": 1,
+      "versionNonce": 634765569,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "buildQueryFromSourceParams()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-node-5",
+      "originalText": "buildQueryFromSourceParams()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-6-label",
+      "type": "text",
+      "x": 188.5,
+      "y": 1947.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1531632792,
+      "version": 1,
+      "versionNonce": 2068740724,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "Param encoder",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-node-6",
+      "originalText": "Param encoder",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-7-label",
+      "type": "text",
+      "x": 473,
+      "y": 1947.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 655506789,
+      "version": 1,
+      "versionNonce": 20659183,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "mergeQueries()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-node-7",
+      "originalText": "mergeQueries()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-node-8-label",
+      "type": "text",
+      "x": 445.5,
+      "y": 2327.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 87333382,
+      "version": 1,
+      "versionNonce": 1597340522,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "Query {sql, params}",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-node-8",
+      "originalText": "Query {sql, params}",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-0-label",
+      "type": "text",
+      "x": 402,
+      "y": 222.4,
+      "width": 167.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 2088067169,
+      "version": 1,
+      "versionNonce": 1313619499,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "interleaves strings\n& params @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-edge-0",
+      "originalText": "interleaves strings & params @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-1-label",
+      "type": "text",
+      "x": 154,
+      "y": 127.4,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1744681636,
+      "version": 1,
+      "versionNonce": 1530531888,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "wraps literals\n@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-edge-1",
+      "originalText": "wraps literals @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-2-label",
+      "type": "text",
+      "x": 410.8,
+      "y": 613.1999999999999,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1834452979,
+      "version": 1,
+      "versionNonce": 462692557,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "SQLChunk[] @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-edge-2",
+      "originalText": "SQLChunk[] @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-3-label",
+      "type": "text",
+      "x": 459.20000000000005,
+      "y": 993.9999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1298017246,
+      "version": 1,
+      "versionNonce": 1116190722,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-4-label",
+      "type": "text",
+      "x": 406.40000000000003,
+      "y": 1374.7999999999997,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1772093029,
+      "version": 1,
+      "versionNonce": 1180831471,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "recursively @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-edge-4",
+      "originalText": "recursively @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-5-label",
+      "type": "text",
+      "x": 185.20000000000002,
+      "y": 1660.6,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 500735384,
+      "version": 1,
+      "versionNonce": 1081429364,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "mapToDriverValue\n@accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-edge-5",
+      "originalText": "mapToDriverValue @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-6-label",
+      "type": "text",
+      "x": 475.20000000000005,
+      "y": 1745.6,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1090411111,
+      "version": 1,
+      "versionNonce": 1794937857,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "combines results\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-edge-6",
+      "originalText": "combines results @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sql-template-tag-processing-flow-edge-7-label",
+      "type": "text",
+      "x": 475.20000000000005,
+      "y": 2126.4,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1497808322,
+      "version": 1,
+      "versionNonce": 2145107254,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "sql-template-tag-processing-flow"
+      },
+      "text": "aggregates sql &\nparams @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sql-template-tag-processing-flow-edge-7",
+      "originalText": "aggregates sql & params @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

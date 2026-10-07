@@ -1,0 +1,2009 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "parallel-iterator-bridge-architecture-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 488.40000000000003,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 345446173,
+      "version": 1,
+      "versionNonce": 1793443975,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "role": "title"
+      },
+      "text": "Parallel Iterator Bridge Architecture",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Parallel Iterator Bridge Architecture",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 40,
+      "width": 240,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 447721476,
+      "version": 1,
+      "versionNonce": 913137424,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-node-0-label"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "node": "iter_bridge",
+        "ref": "src/iter/par_bridge.rs#IterBridge"
+      }
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-1",
+      "type": "ellipse",
+      "x": 620,
+      "y": 200,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 797062301,
+      "version": 1,
+      "versionNonce": 1258633479,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-node-1-label"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "node": "par_iter_trait",
+        "ref": "src/iter/mod.rs#ParallelIterator"
+      }
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-2",
+      "type": "rectangle",
+      "x": 640,
+      "y": 360,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 589837186,
+      "version": 1,
+      "versionNonce": 1995872246,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-node-2-label"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "node": "iter_producer",
+        "ref": "src/iter/par_bridge.rs#IterParallelProducer"
+      }
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-3",
+      "type": "ellipse",
+      "x": 1300,
+      "y": 360,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 2003920947,
+      "version": 1,
+      "versionNonce": 1071023629,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-node-3-label"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "node": "unindexed_producer",
+        "ref": "src/iter/plumbing/mod.rs#UnindexedProducer"
+      }
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-4",
+      "type": "rectangle",
+      "x": 660,
+      "y": 20,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 706954440,
+      "version": 1,
+      "versionNonce": 1449788452,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-node-4-label"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "node": "bridge_fn",
+        "ref": "src/iter/plumbing/mod.rs#bridge_unindexed"
+      }
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-5",
+      "type": "ellipse",
+      "x": 620,
+      "y": 560,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1386142705,
+      "version": 1,
+      "versionNonce": 1405002875,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-node-5-label"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "node": "unindexed_consumer",
+        "ref": "src/iter/plumbing/mod.rs#UnindexedConsumer"
+      }
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-6",
+      "type": "ellipse",
+      "x": 1300,
+      "y": 520,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 377281958,
+      "version": 1,
+      "versionNonce": 1521145482,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-node-6-label"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "node": "folder_trait",
+        "ref": "src/iter/plumbing/mod.rs#Folder"
+      }
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-7",
+      "type": "rectangle",
+      "x": 40,
+      "y": 560,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1257261047,
+      "version": 1,
+      "versionNonce": 1452226897,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-node-7-label"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "node": "collect_consumer",
+        "ref": "src/iter/collect/consumer.rs#CollectConsumer"
+      }
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-8",
+      "type": "ellipse",
+      "x": 1300,
+      "y": 180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1496782780,
+      "version": 1,
+      "versionNonce": 624758088,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-node-8-label"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "node": "reducer_trait",
+        "ref": "src/iter/plumbing/mod.rs#Reducer"
+      }
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-9",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1103896149,
+      "version": 1,
+      "versionNonce": 228842591,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-node-9-label"
+        },
+        {
+          "id": "parallel-iterator-bridge-architecture-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "node": "splitter",
+        "ref": "src/iter/plumbing/mod.rs#Splitter"
+      }
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-0",
+      "type": "arrow",
+      "x": 252,
+      "y": 98.66666666666667,
+      "width": 359.20000000000005,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1478459739,
+      "version": 1,
+      "versionNonce": 2021872213,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "edge": {
+          "from": "iter_bridge",
+          "to": "par_iter_trait",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          140
+        ],
+        [
+          109.60000000000002,
+          140
+        ],
+        [
+          172,
+          140
+        ],
+        [
+          234.40000000000003,
+          140
+        ],
+        [
+          358.70000000000005,
+          140
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-0",
+        "focus": -0.022222222222222143,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-1",
+        "focus": 0.03333333333333335,
+        "gap": 8.84558162014215
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-1",
+      "type": "arrow",
+      "x": 252,
+      "y": 128.66666666666669,
+      "width": 385.8666666666667,
+      "height": 280,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1458971402,
+      "version": 1,
+      "versionNonce": 1494730078,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "edge": {
+          "from": "iter_bridge",
+          "to": "iter_producer",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          280
+        ],
+        [
+          52.93333333333334,
+          280
+        ],
+        [
+          219.39999999999998,
+          280
+        ],
+        [
+          302.6333333333333,
+          280
+        ],
+        [
+          385.3666666666667,
+          280
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-0",
+        "focus": 0.4777777777777782,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-2",
+        "focus": 0.026666666666666002,
+        "gap": 2.1333333333333258
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-2",
+      "type": "arrow",
+      "x": 917.8666666666667,
+      "y": 392,
+      "width": 372.5333333333334,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 890061029,
+      "version": 1,
+      "versionNonce": 56737391,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "edge": {
+          "from": "iter_producer",
+          "to": "unindexed_producer",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          186.26666666666677,
+          0
+        ],
+        [
+          372.0333333333334,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-2",
+        "focus": -0.3599999999999999,
+        "gap": 2.1333333333333258
+      },
+      "endBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-3",
+        "focus": 0.19999999999999998,
+        "gap": 11.143917328363075
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-3",
+      "type": "arrow",
+      "x": 252,
+      "y": 68.66666666666667,
+      "width": 399.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1730867404,
+      "version": 1,
+      "versionNonce": 1292294040,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "edge": {
+          "from": "iter_bridge",
+          "to": "bridge_fn",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          199.60000000000002,
+          0
+        ],
+        [
+          398.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-0",
+        "focus": -0.5222222222222221,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-4",
+        "focus": 0.026666666666666818,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-4",
+      "type": "arrow",
+      "x": 911.2,
+      "y": 52,
+      "width": 379.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 403472255,
+      "version": 1,
+      "versionNonce": 636728217,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "edge": {
+          "from": "bridge_fn",
+          "to": "splitter",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          189.60000000000014,
+          0
+        ],
+        [
+          378.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-4",
+        "focus": -0.35999999999999965,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-9",
+        "focus": 0.2,
+        "gap": 9.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-5",
+      "type": "arrow",
+      "x": 252,
+      "y": 602.1333333333333,
+      "width": 359.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 172700142,
+      "version": 1,
+      "versionNonce": 177379090,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "edge": {
+          "from": "collect_consumer",
+          "to": "unindexed_consumer",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          179.60000000000002,
+          0
+        ],
+        [
+          358.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-7",
+        "focus": 0.053333333333333705,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-5",
+        "focus": -0.05333333333333314,
+        "gap": 8.920462619470142
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-6",
+      "type": "arrow",
+      "x": 917.8666666666667,
+      "y": 425.33333333333337,
+      "width": 372.5333333333334,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 529347673,
+      "version": 1,
+      "versionNonce": 1581381795,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "edge": {
+          "from": "iter_producer",
+          "to": "folder_trait",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          45.33333333333337,
+          0
+        ],
+        [
+          45.33333333333337,
+          120
+        ],
+        [
+          126.26666666666677,
+          120
+        ],
+        [
+          187.8333333333336,
+          120
+        ],
+        [
+          249.4000000000002,
+          120
+        ],
+        [
+          372.0333333333334,
+          120
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-2",
+        "focus": 0.3066666666666677,
+        "gap": 2.1333333333333258
+      },
+      "endBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-6",
+        "focus": 0.49333333333333124,
+        "gap": 16.27692476823605
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-7",
+      "type": "arrow",
+      "x": 931.2,
+      "y": 602.1333333333333,
+      "width": 359.20000000000005,
+      "height": 23.466666666666697,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1258318672,
+      "version": 1,
+      "versionNonce": 817670444,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "edge": {
+          "from": "unindexed_consumer",
+          "to": "folder_trait",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          47.83333333333337,
+          0
+        ],
+        [
+          95.66666666666674,
+          0
+        ],
+        [
+          191.33333333333326,
+          0
+        ],
+        [
+          251.20000000000005,
+          0
+        ],
+        [
+          251.20000000000005,
+          -23.466666666666697
+        ],
+        [
+          358.70000000000005,
+          -23.466666666666697
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-5",
+        "focus": 0.05333333333333314,
+        "gap": 7.975213159320638
+      },
+      "endBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-6",
+        "focus": -0.17333333333333215,
+        "gap": 10.504748969246164
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-8",
+      "type": "arrow",
+      "x": 911.2,
+      "y": 85.33333333333333,
+      "width": 379.20000000000005,
+      "height": 126.66666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1174632131,
+      "version": 1,
+      "versionNonce": 1775599837,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "parallel-iterator-bridge-architecture-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture",
+        "edge": {
+          "from": "bridge_fn",
+          "to": "reducer_trait",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          52,
+          0
+        ],
+        [
+          52,
+          126.66666666666667
+        ],
+        [
+          126.26666666666665,
+          126.66666666666667
+        ],
+        [
+          189.5,
+          126.66666666666667
+        ],
+        [
+          252.73333333333335,
+          126.66666666666667
+        ],
+        [
+          378.70000000000005,
+          126.66666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-4",
+        "focus": 0.30666666666666664,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "parallel-iterator-bridge-architecture-node-8",
+        "focus": 0.2,
+        "gap": 10.653099586232164
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-0-label",
+      "type": "text",
+      "x": 52,
+      "y": 87.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 731304337,
+      "version": 1,
+      "versionNonce": 1533190043,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "IterBridge<Iter>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-node-0",
+      "originalText": "IterBridge<Iter>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-1-label",
+      "type": "text",
+      "x": 681.9339828220179,
+      "y": 227.7157287525381,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 539097940,
+      "version": 1,
+      "versionNonce": 716637344,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "ParallelIterator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-node-1",
+      "originalText": "ParallelIterator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-2-label",
+      "type": "text",
+      "x": 670,
+      "y": 397.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1667776995,
+      "version": 1,
+      "versionNonce": 218527357,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "IterParallelProducer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-node-2",
+      "originalText": "IterParallelProducer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-3-label",
+      "type": "text",
+      "x": 1366.3629150101524,
+      "y": 387.7157287525381,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1922281358,
+      "version": 1,
+      "versionNonce": 305499186,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "UnindexedProducer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-node-3",
+      "originalText": "UnindexedProducer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-4-label",
+      "type": "text",
+      "x": 691,
+      "y": 57.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 983517717,
+      "version": 1,
+      "versionNonce": 1481497887,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "bridge_unindexed()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-node-4",
+      "originalText": "bridge_unindexed()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-5-label",
+      "type": "text",
+      "x": 686.3629150101524,
+      "y": 587.7157287525381,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1615614024,
+      "version": 1,
+      "versionNonce": 419896996,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "UnindexedConsumer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-node-5",
+      "originalText": "UnindexedConsumer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-6-label",
+      "type": "text",
+      "x": 1346.9314575050762,
+      "y": 557.6446609406726,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1076156567,
+      "version": 1,
+      "versionNonce": 1369229425,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "Folder",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-node-6",
+      "originalText": "Folder",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-7-label",
+      "type": "text",
+      "x": 67.5,
+      "y": 587.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 45673842,
+      "version": 1,
+      "versionNonce": 1691385638,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "CollectConsumer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-node-7",
+      "originalText": "CollectConsumer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-8-label",
+      "type": "text",
+      "x": 1341.4314575050762,
+      "y": 207.7157287525381,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1702661337,
+      "version": 1,
+      "versionNonce": 1980385827,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "Reducer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-node-8",
+      "originalText": "Reducer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-node-9-label",
+      "type": "text",
+      "x": 1336,
+      "y": 47.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 832553340,
+      "version": 1,
+      "versionNonce": 1085966856,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "Splitter",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-node-9",
+      "originalText": "Splitter",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-0-label",
+      "type": "text",
+      "x": 322,
+      "y": 228.66666666666669,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 376366342,
+      "version": 1,
+      "versionNonce": 2113506410,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-edge-0",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-1-label",
+      "type": "text",
+      "x": 274.1333333333333,
+      "y": 398.6666666666667,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 68390075,
+      "version": 1,
+      "versionNonce": 1194697525,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-edge-1",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-2-label",
+      "type": "text",
+      "x": 1064.5333333333335,
+      "y": 382,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 385187660,
+      "version": 1,
+      "versionNonce": 149236504,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-edge-2",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-3-label",
+      "type": "text",
+      "x": 425.20000000000005,
+      "y": 58.66666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1156587753,
+      "version": 1,
+      "versionNonce": 1900864755,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-4-label",
+      "type": "text",
+      "x": 1070.0000000000002,
+      "y": 42,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1434742666,
+      "version": 1,
+      "versionNonce": 320484062,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-edge-4",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-5-label",
+      "type": "text",
+      "x": 392,
+      "y": 592.1333333333333,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 698761615,
+      "version": 1,
+      "versionNonce": 1209516649,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-edge-5",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-6-label",
+      "type": "text",
+      "x": 1017.7333333333335,
+      "y": 535.3333333333334,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1344113888,
+      "version": 1,
+      "versionNonce": 1942652732,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-edge-6",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-7-label",
+      "type": "text",
+      "x": 1091.7333333333333,
+      "y": 592.1333333333333,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 114812077,
+      "version": 1,
+      "versionNonce": 1480262167,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-edge-7",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "parallel-iterator-bridge-architecture-edge-8-label",
+      "type": "text",
+      "x": 1011.0666666666667,
+      "y": 202,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 470463966,
+      "version": 1,
+      "versionNonce": 472184322,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "parallel-iterator-bridge-architecture"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parallel-iterator-bridge-architecture-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

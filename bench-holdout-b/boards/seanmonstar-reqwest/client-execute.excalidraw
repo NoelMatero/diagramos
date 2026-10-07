@@ -1,0 +1,2129 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "reqwest-async-client-request-execution-f-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 567.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1178905667,
+      "version": 1,
+      "versionNonce": 1350351197,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Reqwest Async Client Request Execution Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Reqwest Async Client Request Execution Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-0",
+      "type": "rectangle",
+      "x": 60,
+      "y": 20,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1251648838,
+      "version": 1,
+      "versionNonce": 1125309610,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-0-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "rb_send",
+        "ref": "src/async_impl/request.rs#RequestBuilder::send"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-1",
+      "type": "rectangle",
+      "x": 140,
+      "y": 400,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1194413079,
+      "version": 1,
+      "versionNonce": 1781963505,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-1-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "request",
+        "ref": "src/async_impl/request.rs#Request"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-2",
+      "type": "rectangle",
+      "x": 100,
+      "y": 780,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 644106472,
+      "version": 1,
+      "versionNonce": 1313387716,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-2-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "client_exec",
+        "ref": "src/async_impl/client.rs#Client::execute_request"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-3",
+      "type": "rectangle",
+      "x": 60,
+      "y": 1180,
+      "width": 340,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1321287569,
+      "version": 1,
+      "versionNonce": 925747611,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-3-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "tower_stack",
+        "ref": "src/async_impl/client.rs#Client"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-4",
+      "type": "rectangle",
+      "x": 80,
+      "y": 1600,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1464100898,
+      "version": 1,
+      "versionNonce": 1599933206,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-4-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "hyper_svc",
+        "ref": "src/async_impl/client.rs#HyperService"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-5",
+      "type": "rectangle",
+      "x": 100,
+      "y": 1980,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1940969811,
+      "version": 1,
+      "versionNonce": 1400657069,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-5-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "hyper_client",
+        "state": "external"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-6",
+      "type": "rectangle",
+      "x": 60,
+      "y": 2380,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1085524260,
+      "version": 1,
+      "versionNonce": 30598064,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-6-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "connector",
+        "state": "external"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-7",
+      "type": "rectangle",
+      "x": 120,
+      "y": 2780,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 692637629,
+      "version": 1,
+      "versionNonce": 1122232743,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-7-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "hyper_resp",
+        "state": "external"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-8",
+      "type": "rectangle",
+      "x": 80,
+      "y": 3180,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1364265214,
+      "version": 1,
+      "versionNonce": 1082963874,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-8-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "pending",
+        "ref": "src/async_impl/client.rs#PendingRequest"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-9",
+      "type": "rectangle",
+      "x": 100,
+      "y": 3560,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 756909135,
+      "version": 1,
+      "versionNonce": 2052863785,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-9-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "resp_new",
+        "ref": "src/async_impl/response.rs#Response::new"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-10",
+      "type": "rectangle",
+      "x": 140,
+      "y": 3940,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1067579591,
+      "version": 1,
+      "versionNonce": 978335969,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-node-10-label"
+        },
+        {
+          "id": "reqwest-async-client-request-execution-f-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "node": "response",
+        "ref": "src/async_impl/response.rs#Response"
+      }
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-0",
+      "type": "arrow",
+      "x": 224.4,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1460702425,
+      "version": 1,
+      "versionNonce": 1107708451,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "edge": {
+          "from": "rb_send",
+          "to": "request",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-0",
+        "focus": -0.027500000000000035,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-1",
+        "focus": 0.05499999999999999,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-1",
+      "type": "arrow",
+      "x": 224.4,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 42189776,
+      "version": 1,
+      "versionNonce": 343997100,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "edge": {
+          "from": "request",
+          "to": "client_exec",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-1",
+        "focus": -0.05499999999999999,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-2",
+        "focus": -0.043076923076923124,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-2",
+      "type": "arrow",
+      "x": 224.4,
+      "y": 873.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1334827007,
+      "version": 1,
+      "versionNonce": 163054873,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "edge": {
+          "from": "client_exec",
+          "to": "tower_stack",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-2",
+        "focus": 0.043076923076923124,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-3",
+        "focus": -0.032941176470588245,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-3",
+      "type": "arrow",
+      "x": 224.4,
+      "y": 1294.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1104054894,
+      "version": 1,
+      "versionNonce": 1851189394,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "edge": {
+          "from": "tower_stack",
+          "to": "hyper_svc",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-3",
+        "focus": 0.032941176470588245,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-4",
+        "focus": 0.031428571428571264,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-4",
+      "type": "arrow",
+      "x": 224.4,
+      "y": 1675.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1821415781,
+      "version": 1,
+      "versionNonce": 1730547695,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "edge": {
+          "from": "hyper_svc",
+          "to": "hyper_client",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-4",
+        "focus": -0.031428571428571264,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-5",
+        "focus": 0.036666666666666486,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-5",
+      "type": "arrow",
+      "x": 224.4,
+      "y": 2076,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 514738508,
+      "version": 1,
+      "versionNonce": 818620696,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "edge": {
+          "from": "hyper_client",
+          "to": "connector",
+          "claim": "depends"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-5",
+        "focus": -0.036666666666666486,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-6",
+        "focus": 0.02750000000000003,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-6",
+      "type": "arrow",
+      "x": 224.4,
+      "y": 2476.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 262330843,
+      "version": 1,
+      "versionNonce": 1548198869,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "edge": {
+          "from": "connector",
+          "to": "hyper_resp",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-6",
+        "focus": -0.02750000000000003,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-7",
+        "focus": -0.05090909090909073,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-7",
+      "type": "arrow",
+      "x": 224.4,
+      "y": 2877.6000000000004,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 242842506,
+      "version": 1,
+      "versionNonce": 1021056734,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "edge": {
+          "from": "hyper_resp",
+          "to": "pending",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-7",
+        "focus": 0.05090909090909073,
+        "gap": 2.399999999999636
+      },
+      "endBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-8",
+        "focus": 0.031428571428571264,
+        "gap": 1.5999999999994543
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-8",
+      "type": "arrow",
+      "x": 224.4,
+      "y": 3258.4000000000005,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 72713025,
+      "version": 1,
+      "versionNonce": 1370038411,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "edge": {
+          "from": "pending",
+          "to": "resp_new",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-8",
+        "focus": -0.031428571428571264,
+        "gap": 1.5999999999994543
+      },
+      "endBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-9",
+        "focus": 0.036666666666666785,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-9",
+      "type": "arrow",
+      "x": 224.4,
+      "y": 3639.2000000000007,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1882069656,
+      "version": 1,
+      "versionNonce": 1560876148,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "reqwest-async-client-request-execution-f-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f",
+        "edge": {
+          "from": "resp_new",
+          "to": "response",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-9",
+        "focus": -0.036666666666666785,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "reqwest-async-client-request-execution-f-node-10",
+        "focus": 0.05499999999999914,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-0-label",
+      "type": "text",
+      "x": 143,
+      "y": 35,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 285656503,
+      "version": 1,
+      "versionNonce": 830717457,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "RequestBuilder\n::send()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-0",
+      "originalText": "RequestBuilder\n::send()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-1-label",
+      "type": "text",
+      "x": 181.5,
+      "y": 427.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 412063506,
+      "version": 1,
+      "versionNonce": 909551430,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "Request",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-1",
+      "originalText": "Request",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-2-label",
+      "type": "text",
+      "x": 125.49999999999999,
+      "y": 805,
+      "width": 209.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1003361589,
+      "version": 1,
+      "versionNonce": 351747007,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "Client\n::execute_request()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-2",
+      "originalText": "Client\n::execute_request()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-3-label",
+      "type": "text",
+      "x": 108.99999999999999,
+      "y": 1202.5,
+      "width": 242.00000000000003,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 168713960,
+      "version": 1,
+      "versionNonce": 856250052,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "Tower Service Stack\nRetry → Redirect →\nCookie → Decompression",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-3",
+      "originalText": "Tower Service Stack\nRetry → Redirect →\nCookie → Decompression",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-4-label",
+      "type": "text",
+      "x": 154,
+      "y": 1615,
+      "width": 132,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1022547203,
+      "version": 1,
+      "versionNonce": 241876509,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "HyperService\n::call()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-4",
+      "originalText": "HyperService\n::call()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-5-label",
+      "type": "text",
+      "x": 132,
+      "y": 2005,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1969129134,
+      "version": 1,
+      "versionNonce": 63234002,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "Hyper Client\n(legacy::Client)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-5",
+      "originalText": "Hyper Client\n(legacy::Client)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-6-label",
+      "type": "text",
+      "x": 126.49999999999999,
+      "y": 2405,
+      "width": 187.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2063535281,
+      "version": 1,
+      "versionNonce": 1014451771,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "HttpConnector\n(DNS → TLS → TCP)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-6",
+      "originalText": "HttpConnector\n(DNS → TLS → TCP)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-7-label",
+      "type": "text",
+      "x": 147.5,
+      "y": 2805,
+      "width": 165,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 585945716,
+      "version": 1,
+      "versionNonce": 1496644416,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "hyper::Response\n<Incoming>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-7",
+      "originalText": "hyper::Response\n<Incoming>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-8-label",
+      "type": "text",
+      "x": 143,
+      "y": 3195,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1959799135,
+      "version": 1,
+      "versionNonce": 1308132345,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "PendingRequest\nFuture",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-8",
+      "originalText": "PendingRequest\nFuture",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-9-label",
+      "type": "text",
+      "x": 176,
+      "y": 3575,
+      "width": 88,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 804169882,
+      "version": 1,
+      "versionNonce": 1741832558,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "Response\n::new()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-9",
+      "originalText": "Response\n::new()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-node-10-label",
+      "type": "text",
+      "x": 176,
+      "y": 3967.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 2043684802,
+      "version": 1,
+      "versionNonce": 942512950,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "Response",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-node-10",
+      "originalText": "Response",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-0-label",
+      "type": "text",
+      "x": 162.8,
+      "y": 232.4,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1807884640,
+      "version": 1,
+      "versionNonce": 2011188412,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "builds @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-edge-0",
+      "originalText": "builds @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-1-label",
+      "type": "text",
+      "x": 162.8,
+      "y": 613.1999999999999,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 578582829,
+      "version": 1,
+      "versionNonce": 1548797847,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "invokes @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-edge-1",
+      "originalText": "invokes @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-2-label",
+      "type": "text",
+      "x": 162.8,
+      "y": 1003.9999999999999,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1898513418,
+      "version": 1,
+      "versionNonce": 389019742,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "routes through\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-edge-2",
+      "originalText": "routes through @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-3-label",
+      "type": "text",
+      "x": 140.8,
+      "y": 1434.7999999999997,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1162532367,
+      "version": 1,
+      "versionNonce": 1278052329,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "bottom layer @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-edge-3",
+      "originalText": "bottom layer @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-4-label",
+      "type": "text",
+      "x": 162.8,
+      "y": 1815.6,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 848958412,
+      "version": 1,
+      "versionNonce": 217772184,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": ".call() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-edge-4",
+      "originalText": ".call() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-5-label",
+      "type": "text",
+      "x": 162.8,
+      "y": 2206.4,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1620358505,
+      "version": 1,
+      "versionNonce": 1969400435,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "uses connector\n@depends",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-edge-5",
+      "originalText": "uses connector @depends",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-6-label",
+      "type": "text",
+      "x": 158.4,
+      "y": 2617.2000000000003,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 840137094,
+      "version": 1,
+      "versionNonce": 34558442,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "receives @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-edge-6",
+      "originalText": "receives @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-7-label",
+      "type": "text",
+      "x": 171.6,
+      "y": 3018.0000000000005,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 532160827,
+      "version": 1,
+      "versionNonce": 1263233205,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "polls @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-edge-7",
+      "originalText": "polls @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-8-label",
+      "type": "text",
+      "x": 167.2,
+      "y": 3398.8000000000006,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 136952856,
+      "version": 1,
+      "versionNonce": 505958644,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "awaits @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-edge-8",
+      "originalText": "awaits @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "reqwest-async-client-request-execution-f-edge-9-label",
+      "type": "text",
+      "x": 167.2,
+      "y": 3779.600000000001,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1408310501,
+      "version": 1,
+      "versionNonce": 605360751,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "reqwest-async-client-request-execution-f"
+      },
+      "text": "wraps @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "reqwest-async-client-request-execution-f-edge-9",
+      "originalText": "wraps @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
