@@ -1,0 +1,2265 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 516.216,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 996058172,
+      "version": 1,
+      "versionNonce": 696203976,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "role": "title"
+      },
+      "text": "Rocket Lifecycle: Build, Ignition, and Launch",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Rocket Lifecycle: Build, Ignition, and Launch",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 180,
+      "width": 200,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e3f2fd",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 2052725099,
+      "version": 1,
+      "versionNonce": 1684412517,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-node-0-label"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "node": "build",
+        "ref": "core/lib/src/rocket.rs#Rocket"
+      }
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-1",
+      "type": "rectangle",
+      "x": 540,
+      "y": 20,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 641647578,
+      "version": 1,
+      "versionNonce": 2019943342,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-node-1-label"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "node": "mount",
+        "ref": "core/lib/src/rocket.rs#Rocket::mount"
+      }
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-2",
+      "type": "rectangle",
+      "x": 540,
+      "y": 400,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1582661557,
+      "version": 1,
+      "versionNonce": 1881400127,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-node-2-label"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "node": "attach",
+        "ref": "core/lib/src/rocket.rs#Rocket::attach"
+      }
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-3",
+      "type": "rectangle",
+      "x": 1140,
+      "y": 360,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1231416732,
+      "version": 1,
+      "versionNonce": 1593319848,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-node-3-label"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "node": "fairings",
+        "ref": "core/lib/src/fairing/mod.rs#Fairings"
+      }
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-4",
+      "type": "rectangle",
+      "x": 1140,
+      "y": 20,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f5e9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1340202383,
+      "version": 1,
+      "versionNonce": 2012108393,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-node-4-label"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "node": "router",
+        "ref": "core/lib/src/router/router.rs#Router"
+      }
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-5",
+      "type": "rectangle",
+      "x": 560,
+      "y": 180,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1163651134,
+      "version": 1,
+      "versionNonce": 807754722,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-node-5-label"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "node": "ignite",
+        "ref": "core/lib/src/rocket.rs#Rocket::ignite"
+      }
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-6",
+      "type": "rectangle",
+      "x": 1160,
+      "y": 200,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3e0",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1424501097,
+      "version": 1,
+      "versionNonce": 348276339,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-node-6-label"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "node": "ignited",
+        "ref": "core/lib/src/rocket.rs#Rocket"
+      }
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-7",
+      "type": "rectangle",
+      "x": 1700,
+      "y": 180,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1863714976,
+      "version": 1,
+      "versionNonce": 1219853308,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-node-7-label"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "node": "launch",
+        "ref": "core/lib/src/rocket.rs#Rocket::launch"
+      }
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-8",
+      "type": "rectangle",
+      "x": 2240,
+      "y": 180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffebee",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1740355731,
+      "version": 1,
+      "versionNonce": 659413741,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-node-8-label"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "node": "listener",
+        "state": "external"
+      }
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-9",
+      "type": "rectangle",
+      "x": 2240,
+      "y": 340,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fce4ec",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 324471138,
+      "version": 1,
+      "versionNonce": 1199727958,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-node-9-label"
+        },
+        {
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "node": "orbit",
+        "ref": "core/lib/src/rocket.rs#Rocket"
+      }
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-0",
+      "type": "arrow",
+      "x": 212,
+      "y": 208.66666666666669,
+      "width": 326.432,
+      "height": 156.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 2003128444,
+      "version": 1,
+      "versionNonce": 381331208,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "build",
+          "to": "mount",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -156.66666666666669
+        ],
+        [
+          84.88266666666664,
+          -156.66666666666669
+        ],
+        [
+          145.26999999999998,
+          -156.66666666666669
+        ],
+        [
+          205.65733333333333,
+          -156.66666666666669
+        ],
+        [
+          325.932,
+          -156.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-0",
+        "focus": -0.5222222222222224,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-1",
+        "focus": 0.20000000000000004,
+        "gap": 1.5679999999999836
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-1",
+      "type": "arrow",
+      "x": 212,
+      "y": 268.6666666666667,
+      "width": 326.432,
+      "height": 180.13333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1928114965,
+      "version": 1,
+      "versionNonce": 2049583135,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "build",
+          "to": "attach",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          180.13333333333333
+        ],
+        [
+          73.14933333333335,
+          180.13333333333333
+        ],
+        [
+          199.79066666666665,
+          180.13333333333333
+        ],
+        [
+          263.11133333333333,
+          180.13333333333333
+        ],
+        [
+          325.932,
+          180.13333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-0",
+        "focus": 0.47777777777777786,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-2",
+        "focus": -0.22000000000000003,
+        "gap": 1.5679999999999836
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-2",
+      "type": "arrow",
+      "x": 738.432,
+      "y": 448.8,
+      "width": 404.11199999999985,
+      "height": 23.46666666666664,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 986997818,
+      "version": 1,
+      "versionNonce": 465100174,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "attach",
+          "to": "fairings",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          106.89466666666658,
+          0
+        ],
+        [
+          160.34199999999987,
+          0
+        ],
+        [
+          213.78933333333327,
+          0
+        ],
+        [
+          296.11199999999985,
+          0
+        ],
+        [
+          296.11199999999985,
+          -23.46666666666664
+        ],
+        [
+          403.61199999999985,
+          -23.46666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-2",
+        "focus": 0.22000000000000003,
+        "gap": 1.5679999999999836
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-3",
+        "focus": -0.30666666666666687,
+        "gap": 2.543999999999869
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-3",
+      "type": "arrow",
+      "x": 738.432,
+      "y": 52,
+      "width": 404.11199999999985,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1419386955,
+      "version": 1,
+      "versionNonce": 347530949,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "mount",
+          "to": "router",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          202.05599999999993,
+          0
+        ],
+        [
+          403.61199999999985,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-1",
+        "focus": -0.20000000000000004,
+        "gap": 1.5679999999999836
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-4",
+        "focus": 0.3600000000000004,
+        "gap": 2.543999999999869
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-4",
+      "type": "arrow",
+      "x": 212,
+      "y": 238.66666666666669,
+      "width": 356.432,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1188696960,
+      "version": 1,
+      "versionNonce": 625302364,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "build",
+          "to": "ignite",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          178.216,
+          0
+        ],
+        [
+          355.932,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-0",
+        "focus": -0.02222222222222231,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-5",
+        "focus": 0.022222222222222518,
+        "gap": 8.432000000000016
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-5",
+      "type": "arrow",
+      "x": 728.432,
+      "y": 208.66666666666669,
+      "width": 414.11199999999985,
+      "height": 123.33333333333336,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 46928329,
+      "version": 1,
+      "versionNonce": 516459347,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "ignite",
+          "to": "router",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          42,
+          0
+        ],
+        [
+          42,
+          -99.86666666666669
+        ],
+        [
+          168.85599999999988,
+          -99.86666666666669
+        ],
+        [
+          306.11199999999985,
+          -99.86666666666669
+        ],
+        [
+          306.11199999999985,
+          -123.33333333333336
+        ],
+        [
+          413.61199999999985,
+          -123.33333333333336
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-5",
+        "focus": -0.5222222222222225,
+        "gap": 8.432000000000016
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-4",
+        "focus": -0.30666666666666637,
+        "gap": 2.543999999999869
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-6",
+      "type": "arrow",
+      "x": 728.432,
+      "y": 268.6666666666667,
+      "width": 414.11199999999985,
+      "height": 123.33333333333331,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 530312990,
+      "version": 1,
+      "versionNonce": 213203778,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "ignite",
+          "to": "fairings",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          42,
+          0
+        ],
+        [
+          42,
+          123.33333333333331
+        ],
+        [
+          145.3893333333333,
+          123.33333333333331
+        ],
+        [
+          212.56999999999994,
+          123.33333333333331
+        ],
+        [
+          279.7506666666666,
+          123.33333333333331
+        ],
+        [
+          413.61199999999985,
+          123.33333333333331
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-5",
+        "focus": 0.4777777777777775,
+        "gap": 8.432000000000016
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-3",
+        "focus": 0.3599999999999996,
+        "gap": 2.543999999999869
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-7",
+      "type": "arrow",
+      "x": 728.432,
+      "y": 238.66666666666669,
+      "width": 434.11199999999985,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 665287535,
+      "version": 2,
+      "versionNonce": 675226825,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "ignite",
+          "to": "ignited",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          217.05599999999993,
+          0
+        ],
+        [
+          433.61199999999985,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-5",
+        "focus": -0.022222222222222518,
+        "gap": 8.432000000000016
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-6",
+        "focus": 0.03333333333333271,
+        "gap": 2.543999999999869
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": ""
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-8",
+      "type": "arrow",
+      "x": 1362.5439999999999,
+      "y": 238.66666666666669,
+      "width": 346.432,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1654821060,
+      "version": 1,
+      "versionNonce": 1287148240,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "ignited",
+          "to": "launch",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          173.2159999999999,
+          0
+        ],
+        [
+          345.932,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-6",
+        "focus": -0.03333333333333271,
+        "gap": 2.543999999999869
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-7",
+        "focus": -0.17333333333333262,
+        "gap": 8.975999999999885
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-9",
+      "type": "arrow",
+      "x": 1868.9759999999999,
+      "y": 222,
+      "width": 363.7120000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 837476957,
+      "version": 1,
+      "versionNonce": 231299271,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "launch",
+          "to": "listener",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          181.856,
+          0
+        ],
+        [
+          363.2120000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-7",
+        "focus": -0.15999999999999956,
+        "gap": 8.975999999999885
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-8",
+        "focus": -0.05,
+        "gap": 7.311999999999898
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-10",
+      "type": "arrow",
+      "x": 1868.9759999999999,
+      "y": 255.33333333333334,
+      "width": 363.7120000000002,
+      "height": 126.66666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1713387513,
+      "version": 2,
+      "versionNonce": 1471170755,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rocket-lifecycle-build-ignition-and-laun-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun",
+        "edge": {
+          "from": "launch",
+          "to": "orbit",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          126.66666666666666
+        ],
+        [
+          118.52266666666674,
+          126.66666666666666
+        ],
+        [
+          241.11733333333336,
+          126.66666666666666
+        ],
+        [
+          302.4146666666668,
+          126.66666666666666
+        ],
+        [
+          363.2120000000002,
+          126.66666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-7",
+        "focus": 0.5066666666666664,
+        "gap": 8.975999999999885
+      },
+      "endBinding": {
+        "elementId": "rocket-lifecycle-build-ignition-and-laun-node-9",
+        "focus": -0.05000000000000001,
+        "gap": 7.311999999999898
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": ""
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-0-label",
+      "type": "text",
+      "x": 50.540000000000006,
+      "y": 227.5,
+      "width": 138.92,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1682496534,
+      "version": 1,
+      "versionNonce": 632632826,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "Rocket<Build>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-node-0",
+      "originalText": "Rocket<Build>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-1-label",
+      "type": "text",
+      "x": 570.74,
+      "y": 47.5,
+      "width": 138.52,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 18966475,
+      "version": 1,
+      "versionNonce": 766276933,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "mount(routes)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-node-1",
+      "originalText": "mount(routes)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-2-label",
+      "type": "text",
+      "x": 567.54,
+      "y": 427.5,
+      "width": 144.92000000000002,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 291837404,
+      "version": 1,
+      "versionNonce": 1973766120,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "attach(fairing)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-node-2",
+      "originalText": "attach(fairing)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-3-label",
+      "type": "text",
+      "x": 1182.69,
+      "y": 397.5,
+      "width": 74.62,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 720382393,
+      "version": 1,
+      "versionNonce": 1095105411,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "Fairings",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-node-3",
+      "originalText": "Fairings",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-4-label",
+      "type": "text",
+      "x": 1173.24,
+      "y": 57.5,
+      "width": 173.52,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1412266586,
+      "version": 1,
+      "versionNonce": 1194274606,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "Router<Finalized>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-node-4",
+      "originalText": "Router<Finalized>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-5-label",
+      "type": "text",
+      "x": 604.98,
+      "y": 227.5,
+      "width": 70.03999999999999,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 2122617119,
+      "version": 1,
+      "versionNonce": 1425477049,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "ignite()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-node-5",
+      "originalText": "ignite()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-6-label",
+      "type": "text",
+      "x": 1184.77,
+      "y": 227.5,
+      "width": 150.45999999999998,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 64012080,
+      "version": 1,
+      "versionNonce": 1551381900,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "Rocket<Ignite>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-node-6",
+      "originalText": "Rocket<Ignite>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-7-label",
+      "type": "text",
+      "x": 1742.11,
+      "y": 217.5,
+      "width": 75.78,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1621885,
+      "version": 1,
+      "versionNonce": 1208106087,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "launch()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-node-7",
+      "originalText": "launch()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-8-label",
+      "type": "text",
+      "x": 2281.05,
+      "y": 207.5,
+      "width": 77.9,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1035019630,
+      "version": 1,
+      "versionNonce": 1947265426,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "Listener",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-node-8",
+      "originalText": "Listener",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-node-9-label",
+      "type": "text",
+      "x": 2269.06,
+      "y": 367.5,
+      "width": 141.88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1107574979,
+      "version": 1,
+      "versionNonce": 521371357,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "Rocket<Orbit>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-node-9",
+      "originalText": "Rocket<Orbit>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-0-label",
+      "type": "text",
+      "x": 273.66666666666663,
+      "y": 42,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 2146519577,
+      "version": 1,
+      "versionNonce": 1540423523,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-1-label",
+      "type": "text",
+      "x": 261.93333333333334,
+      "y": 438.8,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 2020927676,
+      "version": 1,
+      "versionNonce": 1401753672,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-2-label",
+      "type": "text",
+      "x": 923.8373333333333,
+      "y": 438.8,
+      "width": 56.768,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1521993515,
+      "version": 1,
+      "versionNonce": 1474258725,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-2",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-3-label",
+      "type": "text",
+      "x": 887.136,
+      "y": 42,
+      "width": 106.704,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1224614902,
+      "version": 1,
+      "versionNonce": 1751283034,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "builds @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-3",
+      "originalText": "builds @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-4-label",
+      "type": "text",
+      "x": 367,
+      "y": 228.66666666666669,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1291248477,
+      "version": 1,
+      "versionNonce": 565111751,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-5-label",
+      "type": "text",
+      "x": 838.3279999999999,
+      "y": 98.8,
+      "width": 117.92,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 82744976,
+      "version": 1,
+      "versionNonce": 1748455020,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "finalize @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-5",
+      "originalText": "finalize @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-6-label",
+      "type": "text",
+      "x": 811.7653333333333,
+      "y": 382,
+      "width": 124.112,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1280102911,
+      "version": 1,
+      "versionNonce": 1731564313,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "on_ignite @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-6",
+      "originalText": "on_ignite @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-7-label",
+      "type": "text",
+      "x": 910.7679999999999,
+      "y": 228.66666666666669,
+      "width": 69.44,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 954281786,
+      "version": 1,
+      "versionNonce": 165441166,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-7",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-8-label",
+      "type": "text",
+      "x": 1512.5439999999999,
+      "y": 228.66666666666669,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 480657105,
+      "version": 1,
+      "versionNonce": 380293595,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-9-label",
+      "type": "text",
+      "x": 2008.9759999999999,
+      "y": 212,
+      "width": 83.712,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 648129684,
+      "version": 1,
+      "versionNonce": 250083040,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "bind @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-9",
+      "originalText": "bind @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rocket-lifecycle-build-ignition-and-laun-edge-10-label",
+      "type": "text",
+      "x": 1952.7786666666666,
+      "y": 372,
+      "width": 69.44,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 476216448,
+      "version": 1,
+      "versionNonce": 1258464860,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rocket-lifecycle-build-ignition-and-laun"
+      },
+      "text": "@returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rocket-lifecycle-build-ignition-and-laun-edge-10",
+      "originalText": "@returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
