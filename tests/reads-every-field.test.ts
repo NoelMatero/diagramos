@@ -30,6 +30,10 @@ beforeAll(async () => { await initEngine(); }, 60_000);
  * `JSON.stringify` or `asdict` is the language's own rather than a function
  * nobody can see into, and a call nobody can see into keeps the red (#255).
  * With none running those stay red, and the test says so.
+ *
+ * TypeScript needs none any more (#468): `JSON`, `Object` and `console` are
+ * names nothing in the file binds, so they are the language's, and a member
+ * of one is outside the repository -- read from the scopes, not asked.
  */
 const COMPILER = true;
 type Shape = [shape: string, from: string, to: string, member: string, needsCompiler?: boolean];
@@ -74,18 +78,18 @@ const TYPESCRIPT: Shapes = {
     ].join("\n\n"),
   },
   right: [
-    ["JSON.stringify", "r.ts#json", "c.ts#Config", "width", COMPILER],
-    ["Object.values", "r.ts#values", "c.ts#Config", "height", COMPILER],
-    ["Object.assign", "r.ts#assign", "c.ts#Config", "width", COMPILER],
+    ["JSON.stringify", "r.ts#json", "c.ts#Config", "width"],
+    ["Object.values", "r.ts#values", "c.ts#Config", "height"],
+    ["Object.assign", "r.ts#assign", "c.ts#Config", "width"],
     ["for..in", "r.ts#forIn", "c.ts#Config", "width"],
     ["spread", "r.ts#spread", "c.ts#Config", "width"],
     ["c['width']", "r.ts#indexed", "c.ts#Config", "width"],
     ["destructuring", "r.ts#destructured", "c.ts#Config", "width"],
-    ["JSON.stringify beside other reads", "r.ts#jsonMixed", "c.ts#Config", "width", COMPILER],
+    ["JSON.stringify beside other reads", "r.ts#jsonMixed", "c.ts#Config", "width"],
     ["structuredClone", "r.ts#clone", "c.ts#Config", "width"],
-    ["console.log(c)", "r.ts#logged", "c.ts#Config", "width", COMPILER],
+    ["console.log(c)", "r.ts#logged", "c.ts#Config", "width"],
     ["own walker (unknown param)", "r.ts#ownWalker", "c.ts#Config", "width"],
-    ["own walker beside other reads", "r.ts#ownMethodLike", "c.ts#Config", "width", COMPILER],
+    ["own walker beside other reads", "r.ts#ownMethodLike", "c.ts#Config", "width"],
   ],
   wrong: [
     ["never touches Config", "r.ts#other", "c.ts#Config", "width"],

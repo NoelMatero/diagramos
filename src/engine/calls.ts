@@ -71,6 +71,7 @@ import {
 } from "./compiled-calls";
 import { declaredBases } from "./conforms";
 import { mayAccuse } from "./licence";
+import { enclosing, lookUp, moduleScope, type Meaning, type Space, type WildcardAnswer } from "./names";
 import { declaresMember, holdersIn } from "./overrides";
 import { each, parseSource, type Language, type Node, type Tree } from "./parse";
 
@@ -531,6 +532,12 @@ export interface Bindings {
   /** Names bound more than once, where the text does not say which wins. */
   ambiguous: Set<string>;
   /**
+   * The part of `ambiguous` that is two imports of one name from two places
+   * (#468). The rest -- an import beside a declaration somewhere in the file
+   * -- is a question of scope, and `names.ts` answers it at the spot.
+   */
+  importedTwice: Set<string>;
+  /**
    * Names this file passes on without binding: `export { x } from "./y"`.
    *
    * Not a binding -- nothing in this file can call `x` -- so it is kept apart
@@ -587,7 +594,7 @@ function lastSegment(path: string): string {
 function bind(into: Bindings, name: string, binding: Binding): void {
   if (into.local.has(name)) { into.ambiguous.add(name); return; }
   const already = into.imported.get(name);
-  if (already && already.specifier !== binding.specifier) { into.ambiguous.add(name); return; }
+  if (already && already.specifier !== binding.specifier) { into.ambiguous.add(name); into.importedTwice.add(name); return; }
   into.imported.set(name, binding);
 }
 
@@ -912,7 +919,7 @@ function readBindings(source: string, language: Language): Bindings | undefined 
   const tree = parseSource(source, language);
   if (!tree) return undefined;
   const bindings: Bindings = {
-    imported: new Map(), local: new Set(), ambiguous: new Set(),
+    imported: new Map(), local: new Set(), ambiguous: new Set(), importedTwice: new Set(),
     forwarded: new Map(), wildcard: false, reExported: [],
   };
   declaredNames(tree.rootNode, bindings.local);
@@ -1075,76 +1082,6 @@ function calleeOfNode(callee: Node): Callee {
   };
 }
 
-/**
- * The names a routine binds for itself: its parameters, and whatever its body
- * sets before using it (#337).
- *
- * Read as *fields*, per docs/reading-a-grammar.md, because a list of node
- * types is the mistake that file exists to describe. Three fields carry every
- * binding in all four grammars:
- *
- *   `name`      TypeScript's `variable_declarator`, Python's
- *               `default_parameter`, a nested `function_declaration`
- *   `pattern`   Rust's `parameter` and `let_declaration`, TypeScript's
- *               `required_parameter`
- *   `left`      Python's `assignment`, which spells the same idea a third way
- *
- * A `type` field is never descended into, and that is not a detail: Rust puts
- * the binding and its type on one node, so a walk that took every identifier
- * under `parameters` would bind `Mystery` from `fn f(x: Mystery)` and then
- * place a call on it.
- *
- * Generous by design. A name collected here that is not really a binding
- * turns a site's reason from `unbound` into `local-callee`, and both leave the
- * body open -- so the cost of over-reading is a ranking that is wrong about
- * the reason, never a verdict that is wrong about the code.
- */
-function boundByRoutine(routine: Node): Set<string> {
-  const bound = new Set<string>();
-  const take = (node: Node): void => {
-    if (node.childCount === 0) {
-      if (NAME_LEAF.test(node.type)) bound.add(node.text);
-      return;
-    }
-    for (const child of children(node)) take(child);
-  };
-  /**
-   * Inside the parameter list every name is a binding, so the leaves are taken
-   * whether a field points at them or not -- Python writes `def f(hook)` as a
-   * bare `identifier` under `parameters` with no field on it at all, which is
-   * the "where there is no field, read the structure" half of the rule.
-   */
-  const walkParameters = (node: Node): void => {
-    const type = node.childForFieldName("type");
-    if (node.childCount === 0) { take(node); return; }
-    for (const child of children(node)) {
-      if (type && child.id === type.id) continue;
-      walkParameters(child);
-    }
-  };
-  /**
-   * Inside the body only a field says "binding". A bare identifier there is a
-   * *use*, and taking those would bind every name the routine mentions --
-   * which would make `local-callee` mean nothing at all.
-   */
-  const walkBody = (node: Node): void => {
-    for (const field of ["name", "pattern", "left"]) {
-      const named = node.childForFieldName(field);
-      if (named) take(named);
-    }
-    const type = node.childForFieldName("type");
-    for (const child of children(node)) {
-      if (type && child.id === type.id) continue;
-      walkBody(child);
-    }
-  };
-  const parameters = routine.childForFieldName("parameters");
-  if (parameters) walkParameters(parameters);
-  const body = routine.childForFieldName("body");
-  if (body) walkBody(body);
-  return bound;
-}
-
 /** 1-based line of a byte offset, counted the way an editor counts. */
 const lineOf = (source: string, offset: number) => source.slice(0, offset).split("\n").length;
 
@@ -1165,7 +1102,7 @@ type Chosen = { name: string; at: { start: number; end: number } };
  * that assigns the local on each side. A function declared inside the
  * routine is the same case with one branch.
  *
- * Read as fields, the way `boundByRoutine` reads bindings. Any one binding
+ * Read as fields, the way `names.ts` reads bindings. Any one binding
  * this cannot follow is the old doubt: a parameter (the caller chooses), a
  * loop or `catch`, a destructuring, `+=`, a `global`, a value that is
  * computed (`table[k]`, `make()`, `obj.fn`). Only the routine's own
@@ -1335,18 +1272,14 @@ const INSPECTS = new Set(["isinstance", "issubclass", "id", "type", "len", "bool
  * call through one is a site of its own. A name bound by the file or the
  * routine (`getattr = ...`, `from x import getattr`) is not the builtin.
  */
-function quietReads(routine: Node, bindings: Bindings): Set<number> {
+function quietReads(routine: Node, bindings: Bindings, side: CallSide): Set<number> {
   const quiet = new Set<number>();
-  if (bindings.wildcard) return quiet;
   /*
-   * Bound here as something else. Not `boundByRoutine`, which takes every
-   * name on the left of an operator and so bound `getattr` in pydantic's
-   * `a and getattr(...)`: a parameter, an assignment, a loop or `as` target.
+   * The built-in, and not something bound here under its name: a parameter,
+   * an assignment, an import, a wildcard that may carry one. `names.ts`
+   * answers it as it does for every other call (#468).
    */
-  const parameters = routine.childForFieldName("parameters")?.text ?? "";
-  const own = (name: string) => bindings.local.has(name) || bindings.imported.has(name)
-    || new RegExp(`\\b${name}\\b`).test(parameters)
-    || new RegExp(`\\b${name}\\s*(:[^=\\n]*)?:?=(?!=)|\\b(as|for|def)\\s+${name}\\b`).test(routine.text);
+  const builtin = (name: string, at: Node) => meaningOf(name, side, bindings, at, "value").at === "outside";
   const visit = (node: Node, handed: boolean): void => {
     const each_ = (child: Node | null, onward: boolean) => { if (child) visit(child, onward); };
     const rest = (onward: boolean, skip?: Node | null) => {
@@ -1358,7 +1291,7 @@ function quietReads(routine: Node, bindings: Bindings): Set<number> {
     switch (node.type) {
       case "call": {
         const callee = node.childForFieldName("function");
-        const name = callee?.type === "identifier" && !own(callee.text) ? callee.text : undefined;
+        const name = callee?.type === "identifier" && builtin(callee.text, node) ? callee.text : undefined;
         if (name !== undefined && READS_BY_NAME.has(name) && !handed) quiet.add(node.id);
         each_(callee, true);
         // `getattr(x, n, default)` hands back `default` itself; what `isinstance` is given goes nowhere.
@@ -1555,13 +1488,14 @@ function arrivesAt(
   if (!opened) return "maybe";
   const bindings = bindingsIn(opened.source, opened.language);
   if (!bindings) return "maybe";
-  if (bindings.ambiguous.has(name)) return "maybe";
+  const top = moduleScope(opened.source, opened.language);
+  if (bindings.importedTwice.has(name) || top?.ambiguous(name)) return "maybe";
 
   const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
   if (!onward) {
     // Declared right here, and here is not the far end. The one place a
     // forwarding search gets to say no.
-    if (bindings.local.has(name) && !bindings.wildcard) return "no";
+    if (declaredAtTop(top, name) && !bindings.wildcard) return "no";
     /*
      * A barrel. `comesToRest` follows these to a unique answer and this only
      * ever looks for a **yes**: a wildcard whose targets do not lead to the
@@ -1627,6 +1561,9 @@ function resolves(
   side: CallSide,
   bindings: Bindings,
   target: { file: string; names: Set<string> },
+  /** The call and its routine's holder, as `placeOf` takes them (#468). */
+  site?: Node,
+  holder?: Node,
 ): "yes" | CallsWithheld | undefined {
   if (callee.kind === "computed") return "computed";
   if (callee.kind === "bare" && REACHES_ANYTHING.has(callee.name)) return "dynamic";
@@ -1648,14 +1585,41 @@ function resolves(
   }
 
   /*
-   * A member of `self` is a member of whatever the routine belongs to, and that
-   * is in this file. Same file, so the name is placed; a different file, and the
-   * text says nothing about whose method it is.
+   * A member of `self` is a member of whatever the routine belongs to, by
+   * `placeOwn`'s rules (#468): that type's own method in this file, a class's
+   * base written here, an object literal's own member. Anything else is not
+   * in the text, and "go to definition" is asked.
    */
-  if (callee.kind === "own") return side.file === target.file ? "yes" : landsOnTarget(callee, side, target);
+  if (callee.kind === "own") {
+    const placed = placeOwn(callee, { ...side, declarationAt: undefined }, holder, site);
+    return "file" in placed && placed.file === target.file ? "yes" : landsOnTarget(callee, side, target);
+  }
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
   if (!bound) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "receiver";
+  /*
+   * What the name means where it is written (#468), before any table is
+   * asked: a local that shadows an import holds a value, a built-in is no
+   * file of the repository, and a name two scopes declare is ambiguous only
+   * where both are in sight.
+   */
+  if (site) {
+    const meaning = meaningOf(bound, side, bindings, site, callee.kind === "bare" && site.type === "macro_invocation" ? "macro" : "value");
+    if (meaning.at === "bound") return callee.kind === "through" ? landsOnTarget(callee, side, target) : "local-callee";
+    if (meaning.at === "outside") {
+      if (callee.kind !== "through") return undefined;
+      return closedToAdditions(bound, callee.name, side) ? undefined : landsOnTarget(callee, side, target);
+    }
+    if (meaning.at === "unknown") return callee.kind === "through" ? landsOnTarget(callee, side, target) : meaning.why;
+    if (meaning.at === "declared") {
+      if (callee.kind === "through") return landsOnTarget(callee, side, target);
+      return side.file === target.file ? "yes" : undefined;
+    }
+    if (meaning.at === "wildcard") {
+      if (callee.kind === "through") return landsOnTarget(callee, side, target);
+      return meaning.file === target.file ? "yes" : undefined;
+    }
+  }
   /*
    * Ambiguous as a name is not ambiguous at one position (#433), which is why
    * `placeOf` already asks there. anyhow's `error.rs` imports `Error` and also
@@ -1667,7 +1631,9 @@ function resolves(
    * for that reason (`wouldHelp`), so leaving it `ambiguous` meant nothing
    * was ever asked -- the first build of this moved no arrow on the bench.
    */
-  if (bindings.ambiguous.has(bound)) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "ambiguous";
+  if ((site ? bindings.importedTwice : bindings.ambiguous).has(bound)) {
+    return callee.kind === "through" ? landsOnTarget(callee, side, target) : "ambiguous";
+  }
 
   const imported = bindings.imported.get(bound);
   if (!imported) {
@@ -1744,12 +1710,14 @@ function callsTo(
   const { routines, declared, unreadable } = routinesNamed(side.source, routine, side.language);
   if (unreadable) return { why: "unreadable" };
   if (routines.length === 0) return { why: declared ? "no-body" : "not-declared" };
+  const tree = parseSource(side.source, side.language);
+  const holders = tree ? holdersIn(tree.rootNode) : new Map<number, Node>();
 
   let why: CallsWithheld | undefined;
   for (const body of routines) {
     if (body.hasError) { why ??= "incomplete"; continue; }
     let found: CallsEvidence | undefined;
-    const quiet = side.language === "python" && !target.hooked ? quietReads(body, bindings) : undefined;
+    const quiet = side.language === "python" && !target.hooked ? quietReads(body, bindings, side) : undefined;
     each(body, (node) => {
       if (found) return;
       /*
@@ -1766,7 +1734,7 @@ function callsTo(
       }
       const callee = calleeOf(node);
       if (!callee) return;
-      const answer = resolves(callee, side, bindings, target);
+      const answer = resolves(callee, side, bindings, target, node, holders.get(body.id));
       if (answer === undefined) return;
       // Read or set by name, and the result runs nowhere: no call to the head (#431).
       if (answer === "dynamic" && quiet?.has(node.id)) return;
@@ -2867,10 +2835,13 @@ function comesToRest(
   if (!opened) return { file };
   const bindings = bindingsIn(opened.source, opened.language);
   if (!bindings) return { file };
-  if (bindings.ambiguous.has(name)) return undefined;
-  // Declared right here, under this name. The one branch that can say what
-  // the far end calls it, because it read the declaration.
-  if (bindings.local.has(name)) return { file, as: name };
+  const top = moduleScope(opened.source, opened.language);
+  if (bindings.importedTwice.has(name) || top?.ambiguous(name)) return undefined;
+  // Declared right here, at the file's top, under this name (#468: a method
+  // of the same name inside a class is not something an import reaches). The
+  // one branch that can say what the far end calls it, because it read the
+  // declaration.
+  if (declaredAtTop(top, name)) return { file, as: name };
 
   const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
   if (!onward) {
@@ -2901,6 +2872,11 @@ function comesToRest(
   return undefined;
 }
 
+/** Whether a file's top declares `name` itself, in any namespace: a routine, a value, a type. */
+function declaredAtTop(top: ReturnType<typeof moduleScope>, name: string): boolean {
+  return top !== undefined && (["value", "type", "macro"] as const).some((space) => top.has(name, space) === "declared");
+}
+
 /**
  * `comesToRest` with its one permissive step taken out.
  *
@@ -2924,8 +2900,9 @@ function declaresOrForwards(
   if (!opened) return undefined;
   const bindings = bindingsIn(opened.source, opened.language);
   if (!bindings) return undefined;
-  if (bindings.ambiguous.has(name)) return undefined;
-  if (bindings.local.has(name)) return { file, as: name };
+  const top = moduleScope(opened.source, opened.language);
+  if (bindings.importedTwice.has(name) || top?.ambiguous(name)) return undefined;
+  if (declaredAtTop(top, name)) return { file, as: name };
   const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
   if (onward) {
     const { files } = filesFor(onward.specifier, opened.imports);
@@ -3010,7 +2987,21 @@ type Rest = { file: string; as?: string };
  * one way for `@calls` and another way for `@builds` is two readers that have to
  * agree and silently would not.
  */
-export function placeName(name: string, side: CallSide, bindings: Bindings): Placement | { why: SiteUnresolved } {
+export function placeName(name: string, side: CallSide, bindings: Bindings, site?: Node): Placement | { why: SiteUnresolved } {
+  /*
+   * Where the caller holds the call, the name is read where it is written
+   * (#468): a parameter or a local of the same name is a value, and a class
+   * declared inside another class is not in a module function's sight. A
+   * built-in stays the doubt it always was here -- a type that is no file.
+   */
+  if (site) {
+    const meaning = meaningOf(name, side, bindings, site, "value");
+    if (meaning.at === "bound") return { why: "local-callee" };
+    if (meaning.at === "unknown") return { why: meaning.why };
+    if (meaning.at === "outside") return { why: "unbound" };
+    if (meaning.at === "declared") return { file: side.file, as: name };
+    if (meaning.at === "wildcard") return { file: meaning.file, as: name };
+  }
   if (bindings.ambiguous.has(name)) return { why: "ambiguous" };
   const imported = bindings.imported.get(name);
   // Declared in this file, under the name written here: nothing renames a
@@ -3217,14 +3208,145 @@ function placeOwn(
   callee: Extract<Callee, { kind: "own" }>,
   side: CallSide,
   holder: Node | undefined,
+  at?: Node,
 ): Placement | { why: SiteUnresolved } {
   const here: Placement = { file: side.file, as: callee.name };
-  if (!holder) return here;
-  if (side.language === "rust") return holder.childForFieldName("type") ? here : { ...here, overridden: true };
+  const ask = (): Placement | { why: SiteUnresolved } =>
+    (side.declarationAt ? placeThroughDefinition(callee.nameAt, side) : undefined) ?? { why: "receiver" };
+  if (side.language === "rust") {
+    if (!holder) return ask();
+    /*
+     * An `impl` is for one type, and `self.len()` is that type's `len` -- only
+     * when an `impl` of the same type in this file declares one (#468). The
+     * rule before was "this file", and an `impl Shape for Vec<u8>` calling
+     * `self.len()` was read as some other type's `len` written beside it: 551
+     * calls the compiler places in the standard library or a crate. Anything
+     * else -- `Vec`'s own, a `Deref` target's, a trait's in scope -- is the
+     * compiler's to say.
+     */
+    if (!holder.childForFieldName("type")) return { ...here, overridden: true };
+    return implDeclares(holder, callee.name, side) ? here : ask();
+  }
+  /*
+   * `this` is fixed by the nearest function that is not an arrow (#468). A
+   * class's method has the class's; an object literal's method has whatever
+   * calls it, which for Vite's plugin hooks is Rollup's context and not the
+   * module -- 83 `this.error()`/`this.resolve()` calls were placed at
+   * same-named functions of the file. So a literal's `this.x()` is the
+   * literal's own `x` when it declares one, and a plain function's is unknown.
+   */
+  if (at && side.language !== "python") {
+    const owner = thisOwner(at, side);
+    if (owner?.kind === "literal") return objectDeclares(owner.node, callee.name) ? here : ask();
+    if (owner?.kind !== "class") return ask();
+  }
+  if (!holder) return ask();
   if (!declaresMember(holder, callee.name)) {
-    return (side.declarationAt ? placeThroughDefinition(callee.nameAt, side) : undefined) ?? { why: "receiver" };
+    if (inheritedHere(holder, callee.name, side) === "yes") return overriddenBelow(holder, callee.name, side) ? { ...here, overridden: true } : here;
+    return ask();
   }
   return overriddenBelow(holder, callee.name, side) ? { ...here, overridden: true } : here;
+}
+
+/** What fixes `this` at a call: a class's method, an object literal's method, or a plain function. */
+function thisOwner(at: Node, side: CallSide): { kind: "class" | "literal" | "function"; node: Node } | undefined {
+  for (const up of enclosing(side.source, side.language, at)) {
+    if (up.type === "arrow_function") continue;
+    if (up.type === "method_definition") {
+      const container = enclosing(side.source, side.language, up)[0];
+      return container?.type === "object" ? { kind: "literal", node: container } : { kind: "class", node: up };
+    }
+    if (up.type === "function_expression" || up.type === "function" || up.type === "generator_function") {
+      const pair = enclosing(side.source, side.language, up)[0];
+      const literal = pair?.type === "pair" ? enclosing(side.source, side.language, pair)[0] : undefined;
+      return literal?.type === "object" ? { kind: "literal", node: literal } : { kind: "function", node: up };
+    }
+    if (up.type === "function_declaration" || up.type === "generator_function_declaration") return { kind: "function", node: up };
+    if (up.type === "class_static_block" || up.type === "public_field_definition" || up.type === "field_definition") {
+      return { kind: "class", node: up };
+    }
+  }
+  return undefined;
+}
+
+/** Whether an object literal declares `member`: `{ step() {} }`, `{ step: () => .. }`. */
+function objectDeclares(literal: Node, member: string): boolean {
+  for (let index = 0; index < literal.childCount; index += 1) {
+    const one = literal.child(index);
+    const key = one?.childForFieldName("name") ?? one?.childForFieldName("key");
+    if (key && key.text.replace(/^["']|["']$/g, "") === member) return true;
+    if (one?.type === "shorthand_property_identifier" && one.text === member) return true;
+  }
+  return false;
+}
+
+/** The type an `impl` is for, without its generics or references: `Wrap` in `impl<T> Trait for &Wrap<T>`. */
+function implTypeName(impl: Node): string | undefined {
+  let type = impl.childForFieldName("type");
+  for (let step = 0; type && step < 4; step += 1) {
+    if (type.type === "type_identifier" || type.type === "primitive_type") return type.text;
+    if (type.type === "scoped_type_identifier") return type.childForFieldName("name")?.text;
+    type = type.childForFieldName("type") ?? null;
+  }
+  return undefined;
+}
+
+/**
+ * Whether an `impl` of the same type as `holder`, anywhere in this file,
+ * declares `method` -- or `holder` implements a trait this file declares
+ * whose default body is `method`. Either is where `self.method()` runs; a
+ * type's inherent method wins over a trait's, and both are written here.
+ */
+function implDeclares(holder: Node, method: string, side: CallSide): boolean {
+  const type = implTypeName(holder);
+  const tree = parseSource(side.source, side.language);
+  if (!type || !tree) return false;
+  const trait = holder.childForFieldName("trait");
+  const traitName = trait ? (trait.childForFieldName("name") ?? trait.childForFieldName("type") ?? trait).text : undefined;
+  let found = false;
+  each(tree.rootNode, (node) => {
+    if (found) return;
+    const own = node.type === "impl_item" && implTypeName(node) === type;
+    const defaults = node.type === "trait_item" && traitName !== undefined && node.childForFieldName("name")?.text === traitName;
+    if (!own && !defaults) return;
+    const body = node.childForFieldName("body");
+    if (!body) return;
+    for (let index = 0; index < body.childCount; index += 1) {
+      const item = body.child(index);
+      if (item?.type === "function_item" && item.childForFieldName("name")?.text === method) found = true;
+    }
+  });
+  return found;
+}
+
+/**
+ * Whether `member` comes to `holder` from a base class declared in this same
+ * file, which is then where it runs (#468). Followed through bases written
+ * here only: a base imported from elsewhere, or one that cannot be read, ends
+ * the search, because a base it could not see may be the one declaring it.
+ */
+function inheritedHere(holder: Node, member: string, side: CallSide, depth = 0): "yes" | "no" | "unknown" {
+  if (depth >= FOLLOW_LIMIT) return "unknown";
+  const name = holder.childForFieldName("name");
+  if (!name || name.childCount !== 0) return "unknown";
+  const read = declaredBases(side.source, name.text, side.language);
+  if (!("bases" in read) || read.doubt) return "unknown";
+  const tree = parseSource(side.source, side.language);
+  if (!tree) return "unknown";
+  for (const base of read.bases) {
+    // `object` declares nothing a call names; any other base written
+    // nowhere here is somebody else's, and may be the one declaring it.
+    if (base.name === "object" && side.language === "python") continue;
+    const classes: Node[] = [];
+    each(tree.rootNode, (node) => {
+      if (/class_(declaration|definition)$|^class$/.test(node.type) && node.childForFieldName("name")?.text === base.name) classes.push(node);
+    });
+    if (classes.length !== 1) return "unknown";
+    if (declaresMember(classes[0]!, member)) return "yes";
+    const above = inheritedHere(classes[0]!, member, side, depth + 1);
+    if (above !== "no") return above;
+  }
+  return "no";
 }
 
 /**
@@ -3243,24 +3365,22 @@ function placeOf(
   side: CallSide,
   bindings: Bindings,
   /**
-   * The names the enclosing routine binds -- `boundByRoutine`. Optional, and
-   * absent only where there is no routine to ask: `resolves` answers per ask
-   * and never holds a body node. A site left `unbound` there rather than
-   * `local-callee` reports the same openness under a coarser word, which is
-   * the one asymmetry between the two readers and is why it is written down.
+   * The call itself, where the name is looked up from (#468): what a name
+   * means depends on the scopes around the spot it is written. Absent where
+   * nobody holds a node, and the file's top is asked instead.
    */
-  scope?: ReadonlySet<string>,
+  site?: Node,
   /**
    * The class, `impl` or trait the enclosing routine is a member of --
    * `holdersIn` -- for an `own` call to be judged against (#353). Absent
-   * where there is no routine to ask, as `scope` is.
+   * where there is no routine to ask, as `site` is.
    */
   holder?: Node,
 ): Placement | { why: SiteUnresolved } {
   if (callee.kind === "computed") return { why: "computed" };
   if (REACHES_ANYTHING.has(callee.name)) return { why: "dynamic" };
 
-  if (callee.kind === "own") return placeOwn(callee, side, holder);
+  if (callee.kind === "own") return placeOwn(callee, side, holder, site);
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
   const at = callee.kind === "through" ? callee.at : undefined;
@@ -3295,15 +3415,63 @@ function placeOf(
   // look up. Dynamic dispatch, and the reader cannot say whose method it is --
   // unless a resolver can, from the expression itself rather than its name.
   if (!bound) return throughChecker();
-  if (bindings.ambiguous.has(bound)) {
-    // Ambiguous as a *value* name (declared twice over) does not mean the
-    // resolver is confused -- it asked the compiler at one exact position,
-    // which binding governs there is not in doubt for it the way it is for
-    // a linear text read.
-    return callee.kind === "through" ? throughChecker() : { why: "ambiguous" };
+
+  if (callee.kind === "through") {
+    const member = memberOfType(callee, side, site, holder);
+    if (member) return member;
+  }
+  const meaning = meaningOf(bound, side, bindings, site, callee.kind === "bare" && site?.type === "macro_invocation" ? "macro" : "value");
+  switch (meaning.at) {
+    case "unknown":
+      // Ambiguous as a *value* name (declared twice over) does not mean the
+      // resolver is confused -- it asked the compiler at one exact position,
+      // which binding governs there is not in doubt for it the way it is for
+      // a linear text read.
+      return callee.kind === "through" ? throughChecker() : { why: meaning.why };
+    case "bound":
+      /*
+       * A parameter or a local holds a *value*, and `unbound` would send a
+       * reader looking for an import that is not missing (#337).
+       */
+      return callee.kind === "through" ? throughChecker() : { why: "local-callee" };
+    case "outside":
+      /*
+       * A name the language or the host put here (#337, #468): `isinstance`,
+       * `Number`, `Ok`, `setTimeout`. Nothing imported it because nothing has
+       * to, and there is no file in any repository it can reach. Placed
+       * outside the repository, which lets a body close and can never be
+       * what an arrow reaches. A member of one -- `Math.max`, `str.join` --
+       * is outside too, where the language closes the type to additions.
+       */
+      if (callee.kind !== "through") return { file: EXTERNAL_RECEIVER };
+      return closedToAdditions(bound, callee.name, side) ? { file: EXTERNAL_RECEIVER } : throughChecker();
+    case "declared":
+      /*
+       * Declared here. A bare name means this file's own; a member reached
+       * *through* a local value is that value's method, and its type is not in
+       * the text even though the name it is bound to is -- unless a resolver
+       * says what it is.
+       */
+      if (callee.kind === "through") return throughChecker();
+      if (!runsWhenCalled(side.source, callee.name, side.language)) return { why: "local-callee" };
+      return { file: side.file, as: callee.name };
+    case "wildcard":
+      // Brought in by a wildcard from the one file that declares it.
+      if (callee.kind === "through") return throughChecker();
+      {
+        const far = meaning.file === side.file ? side : side.open?.(meaning.file);
+        if (far && !runsWhenCalled(far.source, callee.name, far.language)) return { why: "local-callee" };
+      }
+      return { file: meaning.file, as: callee.name };
+    case "imported":
   }
 
   const imported = bindings.imported.get(bound);
+  // Read at the spot, only two imports of the name are a collision left to see.
+  const collides = site ? bindings.importedTwice : bindings.ambiguous;
+  if (!imported || collides.has(bound)) {
+    return callee.kind === "through" ? throughChecker() : { why: collides.has(bound) ? "ambiguous" : "unbound" };
+  }
   /*
    * `x.foo()` where `x` happens to be imported: only a question about
    * `imported.specifier`'s own file when `x` is a *namespace* import
@@ -3319,47 +3487,7 @@ function placeOf(
    * That fallback is right for a genuine namespace; it was never asked
    * whether this was one.
    */
-  if (imported && callee.kind === "through" && !imported.namespace) return throughChecker();
-  if (!imported) {
-    if (!bindings.local.has(bound)) {
-      if (callee.kind !== "through") {
-        /*
-         * The routine's own binding first: a parameter or a local holds a
-         * *value*, and `unbound` would send a reader looking for an import
-         * that is not missing (#337).
-         */
-        if (scope?.has(bound)) return { why: "local-callee" };
-        /*
-         * Before the doubt: is this a name the *language* put here (#337)?
-         * `isinstance`, `Number`, `Ok` -- nothing imported them because
-         * nothing has to, and there is no file in any repository they could
-         * reach. Placed outside the repository, which lets a body close and
-         * can never be what an arrow reaches.
-         *
-         * Not while a wildcard import is in the file. That brings in names
-         * nothing can enumerate, one of which may be a `list` of the
-         * repository's own, and which one the call means is then not in the
-         * text -- the doubt `throughWildcards` already refuses on.
-         */
-        if (!bindings.wildcard && providedByLanguage(bound, side.language)) {
-          return { file: EXTERNAL_RECEIVER };
-        }
-        return { why: "unbound" };
-      }
-      return throughChecker();
-    }
-    /*
-     * Declared here. A bare name means this file's own; a member reached
-     * *through* a local value is that value's method, and its type is not in
-     * the text even though the name it is bound to is -- unless a resolver
-     * says what it is.
-     */
-    if (callee.kind !== "through") {
-      if (!runsWhenCalled(side.source, callee.name, side.language)) return { why: "local-callee" };
-      return { file: side.file, as: callee.name };
-    }
-    return throughChecker();
-  }
+  if (callee.kind === "through" && !imported.namespace) return throughChecker();
 
   const { files, known } = filesFor(imported.specifier, side.imports);
   if (files.size === 0) {
@@ -3395,6 +3523,156 @@ function placeOf(
   }
   if (settled) return settled;
   return callee.kind === "through" ? throughChecker() : { why: "elsewhere" };
+}
+
+/**
+ * What a name means at a call, by `names.ts` (#468) -- or, with no call to
+ * stand at, by what the file's top binds, which is what every reader asked
+ * before there was a lookup.
+ */
+function meaningOf(name: string, side: CallSide, bindings: Bindings, site: Node | undefined, space: "value" | "macro"): Meaning {
+  if (site) {
+    return lookUp(name, site, {
+      source: side.source, language: side.language, wildcard: (specifier, wanted, space) => wildcardBrings(specifier, wanted, space, side),
+    }, space);
+  }
+  if (bindings.ambiguous.has(name)) return { at: "unknown", why: "ambiguous" };
+  if (bindings.imported.has(name)) return { at: "imported" };
+  if (bindings.local.has(name)) return { at: "declared" };
+  if (!bindings.wildcard && providedByLanguage(name, side.language)) return { at: "outside" };
+  return { at: "unknown", why: "unbound" };
+}
+
+/**
+ * What a wildcard brings in, for one name (#468). Into the repository it is
+ * opened and read, under the same budget as any re-export; into a Rust crate
+ * outside it, it can bring nothing of the repository's.
+ */
+function wildcardBrings(specifier: string, name: string, space: Space, side: CallSide): WildcardAnswer {
+  const { files, known } = filesFor(specifier, side.imports);
+  if (files.size === 0) {
+    if (side.language !== "rust" || !known) return "unknown";
+    const first = specifier.replace(/^::/, "").split("::")[0] ?? "";
+    if (/^(crate|self|super|Self)$/.test(first)) return "unknown";
+    // A module of this file's own, written `use parser::*` (2018 paths).
+    if (new RegExp(`\\bmod\\s+${escapeName(first)}\\b`).test(side.source)) return "unknown";
+    return "outside";
+  }
+  let answer: WildcardAnswer = "lacks";
+  for (const file of files) {
+    const one = exportsName(name, space, file, side, new Set(), 0);
+    if (one === "unknown") return one;
+    if (typeof one === "object") {
+      if (typeof answer === "object" && answer.has !== one.has) return "unknown";
+      answer = one;
+    } else if (one === "outside" && answer === "lacks") answer = "outside";
+  }
+  return answer;
+}
+
+/** Whether a file the repository holds puts `name` in reach of a wildcard over it. */
+function exportsName(name: string, space: Space, file: string, side: CallSide, seen: Set<string>, depth: number): WildcardAnswer {
+  if (seen.has(file) || depth >= FOLLOW_LIMIT) return "unknown";
+  seen.add(file);
+  const opened = side.open?.(file);
+  if (!opened) return "unknown";
+  const top = moduleScope(opened.source, opened.language);
+  if (!top || top.limited) return "unknown";
+  const has = top.has(name, space);
+  if (has) return { has: has === "declared" ? file : undefined };
+  let answer: WildcardAnswer = "lacks";
+  for (const specifier of top.wildcards) {
+    const { files, known } = filesFor(specifier, opened.imports);
+    if (files.size === 0) {
+      const first = specifier.split("::")[0] ?? "";
+      if (opened.language === "rust" && known && !/^(crate|self|super|Self)$/.test(first)) { answer = "outside"; continue; }
+      return "unknown";
+    }
+    for (const next of files) {
+      const one = exportsName(name, space, next, side, seen, depth + 1);
+      if (one === "unknown" || typeof one === "object") return one;
+      if (one === "outside") answer = "outside";
+    }
+  }
+  return answer;
+}
+
+/**
+ * `Type::method()` and `Self::method()`, read as the type's own where the
+ * text says which (#468): an `impl` of that type in this file declares the
+ * method. Undefined leaves the call to the rest of `placeOf`.
+ */
+function memberOfType(
+  callee: Extract<Callee, { kind: "through" }>,
+  side: CallSide,
+  site: Node | undefined,
+  holder: Node | undefined,
+): Placement | undefined {
+  if (side.language !== "rust" || !site) return undefined;
+  let type: string | undefined;
+  if (callee.through === "Self") type = holder?.type === "impl_item" ? implTypeName(holder) : undefined;
+  else if (/^[A-Z]\w*$/.test(callee.through)) {
+    // The type this spot sees by that name is one this file declares.
+    const meaning = lookUp(callee.through, site, {
+      source: side.source, language: side.language, wildcard: (specifier, wanted, space) => wildcardBrings(specifier, wanted, space, side),
+    }, "type");
+    if (meaning.at === "declared") type = callee.through;
+  }
+  if (!type) return undefined;
+  const tree = parseSource(side.source, side.language);
+  if (!tree) return undefined;
+  /*
+   * An inherent `impl` only. A type's own method wins over any trait's, so a
+   * trait `impl` here declaring `state_len` says nothing about
+   * `OwnedDFA::state_len(self)` when `OwnedDFA` has its own in another file
+   * -- regex's remapper is exactly that, and placing it here was wrong.
+   */
+  let found = false;
+  each(tree.rootNode, (node) => {
+    if (found || node.type !== "impl_item" || node.childForFieldName("trait") || implTypeName(node) !== type) return;
+    const body = node.childForFieldName("body");
+    for (let index = 0; body && index < body.childCount; index += 1) {
+      const item = body.child(index);
+      if (item?.type === "function_item" && item.childForFieldName("name")?.text === callee.name) found = true;
+    }
+  });
+  return found ? { file: side.file, as: callee.name } : undefined;
+}
+
+const RUST_CLOSED_TYPES = new Set(["Box", "String", "Vec", "Option", "Result"]);
+const PRELUDE_TRAIT_METHODS = new Set([
+  "from", "into", "try_from", "try_into", "default", "clone", "clone_from", "eq", "ne", "cmp", "partial_cmp",
+  "lt", "le", "gt", "ge", "max", "min", "clamp", "hash", "fmt", "to_string", "to_owned", "next", "next_back",
+  "extend", "from_iter", "into_iter", "as_ref", "as_mut", "drop", "borrow", "borrow_mut", "deref", "deref_mut",
+  "call", "call_mut", "call_once", "from_str",
+]);
+
+/**
+ * Whether no code in the repository can add `member` to the built-in `type`
+ * (#468). ECMAScript's namespaces and Python's built-in types are closed to
+ * additions from outside; Rust's are not -- any trait in scope can lend
+ * `Vec` a method -- so there it holds only when neither this file nor any
+ * file of the repository it imports from declares a function of that name.
+ * A host object -- `window`, `globalThis` -- is a bag anybody may write to.
+ */
+function closedToAdditions(type: string, member: string, side: CallSide): boolean {
+  if (side.language === "python") return true;
+  if (side.language !== "rust") return type !== "globalThis" && providedByLanguage(type, side.language);
+  /*
+   * A prelude trait's method is implemented wherever the crate likes:
+   * `Vec::from(mine)` runs an `impl From<Mine> for Vec<u8>` written in any
+   * file, and `Default::default()` runs whichever type's is wanted. Only a
+   * type's own methods, on the types that have nothing but.
+   */
+  if (!RUST_CLOSED_TYPES.has(type) || PRELUDE_TRAIT_METHODS.has(member)) return false;
+  const declares = new RegExp(`\\bfn\\s+${escapeName(member)}\\b`);
+  if (declares.test(side.source)) return false;
+  for (const one of side.imports) {
+    if (!one.file) continue;
+    const opened = side.open?.(one.file);
+    if (!opened || declares.test(opened.source)) return false;
+  }
+  return true;
 }
 
 /** One call site as `callSitesIn` lists it, placed or refused. */
@@ -3489,10 +3767,9 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
      * another's.
      */
     if (only !== undefined && name.text !== only) { bodies.push(body); return; }
-    const scope = boundByRoutine(node);
     holders ??= holdersIn(tree.rootNode);
     const holder = holders.get(node.id);
-    const quiet = side.language === "python" ? quietReads(node, bindings) : undefined;
+    const quiet = side.language === "python" ? quietReads(node, bindings, side) : undefined;
     each(node, (inner) => {
       /*
        * A macro's arguments are loose tokens rather than a tree, so a call
@@ -3512,7 +3789,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
       }
       const callee = calleeOf(inner) ?? constructedBy(inner) ?? renderedBy(inner);
       if (!callee) return;
-      const where = placeOf(callee, side, bindings, scope, holder);
+      const where = placeOf(callee, side, bindings, inner, holder);
       if ("why" in where && where.why === "dynamic" && quiet?.has(inner.id)) {
         body.sites.push({ ...siteOf(callee, side.source, inner, { file: EXTERNAL_RECEIVER }), byName: true });
         return;
@@ -3528,7 +3805,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
       if (chosen) {
         for (const choice of chosen) {
           const held: Callee = { kind: "bare", name: choice.name, nameAt: choice.at };
-          body.sites.push(siteOf(held, side.source, inner, placeOf(held, side, bindings, scope, holder)));
+          body.sites.push(siteOf(held, side.source, inner, placeOf(held, side, bindings, inner, holder)));
         }
         return;
       }
