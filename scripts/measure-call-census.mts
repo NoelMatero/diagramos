@@ -48,7 +48,9 @@
  * repository; a line declaring a variable, a parameter, a field or an import
  * is where a value is held, not what runs.
  *
- * Test files and test folders are left out: no bench board is drawn from them,
+ * Test files and folders, Rust `#[cfg(test)]` modules, and bundles, docs and
+ * static assets (`build`, `docs`, `static`, `assets`, `*.min.js`) are left out:
+ * no bench board is drawn from them,
  * and they would roughly double the run.
  *
  * ## Running it
@@ -194,12 +196,20 @@ interface Summary {
   diagnostics: string[];
 }
 
+const TEST_DIRS = new Set(["test", "tests", "__tests__", "__test__", "testing", "spec", "__mocks__", "__testfixtures__", "__fixtures__", "fixtures"]);
+/**
+ * Folders that hold bundles, vendored copies and documentation sites rather
+ * than a project's own source: zx's `build/*.cjs`, MobX's `docs/assets`, a
+ * Django app's `static/` jQuery, pip's `_vendor` copies of other libraries. No bench board draws from them, and in the
+ * first run they made a quarter of holdout-b's TypeScript calls.
+ */
+const GENERATED_DIRS = new Set(["build", "docs", "static", "assets", "_vendor"]);
 const isTestPath = (rel: string): boolean => {
   const parts = rel.split(path.sep);
   const base = parts[parts.length - 1]!;
-  if (parts.slice(0, -1).some((one) => ["test", "tests", "__tests__", "__test__", "testing", "spec", "__mocks__", "__testfixtures__", "__fixtures__", "fixtures"].includes(one))) return true;
+  if (parts.slice(0, -1).some((one) => TEST_DIRS.has(one) || GENERATED_DIRS.has(one))) return true;
   return /\.(test|spec)\.[cm]?[jt]sx?$/.test(base) || /^test_.*\.py$|_test\.py$|^conftest\.py$/.test(base)
-    || /_tests?\.rs$/.test(base) || base.endsWith(".d.ts");
+    || /(^|_)tests?\.rs$/.test(base) || base.endsWith(".d.ts") || /\.min\.[cm]?js$/.test(base);
 };
 
 /** The leaf a call names, by the same rules `calleeOf` reads it with, or undefined for a computed callee. */
@@ -289,22 +299,35 @@ function callsByName(root: Node): Map<number, Node> {
   return out;
 }
 
-/** Line spans (1-based) of `#[cfg(test)] mod ... { }` blocks, at any depth. */
+/** Whether a `macro_rules!` definition spans this line (1-based). */
+function insideMacroDefinition(root: Node, line: number): boolean {
+  const row = line - 1;
+  const visit = (n: Node): boolean => {
+    if (n.startPosition.row > row || n.endPosition.row < row) return false;
+    if (n.type === "macro_definition") return true;
+    for (let i = 0; i < n.namedChildCount; i++) if (visit(n.namedChild(i)!)) return true;
+    return false;
+  };
+  return visit(root);
+}
+
+/** Line spans (1-based) of `#[cfg(test)] mod ... { }` blocks and `#[test]` functions, at any depth. */
 function rustTestModules(root: Node): Array<[number, number]> {
   const out: Array<[number, number]> = [];
   const visit = (n: Node): void => {
     for (let i = 0; i < n.namedChildCount; i++) {
       const c = n.namedChild(i)!;
-      if (c.type !== "mod_item") continue;
+      if (c.type !== "mod_item" && c.type !== "function_item") continue;
+      const marks = c.type === "mod_item" ? /cfg\(\s*test\s*\)/ : /^#\[(\w+::)*test\b/;
       for (let j = i - 1; j >= 0; j--) {
         const before = n.namedChild(j)!;
         if (before.type !== "attribute_item" && before.type !== "line_comment" && before.type !== "block_comment") break;
-        if (before.type === "attribute_item" && /cfg\(\s*test\s*\)/.test(before.text)) {
+        if (before.type === "attribute_item" && marks.test(before.text)) {
           out.push([c.startPosition.row + 1, c.endPosition.row + 1]);
           break;
         }
       }
-      const body = c.childForFieldName("body");
+      const body = c.type === "mod_item" ? c.childForFieldName("body") : null;
       if (body) visit(body);
     }
   };
@@ -661,6 +684,16 @@ async function measureOne(setName: string, project: string): Promise<void> {
     const lineText = (read(got.file) ?? "").split("\n")[got.line - 1] ?? "";
     const mentioned = name !== "" && new RegExp(`(?<![\\w$])${name.replace(/[$]/g, "\\$")}(?![\\w$])`).test(lineText);
     if (!pick && !mentioned) pick = here.find((one) => one.lands !== "value") ?? here[0];
+    /*
+     * Rust writes routines a person never typed: `#[derive(Clone)]` writes
+     * `clone`, a `macro_rules!` body or an invocation like
+     * `top_level_handler_fn!(get, GET)` writes `get`. "Go to definition" lands
+     * on that line, and the routine is the repo's, so it is a placement.
+     */
+    if (!pick && lang === "rust") {
+      if (/^\s*#\[derive\(/.test(lineText)) pick = { name, lands: "routine" };
+      else if (/^\s*[\w:]+!\s*[([{]/.test(lineText) || insideMacroDefinition(target, got.line)) pick = { name, lands: "macro" };
+    }
     if (!pick) return { kind: "repo", file: got.file, line: got.line, lands: "value" };
     return { kind: "repo", file: got.file, line: got.line, name: pick.name, lands: pick.lands, ...(pick.holder ? { holder: pick.holder } : {}) };
   };
