@@ -55,7 +55,7 @@
  * and the refusals this must keep are in `tests/engine-names.test.ts`.
  */
 import { providedByHost, providedByLanguage } from "./builtins";
-import { parseSource, type Language, type Node, type Tree } from "./parse";
+import { each, parseSource, type Language, type Node, type Tree } from "./parse";
 
 /**
  * What a name means at one spot.
@@ -118,8 +118,6 @@ interface Scope {
   elsewhere: Set<string>;
   /** Python: a class body, visible only to code directly in it. */
   classBody: boolean;
-  /** Rust: a function item, which ends the locals an inner item can see. */
-  itemBoundary: boolean;
 }
 
 /** Everything one tree's lookups need, built once per tree. */
@@ -148,9 +146,21 @@ function indexOf(tree: Tree): Index {
   return made;
 }
 
+/**
+ * The tree a node belongs to. Not `parseSource` again: reading one call can
+ * open other files, the parse cache can let this one go meanwhile, and a
+ * fresh tree has none of the old one's nodes -- every lookup from a call in
+ * it then climbed nowhere and answered "not known" (Nest's `forwardRef`,
+ * written in a constructor's parameter decorator, after its import was
+ * followed through three barrels).
+ */
+function treeOf(node: Node, source: string, language: Language): Tree | undefined {
+  return (node as Node & { tree?: Tree }).tree ?? parseSource(source, language);
+}
+
 /** The nodes enclosing `node`, innermost first, the root last. */
 export function enclosing(source: string, language: Language, node: Node): Node[] {
-  const tree = parseSource(source, language);
+  const tree = treeOf(node, source, language);
   if (!tree) return [];
   const { parents } = indexOf(tree);
   const out: Node[] = [];
@@ -181,7 +191,7 @@ function fielded(node: Node): Array<{ node: Node; field: string | null }> {
 function emptyScope(): Scope {
   return {
     values: new Map(), lets: new Map(), macros: new Set(), types: new Set(), twice: new Set(), wildcards: [],
-    elsewhere: new Set(), classBody: false, itemBoundary: false,
+    elsewhere: new Set(), classBody: false,
   };
 }
 
@@ -470,7 +480,7 @@ function pyBlock(node: Node, scope: Scope, local: boolean): void {
         // Their own scope -- except that a walrus inside a comprehension binds
         // in the enclosing function. Rare, and binding it here is the generous
         // direction: a value the routine holds.
-        each_(child, (inner) => {
+        each(child, (inner) => {
           if (inner.type === "named_expression") pyTarget(inner.childForFieldName("name"), (n) => put(scope, n, "bound"));
         });
         continue;
@@ -506,12 +516,6 @@ function pyBlock(node: Node, scope: Scope, local: boolean): void {
     }
     if (child.childCount > 0) pyBlock(child, scope, local);
   }
-}
-
-/** `each` without importing it twice; a local walk that can be cut short. */
-function each_(node: Node, visit: (node: Node) => void): void {
-  visit(node);
-  for (const child of kids(node)) each_(child, visit);
 }
 
 function pyScope(node: Node): Scope | null {
@@ -646,7 +650,6 @@ function rustScope(node: Node): Scope | null {
     case "function_item":
     case "closure_expression": {
       const scope = emptyScope();
-      scope.itemBoundary = node.type === "function_item";
       const list = node.childForFieldName("parameters");
       if (list) {
         for (const one of kids(list)) {
@@ -680,7 +683,7 @@ function rustScope(node: Node): Scope | null {
 function importNames(node: Node, scope: Scope, language: "ts" | "python" | "rust"): void {
   if (language === "ts") {
     if (node.type !== "import_statement") return;
-    each_(node, (part) => {
+    each(node, (part) => {
       if (part.type === "import_specifier") {
         const bound = part.childForFieldName("alias") ?? part.childForFieldName("name");
         if (bound) put(scope, bound.text, "imported");
@@ -779,7 +782,7 @@ function inlineModule(index: Index, node: Node): boolean {
 /** The `enum` this file declares under `name`, and its variants -- for `use Kind::*`. */
 function variantsOf(root: Node, name: string): Set<string> | undefined {
   let found: Set<string> | undefined;
-  each_(root, (node) => {
+  each(root, (node) => {
     if (found || node.type !== "enum_item" || node.childForFieldName("name")?.text !== name) return;
     found = new Set();
     const body = node.childForFieldName("body");
@@ -818,7 +821,7 @@ export interface LookUp {
  * `Type::make()` in the second.
  */
 export function lookUp(name: string, site: Node, side: LookUp, space: Space = "value"): Meaning {
-  const tree = parseSource(side.source, side.language);
+  const tree = treeOf(site, side.source, side.language);
   if (!tree) return { at: "unknown", why: "unbound" };
   const index = indexOf(tree);
   const language = side.language;
@@ -851,7 +854,7 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
       const guarded = at.childForFieldName("consequence") ?? at.childForFieldName("body");
       if (condition && guarded && below.id === guarded.id) {
         const lets: Node[] = [];
-        each_(condition, (inner) => { if (inner.type === "let_condition") lets.push(inner); });
+        each(condition, (inner) => { if (inner.type === "let_condition") lets.push(inner); });
         for (const one of lets) {
           const found = scopeAt(index, one, language);
           const hit = found?.values.get(name);
@@ -909,7 +912,6 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
           return { at: "wildcard", file: carried };
         }
       }
-      if (scope.itemBoundary) pastItem = true;
     }
     // A Rust module sees none of the module around it; `use super::*` is how it would.
     if (language === "rust" && inlineModule(index, at)) {
@@ -966,10 +968,25 @@ export function moduleScope(
 } | undefined {
   const tree = parseSource(source, language);
   if (!tree) return undefined;
-  const scope = scopeAt(indexOf(tree), tree.rootNode, language);
+  const index = indexOf(tree);
+  const scope = scopeAt(index, tree.rootNode, language);
   if (!scope) return undefined;
+  /*
+   * Rust writes modules inside a file too -- `pub mod sinks { pub struct UTF8 }`
+   * in ripgrep's `sink.rs` -- and a path through one ends in this file. What
+   * they declare is this file's to answer for.
+   */
+  const inner: Scope[] = [];
+  if (language === "rust") {
+    each(tree.rootNode, (node) => {
+      if (inlineModule(index, node)) { const one = scopeAt(index, node, language); if (one) inner.push(one); }
+    });
+  }
+  const declaredInside = (name: string, space: Space) => inner.some((one) =>
+    space === "type" ? one.types.has(name) : space === "macro" ? one.macros.has(name) : one.values.get(name)?.entry === "declared");
   return {
     has: (name, space) => {
+      if (!scope.values.has(name) && !scope.types.has(name) && !scope.macros.has(name) && declaredInside(name, space)) return "declared";
       const hit = scope.values.get(name);
       if (hit?.entry === "imported" || hit && scope.twice.has(name)) return "other";
       if (space === "macro") return scope.macros.has(name) ? "declared" : undefined;

@@ -271,6 +271,15 @@ describe("Rust's order and modules", () => {
 });
 
 describe("re-exports", () => {
+  it("Rust: a module written inside the far file is that file's", () => {
+    const sink = "pub mod sinks {\n    pub struct UTF8<F>(pub F);\n}\n";
+    const side = {
+      open: (file: string) => file === "sink.rs" ? { source: sink, language: "rust" as const, imports: [] } : undefined,
+      imports: [{ specifier: "crate::sink", file: "sink.rs" }, { specifier: "crate", file: "lib.rs" }],
+    };
+    expect(placed("use crate::sink::sinks::UTF8;\nfn f() {\n    UTF8(1);\n}\n", "f", "rust", side)).toEqual(["sink.rs"]);
+  });
+
   it("Python: a name comes from the most specific module written above it", () => {
     const files: Record<string, { source: string; imports: CallSide["imports"] }> = {
       "fastapi/__init__.py": { source: "from .applications import FastAPI as FastAPI\n", imports: [] },
@@ -292,6 +301,25 @@ describe("re-exports", () => {
       + "def f():\n    helper(1)\n    return JSONResponse(1)\n";
     // Starlette's, through a module that passes it on -- not the package's `__init__.py`.
     expect(named(source, "f", "python", side)).toEqual({ helper: "fastapi/helpers.py", JSONResponse: "?elsewhere" });
+  });
+});
+
+describe("reading one call opens other files", () => {
+  it("and the file's own parse may be let go meanwhile, without losing its names", () => {
+    // One import followed through a barrel of more modules than the parse
+    // cache holds: by the next call, this file's tree has been let go.
+    const far: Record<string, string> = { "barrel.ts": "" };
+    for (let index = 0; index < 60; index += 1) {
+      far[`m${index}.ts`] = `export function f${index}() {}\n`;
+      far["barrel.ts"] += `export * from "./m${index}";\n`;
+    }
+    const barrelImports = Array.from({ length: 60 }, (_, index) => ({ specifier: `./m${index}`, file: `m${index}.ts` }));
+    const sites = placed("import { f59 } from \"./barrel\";\nfunction own() {}\nfunction g() {\n  f59();\n  own();\n}\n", "g", "ts", {
+      imports: [{ specifier: "./barrel", file: "barrel.ts" }],
+      open: (file) => far[file] === undefined ? undefined
+        : { source: far[file]!, language: "ts", imports: file === "barrel.ts" ? barrelImports : [] },
+    });
+    expect(sites).toEqual(["m59.ts", "a.ts"]);
   });
 });
 
