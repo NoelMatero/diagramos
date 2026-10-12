@@ -269,11 +269,48 @@ function callsInTokens(tree: Node, out: Node[] = []): Node[] {
   return out;
 }
 
-const lineAt = (source: string, offset: number): number => {
-  let line = 1;
-  for (let i = 0; i < offset && i < source.length; i++) if (source.charCodeAt(i) === 10) line++;
-  return line;
-};
+
+/**
+ * Every call in a file, by where the name it calls starts. One walk down the
+ * tree: web-tree-sitter finds a node's parent by searching from the root, so
+ * climbing from a name to its call costs a file's size per call, and on
+ * regex's ten-thousand-line files that turned seconds into hours.
+ */
+function callsByName(root: Node): Map<number, Node> {
+  const out = new Map<number, Node>();
+  const visit = (n: Node): void => {
+    if (isCall(n)) {
+      const leaf = nameLeaf(n);
+      if (leaf && !out.has(leaf.startIndex)) out.set(leaf.startIndex, n);
+    }
+    for (let i = 0; i < n.namedChildCount; i++) visit(n.namedChild(i)!);
+  };
+  visit(root);
+  return out;
+}
+
+/** Line spans (1-based) of `#[cfg(test)] mod ... { }` blocks, at any depth. */
+function rustTestModules(root: Node): Array<[number, number]> {
+  const out: Array<[number, number]> = [];
+  const visit = (n: Node): void => {
+    for (let i = 0; i < n.namedChildCount; i++) {
+      const c = n.namedChild(i)!;
+      if (c.type !== "mod_item") continue;
+      for (let j = i - 1; j >= 0; j--) {
+        const before = n.namedChild(j)!;
+        if (before.type !== "attribute_item" && before.type !== "line_comment" && before.type !== "block_comment") break;
+        if (before.type === "attribute_item" && /cfg\(\s*test\s*\)/.test(before.text)) {
+          out.push([c.startPosition.row + 1, c.endPosition.row + 1]);
+          break;
+        }
+      }
+      const body = c.childForFieldName("body");
+      if (body) visit(body);
+    }
+  };
+  visit(root);
+  return out;
+}
 
 /** The declarations whose name is written on `line` (1-based) of a parsed file. */
 function declarationsOn(root: Node, line: number): Array<{ name: string; lands: "routine" | "type" | "macro" | "value"; holder?: string }> {
@@ -374,7 +411,20 @@ async function measureOne(setName: string, project: string): Promise<void> {
   const answerOf = (site: CallSitePlaced): CheckerAnswer =>
     site.file !== undefined ? { file: site.file, ...(site.declaredAs !== undefined ? { as: site.declaredAs } : {}) } : { why: site.why ?? "unknown" };
 
-  const sitesOf = (reading: ReturnType<typeof callSitesIn>, source: string) => {
+  /*
+   * A local holding one of several functions (#417) is listed once per
+   * function it can hold, each named where that function is written. Told
+   * apart from an ordinary call by whether the name climbs to a call that
+   * opens on the site's own line -- a chain split over lines
+   * (`Command::new("x")` then `.long_flag(..)` below it) names a member on a
+   * later line and is still an ordinary call.
+   */
+  const isChosen = (site: CallSitePlaced, calls: Map<number, Node>): boolean => {
+    if (!site.nameAt) return false;
+    const call = calls.get(site.nameAt.start);
+    return !call || call.startPosition.row + 1 !== site.line;
+  };
+  const sitesOf = (reading: ReturnType<typeof callSitesIn>, calls: Map<number, Node>) => {
     const found = new Map<string, { site: CallSitePlaced; routine: string; rline: number; several?: CallSitePlaced[] }>();
     if (!reading.read) return found;
     for (const body of reading.bodies) {
@@ -383,9 +433,7 @@ async function measureOne(setName: string, project: string): Promise<void> {
         if (site.why === "macro") continue;
         let key: string;
         if (site.nameAt) {
-          if (lineAt(source, site.nameAt.start) !== site.line) {
-            // A local holding one of several functions (#417): one site per
-            // function it can hold, each named where that function is written.
+          if (isChosen(site, calls)) {
             key = `chosen:${site.line}:${body.line}`;
             const had = found.get(key);
             found.set(key, { site, routine: body.routine, rline: body.line, several: [...(had?.several ?? []), site] });
@@ -413,9 +461,11 @@ async function measureOne(setName: string, project: string): Promise<void> {
     fileCount[lang]++;
     const tree = parseSource(source, language)?.rootNode as Node | undefined;
     const mine = new Map<string, Entry>();
+    const inTests = language === "rust" && tree ? rustTestModules(tree) : [];
+    const calls = tree ? callsByName(tree) : new Map<number, Node>();
     for (const body of reading.bodies) declared.get(lang)!.add(body.routine);
     routineCount[lang] += reading.bodies.length;
-    for (const [key, { site, routine, rline, several }] of sitesOf(reading, source)) {
+    for (const [key, { site, routine, rline, several }] of sitesOf(reading, calls)) {
       const text: CheckerAnswer = several
         ? { file: several[0]!.file, several: true }
         : answerOf(site);
@@ -469,6 +519,10 @@ async function measureOne(setName: string, project: string): Promise<void> {
           });
         }
       }
+    }
+    // A Rust test module written inside a source file is test code, left out as test files are.
+    if (inTests.length > 0) {
+      for (const [key, entry] of mine) if (inTests.some(([a, b]) => a <= entry.line && entry.line <= b)) mine.delete(key);
     }
     entries.set(rel, mine);
   }
@@ -631,8 +685,9 @@ async function measureOne(setName: string, project: string): Promise<void> {
         return got === undefined || got === "threw" ? undefined : got;
       },
     });
-    const liveSites = sitesOf(live, source);
     const tree = parseSource(source, language)?.rootNode as Node | undefined;
+    const calls = tree ? callsByName(tree) : new Map<number, Node>();
+    const liveSites = sitesOf(live, calls);
     for (const entry of mine.values()) {
       const l = liveSites.get(entry.key);
       const liveAnswer: CheckerAnswer = l?.several ? { file: l.several[0]!.file, several: true } : l ? answerOf(l.site) : entry.text;
