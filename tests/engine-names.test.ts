@@ -270,6 +270,31 @@ describe("Rust's order and modules", () => {
   });
 });
 
+describe("re-exports", () => {
+  it("Python: a name comes from the most specific module written above it", () => {
+    const files: Record<string, { source: string; imports: CallSide["imports"] }> = {
+      "fastapi/__init__.py": { source: "from .applications import FastAPI as FastAPI\n", imports: [] },
+      "fastapi/responses.py": {
+        source: "from starlette.responses import JSONResponse as JSONResponse\n",
+        imports: [{ specifier: "starlette.responses" }],
+      },
+      "fastapi/helpers.py": { source: "def helper(v):\n    return v\n", imports: [] },
+    };
+    const side = {
+      open: (file: string) => files[file] && { ...files[file]!, language: "python" as const },
+      imports: [
+        { specifier: "fastapi", file: "fastapi/__init__.py" },
+        { specifier: "fastapi.responses", file: "fastapi/responses.py" },
+        { specifier: "fastapi.helpers", file: "fastapi/helpers.py" },
+      ],
+    };
+    const source = "from fastapi import FastAPI\nfrom fastapi.responses import JSONResponse\nfrom fastapi.helpers import helper\n\n\n"
+      + "def f():\n    helper(1)\n    return JSONResponse(1)\n";
+    // Starlette's, through a module that passes it on -- not the package's `__init__.py`.
+    expect(named(source, "f", "python", side)).toEqual({ helper: "fastapi/helpers.py", JSONResponse: "?elsewhere" });
+  });
+});
+
 describe("a name declared twice, but in different scopes", () => {
   it("Python: a method and a module function of one name are not a collision", () => {
     const source = "def get(v):\n    return v\n\n\nclass K:\n    def get(self):\n        pass\n\n\ndef f(v):\n    return get(v)\n";

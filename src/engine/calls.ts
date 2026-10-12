@@ -1446,9 +1446,21 @@ function holdsRoutines(node: Node): boolean {
 function filesFor(specifier: string, imports: CallSide["imports"]): { files: Set<string>; known: boolean } {
   const files = new Set<string>();
   let known = false;
+  /*
+   * Python names a module by its whole dotted path, and `from a.b import x`
+   * takes `x` from `a.b` -- never from `a`, though `a` covers it too (#468).
+   * With both written in the file, the package's `__init__.py` answered
+   * first and FastAPI's `from fastapi.responses import JSONResponse` was
+   * placed at `fastapi/__init__.py`, 39 times. So the most specific module
+   * written down above the name is the one it comes from.
+   */
+  const above = imports.filter((one) => one.file && one.specifier !== specifier && pathCovers(one.specifier, specifier));
+  const nearest = Math.max(-1, ...above.map((one) => one.specifier.length));
+  const python = !specifier.includes("::") && !specifier.includes("/") && imports.some((one) => one.file?.endsWith(".py"));
   for (const one of imports) {
     if (!pathCovers(one.specifier, specifier) && !pathCovers(specifier, one.specifier)) continue;
     known = true;
+    if (python && one.file && above.includes(one) && one.specifier.length < nearest) continue;
     if (one.file) files.add(one.file);
   }
   return { files, known };
