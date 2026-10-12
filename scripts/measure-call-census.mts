@@ -895,9 +895,58 @@ function tables(summaries: Summaries, failed: string[]): string {
     }
     add();
   }
+  for (const line of whereItLands(summaries)) add(line);
   const seconds = summaries.reduce((t, s) => t + s.seconds, 0);
   add(`Projects took ${Math.round(seconds / 60)} min in all. Compiler notes per project are in each \`<project>.json\` (\`diagnostics\`).`);
   return lines.join("\n");
+}
+
+/**
+ * Read from the rows, because a summary does not keep it: how often the
+ * compiler answered, whether an agreement or a gap lands inside the repo or in
+ * a library, and the live gap per layer-1 issue. A gap call into a library
+ * still counts: while it is unplaced, the checker cannot rule it out as the
+ * call an arrow names.
+ */
+function whereItLands(summaries: Summaries): string[] {
+  type Tally = { calls: number; answered: number; agreeRepo: number; agreeOut: number; gapRepo: number; gapOut: number; issue: Record<string, [number, number]> };
+  const tally = Object.fromEntries(LANGS.map((one) => [one, { calls: 0, answered: 0, agreeRepo: 0, agreeOut: 0, gapRepo: 0, gapOut: 0, issue: {} }])) as Record<Lang, Tally>;
+  for (const s of summaries) {
+    const rowsPath = path.join(RUN, s.set, `${s.project}.jsonl`);
+    if (!existsSync(rowsPath)) continue;
+    for (const line of readFileSync(rowsPath, "utf8").split("\n")) {
+      if (!line) continue;
+      const row = JSON.parse(line) as Row;
+      const t = tally[row.lang];
+      const inRepo = row.compiler.kind === "repo";
+      t.calls++;
+      if (row.compiler.kind !== "silent") t.answered++;
+      if (row.bin.live === "agree") inRepo ? t.agreeRepo++ : t.agreeOut++;
+      if (row.bin.live === "gap") {
+        inRepo ? t.gapRepo++ : t.gapOut++;
+        const cell = (t.issue[ISSUE_OF[row.shape ?? ""] ?? "no layer-1 issue"] ??= [0, 0]);
+        cell[inRepo ? 0 : 1]++;
+      }
+    }
+  }
+  const out = ["**Where the compiler lands** (checker as the bench runs it; \"library\" is anything outside the repo, built-ins included)", "",
+    "| Language | Calls | compiler answered | agree: in repo · library | gap: in repo · library |", "|---|--:|--:|--:|--:|"];
+  for (const lang of LANGS) {
+    const t = tally[lang];
+    if (t.calls) out.push(`| ${lang} | ${t.calls} | ${t.answered} (${pct(t.answered, t.calls)}) | ${t.agreeRepo} · ${t.agreeOut} | ${t.gapRepo} · ${t.gapOut} |`);
+  }
+  out.push("", "**Gap per layer-1 issue** (checker as the bench runs it; share of the language's gap; in repo · library)", "",
+    `| Issue | ${LANGS.join(" | ")} |`, `|---|${LANGS.map(() => "--:").join("|")}|`);
+  for (const issue of ["#468", "#469", "#470", "#471", "no layer-1 issue"]) {
+    const cells = LANGS.map((lang) => {
+      const [repo, out_] = tally[lang].issue[issue] ?? [0, 0];
+      const gap = tally[lang].gapRepo + tally[lang].gapOut;
+      return repo + out_ === 0 ? "" : `${repo + out_} (${pct(repo + out_, gap)}; ${repo} · ${out_})`;
+    });
+    out.push(`| ${issue} | ${cells.join(" | ")} |`);
+  }
+  out.push("");
+  return out;
 }
 
 /** Site by site against an earlier run: what moved between bins, and every new disagreement. */
