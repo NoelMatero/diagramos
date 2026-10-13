@@ -259,6 +259,20 @@ describe("Rust's order and modules", () => {
       .toEqual(["?unbound"]);
   });
 
+  it("a macro_rules! written above a module is in sight inside it, and an imported one is not", () => {
+    // clap's benches: `create_app!` is written at the top and used inside `mod startup { .. }`.
+    const own = "macro_rules! create_app {\n    () => { 1 };\n}\nmod startup {\n    fn flag() {\n        create_app!();\n    }\n}\n";
+    const sites = callSitesIn({ file: "a.rs", source: own, language: "rust", imports: [] });
+    if (!sites.read) throw new Error("refused");
+    const calls = sites.bodies.find((one) => one.routine === "flag")!.sites.filter((one) => one.name === "create_app");
+    expect(calls.map((one) => one.file ?? `?${one.why}`)).toEqual(["a.rs"]);
+    // A `use` of a macro belongs to its module; the one inside does not see it.
+    const imported = "use crate::m::create_app;\nmod startup {\n    fn flag() {\n        create_app!();\n    }\n}\n";
+    const far = callSitesIn({ file: "a.rs", source: imported, language: "rust", imports: [{ specifier: "crate::m::create_app", file: "m.rs" }] });
+    if (!far.read) throw new Error("refused");
+    expect(far.bodies.find((one) => one.routine === "flag")!.sites.map((one) => one.file)).not.toContain("m.rs");
+  });
+
   it("Type::make() is the type's own only from an inherent impl the spot can see", () => {
     const own = "struct Pool;\nimpl Pool {\n    fn make() -> Pool { Pool }\n}\nfn f() {\n    Pool::make();\n}\n";
     expect(placed(own, "f", "rust")).toEqual(["a.rs"]);
@@ -329,6 +343,28 @@ describe("a file the parser could not read whole", () => {
       imports: [{ specifier: "./x", file: "x.ts" }],
       open: () => ({ source: "export function go() {}\n", language: "ts", imports: [] }),
     })).toEqual(["x.ts"]);
+  });
+});
+
+describe("a far file the parser could not read whole", () => {
+  it("still declares what its name list says, when its top lost the declaration", () => {
+    // mobx's `api/action.ts`, cut down to what breaks it: a block left open
+    // above the declaration, so the parser files `isAction` inside it.
+    const far = "function setup() {\n    if (__DEV__) {\n        warn()\n}\n\n"
+      + "export function isAction(thing: any) {\n    return thing.isMobxAction === true\n}\n";
+    // Reached through a barrel, as mobx's `../internal` is: a wildcard's
+    // target must declare the name, not merely be the file named.
+    const files: Record<string, { source: string; imports: CallSide["imports"] }> = {
+      "internal.ts": { source: "export * from \"./action\"\nexport * from \"./other\"\n", imports: [
+        { specifier: "./action", file: "action.ts" }, { specifier: "./other", file: "other.ts" },
+      ] },
+      "action.ts": { source: far, imports: [] },
+      "other.ts": { source: "export function other() {}\n", imports: [] },
+    };
+    expect(placed("import { isAction } from \"./internal\";\nfunction f(v) {\n  isAction(v);\n}\n", "f", "ts", {
+      imports: [{ specifier: "./internal", file: "internal.ts" }],
+      open: (file) => files[file] && { ...files[file]!, language: "ts" as const },
+    })).toEqual(["action.ts"]);
   });
 });
 

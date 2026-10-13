@@ -866,6 +866,12 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
    * the language provides too is then the doubt any wildcard's is.
    */
   let viaWildcard = false;
+  /**
+   * Rust: climbed out of an inline module without `use super::*`. Only a
+   * `macro_rules!` written around it is still in sight -- macros scope by the
+   * text, not by the module (`create_app!` in clap's benches).
+   */
+  let macrosOnly = false;
 
   for (let at: Node | undefined = site; at; below = at, at = index.parents.get(at.id)) {
     if (language === "rust" && at.type === "let_condition") continue;
@@ -892,7 +898,9 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
     if (language === "rust" && at.type === "match_arm" && below.id === at.childForFieldName("pattern")?.id) scope = null;
     if (language === "rust" && at.type === "for_expression" && below.id !== at.childForFieldName("body")?.id) scope = null;
 
-    if (scope) {
+    if (scope && macrosOnly) {
+      if (scope.macros.has(name)) return { at: "declared" };
+    } else if (scope) {
       const hidden = scope.classBody && inFunction;
       if (!hidden) {
         if (space === "type") {
@@ -942,7 +950,8 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
     }
     // A Rust module sees none of the module around it; `use super::*` is how it would.
     if (language === "rust" && inlineModule(index, at)) {
-      if (!throughSuper) break;
+      if (!throughSuper && space !== "macro") break;
+      if (!throughSuper) { macrosOnly = true; continue; }
       throughSuper = false;
       viaWildcard = true;
     }
@@ -983,7 +992,7 @@ function judgeWildcard(specifier: string, name: string, tree: Tree, side: LookUp
  * Generous on purpose -- a name counted here that a wildcard would not
  * actually carry turns an answer into "not known", never into a wrong one.
  */
-type Top = { scope: Scope; inner: Scope[] } | null;
+type Top = { scope: Scope; inner: Scope[]; broken: boolean } | null;
 const TOPS_LIMIT = 512;
 /**
  * A file's top, by its text -- not by its tree, which the parse cache lets go
@@ -1005,6 +1014,12 @@ export function moduleScope(
   ambiguous: (name: string) => boolean;
   wildcards: string[];
   limited: boolean;
+  /**
+   * The parser had to recover somewhere in this file, so its top may have
+   * lost a declaration: mobx's `api/action.ts`, whose interface of generic
+   * call signatures turns `export function isAction` into a stray method.
+   */
+  broken: boolean;
 } | undefined {
   const key = `${language}:${source}`;
   let top = tops.get(key);
@@ -1025,7 +1040,7 @@ export function moduleScope(
         if (one) inner.push(one);
       });
     }
-    top = scope ? { scope, inner } : null;
+    top = scope ? { scope, inner, broken: tree.rootNode.hasError } : null;
     tops.set(key, top);
     if (tops.size > TOPS_LIMIT) tops.delete(tops.keys().next().value!);
   } else {
@@ -1033,7 +1048,7 @@ export function moduleScope(
     tops.set(key, top);
   }
   if (!top) return undefined;
-  const { scope, inner } = top;
+  const { scope, inner, broken } = top;
   const declaredInside = (name: string, space: Space) => inner.some((one) =>
     space === "type" ? one.types.has(name) : space === "macro" ? one.macros.has(name) : one.values.get(name)?.entry === "declared");
   return {
@@ -1050,5 +1065,6 @@ export function moduleScope(
     wildcards: scope.wildcards,
     // Python's `__all__` decides what a wildcard over the module carries.
     limited: language === "python" && scope.values.has("__all__"),
+    broken,
   };
 }

@@ -1518,7 +1518,8 @@ function arrivesAt(
     ?? (top?.has(name, "value") === "other" ? bindings.shadowed.get(name) : undefined);
   if (!onward) {
     // Declared right here, and here is not the far end. The one place a
-    // forwarding search gets to say no.
+    // forwarding search gets to say no -- so only from a top the parser read
+    // whole, never from the looser list a broken file falls back to.
     if (declaredAtTop(top, name) && !bindings.wildcard) return "no";
     /*
      * A barrel. `comesToRest` follows these to a unique answer and this only
@@ -2865,7 +2866,7 @@ function comesToRest(
   // of the same name inside a class is not something an import reaches). The
   // one branch that can say what the far end calls it, because it read the
   // declaration.
-  if (declaredAtTop(top, name)) return { file, as: name };
+  if (declaredAtTop(top, name, bindings)) return { file, as: name };
 
   const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name)
     ?? (top?.has(name, "value") === "other" ? bindings.shadowed.get(name) : undefined);
@@ -2897,9 +2898,16 @@ function comesToRest(
   return undefined;
 }
 
-/** Whether a file's top declares `name` itself, in any namespace: a routine, a value, a type. */
-function declaredAtTop(top: ReturnType<typeof moduleScope>, name: string): boolean {
-  return top !== undefined && (["value", "type", "macro"] as const).some((space) => top.has(name, space) === "declared");
+/**
+ * Whether a file's top declares `name` itself, in any namespace: a routine, a
+ * value, a type. Where the parser lost part of the file, the file's whole list
+ * of names stands in for its top, as it did before #468: a declaration the
+ * parser turned into something else is still the file's.
+ */
+function declaredAtTop(top: ReturnType<typeof moduleScope>, name: string, bindings?: Bindings): boolean {
+  if (top === undefined) return false;
+  if ((["value", "type", "macro"] as const).some((space) => top.has(name, space) === "declared")) return true;
+  return bindings !== undefined && top.broken && top.has(name, "value") === undefined && bindings.local.has(name);
 }
 
 /**
@@ -2927,7 +2935,7 @@ function declaresOrForwards(
   if (!bindings) return undefined;
   const top = moduleScope(opened.source, opened.language);
   if (bindings.importedTwice.has(name) || top?.ambiguous(name)) return undefined;
-  if (declaredAtTop(top, name)) return { file, as: name };
+  if (declaredAtTop(top, name, bindings)) return { file, as: name };
   const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name)
     ?? (top?.has(name, "value") === "other" ? bindings.shadowed.get(name) : undefined);
   if (onward) {
