@@ -1759,7 +1759,7 @@ function callsTo(
       }
       const callee = calleeOf(node);
       if (!callee) return;
-      const answer = resolves(callee, side, bindings, target, node, holders.get(body.id));
+      const answer = resolves(callee, side, bindings, target, node, holders.get(body.id) ?? ownHolder(body));
       if (answer === undefined) return;
       // Read or set by name, and the result runs nowhere: no call to the head (#431).
       if (answer === "dynamic" && quiet?.has(node.id)) return;
@@ -1777,6 +1777,18 @@ function callsTo(
     if (found) return { evidence: found };
   }
   return why ? { why } : {};
+}
+
+/**
+ * A class read whole -- the tail of "Injector calls loadProvider" -- holds the
+ * methods inside it, so `this.loadProvider()` in one of them is judged against
+ * that class (#468). `holdersIn`'s rule for what holds: a body and a name (or
+ * an `impl`'s type), and no parameters of its own.
+ */
+function ownHolder(body: Node): Node | undefined {
+  const holds = body.childForFieldName("parameters") === null && body.childForFieldName("body") !== null
+    && (body.childForFieldName("name") ?? body.childForFieldName("type")) !== null;
+  return holds ? body : undefined;
 }
 
 /** A name, made safe to put in a pattern. Identifiers are tame; `$` is not. */

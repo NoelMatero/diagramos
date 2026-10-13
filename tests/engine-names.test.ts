@@ -21,7 +21,7 @@
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { callSitesIn, EXTERNAL_RECEIVER, type CallSide } from "../src/engine/calls";
+import { callSitesIn, callsBetween, EXTERNAL_RECEIVER, type CallSide } from "../src/engine/calls";
 import { initEngine, type Language } from "../src/engine/parse";
 
 beforeAll(async () => { await initEngine(); }, 120_000);
@@ -175,6 +175,14 @@ describe("wrong placements: a name means what its scope says", () => {
 
     const own = "export const api = {\n  run() {\n    return this.step();\n  },\n  step() {},\n};\n";
     expect(placed(own, "run", "ts")).toEqual(["a.ts"]);
+  });
+
+  it("TS: a class read whole is the this of its own methods", () => {
+    // Nest's "Injector calls loadProvider": the tail is the class, so the
+    // reading holds the class, and `this` in its method is that class.
+    const source = "export class Injector {\n  async resolve() {\n    await this.loadProvider(1);\n  }\n  async loadProvider(n) {}\n}\n";
+    const side = { file: "a.ts", source, language: "ts" as const, imports: [] };
+    expect(callsBetween({ ...side, routine: "Injector" }, { ...side, names: ["loadProvider"] }).verdict).toBe("confirmed");
   });
 
   it("TS: this inside a plain function is whatever called it", () => {
