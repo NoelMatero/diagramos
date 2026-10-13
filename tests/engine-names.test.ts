@@ -316,6 +316,22 @@ describe("re-exports", () => {
   });
 });
 
+describe("a file the parser could not read whole", () => {
+  it("still has its imports, wherever recovery put them", () => {
+    // zx's `core.ts`, cut down: past this, tree-sitter's TypeScript grammar
+    // gives up and the whole file -- its top included -- is one ERROR node.
+    const source = "import { go } from \"./x\";\nfunction f() {\n  go();\n}\n"
+      + "  S = false,\n  R = S extends true ? A : B,\n> {\n  (pieces: TemplateStringsArray, ...args: any[]): R\n"
+      + "  <O extends Partial<Options> = Partial<Options>, R = O extends { sync: true } ? Shell<true> : Shell>(opts: O): R\n"
+      + "  sync: {\n    (pieces: TemplateStringsArray, ...args: any[]): A\n    (opts: Partial<Omit<Options, 'sync'>>): Shell<true>\n  }\n}\n\n"
+      + "export type $ = Shell & Options\n";
+    expect(placed(source, "f", "ts", {
+      imports: [{ specifier: "./x", file: "x.ts" }],
+      open: () => ({ source: "export function go() {}\n", language: "ts", imports: [] }),
+    })).toEqual(["x.ts"]);
+  });
+});
+
 describe("reading one call opens other files", () => {
   it("and the file's own parse may be let go meanwhile, without losing its names", () => {
     // One import followed through a barrel of more modules than the parse

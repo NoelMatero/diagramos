@@ -188,6 +188,22 @@ function fielded(node: Node): Array<{ node: Node; field: string | null }> {
   return out;
 }
 
+/**
+ * A scope's statements, read through the parser's own recovery: a stretch it
+ * could not parse becomes an `ERROR` node holding the statements after it,
+ * and in zx's `core.ts` that was the whole top of the file -- every import in
+ * it unseen, 78 calls in four TypeScript projects. The old file-wide reader
+ * never noticed; a reader of scopes has to look inside.
+ */
+function statementsOf(node: Node): Node[] {
+  const out: Node[] = [];
+  for (const child of kids(node)) {
+    if (child.type === "ERROR") out.push(...statementsOf(child));
+    else out.push(child);
+  }
+  return out;
+}
+
 function emptyScope(): Scope {
   return {
     values: new Map(), lets: new Map(), macros: new Set(), types: new Set(), twice: new Set(), wildcards: [],
@@ -339,10 +355,10 @@ function tsVars(node: Node, scope: Scope): void {
   }
 }
 
-function tsScope(node: Node): Scope | null {
-  if (node.type === "program") {
+function tsScope(node: Node, root = false): Scope | null {
+  if (node.type === "program" || root) {
     const scope = emptyScope();
-    for (const statement of kids(node)) {
+    for (const statement of statementsOf(node)) {
       tsDeclaration(statement, scope, false);
       importNames(statement, scope, "ts");
     }
@@ -518,8 +534,8 @@ function pyBlock(node: Node, scope: Scope, local: boolean): void {
   }
 }
 
-function pyScope(node: Node): Scope | null {
-  if (node.type === "module") {
+function pyScope(node: Node, root = false): Scope | null {
+  if (node.type === "module" || root) {
     const scope = emptyScope();
     pyBlock(node, scope, false);
     return scope;
@@ -631,15 +647,15 @@ function rustItem(node: Node, scope: Scope): void {
   }
 }
 
-function rustScope(node: Node): Scope | null {
-  switch (node.type) {
+function rustScope(node: Node, root = false): Scope | null {
+  switch (root ? "source_file" : node.type) {
     case "source_file":
     case "declaration_list":
     case "block": {
       // A `declaration_list` is a module's body only under a `mod`; under an
       // `impl` or a `trait` its items are members, reached through a type.
       const scope = emptyScope();
-      for (const child of kids(node)) {
+      for (const child of statementsOf(node)) {
         if (node.type === "block" && child.type === "let_declaration") {
           const from = child.startIndex + child.text.length;
           rustPattern(child.childForFieldName("pattern"), (name) => scope.lets.set(name, [...scope.lets.get(name) ?? [], from]));
@@ -769,7 +785,9 @@ function importNames(node: Node, scope: Scope, language: "ts" | "python" | "rust
 
 function scopeAt(index: Index, node: Node, language: Language): Scope | null {
   if (index.scopes.has(node.id)) return index.scopes.get(node.id)!;
-  const made = language === "python" ? pyScope(node) : language === "rust" ? rustScope(node) : tsScope(node);
+  // The top of the tree is the module, whatever the parser could make of it.
+  const root = !index.parents.has(node.id);
+  const made = language === "python" ? pyScope(node, root) : language === "rust" ? rustScope(node, root) : tsScope(node, root);
   index.scopes.set(node.id, made);
   return made;
 }
@@ -993,7 +1011,7 @@ export function moduleScope(
   if (top === undefined) {
     const tree = parseSource(source, language);
     if (!tree) return undefined;
-    const scope = language === "python" ? pyScope(tree.rootNode) : language === "rust" ? rustScope(tree.rootNode) : tsScope(tree.rootNode);
+    const scope = language === "python" ? pyScope(tree.rootNode, true) : language === "rust" ? rustScope(tree.rootNode, true) : tsScope(tree.rootNode, true);
     /*
      * Rust writes modules inside a file too -- `pub mod sinks { pub struct UTF8 }`
      * in ripgrep's `sink.rs` -- and a path through one ends in this file. What
