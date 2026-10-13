@@ -1059,13 +1059,14 @@ export interface ConstructsNames {
  * The referee behind #309's measurement counts bare calls only, so nothing
  * measured turns on the ones left out.
  */
-function bareCalls(node: Node, source: string): Array<{ name: string; evidence: ConstructsEvidence }> {
-  const found: Array<{ name: string; evidence: ConstructsEvidence }> = [];
+function bareCalls(node: Node, source: string): Array<{ name: string; node: Node; evidence: ConstructsEvidence }> {
+  const found: Array<{ name: string; node: Node; evidence: ConstructsEvidence }> = [];
   each(node, (child) => {
     const callee = child.childForFieldName("function");
     if (!callee || callee.childCount !== 0 || !TYPE_NAME.test(callee.type)) return;
     found.push({
       name: callee.text,
+      node: child,
       evidence: {
         name: callee.text,
         line: lineOf(source, callee.startIndex),
@@ -1184,7 +1185,7 @@ function pythonConstructions(
     for (const call of bareCalls(body, source)) {
       const meant = meansOneOf(call.name, wanted, bindings);
       if (meant === undefined) continue;
-      const placed = placeName(call.name, names.side, bindings);
+      const placed = placeName(call.name, names.side, bindings, call.node);
       if ("why" in placed) { note(unresolved(placed.why)); continue; }
       if (placed.file !== names.target) { note("elsewhere"); continue; }
       const at = placed.file === names.side.file
