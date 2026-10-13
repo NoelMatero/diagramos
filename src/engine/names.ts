@@ -780,18 +780,27 @@ function inlineModule(index: Index, node: Node): boolean {
 }
 
 /** The `enum` this file declares under `name`, and its variants -- for `use Kind::*`. */
-function variantsOf(root: Node, name: string): Set<string> | undefined {
-  let found: Set<string> | undefined;
-  each(root, (node) => {
-    if (found || node.type !== "enum_item" || node.childForFieldName("name")?.text !== name) return;
-    found = new Set();
-    const body = node.childForFieldName("body");
-    if (body) for (const variant of kids(body)) {
-      const n = variant.childForFieldName("name");
-      if (variant.type === "enum_variant" && n) found.add(n.text);
-    }
-  });
-  return found;
+const enums = new WeakMap<Tree, Map<string, Set<string>>>();
+
+function variantsOf(tree: Tree, name: string): Set<string> | undefined {
+  let known = enums.get(tree);
+  if (!known) {
+    const made = new Map<string, Set<string>>();
+    each(tree.rootNode, (node) => {
+      const named = node.type === "enum_item" ? node.childForFieldName("name")?.text : undefined;
+      if (named === undefined || made.has(named)) return;
+      const found = new Set<string>();
+      const body = node.childForFieldName("body");
+      if (body) for (const variant of kids(body)) {
+        const n = variant.childForFieldName("name");
+        if (variant.type === "enum_variant" && n) found.add(n.text);
+      }
+      made.set(named, found);
+    });
+    enums.set(tree, made);
+    known = made;
+  }
+  return known.get(name);
 }
 
 /** Whether a Rust path names a crate outside the repository by its first step alone. */
@@ -901,7 +910,7 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
           // `use super::*` in a module written inside this file: the module
           // around it, read below as the climb goes on.
           if (specifier === "super" && inlineModule(index, at)) { throughSuper = true; continue; }
-          const answer = judgeWildcard(specifier, name, tree.rootNode, side, space);
+          const answer = judgeWildcard(specifier, name, tree, side, space);
           if (answer === "unknown") return { at: "unknown", why: "unbound" };
           if (typeof answer === "object") { carriers += 1; carried = answer.has; }
         }
@@ -936,12 +945,12 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
 }
 
 /** What one wildcard brings in, for one name. */
-function judgeWildcard(specifier: string, name: string, root: Node, side: LookUp, space: Space): WildcardAnswer {
+function judgeWildcard(specifier: string, name: string, tree: Tree, side: LookUp, space: Space): WildcardAnswer {
   if (side.language === "rust") {
     // `use self::Kind::*` and `use Kind::*`: the variants of an enum this file declares.
     const steps = specifier.replace(/^(self|crate)::/, "").split("::");
     if (steps.length === 1 || /^self::/.test(specifier)) {
-      const variants = variantsOf(root, steps[steps.length - 1]!);
+      const variants = variantsOf(tree, steps[steps.length - 1]!);
       // A variant is a value, never a routine: carried, and by nothing that runs.
       if (variants) return variants.has(name) && space === "value" ? { has: undefined } : "lacks";
     }
@@ -956,6 +965,19 @@ function judgeWildcard(specifier: string, name: string, root: Node, side: LookUp
  * Generous on purpose -- a name counted here that a wildcard would not
  * actually carry turns an answer into "not known", never into a wrong one.
  */
+type Top = { scope: Scope; inner: Scope[] } | null;
+const TOPS_LIMIT = 512;
+/**
+ * A file's top, by its text -- not by its tree, which the parse cache lets go
+ * of after 48 other files. Asked of every file an import is followed through,
+ * and a barrel re-exporting sixty modules asks it of all sixty per call:
+ * keyed by tree, each of those was parsed again whenever the cache had moved
+ * on, faster than the collector freed the old ones, and MobX's and
+ * Excalidraw's census runs ran the parser out of memory. Names only, so it
+ * can remember far more files than the parse cache, as `bindingsIn` does.
+ */
+const tops = new Map<string, Top>();
+
 export function moduleScope(
   source: string,
   language: Language,
@@ -966,22 +988,34 @@ export function moduleScope(
   wildcards: string[];
   limited: boolean;
 } | undefined {
-  const tree = parseSource(source, language);
-  if (!tree) return undefined;
-  const index = indexOf(tree);
-  const scope = scopeAt(index, tree.rootNode, language);
-  if (!scope) return undefined;
-  /*
-   * Rust writes modules inside a file too -- `pub mod sinks { pub struct UTF8 }`
-   * in ripgrep's `sink.rs` -- and a path through one ends in this file. What
-   * they declare is this file's to answer for.
-   */
-  const inner: Scope[] = [];
-  if (language === "rust") {
-    each(tree.rootNode, (node) => {
-      if (inlineModule(index, node)) { const one = scopeAt(index, node, language); if (one) inner.push(one); }
-    });
+  const key = `${language}:${source}`;
+  let top = tops.get(key);
+  if (top === undefined) {
+    const tree = parseSource(source, language);
+    if (!tree) return undefined;
+    const scope = language === "python" ? pyScope(tree.rootNode) : language === "rust" ? rustScope(tree.rootNode) : tsScope(tree.rootNode);
+    /*
+     * Rust writes modules inside a file too -- `pub mod sinks { pub struct UTF8 }`
+     * in ripgrep's `sink.rs` -- and a path through one ends in this file. What
+     * they declare is this file's to answer for.
+     */
+    const inner: Scope[] = [];
+    if (language === "rust") {
+      each(tree.rootNode, (node) => {
+        const body = node.type === "mod_item" ? node.childForFieldName("body") : null;
+        const one = body ? rustScope(body) : null;
+        if (one) inner.push(one);
+      });
+    }
+    top = scope ? { scope, inner } : null;
+    tops.set(key, top);
+    if (tops.size > TOPS_LIMIT) tops.delete(tops.keys().next().value!);
+  } else {
+    tops.delete(key);
+    tops.set(key, top);
   }
+  if (!top) return undefined;
+  const { scope, inner } = top;
   const declaredInside = (name: string, space: Space) => inner.some((one) =>
     space === "type" ? one.types.has(name) : space === "macro" ? one.macros.has(name) : one.values.get(name)?.entry === "declared");
   return {

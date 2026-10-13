@@ -271,6 +271,18 @@ describe("Rust's order and modules", () => {
 });
 
 describe("re-exports", () => {
+  it("Rust: a module and a function of one name are followed through a re-export", () => {
+    const files: Record<string, { source: string; imports: CallSide["imports"] }> = {
+      "lib.rs": { source: "pub mod serve;\npub use self::serve::serve;\n", imports: [{ specifier: "self::serve::serve", file: "serve/mod.rs" }] },
+      "serve/mod.rs": { source: "pub fn serve() {}\n", imports: [] },
+    };
+    const side = {
+      open: (file: string) => files[file] && { ...files[file]!, language: "rust" as const },
+      imports: [{ specifier: "crate::serve", file: "lib.rs" }],
+    };
+    expect(placed("use crate::serve;\nfn f() {\n    serve();\n}\n", "f", "rust", side)).toEqual(["serve/mod.rs"]);
+  });
+
   it("Rust: a module written inside the far file is that file's", () => {
     const sink = "pub mod sinks {\n    pub struct UTF8<F>(pub F);\n}\n";
     const side = {

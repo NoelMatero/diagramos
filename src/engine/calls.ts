@@ -538,6 +538,13 @@ export interface Bindings {
    */
   importedTwice: Set<string>;
   /**
+   * Imports of a name the file also declares somewhere, which `imported`
+   * leaves out (#468). `pub mod serve;` beside `pub use self::serve::serve;`
+   * in axum's `lib.rs` is two namespaces, and a re-export followed through
+   * that file has to go on to `serve/mod.rs` rather than stop there.
+   */
+  shadowed: Map<string, Binding>;
+  /**
    * Names this file passes on without binding: `export { x } from "./y"`.
    *
    * Not a binding -- nothing in this file can call `x` -- so it is kept apart
@@ -592,7 +599,11 @@ function lastSegment(path: string): string {
 }
 
 function bind(into: Bindings, name: string, binding: Binding): void {
-  if (into.local.has(name)) { into.ambiguous.add(name); return; }
+  /*
+   * Declared somewhere in the file as well: ambiguous to a reader of the
+   * whole file, and kept in `shadowed` for one that looks at scopes (#468).
+   */
+  if (into.local.has(name)) { into.ambiguous.add(name); if (!into.shadowed.has(name)) into.shadowed.set(name, binding); return; }
   const already = into.imported.get(name);
   if (already && already.specifier !== binding.specifier) { into.ambiguous.add(name); into.importedTwice.add(name); return; }
   into.imported.set(name, binding);
@@ -919,7 +930,7 @@ function readBindings(source: string, language: Language): Bindings | undefined 
   const tree = parseSource(source, language);
   if (!tree) return undefined;
   const bindings: Bindings = {
-    imported: new Map(), local: new Set(), ambiguous: new Set(), importedTwice: new Set(),
+    imported: new Map(), local: new Set(), ambiguous: new Set(), importedTwice: new Set(), shadowed: new Map(),
     forwarded: new Map(), wildcard: false, reExported: [],
   };
   declaredNames(tree.rootNode, bindings.local);
@@ -1503,7 +1514,8 @@ function arrivesAt(
   const top = moduleScope(opened.source, opened.language);
   if (bindings.importedTwice.has(name) || top?.ambiguous(name)) return "maybe";
 
-  const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
+  const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name)
+    ?? (top?.has(name, "value") === "other" ? bindings.shadowed.get(name) : undefined);
   if (!onward) {
     // Declared right here, and here is not the far end. The one place a
     // forwarding search gets to say no.
@@ -2855,7 +2867,8 @@ function comesToRest(
   // declaration.
   if (declaredAtTop(top, name)) return { file, as: name };
 
-  const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
+  const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name)
+    ?? (top?.has(name, "value") === "other" ? bindings.shadowed.get(name) : undefined);
   if (!onward) {
     if (bindings.reExported.length > 0) {
       return throughWildcards(name, bindings, opened.imports, side, seen, depth);
@@ -2915,7 +2928,8 @@ function declaresOrForwards(
   const top = moduleScope(opened.source, opened.language);
   if (bindings.importedTwice.has(name) || top?.ambiguous(name)) return undefined;
   if (declaredAtTop(top, name)) return { file, as: name };
-  const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name);
+  const onward = bindings.imported.get(name) ?? bindings.forwarded.get(name)
+    ?? (top?.has(name, "value") === "other" ? bindings.shadowed.get(name) : undefined);
   if (onward) {
     const { files } = filesFor(onward.specifier, opened.imports);
     for (const next of files) {
@@ -3311,24 +3325,48 @@ function implTypeName(impl: Node): string | undefined {
  */
 function implDeclares(holder: Node, method: string, side: CallSide): boolean {
   const type = implTypeName(holder);
-  const tree = parseSource(side.source, side.language);
+  const tree = (holder as Node & { tree?: Tree }).tree ?? parseSource(side.source, side.language);
   if (!type || !tree) return false;
   const trait = holder.childForFieldName("trait");
   const traitName = trait ? (trait.childForFieldName("name") ?? trait.childForFieldName("type") ?? trait).text : undefined;
-  let found = false;
-  each(tree.rootNode, (node) => {
-    if (found) return;
-    const own = node.type === "impl_item" && implTypeName(node) === type;
-    const defaults = node.type === "trait_item" && traitName !== undefined && node.childForFieldName("name")?.text === traitName;
-    if (!own && !defaults) return;
+  const methods = rustMethods(tree);
+  return Boolean(methods.anyImpl.get(type)?.has(method) || traitName !== undefined && methods.traits.get(traitName)?.has(method));
+}
+
+/**
+ * The methods each type's `impl`s and each trait in one Rust file declare,
+ * read once per tree: `self.x()` and `Type::x()` ask it per call, and a walk
+ * of the whole file per call was most of what #468 added to a census.
+ */
+const rustMethods_ = new WeakMap<Tree, { inherent: Map<string, Set<string>>; anyImpl: Map<string, Set<string>>; traits: Map<string, Set<string>> }>();
+
+function rustMethods(tree: Tree): { inherent: Map<string, Set<string>>; anyImpl: Map<string, Set<string>>; traits: Map<string, Set<string>> } {
+  const known = rustMethods_.get(tree);
+  if (known) return known;
+  const made = { inherent: new Map<string, Set<string>>(), anyImpl: new Map<string, Set<string>>(), traits: new Map<string, Set<string>>() };
+  const add = (into: Map<string, Set<string>>, key: string, node: Node) => {
     const body = node.childForFieldName("body");
-    if (!body) return;
-    for (let index = 0; index < body.childCount; index += 1) {
+    const set = into.get(key) ?? new Set<string>();
+    into.set(key, set);
+    for (let index = 0; body && index < body.childCount; index += 1) {
       const item = body.child(index);
-      if (item?.type === "function_item" && item.childForFieldName("name")?.text === method) found = true;
+      const name = item?.type === "function_item" ? item.childForFieldName("name")?.text : undefined;
+      if (name) set.add(name);
+    }
+  };
+  each(tree.rootNode, (node) => {
+    if (node.type === "impl_item") {
+      const type = implTypeName(node);
+      if (!type) return;
+      add(made.anyImpl, type, node);
+      if (!node.childForFieldName("trait")) add(made.inherent, type, node);
+    } else if (node.type === "trait_item") {
+      const name = node.childForFieldName("name")?.text;
+      if (name) add(made.traits, name, node);
     }
   });
-  return found;
+  rustMethods_.set(tree, made);
+  return made;
 }
 
 /**
@@ -3341,24 +3379,47 @@ function inheritedHere(holder: Node, member: string, side: CallSide, depth = 0):
   if (depth >= FOLLOW_LIMIT) return "unknown";
   const name = holder.childForFieldName("name");
   if (!name || name.childCount !== 0) return "unknown";
-  const read = declaredBases(side.source, name.text, side.language);
-  if (!("bases" in read) || read.doubt) return "unknown";
-  const tree = parseSource(side.source, side.language);
+  const tree = (holder as Node & { tree?: Tree }).tree ?? parseSource(side.source, side.language);
   if (!tree) return "unknown";
-  for (const base of read.bases) {
-    // `object` declares nothing a call names; any other base written
-    // nowhere here is somebody else's, and may be the one declaring it.
-    if (base.name === "object" && side.language === "python") continue;
-    const classes: Node[] = [];
-    each(tree.rootNode, (node) => {
-      if (/class_(declaration|definition)$|^class$/.test(node.type) && node.childForFieldName("name")?.text === base.name) classes.push(node);
-    });
-    if (classes.length !== 1) return "unknown";
-    if (declaresMember(classes[0]!, member)) return "yes";
-    const above = inheritedHere(classes[0]!, member, side, depth + 1);
-    if (above !== "no") return above;
-  }
-  return "no";
+  const known = inherited_.get(tree) ?? new Map<string, "yes" | "no" | "unknown">();
+  inherited_.set(tree, known);
+  const key = `${name.text}\0${member}\0${depth}`;
+  const remembered = known.get(key);
+  if (remembered) return remembered;
+  const answer = ((): "yes" | "no" | "unknown" => {
+    const read = declaredBases(side.source, name.text, side.language);
+    if (!("bases" in read) || read.doubt) return "unknown";
+    const classes = classesIn(tree);
+    for (const base of read.bases) {
+      // `object` declares nothing a call names; any other base written
+      // nowhere here is somebody else's, and may be the one declaring it.
+      if (base.name === "object" && side.language === "python") continue;
+      const named = classes.get(base.name) ?? [];
+      if (named.length !== 1) return "unknown";
+      if (declaresMember(named[0]!, member)) return "yes";
+      const above = inheritedHere(named[0]!, member, side, depth + 1);
+      if (above !== "no") return above;
+    }
+    return "no";
+  })();
+  known.set(key, answer);
+  return answer;
+}
+
+const inherited_ = new WeakMap<Tree, Map<string, "yes" | "no" | "unknown">>();
+const classes_ = new WeakMap<Tree, Map<string, Node[]>>();
+
+/** The classes one file declares, by name, read once per tree. */
+function classesIn(tree: Tree): Map<string, Node[]> {
+  const known = classes_.get(tree);
+  if (known) return known;
+  const made = new Map<string, Node[]>();
+  each(tree.rootNode, (node) => {
+    const name = /class_(declaration|definition)$|^class$/.test(node.type) ? node.childForFieldName("name")?.text : undefined;
+    if (name !== undefined) made.set(name, [...made.get(name) ?? [], node]);
+  });
+  classes_.set(tree, made);
+  return made;
 }
 
 /**
@@ -3631,7 +3692,7 @@ function memberOfType(
     if (meaning.at === "declared") type = callee.through;
   }
   if (!type) return undefined;
-  const tree = parseSource(side.source, side.language);
+  const tree = (site as Node & { tree?: Tree }).tree ?? parseSource(side.source, side.language);
   if (!tree) return undefined;
   /*
    * An inherent `impl` only. A type's own method wins over any trait's, so a
@@ -3639,16 +3700,7 @@ function memberOfType(
    * `OwnedDFA::state_len(self)` when `OwnedDFA` has its own in another file
    * -- regex's remapper is exactly that, and placing it here was wrong.
    */
-  let found = false;
-  each(tree.rootNode, (node) => {
-    if (found || node.type !== "impl_item" || node.childForFieldName("trait") || implTypeName(node) !== type) return;
-    const body = node.childForFieldName("body");
-    for (let index = 0; body && index < body.childCount; index += 1) {
-      const item = body.child(index);
-      if (item?.type === "function_item" && item.childForFieldName("name")?.text === callee.name) found = true;
-    }
-  });
-  return found ? { file: side.file, as: callee.name } : undefined;
+  return rustMethods(tree).inherent.get(type)?.has(callee.name) ? { file: side.file, as: callee.name } : undefined;
 }
 
 const RUST_CLOSED_TYPES = new Set(["Box", "String", "Vec", "Option", "Result"]);
@@ -3677,14 +3729,33 @@ function closedToAdditions(type: string, member: string, side: CallSide): boolea
    * type's own methods, on the types that have nothing but.
    */
   if (!RUST_CLOSED_TYPES.has(type) || PRELUDE_TRAIT_METHODS.has(member)) return false;
-  const declares = new RegExp(`\\bfn\\s+${escapeName(member)}\\b`);
-  if (declares.test(side.source)) return false;
+  const reach = functionsInReach(side);
+  return reach !== undefined && !reach.has(member);
+}
+
+const reach_ = new Map<string, Set<string> | undefined>();
+
+/**
+ * Every function name this file and the repository files it imports from
+ * declare -- the methods a trait in scope could lend a standard type --
+ * read once per file rather than once per `Vec::new()`. `undefined` when one
+ * of those files could not be opened, which leaves every such call open.
+ */
+function functionsInReach(side: CallSide): Set<string> | undefined {
+  const key = `${side.file}\n${side.source}`;
+  if (reach_.has(key)) return reach_.get(key);
+  let names: Set<string> | undefined = new Set<string>();
+  const take = (source: string) => { for (const m of source.matchAll(/\bfn\s+([A-Za-z_]\w*)/g)) names?.add(m[1]!); };
+  take(side.source);
   for (const one of side.imports) {
     if (!one.file) continue;
     const opened = side.open?.(one.file);
-    if (!opened || declares.test(opened.source)) return false;
+    if (!opened) { names = undefined; break; }
+    take(opened.source);
   }
-  return true;
+  reach_.set(key, names);
+  if (reach_.size > 64) reach_.delete(reach_.keys().next().value!);
+  return names;
 }
 
 /** One call site as `callSitesIn` lists it, placed or refused. */
