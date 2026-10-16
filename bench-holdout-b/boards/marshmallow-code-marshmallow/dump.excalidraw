@@ -1,0 +1,1419 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "schema-dump-serialization-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 396.00000000000006,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1333000069,
+      "version": 1,
+      "versionNonce": 1930614671,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "role": "title"
+      },
+      "text": "Schema.dump Serialization Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Schema.dump Serialization Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 140,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 303150188,
+      "version": 1,
+      "versionNonce": 869503416,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-node-0-label"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "node": "dump",
+        "ref": "src/marshmallow/schema.py#dump"
+      }
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-1",
+      "type": "rectangle",
+      "x": 500,
+      "y": 200,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 908970373,
+      "version": 1,
+      "versionNonce": 697855375,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-node-1-label"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "node": "hooks_pre",
+        "ref": "src/marshmallow/schema.py#_invoke_dump_processors"
+      }
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-2",
+      "type": "rectangle",
+      "x": 1060,
+      "y": 180,
+      "width": 180,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 692172586,
+      "version": 1,
+      "versionNonce": 1175555838,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-node-2-label"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "node": "serialize",
+        "ref": "src/marshmallow/schema.py#_serialize"
+      }
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-3",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 20,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1453991547,
+      "version": 1,
+      "versionNonce": 490525173,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-node-3-label"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "node": "hooks_post",
+        "ref": "src/marshmallow/schema.py#_invoke_dump_processors"
+      }
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-4",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 200,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 2019558640,
+      "version": 1,
+      "versionNonce": 394776652,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-node-4-label"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "node": "field_ser",
+        "ref": "src/marshmallow/fields.py#serialize"
+      }
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-5",
+      "type": "rectangle",
+      "x": 2140,
+      "y": 200,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1909929337,
+      "version": 1,
+      "versionNonce": 1220630851,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-node-5-label"
+        },
+        {
+          "id": "schema-dump-serialization-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "node": "field_conv",
+        "ref": "src/marshmallow/fields.py#_serialize"
+      }
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-0",
+      "type": "arrow",
+      "x": 172,
+      "y": 237.6,
+      "width": 332.8,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1963689443,
+      "version": 1,
+      "versionNonce": 1359643261,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "edge": {
+          "from": "dump",
+          "to": "hooks_pre",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.3,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "schema-dump-serialization-flow-node-0",
+        "focus": 0.6266666666666666,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "schema-dump-serialization-flow-node-1",
+        "focus": 0.06000000000000019,
+        "gap": 4.800000000000011
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-1",
+      "type": "arrow",
+      "x": 724.8,
+      "y": 237.6,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1941194866,
+      "version": 1,
+      "versionNonce": 1082179622,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "edge": {
+          "from": "hooks_pre",
+          "to": "serialize",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "schema-dump-serialization-flow-node-1",
+        "focus": -0.06000000000000019,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "schema-dump-serialization-flow-node-2",
+        "focus": -0.1520000000000005,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-2",
+      "type": "arrow",
+      "x": 172,
+      "y": 207.6,
+      "width": 885.5999999999999,
+      "height": 122.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1703721485,
+      "version": 1,
+      "versionNonce": 249936375,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "edge": {
+          "from": "dump",
+          "to": "serialize",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -122.8
+        ],
+        [
+          441.1333333333332,
+          -122.8
+        ],
+        [
+          777.5999999999999,
+          -122.8
+        ],
+        [
+          777.5999999999999,
+          -3.333333333333343
+        ],
+        [
+          885.0999999999999,
+          -3.333333333333343
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "schema-dump-serialization-flow-node-0",
+        "focus": 0.1266666666666667,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "schema-dump-serialization-flow-node-2",
+        "focus": 0.514666666666666,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-3",
+      "type": "arrow",
+      "x": 1237.6,
+      "y": 237.6,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 2086265524,
+      "version": 1,
+      "versionNonce": 1567251840,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "edge": {
+          "from": "serialize",
+          "to": "field_ser",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.4000000000001,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "schema-dump-serialization-flow-node-2",
+        "focus": 0.1520000000000005,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "schema-dump-serialization-flow-node-4",
+        "focus": 0.060000000000002066,
+        "gap": 9.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-4",
+      "type": "arrow",
+      "x": 1810.3999999999999,
+      "y": 237.6,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1206686951,
+      "version": 1,
+      "versionNonce": 1409461121,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "edge": {
+          "from": "field_ser",
+          "to": "field_conv",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999986,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "schema-dump-serialization-flow-node-4",
+        "focus": -0.06000000000000036,
+        "gap": 9.600000000000136
+      },
+      "endBinding": {
+        "elementId": "schema-dump-serialization-flow-node-5",
+        "focus": 0.060000000000001295,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-5",
+      "type": "arrow",
+      "x": 1237.6,
+      "y": 204.26666666666665,
+      "width": 332.79999999999995,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 654923606,
+      "version": 1,
+      "versionNonce": 377327674,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "edge": {
+          "from": "serialize",
+          "to": "hooks_post",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -120
+        ],
+        [
+          106.40000000000009,
+          -120
+        ],
+        [
+          219.5999999999999,
+          -120
+        ],
+        [
+          276.1999999999998,
+          -120
+        ],
+        [
+          332.29999999999995,
+          -120
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "schema-dump-serialization-flow-node-2",
+        "focus": -0.514666666666666,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "schema-dump-serialization-flow-node-3",
+        "focus": -0.2853333333333341,
+        "gap": 9.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-6",
+      "type": "arrow",
+      "x": 172,
+      "y": 177.6,
+      "width": 1398.3999999999999,
+      "height": 165.6,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1333561441,
+      "version": 1,
+      "versionNonce": 43005483,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "schema-dump-serialization-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow",
+        "edge": {
+          "from": "dump",
+          "to": "hooks_post",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -165.6
+        ],
+        [
+          635.8666666666666,
+          -165.6
+        ],
+        [
+          1290.3999999999999,
+          -165.6
+        ],
+        [
+          1290.3999999999999,
+          -126.66666666666667
+        ],
+        [
+          1397.8999999999999,
+          -126.66666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "schema-dump-serialization-flow-node-0",
+        "focus": -0.3733333333333333,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "schema-dump-serialization-flow-node-3",
+        "focus": 0.38133333333333375,
+        "gap": 9.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-0-label",
+      "type": "text",
+      "x": 67,
+      "y": 187.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 2061217033,
+      "version": 1,
+      "versionNonce": 1240228499,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "dump()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-node-0",
+      "originalText": "dump()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-1-label",
+      "type": "text",
+      "x": 533,
+      "y": 227.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 903373804,
+      "version": 1,
+      "versionNonce": 93968440,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "PRE_DUMP hooks",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-node-1",
+      "originalText": "PRE_DUMP hooks",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-2-label",
+      "type": "text",
+      "x": 1084,
+      "y": 217.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1490678491,
+      "version": 1,
+      "versionNonce": 503578325,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "_serialize()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-node-2",
+      "originalText": "_serialize()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-3-label",
+      "type": "text",
+      "x": 1607.5,
+      "y": 57.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 194118182,
+      "version": 1,
+      "versionNonce": 720587786,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "POST_DUMP hooks",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-node-3",
+      "originalText": "POST_DUMP hooks",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-4-label",
+      "type": "text",
+      "x": 1606.5,
+      "y": 227.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2000033741,
+      "version": 1,
+      "versionNonce": 160611511,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "Field.serialize()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-node-4",
+      "originalText": "Field.serialize()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-node-5-label",
+      "type": "text",
+      "x": 2171,
+      "y": 227.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 997559808,
+      "version": 1,
+      "versionNonce": 906441436,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "Field._serialize()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-node-5",
+      "originalText": "Field._serialize()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-0-label",
+      "type": "text",
+      "x": 312,
+      "y": 227.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1622453630,
+      "version": 1,
+      "versionNonce": 2053680418,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-1-label",
+      "type": "text",
+      "x": 864.8,
+      "y": 227.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 966388243,
+      "version": 1,
+      "versionNonce": 135645037,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-edge-1",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-2-label",
+      "type": "text",
+      "x": 586.7333333333332,
+      "y": 74.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 700779204,
+      "version": 1,
+      "versionNonce": 1207853264,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-3-label",
+      "type": "text",
+      "x": 1377.6,
+      "y": 227.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 253879681,
+      "version": 1,
+      "versionNonce": 758100683,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-4-label",
+      "type": "text",
+      "x": 1950.3999999999996,
+      "y": 227.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 895365730,
+      "version": 1,
+      "versionNonce": 1489498198,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-5-label",
+      "type": "text",
+      "x": 1317.6,
+      "y": 74.26666666666665,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 51271175,
+      "version": 1,
+      "versionNonce": 1668518945,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-edge-5",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "schema-dump-serialization-flow-edge-6-label",
+      "type": "text",
+      "x": 781.4666666666666,
+      "y": 2,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1179962296,
+      "version": 1,
+      "versionNonce": 1076520724,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "schema-dump-serialization-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "schema-dump-serialization-flow-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

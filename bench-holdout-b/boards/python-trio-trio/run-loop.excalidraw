@@ -1,0 +1,2551 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "trio-run-loop-architecture-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 343.20000000000005,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 917962998,
+      "version": 1,
+      "versionNonce": 577133658,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "role": "title"
+      },
+      "text": "Trio Run Loop Architecture",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Trio Run Loop Architecture",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 360,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1356766937,
+      "version": 1,
+      "versionNonce": 23896099,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-node-0-label"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "node": "run",
+        "ref": "src/trio/_core/_run.py#run"
+      }
+    },
+    {
+      "id": "trio-run-loop-architecture-node-1",
+      "type": "rectangle",
+      "x": 500,
+      "y": 160,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 2085737936,
+      "version": 1,
+      "versionNonce": 1407668396,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-node-1-label"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "node": "setup_runner",
+        "ref": "src/trio/_core/_run.py#setup_runner"
+      }
+    },
+    {
+      "id": "trio-run-loop-architecture-node-2",
+      "type": "rectangle",
+      "x": 1160,
+      "y": 140,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1230891519,
+      "version": 1,
+      "versionNonce": 1226726169,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-node-2-label"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "node": "runner",
+        "ref": "src/trio/_core/_run.py#Runner"
+      }
+    },
+    {
+      "id": "trio-run-loop-architecture-node-3",
+      "type": "ellipse",
+      "x": 1060,
+      "y": 360,
+      "width": 280,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1000119406,
+      "version": 1,
+      "versionNonce": 767377042,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-node-3-label"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "node": "unrolled_run",
+        "ref": "src/trio/_core/_run.py#unrolled_run"
+      }
+    },
+    {
+      "id": "trio-run-loop-architecture-node-4",
+      "type": "rectangle",
+      "x": 1900,
+      "y": 200,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1717480293,
+      "version": 1,
+      "versionNonce": 646735343,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-node-4-label"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "node": "io_manager",
+        "ref": "src/trio/_core/_io_epoll.py#EpollIOManager",
+        "state": "external"
+      }
+    },
+    {
+      "id": "trio-run-loop-architecture-node-5",
+      "type": "rectangle",
+      "x": 3160,
+      "y": 440,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 410803020,
+      "version": 1,
+      "versionNonce": 1882291992,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-node-5-label"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "node": "runqueue",
+        "ref": "src/trio/_core/_run.py#Runner.runq"
+      }
+    },
+    {
+      "id": "trio-run-loop-architecture-node-6",
+      "type": "rectangle",
+      "x": 3160,
+      "y": 160,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 158395355,
+      "version": 1,
+      "versionNonce": 464386517,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-node-6-label"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "node": "task",
+        "ref": "src/trio/_core/_run.py#Task"
+      }
+    },
+    {
+      "id": "trio-run-loop-architecture-node-7",
+      "type": "rectangle",
+      "x": 1900,
+      "y": 380,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 138907018,
+      "version": 1,
+      "versionNonce": 2084728030,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-node-7-label"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "node": "deadlines",
+        "ref": "src/trio/_core/_run.py#Deadlines"
+      }
+    },
+    {
+      "id": "trio-run-loop-architecture-node-8",
+      "type": "rectangle",
+      "x": 1900,
+      "y": 20,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 2116261185,
+      "version": 1,
+      "versionNonce": 286226059,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-node-8-label"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "node": "clock",
+        "ref": "src/trio/_abc.py#Clock",
+        "state": "external"
+      }
+    },
+    {
+      "id": "trio-run-loop-architecture-node-9",
+      "type": "rectangle",
+      "x": 2540,
+      "y": 200,
+      "width": 180,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1778134168,
+      "version": 1,
+      "versionNonce": 477063796,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-node-9-label"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "trio-run-loop-architecture-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "node": "reschedule",
+        "ref": "src/trio/_core/_run.py#Runner.reschedule"
+      }
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-0",
+      "type": "arrow",
+      "x": 172,
+      "y": 391.3333333333333,
+      "width": 332.8,
+      "height": 189.4666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1063164814,
+      "version": 1,
+      "versionNonce": 1973882930,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "run",
+          "to": "setup_runner",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          5.684341886080802e-14
+        ],
+        [
+          32,
+          -189.46666666666664
+        ],
+        [
+          71.66666666666663,
+          -189.46666666666664
+        ],
+        [
+          136.95,
+          -189.46666666666664
+        ],
+        [
+          202.23333333333335,
+          -189.46666666666664
+        ],
+        [
+          332.3,
+          -189.46666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-0",
+        "focus": -0.3733333333333357,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-1",
+        "focus": -0.04666666666666762,
+        "gap": 4.800000000000011
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-1",
+      "type": "arrow",
+      "x": 724.8,
+      "y": 201.86666666666667,
+      "width": 431.60000000000014,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 2079645087,
+      "version": 1,
+      "versionNonce": 1287617337,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "setup_runner",
+          "to": "runner",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          215.80000000000007,
+          0
+        ],
+        [
+          431.10000000000014,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-1",
+        "focus": 0.04666666666666762,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-2",
+        "focus": -0.03111111111111063,
+        "gap": 3.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-2",
+      "type": "arrow",
+      "x": 172,
+      "y": 424.66666666666663,
+      "width": 894.4000000000001,
+      "height": 5.684341886080802e-14,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1529338480,
+      "version": 1,
+      "versionNonce": 404547788,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "run",
+          "to": "unrolled_run",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          447.20000000000005,
+          0
+        ],
+        [
+          893.9000000000001,
+          -0.49999999999994316
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-0",
+        "focus": 0.293333333333332,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-3",
+        "focus": 0.07619047619047364,
+        "gap": 5.910673489719355
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-3",
+      "type": "arrow",
+      "x": 1346.4,
+      "y": 410.6666666666667,
+      "width": 561.5999999999999,
+      "height": 152,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1419709177,
+      "version": 1,
+      "versionNonce": 1230401987,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "unrolled_run",
+          "to": "io_manager",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          -152
+        ],
+        [
+          204.79999999999995,
+          -152
+        ],
+        [
+          383.1999999999998,
+          -152
+        ],
+        [
+          472.39999999999986,
+          -152
+        ],
+        [
+          561.0999999999999,
+          -152
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-3",
+        "focus": -0.2761904761904766,
+        "gap": 10.579861995991886
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-4",
+        "focus": -0.17333333333333248,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-4",
+      "type": "arrow",
+      "x": 2068,
+      "y": 242.00000000000003,
+      "width": 464.8000000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 201952426,
+      "version": 1,
+      "versionNonce": 1185326974,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "io_manager",
+          "to": "reschedule",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          232.4000000000001,
+          0
+        ],
+        [
+          464.3000000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-4",
+        "focus": -0.1599999999999994,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-9",
+        "focus": 0.16000000000000064,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-5",
+      "type": "arrow",
+      "x": 1346.4,
+      "y": 466.6666666666667,
+      "width": 1813.6,
+      "height": 45.333333333333314,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 963771387,
+      "version": 1,
+      "versionNonce": 500296309,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "unrolled_run",
+          "to": "runqueue",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          45.333333333333314
+        ],
+        [
+          884.1333333333332,
+          45.333333333333314
+        ],
+        [
+          1348.8666666666663,
+          45.333333333333314
+        ],
+        [
+          1581.2333333333331,
+          45.333333333333314
+        ],
+        [
+          1813.1,
+          45.333333333333314
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-3",
+        "focus": 0.5238095238095235,
+        "gap": 19.505480559464598
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-5",
+        "focus": -0.43999999999999945,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-6",
+      "type": "arrow",
+      "x": 2712.8,
+      "y": 258.6666666666667,
+      "width": 447.1999999999998,
+      "height": 220,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1960413676,
+      "version": 1,
+      "versionNonce": 879274552,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "reschedule",
+          "to": "runqueue",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          83.40000000000009,
+          0
+        ],
+        [
+          166.80000000000018,
+          0
+        ],
+        [
+          333.5999999999999,
+          0
+        ],
+        [
+          339.1999999999998,
+          0
+        ],
+        [
+          339.1999999999998,
+          220
+        ],
+        [
+          446.6999999999998,
+          220
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-9",
+        "focus": 0.17333333333333262,
+        "gap": 7.199999999999818
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-5",
+        "focus": 0.22666666666666518,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-7",
+      "type": "arrow",
+      "x": 2712.8,
+      "y": 225.33333333333337,
+      "width": 447.1999999999998,
+      "height": 23.466666666666697,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 418750213,
+      "version": 1,
+      "versionNonce": 707626511,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "reschedule",
+          "to": "task",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -23.466666666666697
+        ],
+        [
+          211.8666666666668,
+          -23.466666666666697
+        ],
+        [
+          270.6999999999998,
+          -23.466666666666697
+        ],
+        [
+          329.5333333333333,
+          -23.466666666666697
+        ],
+        [
+          446.6999999999998,
+          -23.466666666666697
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-9",
+        "focus": -0.49333333333333385,
+        "gap": 7.199999999999818
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-6",
+        "focus": -0.04666666666666458,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-8",
+      "type": "arrow",
+      "x": 1316.4,
+      "y": 201.86666666666667,
+      "width": 591.5999999999999,
+      "height": 23.466666666666697,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1500565590,
+      "version": 1,
+      "versionNonce": 1868630842,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "runner",
+          "to": "io_manager",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          76.88333333333321,
+          0
+        ],
+        [
+          153.76666666666665,
+          0
+        ],
+        [
+          307.5333333333333,
+          0
+        ],
+        [
+          483.5999999999999,
+          0
+        ],
+        [
+          483.5999999999999,
+          23.466666666666697
+        ],
+        [
+          591.0999999999999,
+          23.466666666666697
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-2",
+        "focus": 0.03111111111111063,
+        "gap": 3.599999999999909
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-4",
+        "focus": 0.49333333333333323,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-9",
+      "type": "arrow",
+      "x": 1316.4,
+      "y": 231.86666666666667,
+      "width": 591.5999999999999,
+      "height": 173.4666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 2052328935,
+      "version": 1,
+      "versionNonce": 753280641,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "runner",
+          "to": "deadlines",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          -0.5
+        ],
+        [
+          134,
+          0
+        ],
+        [
+          134,
+          150
+        ],
+        [
+          232.5333333333333,
+          150
+        ],
+        [
+          483.5999999999999,
+          150
+        ],
+        [
+          483.5999999999999,
+          173.4666666666667
+        ],
+        [
+          591.0999999999999,
+          173.96666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-2",
+        "focus": 0.5311111111111109,
+        "gap": 3.599999999999909
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-7",
+        "focus": 0.49333333333333607,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-10",
+      "type": "arrow",
+      "x": 1316.4,
+      "y": 171.86666666666667,
+      "width": 591.5999999999999,
+      "height": 150.00000000000006,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1880858239,
+      "version": 1,
+      "versionNonce": 1170309273,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "runner",
+          "to": "clock",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          62,
+          0
+        ],
+        [
+          62,
+          -150.00000000000006
+        ],
+        [
+          232.5333333333333,
+          -150.00000000000006
+        ],
+        [
+          483.5999999999999,
+          -150.00000000000006
+        ],
+        [
+          483.5999999999999,
+          -126.53333333333336
+        ],
+        [
+          591.0999999999999,
+          -127.03333333333335
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-2",
+        "focus": -0.46888888888888935,
+        "gap": 3.599999999999909
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-8",
+        "focus": 0.49333333333333357,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-11",
+      "type": "arrow",
+      "x": 1346.4,
+      "y": 438.6666666666667,
+      "width": 561.5999999999999,
+      "height": 5.684341886080802e-14,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1650086126,
+      "version": 1,
+      "versionNonce": 710960146,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "unrolled_run",
+          "to": "deadlines",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          280.79999999999995,
+          -5.684341886080802e-14
+        ],
+        [
+          561.0999999999999,
+          -5.684341886080802e-14
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-3",
+        "focus": 0.12380952380952456,
+        "gap": 7.291564250682745
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-7",
+        "focus": -0.17333333333333187,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-12",
+      "type": "arrow",
+      "x": 1346.4,
+      "y": 382.6666666666667,
+      "width": 561.5999999999999,
+      "height": 304.00000000000006,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 2006733657,
+      "version": 1,
+      "versionNonce": 2114962851,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "trio-run-loop-architecture-edge-12-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture",
+        "edge": {
+          "from": "unrolled_run",
+          "to": "clock",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -304.00000000000006
+        ],
+        [
+          128.79999999999995,
+          -304.00000000000006
+        ],
+        [
+          345.1999999999998,
+          -304.00000000000006
+        ],
+        [
+          453.39999999999986,
+          -304
+        ],
+        [
+          561.0999999999999,
+          -304
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "trio-run-loop-architecture-node-3",
+        "focus": -0.6761904761904766,
+        "gap": 26.379842574715685
+      },
+      "endBinding": {
+        "elementId": "trio-run-loop-architecture-node-8",
+        "focus": -0.17333333333333248,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "trio-run-loop-architecture-node-0-label",
+      "type": "text",
+      "x": 44.99999999999999,
+      "y": 397.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 848274272,
+      "version": 1,
+      "versionNonce": 1835266748,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "trio.run()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-node-0",
+      "originalText": "trio.run()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-node-1-label",
+      "type": "text",
+      "x": 533,
+      "y": 187.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1766456109,
+      "version": 1,
+      "versionNonce": 1372876183,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "setup_runner()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-node-1",
+      "originalText": "setup_runner()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-node-2-label",
+      "type": "text",
+      "x": 1207,
+      "y": 187.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 938903050,
+      "version": 1,
+      "versionNonce": 213098078,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "Runner",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-node-2",
+      "originalText": "Runner",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-node-3-label",
+      "type": "text",
+      "x": 1123.0050506338835,
+      "y": 417.50252531694167,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 202921999,
+      "version": 1,
+      "versionNonce": 1102130665,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "unrolled_run()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-node-3",
+      "originalText": "unrolled_run()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-node-4-label",
+      "type": "text",
+      "x": 1930.5,
+      "y": 237.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2036831692,
+      "version": 1,
+      "versionNonce": 41850520,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "IOManager",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-node-4",
+      "originalText": "IOManager",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-node-5-label",
+      "type": "text",
+      "x": 3184.5,
+      "y": 477.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 660748137,
+      "version": 1,
+      "versionNonce": 1793478771,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "runqueue (Task deque)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-node-5",
+      "originalText": "runqueue (Task deque)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-node-6-label",
+      "type": "text",
+      "x": 3218,
+      "y": 187.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 2028010374,
+      "version": 1,
+      "versionNonce": 2006120426,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "Task",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-node-6",
+      "originalText": "Task",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-node-7-label",
+      "type": "text",
+      "x": 1930.5,
+      "y": 417.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1720034107,
+      "version": 1,
+      "versionNonce": 1087311541,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "Deadlines",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-node-7",
+      "originalText": "Deadlines",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-node-8-label",
+      "type": "text",
+      "x": 1952.5,
+      "y": 57.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1324826136,
+      "version": 1,
+      "versionNonce": 330036980,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "Clock",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-node-8",
+      "originalText": "Clock",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-node-9-label",
+      "type": "text",
+      "x": 2564,
+      "y": 237.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 448700133,
+      "version": 1,
+      "versionNonce": 429439087,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "reschedule()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-node-9",
+      "originalText": "reschedule()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-0-label",
+      "type": "text",
+      "x": 217.26666666666662,
+      "y": 191.86666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 71891503,
+      "version": 1,
+      "versionNonce": 1405561737,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-1-label",
+      "type": "text",
+      "x": 909.8000000000001,
+      "y": 191.86666666666667,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 21638442,
+      "version": 1,
+      "versionNonce": 1533235454,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-1",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-2-label",
+      "type": "text",
+      "x": 531.2,
+      "y": 414.66666666666663,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1041449293,
+      "version": 1,
+      "versionNonce": 398135607,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "passes runner @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-2",
+      "originalText": "passes runner @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-3-label",
+      "type": "text",
+      "x": 1436.8,
+      "y": 248.66666666666669,
+      "width": 228.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 38975360,
+      "version": 1,
+      "versionNonce": 1143965532,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "get_events(timeout) @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-3",
+      "originalText": "get_events(timeout) @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-4-label",
+      "type": "text",
+      "x": 2208,
+      "y": 232.00000000000003,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 532094043,
+      "version": 1,
+      "versionNonce": 741102421,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "process_events @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-4",
+      "originalText": "process_events @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-5-label",
+      "type": "text",
+      "x": 2142.5333333333333,
+      "y": 502,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1383017382,
+      "version": 1,
+      "versionNonce": 958111882,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "runs tasks @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-5",
+      "originalText": "runs tasks @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-6-label",
+      "type": "text",
+      "x": 2962.8,
+      "y": 248.66666666666669,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1102632585,
+      "version": 1,
+      "versionNonce": 1477752595,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "appends Task @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-6",
+      "originalText": "appends Task @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-7-label",
+      "type": "text",
+      "x": 2898.266666666667,
+      "y": 191.86666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 2092273004,
+      "version": 1,
+      "versionNonce": 331492536,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-7",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-8-label",
+      "type": "text",
+      "x": 1549.1333333333334,
+      "y": 191.86666666666667,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 208799495,
+      "version": 1,
+      "versionNonce": 727922465,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "io_manager @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-8",
+      "originalText": "io_manager @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-9-label",
+      "type": "text",
+      "x": 1478.5333333333333,
+      "y": 371.8666666666667,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1052894050,
+      "version": 1,
+      "versionNonce": 548901718,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "deadlines @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-9",
+      "originalText": "deadlines @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-10-label",
+      "type": "text",
+      "x": 1496.1333333333334,
+      "y": 11.866666666666617,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1579325066,
+      "version": 1,
+      "versionNonce": 605132766,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "clock @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-10",
+      "originalText": "clock @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-11-label",
+      "type": "text",
+      "x": 1486.4,
+      "y": 428.66666666666663,
+      "width": 281.6,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 843344015,
+      "version": 1,
+      "versionNonce": 1494165353,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "expire(), next_deadline() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-11",
+      "originalText": "expire(), next_deadline() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "trio-run-loop-architecture-edge-12-label",
+      "type": "text",
+      "x": 1338.8,
+      "y": 68.66666666666663,
+      "width": 272.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1488696288,
+      "version": 1,
+      "versionNonce": 79817788,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "trio-run-loop-architecture"
+      },
+      "text": "deadline_to_sleep_time() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "trio-run-loop-architecture-edge-12",
+      "originalText": "deadline_to_sleep_time() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
