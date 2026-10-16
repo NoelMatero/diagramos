@@ -1,0 +1,2092 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "litestar-route-registration-and-request--title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 633.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 678641318,
+      "version": 1,
+      "versionNonce": 562399626,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "role": "title"
+      },
+      "text": "Litestar Route Registration and Request Matching",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Litestar Route Registration and Request Matching",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 40,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 211921929,
+      "version": 2,
+      "versionNonce": 1151127443,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--node-0-label"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "node": "handler",
+        "ref": "litestar/handlers/base.py#BaseRouteHandler"
+      }
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-1",
+      "type": "rectangle",
+      "x": 520,
+      "y": 40,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 611359936,
+      "version": 1,
+      "versionNonce": 642635932,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--node-1-label"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "node": "router",
+        "ref": "litestar/router.py#Router"
+      }
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-2",
+      "type": "rectangle",
+      "x": 1020,
+      "y": 40,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 87950511,
+      "version": 2,
+      "versionNonce": 1434891017,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--node-2-label"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "node": "route",
+        "ref": "litestar/routes/http.py#HTTPRoute"
+      }
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-3",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 40,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 695306590,
+      "version": 1,
+      "versionNonce": 889448578,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--node-3-label"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "node": "asgi_router",
+        "ref": "litestar/_asgi/asgi_router.py#ASGIRouter"
+      }
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-4",
+      "type": "rectangle",
+      "x": 2020,
+      "y": 340,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1733658709,
+      "version": 1,
+      "versionNonce": 620083807,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--node-4-label"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "node": "construct_trie",
+        "ref": "litestar/_asgi/asgi_router.py#ASGIRouter.construct_routing_trie"
+      }
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-5",
+      "type": "rectangle",
+      "x": 2680,
+      "y": 340,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 2126545340,
+      "version": 1,
+      "versionNonce": 1015999304,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--node-5-label"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "node": "add_route_trie",
+        "ref": "litestar/_asgi/routing_trie/mapping.py#add_route_to_trie"
+      }
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-6",
+      "type": "rectangle",
+      "x": 3300,
+      "y": 180,
+      "width": 200,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 800370059,
+      "version": 1,
+      "versionNonce": 1107091973,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--node-6-label"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "node": "trie_node",
+        "ref": "litestar/_asgi/routing_trie/types.py#RouteTrieNode"
+      }
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-7",
+      "type": "rectangle",
+      "x": 2040,
+      "y": 20,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1110414714,
+      "version": 1,
+      "versionNonce": 675310798,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--node-7-label"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "node": "parse_path",
+        "ref": "litestar/_asgi/routing_trie/traversal.py#parse_path_to_route"
+      }
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-8",
+      "type": "rectangle",
+      "x": 2660,
+      "y": 180,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 2015905265,
+      "version": 2,
+      "versionNonce": 1796244091,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--node-8-label"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "node": "traverse_map",
+        "ref": "litestar/_asgi/routing_trie/traversal.py#traverse_route_map"
+      },
+      "label": "traverse_route_map()"
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-9",
+      "type": "rectangle",
+      "x": 2660,
+      "y": 20,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1336717000,
+      "version": 2,
+      "versionNonce": 1841029668,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--node-9-label"
+        },
+        {
+          "id": "litestar-route-registration-and-request--edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "node": "parse_handlers",
+        "ref": "litestar/_asgi/routing_trie/traversal.py#parse_node_handlers"
+      }
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-0",
+      "type": "arrow",
+      "x": 192,
+      "y": 85.33333333333334,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1051133438,
+      "version": 1,
+      "versionNonce": 1592393378,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "edge": {
+          "from": "handler",
+          "to": "router",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "litestar-route-registration-and-request--node-0",
+        "focus": 0.13333333333333364,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "litestar-route-registration-and-request--node-1",
+        "focus": -0.133333333333333,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-1",
+      "type": "arrow",
+      "x": 684.8,
+      "y": 85.33333333333334,
+      "width": 341.60000000000014,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 443777359,
+      "version": 1,
+      "versionNonce": 414809641,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "edge": {
+          "from": "router",
+          "to": "route",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          170.80000000000007,
+          0
+        ],
+        [
+          341.10000000000014,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "litestar-route-registration-and-request--node-1",
+        "focus": 0.133333333333333,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "litestar-route-registration-and-request--node-2",
+        "focus": -0.1333333333333341,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-2",
+      "type": "arrow",
+      "x": 1186.4,
+      "y": 85.33333333333334,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 967186784,
+      "version": 3,
+      "versionNonce": 364885180,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "edge": {
+          "from": "route",
+          "to": "asgi_router",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.4000000000001,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "litestar-route-registration-and-request--node-2",
+        "focus": 0.1333333333333341,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "litestar-route-registration-and-request--node-3",
+        "focus": 0.09333333333333348,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": "depends"
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-3",
+      "type": "arrow",
+      "x": 1679.2,
+      "y": 102,
+      "width": 332.79999999999995,
+      "height": 270,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1311983401,
+      "version": 1,
+      "versionNonce": 193899315,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "edge": {
+          "from": "asgi_router",
+          "to": "construct_trie",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          269.4
+        ],
+        [
+          32,
+          270
+        ],
+        [
+          332.29999999999995,
+          270
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "litestar-route-registration-and-request--node-3",
+        "focus": 0.2400000000000004,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "litestar-route-registration-and-request--node-4",
+        "focus": 0.19999999999999998,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-4",
+      "type": "arrow",
+      "x": 2332,
+      "y": 372,
+      "width": 342.8000000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 104569242,
+      "version": 1,
+      "versionNonce": 1123132526,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "edge": {
+          "from": "construct_trie",
+          "to": "add_route_trie",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          171.4000000000001,
+          0
+        ],
+        [
+          342.3000000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "litestar-route-registration-and-request--node-4",
+        "focus": -0.19999999999999998,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "litestar-route-registration-and-request--node-5",
+        "focus": 0.2,
+        "gap": 5.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-5",
+      "type": "arrow",
+      "x": 2934.8,
+      "y": 372,
+      "width": 369.1999999999998,
+      "height": 126.66666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1197773611,
+      "version": 1,
+      "versionNonce": 1810139941,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "edge": {
+          "from": "add_route_trie",
+          "to": "trie_node",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          61.983333333333576,
+          0
+        ],
+        [
+          123.9666666666667,
+          0
+        ],
+        [
+          247.9333333333334,
+          0
+        ],
+        [
+          261.1999999999998,
+          0
+        ],
+        [
+          261.1999999999998,
+          -126.66666666666666
+        ],
+        [
+          368.6999999999998,
+          -126.66666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "litestar-route-registration-and-request--node-5",
+        "focus": -0.2,
+        "gap": 5.199999999999818
+      },
+      "endBinding": {
+        "elementId": "litestar-route-registration-and-request--node-6",
+        "focus": -0.3066666666666656,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-6",
+      "type": "arrow",
+      "x": 1679.2,
+      "y": 68.66666666666667,
+      "width": 359.4666666666667,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 376465244,
+      "version": 1,
+      "versionNonce": 1719047272,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "edge": {
+          "from": "asgi_router",
+          "to": "parse_path",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          179.73333333333335,
+          0
+        ],
+        [
+          358.9666666666667,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "litestar-route-registration-and-request--node-3",
+        "focus": -0.4266666666666676,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "litestar-route-registration-and-request--node-7",
+        "focus": 0.026666666666668195,
+        "gap": 1.3333333333332575
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-7",
+      "type": "arrow",
+      "x": 2318.666666666667,
+      "y": 85.33333333333333,
+      "width": 346.1333333333332,
+      "height": 126.66666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1045686389,
+      "version": 1,
+      "versionNonce": 1260988927,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "edge": {
+          "from": "parse_path",
+          "to": "traverse_map",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          45.33333333333303,
+          0
+        ],
+        [
+          45.33333333333303,
+          126.66666666666667
+        ],
+        [
+          109.73333333333312,
+          126.66666666666667
+        ],
+        [
+          168.83333333333303,
+          126.66666666666667
+        ],
+        [
+          227.9333333333334,
+          126.66666666666667
+        ],
+        [
+          345.6333333333332,
+          126.66666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "litestar-route-registration-and-request--node-7",
+        "focus": 0.30666666666666703,
+        "gap": 1.3333333333330302
+      },
+      "endBinding": {
+        "elementId": "litestar-route-registration-and-request--node-8",
+        "focus": 0.2,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-8",
+      "type": "arrow",
+      "x": 2944.8,
+      "y": 212,
+      "width": 359.1999999999998,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 938517062,
+      "version": 3,
+      "versionNonce": 1634739114,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "edge": {
+          "from": "traverse_map",
+          "to": "trie_node",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          179.5999999999999,
+          0
+        ],
+        [
+          358.6999999999998,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "litestar-route-registration-and-request--node-8",
+        "focus": -0.2,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "litestar-route-registration-and-request--node-6",
+        "focus": 0.36000000000000004,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": "accesses",
+      "label": "children"
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-9",
+      "type": "arrow",
+      "x": 2318.666666666667,
+      "y": 52,
+      "width": 346.1333333333332,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 881281303,
+      "version": 1,
+      "versionNonce": 143909361,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "litestar-route-registration-and-request--edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-",
+        "edge": {
+          "from": "parse_path",
+          "to": "parse_handlers",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          173.0666666666666,
+          0
+        ],
+        [
+          345.6333333333332,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "litestar-route-registration-and-request--node-7",
+        "focus": -0.3600000000000006,
+        "gap": 1.3333333333330302
+      },
+      "endBinding": {
+        "elementId": "litestar-route-registration-and-request--node-9",
+        "focus": 0.2,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-0-label",
+      "type": "text",
+      "x": 44,
+      "y": 67.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1162319952,
+      "version": 1,
+      "versionNonce": 784891948,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "RouteHandler",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--node-0",
+      "originalText": "RouteHandler",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-1-label",
+      "type": "text",
+      "x": 567,
+      "y": 67.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1561528861,
+      "version": 1,
+      "versionNonce": 101011847,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "Router",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--node-1",
+      "originalText": "Router",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-2-label",
+      "type": "text",
+      "x": 1072.5,
+      "y": 67.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1857889786,
+      "version": 1,
+      "versionNonce": 1260054094,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "Route",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--node-2",
+      "originalText": "Route",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-3-label",
+      "type": "text",
+      "x": 1545,
+      "y": 77.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 102883519,
+      "version": 1,
+      "versionNonce": 832345305,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "ASGIRouter",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--node-3",
+      "originalText": "ASGIRouter",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-4-label",
+      "type": "text",
+      "x": 2048,
+      "y": 367.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 2072894332,
+      "version": 1,
+      "versionNonce": 579696648,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "construct_routing_trie()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--node-4",
+      "originalText": "construct_routing_trie()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-5-label",
+      "type": "text",
+      "x": 2705.5,
+      "y": 367.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 795518681,
+      "version": 1,
+      "versionNonce": 1474115619,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "add_route_to_trie()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--node-5",
+      "originalText": "add_route_to_trie()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-6-label",
+      "type": "text",
+      "x": 3328.5,
+      "y": 217.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1967177910,
+      "version": 1,
+      "versionNonce": 1005697306,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "RouteTrieNode",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--node-6",
+      "originalText": "RouteTrieNode",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-7-label",
+      "type": "text",
+      "x": 2064.5,
+      "y": 57.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1336500459,
+      "version": 1,
+      "versionNonce": 808691429,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "parse_path_to_route()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--node-7",
+      "originalText": "parse_path_to_route()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-8-label",
+      "type": "text",
+      "x": 2690,
+      "y": 207.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 708471368,
+      "version": 1,
+      "versionNonce": 2061110436,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "traverse_route_map()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--node-8",
+      "originalText": "traverse_route_map()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--node-9-label",
+      "type": "text",
+      "x": 2684.5,
+      "y": 47.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 76375061,
+      "version": 1,
+      "versionNonce": 975227679,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "parse_node_handlers()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--node-9",
+      "originalText": "parse_node_handlers()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-0-label",
+      "type": "text",
+      "x": 332,
+      "y": 75.33333333333334,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1166949983,
+      "version": 1,
+      "versionNonce": 1764987641,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-1-label",
+      "type": "text",
+      "x": 824.8000000000001,
+      "y": 75.33333333333334,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 11320730,
+      "version": 1,
+      "versionNonce": 51204206,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--edge-1",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-2-label",
+      "type": "text",
+      "x": 1326.4,
+      "y": 75.33333333333334,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 902672317,
+      "version": 1,
+      "versionNonce": 2014349735,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--edge-2",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-3-label",
+      "type": "text",
+      "x": 1684.8,
+      "y": 361.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 318389104,
+      "version": 1,
+      "versionNonce": 2018221004,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-4-label",
+      "type": "text",
+      "x": 2477,
+      "y": 362,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1845988363,
+      "version": 1,
+      "versionNonce": 1584473477,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-5-label",
+      "type": "text",
+      "x": 3151.9333333333334,
+      "y": 362,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 220168278,
+      "version": 1,
+      "versionNonce": 1264589626,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--edge-5",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-6-label",
+      "type": "text",
+      "x": 1832.5333333333333,
+      "y": 58.66666666666667,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 320779513,
+      "version": 1,
+      "versionNonce": 743378883,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-7-label",
+      "type": "text",
+      "x": 2402,
+      "y": 202,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1642264604,
+      "version": 1,
+      "versionNonce": 1808771368,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-8-label",
+      "type": "text",
+      "x": 3084.8,
+      "y": 202,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1640290999,
+      "version": 1,
+      "versionNonce": 1287572753,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "@accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--edge-8",
+      "originalText": "@accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "litestar-route-registration-and-request--edge-9-label",
+      "type": "text",
+      "x": 2465.3333333333335,
+      "y": 42,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1766698002,
+      "version": 1,
+      "versionNonce": 1366406726,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "litestar-route-registration-and-request-"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "litestar-route-registration-and-request--edge-9",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

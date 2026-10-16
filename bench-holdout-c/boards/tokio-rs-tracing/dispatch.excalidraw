@@ -1,0 +1,1970 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "callsite-registration-and-dispatch-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 514.8000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 2037586122,
+      "version": 1,
+      "versionNonce": 2098892318,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Callsite Registration and Dispatch Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Callsite Registration and Dispatch Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-0",
+      "type": "rectangle",
+      "x": 800,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1428909485,
+      "version": 1,
+      "versionNonce": 633056535,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-node-0-label"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "node": "callsite",
+        "ref": "tracing-core/src/callsite.rs#DefaultCallsite"
+      }
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-1",
+      "type": "rectangle",
+      "x": 780,
+      "y": 400,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 366464980,
+      "version": 1,
+      "versionNonce": 2012514848,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-node-1-label"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "node": "callsite_register",
+        "ref": "tracing-core/src/callsite.rs#DefaultCallsite::register"
+      }
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-2",
+      "type": "rectangle",
+      "x": 780,
+      "y": 780,
+      "width": 360,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 944642819,
+      "version": 1,
+      "versionNonce": 1058664477,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-node-2-label"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "node": "rebuild_interest",
+        "ref": "tracing-core/src/callsite.rs#rebuild_callsite_interest"
+      }
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-3",
+      "type": "rectangle",
+      "x": 460,
+      "y": 780,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 179920786,
+      "version": 1,
+      "versionNonce": 1845315782,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-node-3-label"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "node": "callsites_type",
+        "ref": "tracing-core/src/callsite.rs#Callsites"
+      }
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-4",
+      "type": "rectangle",
+      "x": 680,
+      "y": 1160,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 357995521,
+      "version": 1,
+      "versionNonce": 1914594891,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-node-4-label"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "node": "dispatch",
+        "ref": "tracing-core/src/dispatcher.rs#Dispatch"
+      }
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-5",
+      "type": "rectangle",
+      "x": 340,
+      "y": 1540,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1701421144,
+      "version": 1,
+      "versionNonce": 234245428,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-node-5-label"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "node": "subscriber",
+        "ref": "tracing-core/src/subscriber.rs#Subscriber"
+      }
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-6",
+      "type": "rectangle",
+      "x": 920,
+      "y": 1160,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 229217031,
+      "version": 1,
+      "versionNonce": 366254881,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-node-6-label"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "node": "interest",
+        "ref": "tracing-core/src/subscriber.rs#Interest"
+      }
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-7",
+      "type": "rectangle",
+      "x": 80,
+      "y": 400,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1041133174,
+      "version": 1,
+      "versionNonce": 822590682,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-node-7-label"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "node": "event_dispatch",
+        "ref": "tracing-core/src/event.rs#Event::dispatch"
+      }
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-8",
+      "type": "rectangle",
+      "x": 40,
+      "y": 780,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1682343973,
+      "version": 1,
+      "versionNonce": 403916975,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-node-8-label"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "node": "get_default",
+        "ref": "tracing-core/src/dispatcher.rs#get_default"
+      }
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-9",
+      "type": "rectangle",
+      "x": 660,
+      "y": 1540,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1542454796,
+      "version": 1,
+      "versionNonce": 575461848,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-node-9-label"
+        },
+        {
+          "id": "callsite-registration-and-dispatch-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "node": "event_method",
+        "ref": "tracing-core/src/subscriber.rs#Subscriber::event"
+      }
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-0",
+      "type": "arrow",
+      "x": 910.1333333333333,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 2113622002,
+      "version": 1,
+      "versionNonce": 1850838694,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "edge": {
+          "from": "callsite",
+          "to": "callsite_register",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-0",
+        "focus": -0.001212121212121147,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-1",
+        "focus": -0.07047619047619057,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-1",
+      "type": "arrow",
+      "x": 863.4666666666667,
+      "y": 472.8,
+      "width": 286.66666666666674,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 2136116579,
+      "version": 1,
+      "versionNonce": 2128302333,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "edge": {
+          "from": "callsite_register",
+          "to": "callsites_type",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -261.73333333333335,
+          32
+        ],
+        [
+          -286.66666666666674,
+          32
+        ],
+        [
+          -286.66666666666674,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-1",
+        "focus": 0.4038095238095229,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-3",
+        "focus": -0.026666666666667137,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-2",
+      "type": "arrow",
+      "x": 956.8,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 111209012,
+      "version": 1,
+      "versionNonce": 188427264,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "edge": {
+          "from": "callsite_register",
+          "to": "rebuild_interest",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-1",
+        "focus": -0.26285714285714257,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-2",
+        "focus": -0.017777777777778017,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-3",
+      "type": "arrow",
+      "x": 896.8,
+      "y": 853.5999999999999,
+      "width": 113.33333333333337,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1876148621,
+      "version": 1,
+      "versionNonce": 1018595447,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "edge": {
+          "from": "rebuild_interest",
+          "to": "dispatch",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -113.33333333333326,
+          32
+        ],
+        [
+          -113.33333333333326,
+          93.73333333333335
+        ],
+        [
+          -113.33333333333326,
+          145.5
+        ],
+        [
+          -113.33333333333326,
+          197.26666666666665
+        ],
+        [
+          -112.83333333333337,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-2",
+        "focus": 0.3511111111111114,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-4",
+        "focus": 0.2933333333333303,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-4",
+      "type": "arrow",
+      "x": 730.1333333333333,
+      "y": 1234.3999999999999,
+      "width": 276.66666666666663,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 827350742,
+      "version": 1,
+      "versionNonce": 1145986746,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "edge": {
+          "from": "dispatch",
+          "to": "subscriber",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -256.7333333333333,
+          32
+        ],
+        [
+          -276.66666666666663,
+          32
+        ],
+        [
+          -276.66666666666663,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-4",
+        "focus": 0.3733333333333337,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-5",
+        "focus": -0.05444444444444443,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-5",
+      "type": "arrow",
+      "x": 1016.8,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1379114087,
+      "version": 1,
+      "versionNonce": 30636545,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "edge": {
+          "from": "rebuild_interest",
+          "to": "interest",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-2",
+        "focus": -0.31555555555555537,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-6",
+        "focus": -0.03200000000000029,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-6",
+      "type": "arrow",
+      "x": 206.79999999999995,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 743507256,
+      "version": 1,
+      "versionNonce": 1278798740,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "edge": {
+          "from": "event_dispatch",
+          "to": "get_default",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-7",
+        "focus": -0.05666666666666629,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-8",
+        "focus": -0.018823529411764954,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-7",
+      "type": "arrow",
+      "x": 206.79999999999995,
+      "y": 853.5999999999999,
+      "width": 523.3333333333334,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1505988577,
+      "version": 1,
+      "versionNonce": 811664555,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "edge": {
+          "from": "get_default",
+          "to": "dispatch",
+          "claim": "depends"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          219.2666666666667,
+          192.79999999999995
+        ],
+        [
+          523.3333333333334,
+          192.79999999999995
+        ],
+        [
+          523.3333333333334,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-8",
+        "focus": 0.018823529411764954,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-4",
+        "focus": -0.3733333333333337,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-8",
+      "type": "arrow",
+      "x": 783.4666666666666,
+      "y": 1234.3999999999999,
+      "width": 1.1368683772161603e-13,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1676221226,
+      "version": 1,
+      "versionNonce": 462682878,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "callsite-registration-and-dispatch-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow",
+        "edge": {
+          "from": "dispatch",
+          "to": "event_method",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          1.1368683772161603e-13,
+          150.39999999999986
+        ],
+        [
+          1.1368683772161603e-13,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-4",
+        "focus": -0.2933333333333326,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "callsite-registration-and-dispatch-flow-node-9",
+        "focus": -0.05025641025641021,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-0-label",
+      "type": "text",
+      "x": 827.5,
+      "y": 47.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 882998372,
+      "version": 1,
+      "versionNonce": 1515294704,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "DefaultCallsite",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-node-0",
+      "originalText": "DefaultCallsite",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-1-label",
+      "type": "text",
+      "x": 810,
+      "y": 427.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 710247201,
+      "version": 1,
+      "versionNonce": 392839659,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "Callsite::register()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-node-1",
+      "originalText": "Callsite::register()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-2-label",
+      "type": "text",
+      "x": 811.5,
+      "y": 807.5,
+      "width": 297,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 394757278,
+      "version": 1,
+      "versionNonce": 1418826690,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "rebuild_callsite_interest()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-node-2",
+      "originalText": "rebuild_callsite_interest()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-3-label",
+      "type": "text",
+      "x": 492,
+      "y": 807.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 442060211,
+      "version": 1,
+      "versionNonce": 853855885,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "Callsites (Type)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-node-3",
+      "originalText": "Callsites (Type)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-4-label",
+      "type": "text",
+      "x": 716,
+      "y": 1187.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 735205464,
+      "version": 1,
+      "versionNonce": 1691350324,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "Dispatch",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-node-4",
+      "originalText": "Dispatch",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-5-label",
+      "type": "text",
+      "x": 372,
+      "y": 1567.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 615982885,
+      "version": 1,
+      "versionNonce": 157128111,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "Subscriber Trait",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-node-5",
+      "originalText": "Subscriber Trait",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-6-label",
+      "type": "text",
+      "x": 948.5,
+      "y": 1187.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1934922882,
+      "version": 1,
+      "versionNonce": 752044790,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "Interest Type",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-node-6",
+      "originalText": "Interest Type",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-7-label",
+      "type": "text",
+      "x": 106.49999999999999,
+      "y": 427.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 749348647,
+      "version": 1,
+      "versionNonce": 1136485569,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "Event::dispatch()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-node-7",
+      "originalText": "Event::dispatch()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-8-label",
+      "type": "text",
+      "x": 72.5,
+      "y": 807.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 709559564,
+      "version": 1,
+      "versionNonce": 2073616088,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "dispatcher::get_default()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-node-8",
+      "originalText": "dispatcher::get_default()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-node-9-label",
+      "type": "text",
+      "x": 685.5,
+      "y": 1567.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1340874665,
+      "version": 1,
+      "versionNonce": 1099660467,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "Subscriber::event()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-node-9",
+      "originalText": "Subscriber::event()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-0-label",
+      "type": "text",
+      "x": 835.3333333333333,
+      "y": 232.4,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1047311763,
+      "version": 1,
+      "versionNonce": 535568877,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "interest() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-edge-0",
+      "originalText": "interest() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-1-label",
+      "type": "text",
+      "x": 513.7333333333333,
+      "y": 494.8,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1703377150,
+      "version": 1,
+      "versionNonce": 306120610,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "push_default @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-edge-1",
+      "originalText": "push_default @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-2-label",
+      "type": "text",
+      "x": 877.5999999999999,
+      "y": 613.1999999999999,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 334803201,
+      "version": 1,
+      "versionNonce": 1158024523,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "on register @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-edge-2",
+      "originalText": "on register @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-3-label",
+      "type": "text",
+      "x": 708.6666666666667,
+      "y": 927.3333333333333,
+      "width": 149.60000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 781702724,
+      "version": 1,
+      "versionNonce": 1607777104,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "register_callsite\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-edge-3",
+      "originalText": "register_callsite @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-4-label",
+      "type": "text",
+      "x": 403,
+      "y": 1256.3999999999999,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 132194695,
+      "version": 1,
+      "versionNonce": 2068442785,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "inner Arc @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-edge-4",
+      "originalText": "inner Arc @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-5-label",
+      "type": "text",
+      "x": 946.4,
+      "y": 993.9999999999999,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 976289250,
+      "version": 1,
+      "versionNonce": 1889422038,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "combines @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-edge-5",
+      "originalText": "combines @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-6-label",
+      "type": "text",
+      "x": 180.39999999999995,
+      "y": 613.1999999999999,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1724852869,
+      "version": 1,
+      "versionNonce": 933503119,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-7-label",
+      "type": "text",
+      "x": 333.66666666666663,
+      "y": 1036.3999999999999,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1260885816,
+      "version": 1,
+      "versionNonce": 1476444564,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "thread-local @depends",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-edge-7",
+      "originalText": "thread-local @depends",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "callsite-registration-and-dispatch-flow-edge-8-label",
+      "type": "text",
+      "x": 757.0666666666667,
+      "y": 1374.7999999999997,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 455489243,
+      "version": 1,
+      "versionNonce": 2081622741,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "callsite-registration-and-dispatch-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "callsite-registration-and-dispatch-flow-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

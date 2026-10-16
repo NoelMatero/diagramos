@@ -1,0 +1,122 @@
+{
+  "board": "bench-holdout-c/boards/celery-celery/worker-consumer.excalidraw",
+  "project": "celery-celery",
+  "topic": "worker-consumer",
+  "language": "python",
+  "scope": "celery/worker",
+  "pin": "17b895bad4",
+  "tool": "python 1.1.406",
+  "claims": [
+    {
+      "id": "calls|celery/worker/loops.py|celery/worker/consumer/consumer.py#Consumer.create_task_handler|",
+      "word": "calls",
+      "from": "celery/worker/loops.py",
+      "to": "celery/worker/consumer/consumer.py#Consumer.create_task_handler",
+      "fromLabel": "connection.drain_events()",
+      "toLabel": "on_task_received()",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names a file rather than a declaration"
+    },
+    {
+      "id": "calls|celery/worker/consumer/consumer.py#Consumer.create_task_handler|celery/worker/strategy.py#default|",
+      "word": "calls",
+      "from": "celery/worker/consumer/consumer.py#Consumer.create_task_handler",
+      "to": "celery/worker/strategy.py#default",
+      "fromLabel": "on_task_received()",
+      "toLabel": "task_message_handler() [strategy]",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "builds|celery/worker/strategy.py#default|celery/worker/request.py#Request@declared|",
+      "word": "builds",
+      "from": "celery/worker/strategy.py#default",
+      "to": "celery/worker/request.py#Request@declared",
+      "fromLabel": "task_message_handler() [strategy]",
+      "toLabel": "Request instance created & populated",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "needs|celery/worker/strategy.py#default|celery/worker/request.py#Request@declared|",
+      "word": "needs",
+      "from": "celery/worker/strategy.py#default",
+      "to": "celery/worker/request.py#Request@declared",
+      "fromLabel": "task_message_handler() [strategy]",
+      "toLabel": "Request instance created & populated",
+      "language": "python",
+      "source": "labelled",
+      "truth": "true",
+      "why": "it imports it (.request)"
+    },
+    {
+      "id": "calls|celery/worker/strategy.py#default|celery/worker/request.py#Request@declared|",
+      "word": "calls",
+      "from": "celery/worker/strategy.py#default",
+      "to": "celery/worker/request.py#Request@declared",
+      "fromLabel": "task_message_handler() [strategy]",
+      "toLabel": "Request instance created & populated",
+      "language": "python",
+      "source": "swap",
+      "parent": "needs|celery/worker/strategy.py#default|celery/worker/request.py#Request@declared|",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "needs|celery/worker/request.py#Request@declared|celery/worker/strategy.py#default|",
+      "word": "needs",
+      "from": "celery/worker/request.py#Request@declared",
+      "to": "celery/worker/strategy.py#default",
+      "fromLabel": "Request instance created & populated",
+      "toLabel": "task_message_handler() [strategy]",
+      "language": "python",
+      "source": "reverse",
+      "parent": "needs|celery/worker/strategy.py#default|celery/worker/request.py#Request@declared|",
+      "truth": "false",
+      "why": "nothing in it imports that file"
+    },
+    {
+      "id": "needs|celery/worker/strategy.py#default|celery/worker/loops.py|",
+      "word": "needs",
+      "from": "celery/worker/strategy.py#default",
+      "to": "celery/worker/loops.py",
+      "fromLabel": "task_message_handler() [strategy]",
+      "toLabel": "Request instance created & populated",
+      "language": "python",
+      "source": "retarget",
+      "parent": "needs|celery/worker/strategy.py#default|celery/worker/request.py#Request@declared|",
+      "truth": "false",
+      "why": "nothing in it imports that file"
+    },
+    {
+      "id": "feeds|celery/worker/request.py#Request@declared|celery/worker/consumer/consumer.py#Consumer|",
+      "word": "feeds",
+      "from": "celery/worker/request.py#Request@declared",
+      "to": "celery/worker/consumer/consumer.py#Consumer",
+      "fromLabel": "Request instance created & populated",
+      "toLabel": "Consumer.on_task_request() (task_reserved)",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|celery/worker/consumer/consumer.py#Consumer|celery/worker/request.py#Request@declared|",
+      "word": "calls",
+      "from": "celery/worker/consumer/consumer.py#Consumer",
+      "to": "celery/worker/request.py#Request@declared",
+      "fromLabel": "Consumer.on_task_request() (task_reserved)",
+      "toLabel": "Request.execute_using_pool()",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    }
+  ]
+}

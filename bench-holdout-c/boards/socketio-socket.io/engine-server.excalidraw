@@ -1,0 +1,2785 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "engine-io-server-handshake-transport-upg-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 607.2,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1614184141,
+      "version": 1,
+      "versionNonce": 1429529015,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Engine.IO Server Handshake & Transport Upgrade",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Engine.IO Server Handshake & Transport Upgrade",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-0",
+      "type": "rectangle",
+      "x": 300,
+      "y": 20,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 49159988,
+      "version": 1,
+      "versionNonce": 952474368,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-0-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "handleRequest",
+        "ref": "packages/engine.io/lib/server.ts#handleRequest"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-1",
+      "type": "rectangle",
+      "x": 280,
+      "y": 400,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1814099597,
+      "version": 1,
+      "versionNonce": 1782642551,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-1-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "verify",
+        "ref": "packages/engine.io/lib/server.ts#verify",
+        "state": "external"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-2",
+      "type": "rectangle",
+      "x": 260,
+      "y": 780,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 2051572978,
+      "version": 1,
+      "versionNonce": 467402150,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-2-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "handshake",
+        "ref": "packages/engine.io/lib/server.ts#handshake"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-3",
+      "type": "rectangle",
+      "x": 620,
+      "y": 1160,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 2074067555,
+      "version": 1,
+      "versionNonce": 744865789,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-3-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "createTransport",
+        "ref": "packages/engine.io/lib/server.ts#createTransport"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-4",
+      "type": "rectangle",
+      "x": 520,
+      "y": 1920,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 681458232,
+      "version": 1,
+      "versionNonce": 2042845844,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-4-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "transport",
+        "ref": "packages/engine.io/lib/transport.ts#Transport"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-5",
+      "type": "rectangle",
+      "x": 260,
+      "y": 1160,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1443939553,
+      "version": 1,
+      "versionNonce": 1575711659,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-5-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "socket",
+        "ref": "packages/engine.io/lib/socket.ts#Socket"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-6",
+      "type": "rectangle",
+      "x": 260,
+      "y": 1540,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 765301718,
+      "version": 1,
+      "versionNonce": 1910033850,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-6-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-12",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-13",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "setTransport",
+        "ref": "packages/engine.io/lib/socket.ts#setTransport"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-7",
+      "type": "rectangle",
+      "x": 840,
+      "y": 400,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1317065063,
+      "version": 1,
+      "versionNonce": 794683649,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-7-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "handleUpgrade",
+        "ref": "packages/engine.io/lib/server.ts#handleUpgrade"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-8",
+      "type": "rectangle",
+      "x": 860,
+      "y": 780,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1225149804,
+      "version": 1,
+      "versionNonce": 920677560,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-8-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "onWebSocket",
+        "ref": "packages/engine.io/lib/server.ts#onWebSocket"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-9",
+      "type": "rectangle",
+      "x": 1080,
+      "y": 1160,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1830969989,
+      "version": 1,
+      "versionNonce": 749029519,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-9-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "maybeUpgrade",
+        "ref": "packages/engine.io/lib/socket.ts#_maybeUpgrade"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-10",
+      "type": "rectangle",
+      "x": 1120,
+      "y": 1540,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1092523553,
+      "version": 1,
+      "versionNonce": 1978870507,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-10-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "clearTransport",
+        "ref": "packages/engine.io/lib/socket.ts#clearTransport"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-11",
+      "type": "rectangle",
+      "x": 260,
+      "y": 1920,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1455150456,
+      "version": 1,
+      "versionNonce": 1381992916,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-node-11-label"
+        },
+        {
+          "id": "engine-io-server-handshake-transport-upg-edge-13",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "node": "flush",
+        "ref": "packages/engine.io/lib/socket.ts#flush"
+      }
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-0",
+      "type": "arrow",
+      "x": 387.6,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1855083403,
+      "version": 1,
+      "versionNonce": 954807301,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "handleRequest",
+          "to": "verify",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-0",
+        "focus": 0.3742857142857141,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-1",
+        "focus": 0.07600000000000007,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-1",
+      "type": "arrow",
+      "x": 387.6,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 17644410,
+      "version": 1,
+      "versionNonce": 523026126,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "verify",
+          "to": "handshake",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-1",
+        "focus": -0.07600000000000028,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-2",
+        "focus": 0.06333333333333344,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-2",
+      "type": "arrow",
+      "x": 427.6,
+      "y": 853.5999999999999,
+      "width": 300.5333333333334,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 640888405,
+      "version": 1,
+      "versionNonce": 467799135,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "handshake",
+          "to": "createTransport",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          268.66666666666663,
+          32
+        ],
+        [
+          300.5333333333334,
+          32
+        ],
+        [
+          300.5333333333334,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-2",
+        "focus": -0.3966666666666669,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-3",
+        "focus": -0.27911111111111037,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-3",
+      "type": "arrow",
+      "x": 778.1333333333334,
+      "y": 1234.3999999999999,
+      "width": 153.8666666666668,
+      "height": 681.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1033775036,
+      "version": 1,
+      "versionNonce": 863714632,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "createTransport",
+          "to": "transport",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          208.86666666666656
+        ],
+        [
+          0,
+          313.29999999999995
+        ],
+        [
+          0,
+          417.73333333333335
+        ],
+        [
+          0,
+          573.5999999999999
+        ],
+        [
+          -153.8666666666668,
+          573.5999999999999
+        ],
+        [
+          -153.8666666666668,
+          681.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-3",
+        "focus": -0.054222222222222886,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-4",
+        "focus": 0.3033333333333314,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-4",
+      "type": "arrow",
+      "x": 347.6,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1142663855,
+      "version": 1,
+      "versionNonce": 1282606345,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "handshake",
+          "to": "socket",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-2",
+        "focus": 0.2699999999999997,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-5",
+        "focus": 0.095,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-5",
+      "type": "arrow",
+      "x": 347.6,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1750019934,
+      "version": 1,
+      "versionNonce": 737163906,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "socket",
+          "to": "setTransport",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-5",
+        "focus": -0.095,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-6",
+        "focus": -0.326153846153846,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-6",
+      "type": "arrow",
+      "x": 434.26666666666665,
+      "y": 1615.1999999999998,
+      "width": 136.66666666666674,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1266635273,
+      "version": 1,
+      "versionNonce": 998842771,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "setTransport",
+          "to": "transport",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          136.66666666666674,
+          32
+        ],
+        [
+          136.66666666666674,
+          82.0666666666666
+        ],
+        [
+          136.66666666666674,
+          136.75
+        ],
+        [
+          136.66666666666674,
+          191.4333333333334
+        ],
+        [
+          136.66666666666674,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-6",
+        "focus": -0.34051282051282056,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-4",
+        "focus": -0.3633333333333337,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-7",
+      "type": "arrow",
+      "x": 480.9333333333334,
+      "y": 92,
+      "width": 501.5333333333333,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1666073280,
+      "version": 1,
+      "versionNonce": 490351260,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "handleRequest",
+          "to": "handleUpgrade",
+          "claim": "depends"
+        },
+        "via": [
+          "handleUpgrade"
+        ]
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          369.16666666666663,
+          32
+        ],
+        [
+          501.5333333333333,
+          32
+        ],
+        [
+          501.5333333333333,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-0",
+        "focus": -0.2923809523809528,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-7",
+        "focus": 0.017619047619048523,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-8",
+      "type": "arrow",
+      "x": 982.4666666666667,
+      "y": 472.8,
+      "width": 1.1368683772161603e-13,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1540913203,
+      "version": 1,
+      "versionNonce": 1309980173,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "handleUpgrade",
+          "to": "onWebSocket",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          -0.4999999999998863,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-7",
+        "focus": -0.017619047619048523,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-8",
+        "focus": -0.057948717948717025,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-9",
+      "type": "arrow",
+      "x": 939.1333333333334,
+      "y": 853.5999999999999,
+      "width": 111,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 126829442,
+      "version": 1,
+      "versionNonce": 87345142,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "onWebSocket",
+          "to": "createTransport",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          -13.100000000000023,
+          192.79999999999995
+        ],
+        [
+          -111,
+          192.79999999999995
+        ],
+        [
+          -111,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-8",
+        "focus": 0.39128205128205046,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-3",
+        "focus": 0.3875555555555561,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-10",
+      "type": "arrow",
+      "x": 1025.8000000000002,
+      "y": 853.5999999999999,
+      "width": 185.9333333333334,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 621836804,
+      "version": 1,
+      "versionNonce": 214654224,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "onWebSocket",
+          "to": "maybeUpgrade",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          185.9333333333334,
+          32
+        ],
+        [
+          185.9333333333334,
+          57.43333333333328
+        ],
+        [
+          185.9333333333334,
+          179.11666666666656
+        ],
+        [
+          185.9333333333334,
+          239.95833333333326
+        ],
+        [
+          185.9333333333334,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-8",
+        "focus": -0.2753846153846167,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-9",
+        "focus": -0.05904761904761737,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-11",
+      "type": "arrow",
+      "x": 1258.4000000000003,
+      "y": 1234.3999999999999,
+      "width": 2.2737367544323206e-13,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 971177629,
+      "version": 1,
+      "versionNonce": 560150279,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "maybeUpgrade",
+          "to": "clearTransport",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          -2.2737367544323206e-13,
+          150.39999999999986
+        ],
+        [
+          -2.2737367544323206e-13,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-9",
+        "focus": -0.27428571428571824,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-10",
+        "focus": -0.011428571428570717,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-12",
+      "type": "arrow",
+      "x": 1165.0666666666668,
+      "y": 1234.3999999999999,
+      "width": 730.8000000000002,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 763952514,
+      "version": 1,
+      "versionNonce": 1297389046,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-12-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "maybeUpgrade",
+          "to": "setTransport",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -120.95000000000005,
+          32
+        ],
+        [
+          -241.9000000000001,
+          32
+        ],
+        [
+          -483.80000000000007,
+          32
+        ],
+        [
+          -597.6666666666667,
+          32
+        ],
+        [
+          -597.6666666666667,
+          192.79999999999995
+        ],
+        [
+          -730.8000000000002,
+          192.79999999999995
+        ],
+        [
+          -730.8000000000002,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-9",
+        "focus": 0.39238095238095255,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-6",
+        "focus": 0.34051282051282056,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-13",
+      "type": "arrow",
+      "x": 347.6,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 30552627,
+      "version": 1,
+      "versionNonce": 372540429,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "engine-io-server-handshake-transport-upg-edge-13-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg",
+        "edge": {
+          "from": "setTransport",
+          "to": "flush",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-6",
+        "focus": 0.326153846153846,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "engine-io-server-handshake-transport-upg-node-11",
+        "focus": -0.02666666666666621,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-0-label",
+      "type": "text",
+      "x": 330,
+      "y": 47.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 305151489,
+      "version": 1,
+      "versionNonce": 2093286475,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Server.handleRequest",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-0",
+      "originalText": "Server.handleRequest",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-1-label",
+      "type": "text",
+      "x": 308.5,
+      "y": 427.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 752051012,
+      "version": 1,
+      "versionNonce": 395555408,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Server.verify",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-1",
+      "originalText": "Server.verify",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-2-label",
+      "type": "text",
+      "x": 292,
+      "y": 807.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1017660051,
+      "version": 1,
+      "versionNonce": 1470830829,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Server.handshake",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-2",
+      "originalText": "Server.handshake",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-3-label",
+      "type": "text",
+      "x": 649,
+      "y": 1187.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1673725438,
+      "version": 1,
+      "versionNonce": 1241382562,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Server.createTransport",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-3",
+      "originalText": "Server.createTransport",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-4-label",
+      "type": "text",
+      "x": 550.5,
+      "y": 1947.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1695201157,
+      "version": 1,
+      "versionNonce": 1868765071,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Transport",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-4",
+      "originalText": "Transport",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-5-label",
+      "type": "text",
+      "x": 307,
+      "y": 1187.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1231234104,
+      "version": 1,
+      "versionNonce": 264222868,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Socket",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-5",
+      "originalText": "Socket",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-6-label",
+      "type": "text",
+      "x": 285.5,
+      "y": 1567.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 102542983,
+      "version": 1,
+      "versionNonce": 856221089,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Socket.setTransport",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-6",
+      "originalText": "Socket.setTransport",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-7-label",
+      "type": "text",
+      "x": 870,
+      "y": 427.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 946637538,
+      "version": 1,
+      "versionNonce": 677200342,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Server.handleUpgrade",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-7",
+      "originalText": "Server.handleUpgrade",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-8-label",
+      "type": "text",
+      "x": 891,
+      "y": 807.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 996376073,
+      "version": 1,
+      "versionNonce": 1606051219,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Server.onWebSocket",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-8",
+      "originalText": "Server.onWebSocket",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-9-label",
+      "type": "text",
+      "x": 1110,
+      "y": 1187.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1986016492,
+      "version": 1,
+      "versionNonce": 459791160,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Socket._maybeUpgrade",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-9",
+      "originalText": "Socket._maybeUpgrade",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-10-label",
+      "type": "text",
+      "x": 1144.5,
+      "y": 1567.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 220383480,
+      "version": 1,
+      "versionNonce": 1987107924,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Socket.clearTransport",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-10",
+      "originalText": "Socket.clearTransport",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-node-11-label",
+      "type": "text",
+      "x": 284,
+      "y": 1947.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 608342853,
+      "version": 1,
+      "versionNonce": 836265807,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Socket.flush",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-node-11",
+      "originalText": "Socket.flush",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-0-label",
+      "type": "text",
+      "x": 317.20000000000005,
+      "y": 222.4,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 335623862,
+      "version": 1,
+      "versionNonce": 619412250,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "validate request\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-0",
+      "originalText": "validate request @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-1-label",
+      "type": "text",
+      "x": 326,
+      "y": 603.1999999999999,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1852430059,
+      "version": 1,
+      "versionNonce": 422406373,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "new connection\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-1",
+      "originalText": "new connection @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-2-label",
+      "type": "text",
+      "x": 603.8666666666667,
+      "y": 875.5999999999999,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 441340284,
+      "version": 1,
+      "versionNonce": 193411592,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "pick transport @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-2",
+      "originalText": "pick transport @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-3-label",
+      "type": "text",
+      "x": 694.5333333333334,
+      "y": 1642.1333333333332,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1311448281,
+      "version": 1,
+      "versionNonce": 1087830563,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "instantiate @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-3",
+      "originalText": "instantiate @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-4-label",
+      "type": "text",
+      "x": 268.40000000000003,
+      "y": 983.9999999999999,
+      "width": 158.4,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 226335738,
+      "version": 1,
+      "versionNonce": 873769038,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Socket(id, server,\ntransport) @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-4",
+      "originalText": "Socket(id, server, transport) @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-5-label",
+      "type": "text",
+      "x": 277.20000000000005,
+      "y": 1364.7999999999997,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 618813119,
+      "version": 1,
+      "versionNonce": 446060249,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "attach transport\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-5",
+      "originalText": "attach transport @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-6-label",
+      "type": "text",
+      "x": 509.33333333333337,
+      "y": 1677.2666666666664,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1678249552,
+      "version": 1,
+      "versionNonce": 398606892,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "wire listeners\n@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-6",
+      "originalText": "wire listeners @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-7-label",
+      "type": "text",
+      "x": 753.3,
+      "y": 114,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 2077458461,
+      "version": 1,
+      "versionNonce": 1862210439,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "parallel path @depends",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-7",
+      "originalText": "parallel path @depends",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-8-label",
+      "type": "text",
+      "x": 903.2666666666667,
+      "y": 613.1999999999999,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 1531068302,
+      "version": 1,
+      "versionNonce": 1560427570,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "ws upgraded @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-8",
+      "originalText": "ws upgraded @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-9-label",
+      "type": "text",
+      "x": 838.0333333333334,
+      "y": 1036.3999999999999,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "am",
+      "roundness": null,
+      "seed": 1276563939,
+      "version": 1,
+      "versionNonce": 1473455741,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "new transport @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-9",
+      "originalText": "new transport @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-10-label",
+      "type": "text",
+      "x": 1123.7333333333336,
+      "y": 891.0333333333332,
+      "width": 176,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "an",
+      "roundness": null,
+      "seed": 950094737,
+      "version": 1,
+      "versionNonce": 1658891675,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "Socket._maybeUpgrade\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-10",
+      "originalText": "Socket._maybeUpgrade @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-11-label",
+      "type": "text",
+      "x": 1170.4,
+      "y": 1374.7999999999997,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ao",
+      "roundness": null,
+      "seed": 757888340,
+      "version": 1,
+      "versionNonce": 842338976,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "after upgrade @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-11",
+      "originalText": "after upgrade @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-12-label",
+      "type": "text",
+      "x": 588.8666666666668,
+      "y": 1256.3999999999999,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ap",
+      "roundness": null,
+      "seed": 1886567395,
+      "version": 1,
+      "versionNonce": 344228989,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "swap transport @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-12",
+      "originalText": "swap transport @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "engine-io-server-handshake-transport-upg-edge-13-label",
+      "type": "text",
+      "x": 264,
+      "y": 1755.6,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aq",
+      "roundness": null,
+      "seed": 2141071758,
+      "version": 1,
+      "versionNonce": 431200818,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "engine-io-server-handshake-transport-upg"
+      },
+      "text": "drain buffer @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "engine-io-server-handshake-transport-upg-edge-13",
+      "originalText": "drain buffer @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

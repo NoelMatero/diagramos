@@ -1,0 +1,95 @@
+{
+  "board": "bench-holdout-c/boards/pytest-dev-pytest/fixtures.excalidraw",
+  "project": "pytest-dev-pytest",
+  "topic": "fixtures",
+  "language": "python",
+  "scope": "src/_pytest",
+  "pin": "2950bc2392",
+  "tool": "python 1.1.406",
+  "claims": [
+    {
+      "id": "calls|src/_pytest/fixtures.py#FixtureRequest.getfixturevalue|src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef|",
+      "word": "calls",
+      "from": "src/_pytest/fixtures.py#FixtureRequest.getfixturevalue",
+      "to": "src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef",
+      "fromLabel": "FixtureRequest.getfixturevalue() get fixture by name",
+      "toLabel": "_get_active_fixturedef() find & setup fixture",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef|src/_pytest/fixtures.py#FixtureManager.getfixturedefs|",
+      "word": "calls",
+      "from": "src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef",
+      "to": "src/_pytest/fixtures.py#FixtureManager.getfixturedefs",
+      "fromLabel": "_get_active_fixturedef() find & setup fixture",
+      "toLabel": "FixtureManager.getfixturedefs() lookup visible defs",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|src/_pytest/fixtures.py#FixtureManager.getfixturedefs|src/_pytest/fixtures.py#traverse_fixture_closure|",
+      "word": "calls",
+      "from": "src/_pytest/fixtures.py#FixtureManager.getfixturedefs",
+      "to": "src/_pytest/fixtures.py#traverse_fixture_closure",
+      "fromLabel": "FixtureManager.getfixturedefs() lookup visible defs",
+      "toLabel": "traverse_fixture_closure() resolve dependencies",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "builds|src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef|src/_pytest/fixtures.py#SubRequest|",
+      "word": "builds",
+      "from": "src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef",
+      "to": "src/_pytest/fixtures.py#SubRequest",
+      "fromLabel": "_get_active_fixturedef() find & setup fixture",
+      "toLabel": "SubRequest scoped request",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef|src/_pytest/fixtures.py#FixtureDef.execute|",
+      "word": "calls",
+      "from": "src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef",
+      "to": "src/_pytest/fixtures.py#FixtureDef.execute",
+      "fromLabel": "_get_active_fixturedef() find & setup fixture",
+      "toLabel": "FixtureDef.execute() setup & cache",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|src/_pytest/fixtures.py#FixtureDef.execute|src/_pytest/fixtures.py#pytest_fixture_setup|",
+      "word": "calls",
+      "from": "src/_pytest/fixtures.py#FixtureDef.execute",
+      "to": "src/_pytest/fixtures.py#pytest_fixture_setup",
+      "fromLabel": "FixtureDef.execute() setup & cache",
+      "toLabel": "pytest_fixture_setup() call fixture function",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|src/_pytest/fixtures.py#FixtureDef.execute|src/_pytest/fixtures.py#FixtureDef.finish|",
+      "word": "calls",
+      "from": "src/_pytest/fixtures.py#FixtureDef.execute",
+      "to": "src/_pytest/fixtures.py#FixtureDef.finish",
+      "fromLabel": "FixtureDef.execute() setup & cache",
+      "toLabel": "FixtureDef.finish() run finalizers",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    }
+  ]
+}
