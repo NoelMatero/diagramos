@@ -55,7 +55,7 @@ import {
 } from "./lib/call-receivers";
 import { sourceFiles } from "./lib/source-files";
 
-import { callsBetween, type CallSide } from "../src/engine/calls";
+import { callImports, callsBetween, type CallSide } from "../src/engine/calls";
 import { readDependencies } from "../src/engine/deps";
 import { createWorkspace } from "../src/engine/drift";
 import { mayAccuse } from "../src/engine/licence";
@@ -200,7 +200,7 @@ for (const tree of trees) {
     const cached = importsOf.get(rel);
     if (cached) return cached;
     const declared = readDependencies(rel, source, workspace, configs)?.dependencies ?? [];
-    const list = declared.map((one) => ({ specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
+    const list = callImports(declared);
     importsOf.set(rel, list);
     return list;
   };

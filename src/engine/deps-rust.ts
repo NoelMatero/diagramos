@@ -42,6 +42,7 @@ import {
   type RustPosition,
   type RustTarget,
 } from "./rust";
+import { namesNothingHere } from "./repo-names";
 import type { Workspace } from "./workspace";
 
 /**
@@ -157,7 +158,7 @@ export function readRustDependencies(
     return verdict;
   };
 
-  const record = (node: Node, specifier: string, file?: string, star = false, visibility = false): void => {
+  const record = (node: Node, specifier: string, file?: string, star = false, visibility = false, library = false): void => {
     /*
      * A Rust path carries the name at its end -- `crate::parser::ArgMatcher` --
      * so the names a `use` binds are read off the specifier rather than from a
@@ -176,6 +177,7 @@ export function readRustDependencies(
       ...(star ? { star: true } : {}),
       ...(names.length > 0 ? { names } : {}),
       ...(visibility ? { visibility: true } : {}),
+      ...(library && !file ? { library: true as const } : {}),
     });
   };
 
@@ -236,10 +238,27 @@ export function readRustDependencies(
     const targets = resolveRustPath(segments, filePath, layout, workspace, declaration, position);
     const written = segments.join("::");
     if (targets.length === 0) {
-      record(node, written, undefined, star, visibility);
+      record(node, written, undefined, star, visibility, !visibility && isLibrary(segments, position));
       return;
     }
     for (const target of targets) record(node, written, target.file, star, visibility);
+  };
+
+  /**
+   * Whether a path that resolved to nothing starts in a crate outside the
+   * repository (#469): `std`, `core` or `alloc`, or a lower-case name that is
+   * no crate of this workspace, no module or alias this file gives a name to,
+   * and no file or directory anywhere here -- a 2015-edition path names a
+   * module from the crate root, and that module is a file of this tree.
+   */
+  const isLibrary = (segments: string[], position?: RustPosition): boolean => {
+    const first = segments[0]?.replace(/^::/, "") ?? "";
+    if (first === "std" || first === "core" || first === "alloc") return true;
+    if (!/^[a-z_][a-z0-9_]*$/.test(first) || /^(crate|self|super)$/.test(first)) return false;
+    if (layout.byName.has(first) || layout.byName.has(first.replace(/_/g, "-"))) return false;
+    if (position?.scope?.has(first) || scope?.has(first)) return false;
+    if (new RegExp(`\\bmod\\s+${first}\\b|\\bas\\s+${first}\\b`).test(source)) return false;
+    return namesNothingHere(first, workspace);
   };
 
   /**

@@ -80,7 +80,7 @@ import { waitForQuiet } from "./lib/bench-busy";
 import { CLASSY, FN, ISSUE_OF, shapeOf, type Node } from "./lib/call-census-shapes";
 import { sourceFiles } from "./lib/source-files";
 
-import { EXTERNAL_RECEIVER, callSitesIn, type CallSide, type CallSitePlaced } from "../src/engine/calls";
+import { EXTERNAL_RECEIVER, callImports, callSitesIn, type CallSide, type CallSitePlaced } from "../src/engine/calls";
 import { readDependencies } from "../src/engine/deps";
 import { createWorkspace } from "../src/engine/drift";
 import { initEngine, languageOf, parseSource, type Language } from "../src/engine/parse";
@@ -408,8 +408,7 @@ async function measureOne(setName: string, project: string): Promise<void> {
   const imports = (rel: string, source: string): CallSide["imports"] => {
     const cached = importsOf.get(rel);
     if (cached) return cached;
-    const list = (readDependencies(rel, source, workspace, configs)?.dependencies ?? [])
-      .map((one) => ({ specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
+    const list = callImports(readDependencies(rel, source, workspace, configs)?.dependencies ?? []);
     importsOf.set(rel, list);
     return list;
   };

@@ -61,7 +61,7 @@ import { languageOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
-  type CallSide, type CallSitePlaced, type CallsNotClosed, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER,
+  callImports, type CallSide, type CallSitePlaced, type CallsNotClosed, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER,
   type ReceiverResolution, bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
 } from "./calls";
 import type { CompiledCrate } from "./compiled-calls";
@@ -2423,10 +2423,7 @@ function callSide(
       file: target,
       source,
       language,
-      imports: declared.map((one) => ({
-        specifier: one.specifier,
-        ...(one.file ? { file: one.file } : {}),
-      })),
+      imports: callImports(declared),
       open: (wanted) => {
         const other = readSide(wanted);
         return other

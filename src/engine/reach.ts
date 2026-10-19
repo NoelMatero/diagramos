@@ -84,7 +84,7 @@
  * the same fact `EXTERNAL_RECEIVER` already carried.
  */
 import {
-  EXTERNAL_RECEIVER, callSitesIn,
+  EXTERNAL_RECEIVER, callSitesIn, handedOn,
   type BodyCallSites, type CallSide, type CallSitesReading,
   type ReceiverResolution, type SiteUnresolved,
 } from "./calls";
@@ -570,6 +570,28 @@ export function reachBetween(
           at.set(key, landing);
           came.set(key, { previous: keyOf(file, routine), line: site.line });
           next.push(landing);
+        }
+
+        /*
+         * A routine of this repository's handed to library code -- `xs.map(helper)`,
+         * `Thread(target=self.run)` -- is run by it, so it is a step like a
+         * call (#469). Followed only: it can confirm a route and never close one.
+         */
+        const here = sideOf(file);
+        for (const landing of here ? handedOn(here, routine, body.sites) : []) {
+          const key = keyOf(landing.file, landing.routine);
+          const step = { file: landing.file, routine: landing.routine };
+          if (landing.file === to.file && wanted.has(landing.routine)) {
+            at.set(key, step);
+            came.set(key, { previous: keyOf(file, routine), line: landing.line });
+            return { verdict: "reached", ...routeTo(key) };
+          }
+          if (seen.has(key)) continue;
+          if (seen.size >= budget) { overBudget = true; continue; }
+          seen.add(key);
+          at.set(key, step);
+          came.set(key, { previous: keyOf(file, routine), line: landing.line });
+          next.push(step);
         }
 
         /* The second pass: this body's own constructions, joined to its own

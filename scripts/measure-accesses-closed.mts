@@ -85,7 +85,7 @@ import { resolvePythonReceivers } from "./lib/resolution-python-live";
 import { resolveRustReceivers } from "./lib/resolution-rust-receivers";
 import { createTsReferee, receiverResolutionFrom } from "./lib/resolution-ts";
 import { sourceFiles } from "./lib/source-files";
-import {
+import { callImports,
   callSitesIn, EXTERNAL_RECEIVER,
   type BodyCallSites, type CallSide, type ReceiverResolution,
 } from "../src/engine/calls";
@@ -482,7 +482,7 @@ if (!merging) {
       const cached = importsOf.get(relative);
       if (cached) return cached;
       const declared = readDependencies(relative, source, workspace, configs)?.dependencies ?? [];
-      const list = declared.map((one) => ({ specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
+      const list = callImports(declared);
       importsOf.set(relative, list);
       return list;
     };

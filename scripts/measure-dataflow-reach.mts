@@ -66,7 +66,7 @@ import path from "node:path";
 import { indexOf } from "./lib/dataflow-index";
 import { sourceFiles } from "./lib/source-files";
 
-import { callSitesIn, EXTERNAL_RECEIVER, type CallSide, type CallSitePlaced } from "../src/engine/calls";
+import { callImports, callSitesIn, EXTERNAL_RECEIVER, type CallSide, type CallSitePlaced } from "../src/engine/calls";
 import { readDependencies } from "../src/engine/deps";
 import { createWorkspace } from "../src/engine/drift";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
@@ -144,8 +144,7 @@ for (const tree of trees) {
     const declared = source === undefined
       ? []
       : readDependencies(rel, source, workspace, configs)?.dependencies ?? [];
-    const list = declared.map((one) =>
-      ({ specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
+    const list = callImports(declared);
     importsCache.set(rel, list);
     return list;
   };

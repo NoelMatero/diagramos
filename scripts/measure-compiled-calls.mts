@@ -37,7 +37,7 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
-import { compiledBodiesFor, compiledVerdict, type CallSide } from "../src/engine/calls";
+import { callImports, compiledBodiesFor, compiledVerdict, type CallSide } from "../src/engine/calls";
 import { compiledBodiesOf } from "../src/engine/compiled-calls";
 import { readDependencies } from "../src/engine/deps";
 import type { ConfigCache } from "../src/engine/resolve";
@@ -108,7 +108,7 @@ for (const tree of trees.length > 0 ? trees : DEFAULT_TREES) {
       file,
       source,
       language: "rust",
-      imports: declared.map((one) => ({ specifier: one.specifier, ...(one.file ? { file: one.file } : {}) })),
+      imports: callImports(declared),
       compiled: () => crates.crateOf(file),
     };
   };

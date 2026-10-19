@@ -65,7 +65,7 @@ import path from "node:path";
 
 import { sourceFiles } from "./lib/source-files";
 
-import { callSitesIn, EXTERNAL_RECEIVER, type CallSide } from "../src/engine/calls";
+import { callImports, callSitesIn, EXTERNAL_RECEIVER, type CallSide } from "../src/engine/calls";
 import { createTsReferee, isOutsideTree } from "../src/engine/referee-ts";
 import { PROVIDED } from "../src/engine/builtins";
 import { readDependencies } from "../src/engine/deps";
@@ -143,8 +143,7 @@ async function measureOne(tree: string): Promise<Tallies> {
     const cached = importsOf.get(rel);
     if (cached) return cached;
     const declared = readDependencies(rel, source, workspace, configs)?.dependencies ?? [];
-    const list = declared.map((one) => (
-      { specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
+    const list = callImports(declared);
     importsOf.set(rel, list);
     return list;
   };

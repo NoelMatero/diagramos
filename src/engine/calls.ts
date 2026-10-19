@@ -385,7 +385,12 @@ export interface CallSide {
    * and `deps-python.ts` have each been measured at it. This file's job is the
    * half nothing else does: which specifier a *name* came from.
    */
-  imports: Array<{ specifier: string; file?: string }>;
+  imports: Array<{
+    specifier: string;
+    file?: string;
+    /** The specifier names a library: no code of this repository's is behind it (#469, `FileDependency.library`). */
+    library?: true;
+  }>;
   /**
    * Another file in the same repository, when one can be read.
    *
@@ -1454,9 +1459,11 @@ function holdsRoutines(node: Node): boolean {
  * a module outside this repository. That is a definite answer -- the far end is
  * inside it -- and not a doubt.
  */
-function filesFor(specifier: string, imports: CallSide["imports"]): { files: Set<string>; known: boolean } {
+function filesFor(specifier: string, imports: CallSide["imports"]): { files: Set<string>; known: boolean; library: boolean } {
   const files = new Set<string>();
   let known = false;
+  /* Every dependency answering for the binding names a library (#469); one that does not is a doubt. */
+  let library = true;
   /*
    * Python names a module by its whole dotted path, and `from a.b import x`
    * takes `x` from `a.b` -- never from `a`, though `a` covers it too (#468).
@@ -1471,10 +1478,26 @@ function filesFor(specifier: string, imports: CallSide["imports"]): { files: Set
   for (const one of imports) {
     if (!pathCovers(one.specifier, specifier) && !pathCovers(specifier, one.specifier)) continue;
     known = true;
+    if (!one.library) library = false;
     if (python && one.file && above.includes(one) && one.specifier.length < nearest) continue;
     if (one.file) files.add(one.file);
   }
-  return { files, known };
+  return { files, known, library: known && library && files.size === 0 };
+}
+
+/**
+ * What a call's dependency list is, from what `deps.ts` read: every caller
+ * builds `CallSide.imports` here, so none of them drops a field the
+ * checker reads (#469).
+ */
+export function callImports(
+  declared: ReadonlyArray<{ specifier: string; file?: string; library?: true }>,
+): CallSide["imports"] {
+  return declared.map((one) => ({
+    specifier: one.specifier,
+    ...(one.file ? { file: one.file } : {}),
+    ...(one.library ? { library: true as const } : {}),
+  }));
 }
 
 /**
@@ -1621,7 +1644,10 @@ function resolves(
   }
 
   const bound = callee.kind === "through" ? callee.through : callee.name;
-  if (!bound) return callee.kind === "through" ? landsOnTarget(callee, side, target) : "receiver";
+  if (!bound) {
+    if (callee.kind !== "through") return "receiver";
+    return libraryReceiver(callee, side, bindings, site) ? undefined : landsOnTarget(callee, side, target);
+  }
   /*
    * What the name means where it is written (#468), before any table is
    * asked: a local that shadows an import holds a value, a built-in is no
@@ -1692,14 +1718,19 @@ function resolves(
     return side.file === target.file ? "yes" : undefined;
   }
 
-  const { files, known } = filesFor(imported.specifier, side.imports);
+  const { files, known, library } = filesFor(imported.specifier, side.imports);
   if (files.has(target.file)) return "yes";
   /*
    * Imported from a module that resolved to no file here. A package, almost
    * always -- and sometimes a workspace alias that is inside the repository and
-   * that `resolve.ts` cannot place. Nothing separates the two, so it withholds.
+   * that `resolve.ts` cannot place. Withheld, unless the reader knows it is a
+   * library (#469) and the call is the library's own: a name it exports, or a
+   * member of it as a module, as `placeOf` reads them.
    */
-  if (files.size === 0) return known ? "unplaced" : "unbound";
+  if (files.size === 0) {
+    if (library && libraryOwn(callee, imported, bound, side)) return undefined;
+    return known ? "unplaced" : "unbound";
+  }
 
   // Resolved, and to somewhere else. Follow it: the file it landed on may be
   // passing the name on from the far end.
@@ -2190,6 +2221,88 @@ function handsOnHead(
     });
   }
   return named;
+}
+
+/** Member reads a value can be written as: `self.run`, `this.flush`, `obj.method`. */
+const MEMBER_READ = new Set(["member_expression", "attribute", "field_expression"]);
+
+/**
+ * The routines of this repository's that `routine` hands to code outside it
+ * (#469): `xs.map(helper)`, `Thread(target=self.run)`, `debounce(this.flush)`,
+ * `spawn(helper)`. The library runs what it was handed, so each one is a
+ * step the route check (`reach.ts`) takes as though it were a call: a helper
+ * that calls the head makes the arrow one level high, not wrong. One that
+ * reaches nothing of the head's leaves the red standing, as a helper called
+ * by name always has (#359's wrong arrows).
+ *
+ * `handsOnHead` is the head's own name handed on; this is any routine,
+ * because the head is very often one step behind the function handed over.
+ * #461's blind spot -- a library calling back what a repository's user
+ * passed in -- is this shape.
+ *
+ * A value counts when it is placed exactly as a call of it would be -- a
+ * name, a member of `self`, `Type::method` -- at a routine or class of this
+ * repository's. A parameter or a local does not: what it holds is not in the
+ * text, so a coroutine handed to `asyncio.Task` that way stays a gap. A call
+ * written among the arguments is its own site, and a function written there
+ * has its calls read as the routine's, so neither is looked inside.
+ *
+ * `sites` is the routine's own reading, so nothing is placed twice.
+ */
+export function handedOn(
+  side: CallSide,
+  routine: string,
+  sites: readonly CallSitePlaced[],
+): Array<{ file: string; routine: string; line: number }> {
+  const outside = new Set<number>();
+  for (const site of sites) if (site.file === EXTERNAL_RECEIVER && site.nameAt) outside.add(site.nameAt.start);
+  if (outside.size === 0) return [];
+  const tree = parseSource(side.source, side.language);
+  const bindings = bindingsIn(side.source, side.language);
+  if (!tree || !bindings) return [];
+
+  const holders = holdersIn(tree.rootNode);
+  const found: Array<{ file: string; routine: string; line: number }> = [];
+  const take = (value: Node, holder: Node | undefined, line: number): void => {
+    const callee: Callee = value.childCount === 0
+      ? NAME_LEAF.test(value.type)
+        ? { kind: "bare", name: value.text, nameAt: { start: value.startIndex, end: value.startIndex + value.text.length } }
+        : { kind: "computed" }
+      : calleeOfNode(value);
+    if (callee.kind === "computed") return;
+    const placed = placeOf(callee, side, bindings, value, holder);
+    if ("why" in placed || placed.file === EXTERNAL_RECEIVER) return;
+    const name = placed.as ?? callee.name;
+    if (callee.kind !== "bare") {
+      const far = placed.file === side.file ? side : side.open?.(placed.file);
+      if (!far || !isRoutine(far.source, name, far.language)) return;
+    }
+    if (!found.some((one) => one.file === placed.file && one.routine === name)) found.push({ file: placed.file, routine: name, line });
+  };
+  const visit = (node: Node, holder: Node | undefined, line: number): void => {
+    if (calleeOf(node) || constructedBy(node)) return;
+    if (node.childForFieldName("body") && (node.childForFieldName("parameters") ?? node.childForFieldName("parameter"))) return;
+    if (MEMBER_READ.has(node.type) || node.type === "scoped_identifier") { take(node, holder, line); return; }
+    if (node.childCount === 0) { if (node.isNamed) take(node, holder, line); return; }
+    const value = node.childForFieldName("value");
+    if (value && (node.childForFieldName("name") ?? node.childForFieldName("key"))) { visit(value, holder, line); return; }
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child?.isNamed) visit(child, holder, line);
+    }
+  };
+
+  for (const declared of routinesNamed(side.source, routine, side.language).routines) {
+    const holder = holders.get(declared.id);
+    each(declared, (call) => {
+      const callee = calleeOf(call) ?? constructedBy(call);
+      if (!callee || callee.kind === "computed") return;
+      const at = callee.kind === "through" ? callee.memberAt : callee.nameAt;
+      const handed = call.childForFieldName("arguments");
+      if (handed && outside.has(at.start)) visit(handed, holder, lineOf(side.source, call.startIndex));
+    });
+  }
+  return found;
 }
 
 /**
@@ -3443,6 +3556,50 @@ function classesIn(tree: Tree): Map<string, Node[]> {
 }
 
 /**
+ * Whether a call through a name imported from a library is the library's own
+ * code (#469). A bare call is -- the name is one the library exports. So is a
+ * member of a module: a namespace import (`import * as path`, Python's
+ * `import asyncio`), or in Rust a lower-case path (`use std::mem`, then
+ * `mem::swap`). A member of anything else the library hands out is a value's
+ * method: Flask's `current_app` is this repository's app, and a Rust type
+ * (`HashMap::from`) runs whichever `From` impl the crate wrote.
+ */
+function libraryOwn(callee: Callee, imported: Binding, bound: string, side: CallSide): boolean {
+  if (callee.kind === "bare") return true;
+  if (callee.kind !== "through") return false;
+  if (side.language === "rust") return /^[a-z_][a-z0-9_]*$/.test(bound);
+  return imported.namespace;
+}
+
+/**
+ * Whether an expression receiver is a path into a library's modules (#469):
+ * `os.path.join()` under `import os`, `std::mem::swap()` written in place.
+ * Only a chain of plain names, starting at a module import from a library
+ * (Rust: every segment lower-case, and the path is one `deps-rust.ts` read
+ * as a library's).
+ */
+function libraryReceiver(
+  callee: Extract<Callee, { kind: "through" }>,
+  side: CallSide,
+  bindings: Bindings,
+  site: Node | undefined,
+): boolean {
+  const written = side.source.slice(callee.at.start, callee.at.end).replace(/\s+/g, "");
+  const rust = side.language === "rust";
+  const parts = written.split(rust ? "::" : ".");
+  if (parts.length < 2 || !parts.every((one) => (rust ? /^[a-z_][a-z0-9_]*$/ : /^[A-Za-z_$][\w$]*$/).test(one))) return false;
+  const root = parts[0]!;
+  const meaning = meaningOf(root, side, bindings, site, "value");
+  if (meaning.at === "imported") {
+    const imported = bindings.imported.get(root);
+    if (!imported || (!rust && !imported.namespace) || (site ? bindings.importedTwice : bindings.ambiguous).has(root)) return false;
+    return filesFor(imported.specifier, side.imports).library;
+  }
+  if (!rust || (meaning.at !== "unknown" && meaning.at !== "outside")) return false;
+  return filesFor(written, side.imports).library;
+}
+
+/**
  * Where one call site's callee lives, or why the reader cannot say.
  *
  * The target-free twin of `resolves`, and every branch below is the same branch
@@ -3506,8 +3663,12 @@ function placeOf(
 
   // An expression receiver -- `make().run()`, `a.b.c()` -- names nothing to
   // look up. Dynamic dispatch, and the reader cannot say whose method it is --
-  // unless a resolver can, from the expression itself rather than its name.
-  if (!bound) return throughChecker();
+  // unless a resolver can, from the expression itself rather than its name,
+  // or it is a library's module path, `os.path` or `std::mem` (#469).
+  if (!bound) {
+    if (callee.kind === "through" && libraryReceiver(callee, side, bindings, site)) return { file: EXTERNAL_RECEIVER };
+    return throughChecker();
+  }
 
   if (callee.kind === "through") {
     const member = memberOfType(callee, side, site, holder);
@@ -3580,9 +3741,17 @@ function placeOf(
    * That fallback is right for a genuine namespace; it was never asked
    * whether this was one.
    */
+  const { files, known, library } = filesFor(imported.specifier, side.imports);
+  /*
+   * A library's own code (#469): a name it exports, called bare -- `cast()`,
+   * `isNil()`, `max()` -- or a member of it as a module -- `asyncio.Task()`,
+   * `path.join()`, `mem::swap()`. Nothing of this repository's runs there
+   * unless the call hands it something that does, and the route check
+   * follows that as a step (`handedOn`).
+   */
+  if (files.size === 0 && library && libraryOwn(callee, imported, bound, side)) return { file: EXTERNAL_RECEIVER };
   if (callee.kind === "through" && !imported.namespace) return throughChecker();
 
-  const { files, known } = filesFor(imported.specifier, side.imports);
   if (files.size === 0) {
     // `bound` reads as a namespace/module import whose specifier did not
     // resolve -- correct for `ns.foo()`, and not the last word for a
