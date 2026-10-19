@@ -3008,8 +3008,13 @@ function comesToRest(
     return bindings.wildcard ? undefined : { file };
   }
 
-  const { files } = filesFor(onward.specifier, opened.imports);
-  if (files.size === 0) return undefined;
+  const { files, library } = filesFor(onward.specifier, opened.imports);
+  /*
+   * Passed on from a library (#469): zx's `util.ts` re-exports what
+   * `vendor-core.ts` takes from `zurk/spawn`. The name rests outside the
+   * repository, exactly as if the call's own file had imported it there.
+   */
+  if (files.size === 0) return library && !onward.namespace ? { file: EXTERNAL_RECEIVER } : undefined;
   for (const next of files) {
     const rest = comesToRest(onward.name ?? name, next, side, seen, depth + 1);
     if (!rest) continue;

@@ -261,11 +261,13 @@ describe("a library call is not the head", () => {
   shapes("Python", {
     files: {
       "target.py": "def b(x):\n    return x\n",
+      "compat.py": "from urllib.parse import quote as compat_quote\n",
       "work.py": [
-        "import os\nimport warnings\nfrom typing import cast\nfrom urllib.parse import quote\nfrom toolz import pipe",
+        "import os\nimport warnings\nfrom typing import cast\nfrom urllib.parse import quote\nfrom toolz import pipe\nfrom compat import compat_quote",
         "def plain(x):\n    return quote(cast(str, x))",
         "def module_calls(x):\n    warnings.warn('old')\n    return os.getcwd()",
         "def keeps_value(x):\n    return quote(x, safe='/')",
+        "def passed_on(x):\n    return compat_quote(x)",
         "def shout(x):\n    return x",
         "def hands_unrelated(xs):\n    return list(pipe(xs, shout))",
         "",
@@ -275,6 +277,7 @@ describe("a library call is not the head", () => {
     wrong: [
       ["the library is handed a function that never reaches the head", "work.py#hands_unrelated", "target.py#b"],
       ["every call is a library function imported by name", "work.py#plain", "target.py#b"],
+      ["the library function is passed on by a module of the repository's", "work.py#passed_on", "target.py#b"],
       ["every call is a library module's function", "work.py#module_calls", "target.py#b"],
       ["the library is handed only plain values", "work.py#keeps_value", "target.py#b"],
     ],
@@ -284,11 +287,14 @@ describe("a library call is not the head", () => {
     files: {
       "tsconfig.json": "{ \"compilerOptions\": { \"strict\": true } }\n",
       "target.ts": "export function b(x: number): number {\n  return x;\n}\n",
+      "vendor-core.ts": "export { isStringLiteral } from \"zurk/spawn\";\n",
+      "util.ts": "export { isStringLiteral } from \"./vendor-core\";\n",
       "work.ts": [
-        "import { debounce, isNil } from \"lodash\";\nimport * as path from \"node:path\";",
+        "import { isStringLiteral } from \"./util\";\nimport { debounce, isNil } from \"lodash\";\nimport * as path from \"node:path\";",
         "export function plain(x: unknown): number {\n  return isNil(x) ? 0 : 1;\n}",
         "export function joined(a: string): string {\n  return path.join(a, \"x\");\n}",
         "function shout(x: number): number {\n  return x;\n}",
+        "export function echo(x: unknown): boolean {\n  return isStringLiteral(x);\n}",
         "export function handsUnrelated(): () => void {\n  return debounce(shout, 10);\n}",
         "",
       ].join("\n\n"),
@@ -297,6 +303,7 @@ describe("a library call is not the head", () => {
     wrong: [
       ["every call is a package's function imported by name", "work.ts#plain", "target.ts#b"],
       ["every call is a namespace import's function", "work.ts#joined", "target.ts#b"],
+      ["the package's function is passed on through two files of the repository's", "work.ts#echo", "target.ts#b"],
       ["the library is handed a function that never reaches the head", "work.ts#handsUnrelated", "target.ts#b"],
     ],
   });
