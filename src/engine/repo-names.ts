@@ -48,11 +48,34 @@ export function repoNames(workspace: Workspace): ReadonlySet<string> | undefined
       } else if (kind === "file") {
         const dot = entry.indexOf(".");
         names.add(dot > 0 ? entry.slice(0, dot) : entry);
+        if (entry.endsWith(".d.ts")) {
+          const declared = ambient.get(workspace) ?? [];
+          for (const match of workspace.read(child).matchAll(/\bdeclare\s+module\s+['"]([^'"]+)['"]/g)) declared.push(match[1]!);
+          ambient.set(workspace, declared);
+        }
       }
     }
   }
   known.set(workspace, names);
   return names ?? undefined;
+}
+
+const ambient = new WeakMap<Workspace, string[]>();
+
+/**
+ * Whether a declaration file of this repository's describes the module
+ * itself -- `declare module "estree-walker"` in Vue's `global.d.ts`. The
+ * code that runs is still the package's, but the compiler's "go to
+ * definition" lands on the repository's declaration, and which of the two a
+ * box anchored there means is not this reader's to decide, so the module is
+ * not read as a library (#469: 13 calls in Vue, excalidraw and Vite).
+ * `undefined` past the walk's cap counts as declared.
+ */
+export function declaredHere(specifier: string, workspace: Workspace): boolean {
+  if (repoNames(workspace) === undefined) return true;
+  return (ambient.get(workspace) ?? []).some((pattern) => pattern.includes("*")
+    ? new RegExp(`^${pattern.split("*").map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join(".*")}$`).test(specifier)
+    : pattern === specifier);
 }
 
 /** Whether nothing in the repository is called `name`; false when that cannot be told. */

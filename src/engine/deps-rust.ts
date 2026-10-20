@@ -253,11 +253,18 @@ export function readRustDependencies(
    */
   const isLibrary = (segments: string[], position?: RustPosition): boolean => {
     const first = segments[0]?.replace(/^::/, "") ?? "";
+    /*
+     * A crate's path has a crate and a name in it. One segment is an item in
+     * scope: pydantic-core's `pub(crate) use py_schema_error_type;` passes on
+     * the macro written above it, and read as a crate it sent 23 calls of the
+     * repository's own macro outside.
+     */
+    if (segments.length < 2) return false;
     if (first === "std" || first === "core" || first === "alloc") return true;
     if (!/^[a-z_][a-z0-9_]*$/.test(first) || /^(crate|self|super)$/.test(first)) return false;
     if (layout.byName.has(first) || layout.byName.has(first.replace(/_/g, "-"))) return false;
     if (position?.scope?.has(first) || scope?.has(first)) return false;
-    if (new RegExp(`\\bmod\\s+${first}\\b|\\bas\\s+${first}\\b`).test(source)) return false;
+    if (new RegExp(`\\b(mod|fn|struct|enum|union|trait|type|const|static)\\s+${first}\\b|\\bas\\s+${first}\\b|macro_rules!\\s*${first}\\b`).test(source)) return false;
     return namesNothingHere(first, workspace);
   };
 
@@ -545,6 +552,9 @@ export function readRustDependencies(
         const tail = part.type === "scoped_identifier" ? part.childForFieldName("name") : part.type === "identifier" ? part : null;
         if (!tail || !macros.has(tail.text)) return;
         if (part.type === "identifier" && part.text !== tail.text) return;
+        // A library crate's macro is the library's (#469): `use pyo3::intern`.
+        const path = part.type === "scoped_identifier" ? segmentsOf(part) : undefined;
+        if (path && isLibrary(path)) return;
         unplaced(part, part.text, 0);
       });
     });

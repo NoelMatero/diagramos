@@ -29,6 +29,7 @@ import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
+import { readDependencies } from "../src/engine/deps";
 import { createDiagram } from "../src/engine/diagram";
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, type DriftReport } from "../src/engine/drift";
 import { initEngine } from "../src/engine/parse";
@@ -253,6 +254,44 @@ describe("refusals: an import that only looks like a package is this repository'
     right: [
       ["the sibling crate's function may be what reaches the head", "core/src/lib.rs#load", "common/src/other.rs#unrelated"],
     ],
+    wrong: [],
+  });
+});
+
+describe("refusals the census found (#469)", () => {
+  /*
+   * pydantic-core passes its own macro on with a one-word `pub(crate) use`,
+   * and the first build read that word as a crate: 23 calls of the
+   * repository's macro were placed outside, against the compiler.
+   */
+  it("reads a Rust macro the repository passes on itself as the repository's", () => {
+    const files = {
+      "Cargo.toml": "[package]\nname = \"fixture\"\nversion = \"0.1.0\"\nedition = \"2021\"\n[workspace]\n",
+      "src/lib.rs": "pub mod tools;\n",
+      "src/tools.rs": "use std::fmt;\nuse pyo3::intern;\n\nmacro_rules! make_error {\n    ($x:expr) => { $x };\n}\npub(crate) use make_error;\n\npub fn go() {\n    intern!(1);\n}\n",
+    };
+    write(files);
+    const read = readDependencies("src/tools.rs", files["src/tools.rs"], createWorkspace(repo))!;
+    const library = (specifier: string) => read.dependencies.filter((one) => one.specifier === specifier).map((one) => one.library === true);
+    expect(library("make_error")).toEqual([false]);
+    expect(library("std::fmt")).toEqual([true]);
+    // A library crate's macro is the library's, not a path for the compiler to place.
+    expect(library("pyo3::intern").every(Boolean)).toBe(true);
+  });
+
+  /*
+   * Vue writes `declare module "estree-walker"` in its own `global.d.ts`,
+   * and the compiler's answer for `walk` is that declaration. Which of the
+   * two a box there means is not the reader's to decide (13 calls).
+   */
+  shapes("a package the repository declares in a .d.ts", {
+    files: {
+      "tsconfig.json": "{ \"compilerOptions\": { \"strict\": true } }\n",
+      "global.d.ts": "declare module \"walker\" {\n  export function walk(x: unknown, f: () => void): void;\n}\n",
+      "target.ts": "export function b(): number {\n  return 1;\n}\n",
+      "work.ts": "import { walk } from \"walker\";\n\nexport function visit(x: unknown): void {\n  walk(x, () => undefined);\n}\n",
+    },
+    right: [["the package's only declaration is the repository's", "work.ts#visit", "target.ts#b"]],
     wrong: [],
   });
 });

@@ -41,7 +41,7 @@ import { licenceFor } from "./licence";
 import { each, languageOf, parseSource, type Node } from "./parse";
 import { builtinModules } from "node:module";
 
-import { namesNothingHere } from "./repo-names";
+import { declaredHere, namesNothingHere } from "./repo-names";
 import { isNickname, resolveDependency, type ConfigCache } from "./resolve";
 import { crateOf, readRustLayout, type RustLayout } from "./rust";
 import { readRustDependencies } from "./deps-rust";
@@ -550,7 +550,7 @@ function isLibrary(specifier: string, fromFile: string, workspace: Workspace, co
   if (specifier.startsWith("node:") || NODE_BUILTINS.has(specifier)) return true;
   if (specifier.startsWith(".") || specifier.startsWith("@/")) return false;
   if (!/^(@[\w.-]+\/)?[\w.-]+(\/|$)/.test(specifier)) return false;
-  if (isNickname(specifier, fromFile, workspace, configs)) return false;
+  if (isNickname(specifier, fromFile, workspace, configs) || declaredHere(specifier, workspace)) return false;
   const parts = specifier.split("/");
   const scoped = specifier.startsWith("@");
   const name = scoped ? parts[1]! : parts[0]!;
