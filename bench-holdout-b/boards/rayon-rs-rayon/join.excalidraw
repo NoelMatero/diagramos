@@ -1,0 +1,1992 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "join-work-stealing-execution-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 382.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 826928624,
+      "version": 1,
+      "versionNonce": 801217356,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "join: Work-Stealing Execution",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "join: Work-Stealing Execution",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-node-0",
+      "type": "rectangle",
+      "x": 200,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1698152255,
+      "version": 1,
+      "versionNonce": 1628035161,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-node-0-label"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "node": "join_fn",
+        "ref": "rayon-core/src/join/mod.rs#join_context"
+      }
+    },
+    {
+      "id": "join-work-stealing-execution-node-1",
+      "type": "rectangle",
+      "x": 120,
+      "y": 400,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 20753582,
+      "version": 1,
+      "versionNonce": 846901714,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-node-1-label"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "node": "create_job",
+        "ref": "rayon-core/src/job.rs#StackJob"
+      }
+    },
+    {
+      "id": "join-work-stealing-execution-node-2",
+      "type": "rectangle",
+      "x": 140,
+      "y": 800,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 418874649,
+      "version": 1,
+      "versionNonce": 1084219491,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-node-2-label"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "node": "push_deque",
+        "ref": "rayon-core/src/registry.rs#WorkerThread"
+      }
+    },
+    {
+      "id": "join-work-stealing-execution-node-3",
+      "type": "rectangle",
+      "x": 140,
+      "y": 1200,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1147845648,
+      "version": 1,
+      "versionNonce": 1487296236,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-node-3-label"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "node": "exec_a",
+        "ref": "rayon-core/src/join/mod.rs#join_context"
+      }
+    },
+    {
+      "id": "join-work-stealing-execution-node-4",
+      "type": "rectangle",
+      "x": 140,
+      "y": 1600,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1368089883,
+      "version": 1,
+      "versionNonce": 119453717,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-node-4-label"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "node": "probe_latch",
+        "ref": "rayon-core/src/latch.rs#SpinLatch"
+      }
+    },
+    {
+      "id": "join-work-stealing-execution-node-5",
+      "type": "rectangle",
+      "x": 80,
+      "y": 2000,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 606270922,
+      "version": 1,
+      "versionNonce": 804484382,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-node-5-label"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "node": "take_local",
+        "ref": "rayon-core/src/registry.rs#WorkerThread"
+      }
+    },
+    {
+      "id": "join-work-stealing-execution-node-6",
+      "type": "rectangle",
+      "x": 400,
+      "y": 2400,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1760386725,
+      "version": 1,
+      "versionNonce": 1790374959,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-node-6-label"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "node": "run_inline",
+        "ref": "rayon-core/src/job.rs#StackJob"
+      }
+    },
+    {
+      "id": "join-work-stealing-execution-node-7",
+      "type": "rectangle",
+      "x": 40,
+      "y": 2400,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1620497548,
+      "version": 1,
+      "versionNonce": 1961919832,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-node-7-label"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "node": "wait_steal",
+        "ref": "rayon-core/src/registry.rs#WorkerThread"
+      }
+    },
+    {
+      "id": "join-work-stealing-execution-node-8",
+      "type": "rectangle",
+      "x": 420,
+      "y": 2800,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 307259783,
+      "version": 1,
+      "versionNonce": 1752712865,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-node-8-label"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "join-work-stealing-execution-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "node": "return_result",
+        "ref": "rayon-core/src/join/mod.rs#join_context"
+      }
+    },
+    {
+      "id": "join-work-stealing-execution-edge-0",
+      "type": "arrow",
+      "x": 283.73333333333335,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1211376688,
+      "version": 1,
+      "versionNonce": 82850956,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "edge": {
+          "from": "join_fn",
+          "to": "create_job",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "join-work-stealing-execution-node-0",
+        "focus": 0.06962962962962949,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "join-work-stealing-execution-node-1",
+        "focus": 0.023333333333333456,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "join-work-stealing-execution-edge-1",
+      "type": "arrow",
+      "x": 283.73333333333335,
+      "y": 492.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1885654713,
+      "version": 1,
+      "versionNonce": 400931459,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "edge": {
+          "from": "create_job",
+          "to": "push_deque"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "join-work-stealing-execution-node-1",
+        "focus": -0.023333333333333456,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "join-work-stealing-execution-node-2",
+        "focus": 0.02666666666666685,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "join-work-stealing-execution-edge-2",
+      "type": "arrow",
+      "x": 283.73333333333335,
+      "y": 893.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1953567822,
+      "version": 1,
+      "versionNonce": 1886639858,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "edge": {
+          "from": "push_deque",
+          "to": "exec_a"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "join-work-stealing-execution-node-2",
+        "focus": -0.02666666666666685,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "join-work-stealing-execution-node-3",
+        "focus": 0.026666666666666592,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "join-work-stealing-execution-edge-3",
+      "type": "arrow",
+      "x": 283.73333333333335,
+      "y": 1294.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1761683295,
+      "version": 1,
+      "versionNonce": 924343801,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "edge": {
+          "from": "exec_a",
+          "to": "probe_latch"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "join-work-stealing-execution-node-3",
+        "focus": -0.026666666666666592,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "join-work-stealing-execution-node-4",
+        "focus": -0.04177777777777782,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "join-work-stealing-execution-edge-4",
+      "type": "arrow",
+      "x": 233.73333333333335,
+      "y": 1695.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1684028588,
+      "version": 1,
+      "versionNonce": 515897848,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "edge": {
+          "from": "probe_latch",
+          "to": "take_local"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "join-work-stealing-execution-node-4",
+        "focus": 0.37511111111111095,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "join-work-stealing-execution-node-5",
+        "focus": -0.03916666666666685,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "join-work-stealing-execution-edge-5",
+      "type": "arrow",
+      "x": 333.73333333333335,
+      "y": 1695.1999999999998,
+      "width": 386.6666666666665,
+      "height": 1102.4000000000005,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 100891589,
+      "version": 1,
+      "versionNonce": 344352975,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "edge": {
+          "from": "probe_latch",
+          "to": "return_result"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          386.6666666666665,
+          32
+        ],
+        [
+          386.6666666666665,
+          417.8666666666668
+        ],
+        [
+          386.6666666666665,
+          994.4000000000005
+        ],
+        [
+          266.66666666666663,
+          994.4000000000005
+        ],
+        [
+          266.66666666666663,
+          1101.9000000000005
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "join-work-stealing-execution-node-4",
+        "focus": -0.2915555555555556,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "join-work-stealing-execution-node-8",
+        "focus": 0.5033333333333327,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "join-work-stealing-execution-edge-6",
+      "type": "arrow",
+      "x": 287.0666666666667,
+      "y": 2096,
+      "width": 253.33333333333326,
+      "height": 310.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1092355434,
+      "version": 1,
+      "versionNonce": 738634046,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "edge": {
+          "from": "take_local",
+          "to": "run_inline"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          250.06666666666672,
+          32
+        ],
+        [
+          253.33333333333326,
+          32
+        ],
+        [
+          253.33333333333326,
+          310.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "join-work-stealing-execution-node-5",
+        "focus": -0.29416666666666685,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "join-work-stealing-execution-node-6",
+        "focus": 0.002857142857143001,
+        "gap": 6.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "join-work-stealing-execution-edge-7",
+      "type": "arrow",
+      "x": 540.4,
+      "y": 2486.8,
+      "width": 0,
+      "height": 310.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 687386299,
+      "version": 1,
+      "versionNonce": 1542072629,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "edge": {
+          "from": "run_inline",
+          "to": "return_result"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          155.4000000000001
+        ],
+        [
+          0,
+          310.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "join-work-stealing-execution-node-6",
+        "focus": -0.002857142857143001,
+        "gap": 6.800000000000182
+      },
+      "endBinding": {
+        "elementId": "join-work-stealing-execution-node-8",
+        "focus": 0.0033333333333327234,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "join-work-stealing-execution-edge-8",
+      "type": "arrow",
+      "x": 180.40000000000003,
+      "y": 2096,
+      "width": 2.842170943040401e-14,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 118064760,
+      "version": 1,
+      "versionNonce": 1554853076,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "edge": {
+          "from": "take_local",
+          "to": "wait_steal"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0.4999999999999716,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "join-work-stealing-execution-node-5",
+        "focus": 0.37249999999999966,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "join-work-stealing-execution-node-7",
+        "focus": 0.0028571428571423055,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "join-work-stealing-execution-edge-9",
+      "type": "arrow",
+      "x": 180.4,
+      "y": 2496.8,
+      "width": 300,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1902921505,
+      "version": 1,
+      "versionNonce": 4247019,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "join-work-stealing-execution-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution",
+        "edge": {
+          "from": "wait_steal",
+          "to": "return_result"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.80000000000018
+        ],
+        [
+          107.59999999999988,
+          192.80000000000018
+        ],
+        [
+          300,
+          192.80000000000018
+        ],
+        [
+          300,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "join-work-stealing-execution-node-7",
+        "focus": -0.002857142857143334,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "join-work-stealing-execution-node-8",
+        "focus": -0.4966666666666673,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "join-work-stealing-execution-node-0-label",
+      "type": "text",
+      "x": 224,
+      "y": 47.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1750393034,
+      "version": 1,
+      "versionNonce": 176711198,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "join_context",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-node-0",
+      "originalText": "join_context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-node-1-label",
+      "type": "text",
+      "x": 181,
+      "y": 425,
+      "width": 198.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1879471823,
+      "version": 1,
+      "versionNonce": 1326577321,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "Create StackJob\nwrapping closure B",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-node-1",
+      "originalText": "Create StackJob\nwrapping closure B",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-node-2-label",
+      "type": "text",
+      "x": 197.5,
+      "y": 825,
+      "width": 165,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1050758432,
+      "version": 1,
+      "versionNonce": 15880572,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "Push job_b\nto worker deque",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-node-2",
+      "originalText": "Push job_b\nto worker deque",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-node-3-label",
+      "type": "text",
+      "x": 186.5,
+      "y": 1225,
+      "width": 187.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 782714093,
+      "version": 1,
+      "versionNonce": 1093948503,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "Execute closure A\non current thread",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-node-3",
+      "originalText": "Execute closure A\non current thread",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-node-4-label",
+      "type": "text",
+      "x": 207.5,
+      "y": 1625,
+      "width": 165,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1132619078,
+      "version": 1,
+      "versionNonce": 400956586,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "Check latch:\nB already done?",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-node-4",
+      "originalText": "Check latch:\nB already done?",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-node-5-label",
+      "type": "text",
+      "x": 152,
+      "y": 2025,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 743314683,
+      "version": 1,
+      "versionNonce": 1850557813,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "Try pop job_b\nfrom local deque",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-node-5",
+      "originalText": "Try pop job_b\nfrom local deque",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-node-6-label",
+      "type": "text",
+      "x": 468.5,
+      "y": 2415,
+      "width": 143,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1644636044,
+      "version": 1,
+      "versionNonce": 952315480,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "Execute job_b\ninline",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-node-6",
+      "originalText": "Execute job_b\ninline",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-node-7-label",
+      "type": "text",
+      "x": 92,
+      "y": 2425,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 128467497,
+      "version": 1,
+      "versionNonce": 2125843507,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "Wait for thief,\nsteal other work",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-node-7",
+      "originalText": "Wait for thief,\nsteal other work",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-node-8-label",
+      "type": "text",
+      "x": 430,
+      "y": 2825,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 722515714,
+      "version": 1,
+      "versionNonce": 1778227830,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "Return\n(result_a, result_b)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-node-8",
+      "originalText": "Return\n(result_a, result_b)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-edge-0-label",
+      "type": "text",
+      "x": 226.53333333333336,
+      "y": 232.4,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1737643917,
+      "version": 1,
+      "versionNonce": 1035774583,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "wraps @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-edge-0",
+      "originalText": "wraps @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-edge-1-label",
+      "type": "text",
+      "x": 244.13333333333335,
+      "y": 633.1999999999999,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 514511296,
+      "version": 1,
+      "versionNonce": 267339676,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "advertise",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-edge-1",
+      "originalText": "advertise",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-edge-2-label",
+      "type": "text",
+      "x": 266.1333333333333,
+      "y": 1034,
+      "width": 35.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 453507183,
+      "version": 1,
+      "versionNonce": 1227090889,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "then",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-edge-2",
+      "originalText": "then",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-edge-3-label",
+      "type": "text",
+      "x": 252.93333333333334,
+      "y": 1434.7999999999997,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 948532586,
+      "version": 1,
+      "versionNonce": 760084798,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "after A",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-edge-3",
+      "originalText": "after A",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-edge-4-label",
+      "type": "text",
+      "x": 202.93333333333334,
+      "y": 1835.6,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 26590921,
+      "version": 1,
+      "versionNonce": 910418515,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "not set",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-edge-4",
+      "originalText": "not set",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-edge-5-label",
+      "type": "text",
+      "x": 671.9999999999999,
+      "y": 2103.0666666666666,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 420222124,
+      "version": 1,
+      "versionNonce": 155517432,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "already set",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-edge-5",
+      "originalText": "already set",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-edge-6-label",
+      "type": "text",
+      "x": 515.1333333333334,
+      "y": 2118,
+      "width": 44,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1810728603,
+      "version": 1,
+      "versionNonce": 261715093,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "found",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-edge-6",
+      "originalText": "found",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-edge-7-label",
+      "type": "text",
+      "x": 505.2,
+      "y": 2632.2000000000003,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 633533414,
+      "version": 1,
+      "versionNonce": 596000202,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "complete",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-edge-7",
+      "originalText": "complete",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-edge-8-label",
+      "type": "text",
+      "x": 101.20000000000003,
+      "y": 2236.4,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1520090181,
+      "version": 1,
+      "versionNonce": 1050735183,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "not found (stolen)",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-edge-8",
+      "originalText": "not found (stolen)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "join-work-stealing-execution-edge-9-label",
+      "type": "text",
+      "x": 243.9999999999999,
+      "y": 2679.6000000000004,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1132130808,
+      "version": 1,
+      "versionNonce": 54093652,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "join-work-stealing-execution"
+      },
+      "text": "thief done",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "join-work-stealing-execution-edge-9",
+      "originalText": "thief done",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

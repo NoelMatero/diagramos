@@ -1,0 +1,83 @@
+{
+  "board": "bench-holdout-b/boards/encode-django-rest-framework/routers-viewsets.excalidraw",
+  "project": "encode-django-rest-framework",
+  "topic": "routers-viewsets",
+  "language": "python",
+  "scope": "rest_framework",
+  "pin": "d6c45646ed",
+  "tool": "python 1.1.406",
+  "claims": [
+    {
+      "id": "calls|rest_framework/routers.py#SimpleRouter|rest_framework/routers.py#SimpleRouter.register|",
+      "word": "calls",
+      "from": "rest_framework/routers.py#SimpleRouter",
+      "to": "rest_framework/routers.py#SimpleRouter.register",
+      "fromLabel": "SimpleRouter",
+      "toLabel": "register()",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|rest_framework/routers.py#SimpleRouter|rest_framework/routers.py#SimpleRouter.get_urls|",
+      "word": "calls",
+      "from": "rest_framework/routers.py#SimpleRouter",
+      "to": "rest_framework/routers.py#SimpleRouter.get_urls",
+      "fromLabel": "SimpleRouter",
+      "toLabel": "get_urls()",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|rest_framework/routers.py#SimpleRouter.get_urls|rest_framework/routers.py#SimpleRouter.get_routes|",
+      "word": "calls",
+      "from": "rest_framework/routers.py#SimpleRouter.get_urls",
+      "to": "rest_framework/routers.py#SimpleRouter.get_routes",
+      "fromLabel": "get_urls()",
+      "toLabel": "get_routes()",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|rest_framework/routers.py#SimpleRouter.get_urls|rest_framework/routers.py#SimpleRouter.get_method_map|",
+      "word": "calls",
+      "from": "rest_framework/routers.py#SimpleRouter.get_urls",
+      "to": "rest_framework/routers.py#SimpleRouter.get_method_map",
+      "fromLabel": "get_urls()",
+      "toLabel": "get_method_map()",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|rest_framework/routers.py#SimpleRouter.get_urls|rest_framework/viewsets.py#ViewSetMixin.as_view|",
+      "word": "calls",
+      "from": "rest_framework/routers.py#SimpleRouter.get_urls",
+      "to": "rest_framework/viewsets.py#ViewSetMixin.as_view",
+      "fromLabel": "get_urls()",
+      "toLabel": "ViewSet.as_view()",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    },
+    {
+      "id": "calls|rest_framework/views.py#APIView.dispatch|rest_framework/viewsets.py#ViewSetMixin.initialize_request|",
+      "word": "calls",
+      "from": "rest_framework/views.py#APIView.dispatch",
+      "to": "rest_framework/viewsets.py#ViewSetMixin.initialize_request",
+      "fromLabel": "dispatch()",
+      "toLabel": "initialize_request()",
+      "language": "python",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names nothing the tool declares"
+    }
+  ]
+}
