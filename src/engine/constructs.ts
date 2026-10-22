@@ -71,8 +71,9 @@ import {
   bindingsIn, callsBetween, callSitesIn, compiledBodiesFor, EXTERNAL_RECEIVER, JSX_TAG, placeName,
   type Bindings, type CallSide, type CallsNotClosed,
 } from "./calls";
+import { declarationName, escapeName, NAME_END } from "./declared";
 import { mayAccuse } from "./licence";
-import { each, parseSource, type Language, type Node } from "./parse";
+import { each, incomplete, parseSource, type Language, type Node } from "./parse";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -296,10 +297,7 @@ function routinesNamed(
      * rather than in `parse.ts` because it is not a fact about declarations in
      * general: it is where Rust keeps the methods.
      */
-    const name = node.type === "impl_item"
-      ? node.childForFieldName("type")
-      : node.childForFieldName("name") ?? node.childForFieldName("left");
-    if (!name || name.childCount !== 0 || name.text !== routine) return;
+    if (declarationName(node)?.text !== routine) return;
     declared = true;
     // The parameters may sit on the declaration or on the value assigned to it:
     // `function f()` has its own, `const f = () => x` has the arrow function's.
@@ -340,7 +338,7 @@ function madeIn(
   routine: Node,
   source: string,
 ): { made: Map<string, ConstructsEvidence>; why?: ConstructsWithheld } {
-  if (routine.hasError) return { made: new Map(), why: "incomplete" };
+  if (incomplete(routine)) return { made: new Map(), why: "incomplete" };
 
   const made = new Map<string, ConstructsEvidence>();
   let why: ConstructsWithheld | undefined;
@@ -476,7 +474,7 @@ function onlyStructs(source: string, names: string[]): boolean {
 function macroDeclares(source: string, routine: string): boolean {
   const tree = parseSource(source, "rust");
   if (!tree) return true;
-  const written = new RegExp(`\\bfn\\s+${routine.replace(/[^\w]/g, "")}\\b`);
+  const written = new RegExp(`\\bfn\\s+${escapeName(routine)}${NAME_END}`, "u");
   let found = false;
   each(tree.rootNode, (node) => {
     if (!found && node.type === "token_tree" && written.test(node.text)) found = true;
@@ -1181,7 +1179,7 @@ function pythonConstructions(
   for (const body of routines) {
     // The same doubt `madeIn` refuses on: a recovered parse is a statement about
     // a file only partly read, so a call node found inside one is not evidence.
-    if (body.hasError) { note("incomplete"); continue; }
+    if (incomplete(body)) { note("incomplete"); continue; }
     for (const call of bareCalls(body, source)) {
       const meant = meansOneOf(call.name, wanted, bindings);
       if (meant === undefined) continue;

@@ -615,10 +615,16 @@ describe("the reasons a Rust file cannot support a refutation", () => {
     expect(flagsOf(files, "src/lib.rs")).toEqual([]);
   });
 
-  it("reports a file it could not parse to the end as incomplete", () => {
-    const files = { "Cargo.toml": MANIFEST, "src/lib.rs": "fn go() { let x = ~~~; }\n" };
+  it("reports a file incomplete when a line it could not read may hold a use or a module", () => {
+    const files = { "Cargo.toml": MANIFEST, "src/lib.rs": "use crate::a::;\nfn go() {}\nmod a;\n" };
     const read = readDependencies("src/lib.rs", files["src/lib.rs"]!, fakeWorkspace(files), new Map());
     expect(read?.complete).toBe(false);
+  });
+
+  it("vouches for the imports of a file whose unread line writes none (#462)", () => {
+    const files = { "Cargo.toml": MANIFEST, "src/lib.rs": "fn go() { let x = ~~~; }\n" };
+    const read = readDependencies("src/lib.rs", files["src/lib.rs"]!, fakeWorkspace(files), new Map());
+    expect(read?.complete).toBe(true);
   });
 });
 

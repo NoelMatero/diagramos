@@ -48,7 +48,8 @@
  * doubt be rounded away, and the doubt is the part that decides the question.
  */
 
-import { each, parseSource, type Language, type Node } from "./parse";
+import { declarationName } from "./declared";
+import { each, incomplete, parseSource, type Language, type Node } from "./parse";
 
 /** Why a body could not be read at all. Each is a reason to say nothing. */
 export type DataflowWithheld =
@@ -1879,13 +1880,12 @@ export function readBody(source: string, routine: string, language: Language): B
     // Declared and not a routine is a different answer from never declared.
     let declared = false;
     each(tree.rootNode, (node) => {
-      const name = node.childForFieldName("name") ?? node.childForFieldName("left");
-      if (name && name.childCount === 0 && name.text === routine) declared = true;
+      if (node.type !== "impl_item" && declarationName(node)?.text === routine) declared = true;
     });
     return { read: false, why: declared ? "no-body" : "not-declared" };
   }
   const node = routines[0]!.node;
-  if (node.hasError) return { read: false, why: "incomplete" };
+  if (incomplete(node)) return { read: false, why: "incomplete" };
   let macro = false;
   each(node, (child) => { if (child.type === "token_tree") macro = true; });
   if (macro) return { read: false, why: "macro" };
@@ -1904,7 +1904,7 @@ export function readBodies(
 
   const bodies: Body[] = [];
   for (const one of routinesIn(tree.rootNode)) {
-    if (one.node.hasError) { bump("incomplete"); continue; }
+    if (incomplete(one.node)) { bump("incomplete"); continue; }
     let macro = false;
     each(one.node, (child) => { if (child.type === "token_tree") macro = true; });
     if (macro) { bump("macro"); continue; }

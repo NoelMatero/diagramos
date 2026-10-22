@@ -83,9 +83,10 @@
  * bucket and #216 made it split them.
  */
 import { declaredShapes } from "./body";
+import { escapeName, NAME_END, NAME_START } from "./declared";
 import type { Site } from "./gate";
 import { mayAccuse } from "./licence";
-import { each, parseSource, type Language, type Node } from "./parse";
+import { each, incomplete, parseSource, type Language, type Node } from "./parse";
 
 /**
  * Why no verdict was reached. Every one is a reason to stay quiet, and the
@@ -589,7 +590,7 @@ export function declaredBases(
 ): BasesRead {
   const tree = parseSource(source, language);
   if (!tree) return { why: "unreadable" };
-  if (tree.rootNode.hasError) return { why: "incomplete" };
+  if (incomplete(tree.rootNode)) return { why: "incomplete" };
 
   /*
    * The sort of the tail, before its declaration is looked for.
@@ -789,10 +790,10 @@ export function conformedTypes(
  */
 function registers(source: string, targets: string[], subject: string): boolean {
   return targets.some((target) => {
-    const name = target.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const plain = subject.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    return new RegExp(`\\b${name}\\.register\\(\\s*${plain}\\s*\\)`).test(source)
-      || new RegExp(`@\\s*${name}\\.register\\s*\\n(?:\\s*@.*\\n)*\\s*class\\s+${plain}\\b`).test(source);
+    const name = escapeName(target);
+    const plain = escapeName(subject);
+    return new RegExp(`${NAME_START}${name}\\.register\\(\\s*${plain}\\s*\\)`, "u").test(source)
+      || new RegExp(`@\\s*${name}\\.register\\s*\\n(?:\\s*@.*\\n)*\\s*class\\s+${plain}${NAME_END}`, "u").test(source);
   });
 }
 

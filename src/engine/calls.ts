@@ -70,10 +70,11 @@ import {
   compiledBodiesOf, compiledRefutes, ownCallIn, traitImplsOf, type CompiledBody, type CompiledCrate,
 } from "./compiled-calls";
 import { declaredBases } from "./conforms";
+import { declarationName, escapeName, NAME_END, NAME_START, wholeName } from "./declared";
 import { mayAccuse } from "./licence";
 import { enclosing, lookUp, moduleScope, type Meaning, type Space, type WildcardAnswer } from "./names";
 import { declaresMember, holdersIn } from "./overrides";
-import { each, parseSource, type Language, type Node, type Tree } from "./parse";
+import { each, incomplete, parseSource, type Language, type Node, type Tree } from "./parse";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -1419,10 +1420,7 @@ export function routinesNamed(
   const routines: Node[] = [];
   let declared = false;
   each(tree.rootNode, (node) => {
-    const name = node.type === "impl_item"
-      ? node.childForFieldName("type")
-      : node.childForFieldName("name") ?? node.childForFieldName("left");
-    if (!name || name.childCount !== 0 || name.text !== routine) return;
+    if (declarationName(node)?.text !== routine) return;
     declared = true;
     const value = node.childForFieldName("value");
     if (node.childForFieldName("parameters") ?? value?.childForFieldName("parameters")) {
@@ -1771,7 +1769,7 @@ function callsTo(
 
   let why: CallsWithheld | undefined;
   for (const body of routines) {
-    if (body.hasError) { why ??= "incomplete"; continue; }
+    if (incomplete(body)) { why ??= "incomplete"; continue; }
     let found: CallsEvidence | undefined;
     const quiet = side.language === "python" && !target.hooked ? quietReads(body, bindings, side) : undefined;
     each(body, (node) => {
@@ -1783,7 +1781,7 @@ function callsTo(
        * Rust would silence every question.
        */
       if (node.type === "token_tree") {
-        if ([...target.names].some((name) => new RegExp(`\\b${escapeName(name)}\\b`).test(node.text))) {
+        if ([...target.names].some((name) => wholeName(name).test(node.text))) {
           why ??= "macro";
         }
         return;
@@ -1820,11 +1818,6 @@ function ownHolder(body: Node): Node | undefined {
   const holds = body.childForFieldName("parameters") === null && body.childForFieldName("body") !== null
     && (body.childForFieldName("name") ?? body.childForFieldName("type")) !== null;
   return holds ? body : undefined;
-}
-
-/** A name, made safe to put in a pattern. Identifiers are tame; `$` is not. */
-function escapeName(name: string): string {
-  return name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 /**
@@ -2315,7 +2308,7 @@ function traitDeclaredHere(side: CallSide, written: string): boolean {
   const first = segments[0];
   if (!first) return false;
   if (first === "crate" || first === "self" || first === "super") return true;
-  if (segments.length === 1 && new RegExp(`\\btrait\\s+${escapeName(first)}\\b`).test(side.source)) return true;
+  if (segments.length === 1 && new RegExp(`\\btrait\\s+${escapeName(first)}${NAME_END}`, "u").test(side.source)) return true;
   const binding = bindingsIn(side.source, side.language)?.imported.get(first);
   if (!binding) return false;
   return side.imports.some((one) => one.specifier === binding.specifier && one.file !== undefined);
@@ -2643,7 +2636,7 @@ function runWhenMade(to: CallSide, type: string, routine: string): boolean {
 /** Whether `name` is written anywhere in a type's own code in this file. */
 function writtenInside(source: string, language: Language, type: string, name: string): boolean {
   const lines = source.split("\n");
-  const word = new RegExp(`\\b${escapeName(name)}\\b`);
+  const word = wholeName(name);
   return typeSpans(source, language, type)
     .some(([first, last]) => word.test(lines.slice(first - 1, last).join("\n")));
 }
@@ -2666,10 +2659,12 @@ function lineageOf(side: CallSide, type: string): Set<string> {
 function aliases(source: string, head: string, landed: string): boolean {
   const h = escapeName(head);
   const l = escapeName(landed);
+  const [head_, landed_] = [`${NAME_START}${h}${NAME_END}`, `${NAME_START}${l}${NAME_END}`];
   return new RegExp(
-    `\\b${h}\\s*(?::[^=;\\n]*)?=\\s*[\\w.:]*\\b${l}\\b`
-    + `|\\b${l}\\s+as\\s+${h}\\b`
-    + `|\\b${h}\\s*:\\s*[\\w.:]*\\b${l}\\b`,
+    `${head_}\\s*(?::[^=;\\n]*)?=\\s*[\\w$.:]*${landed_}`
+    + `|${landed_}\\s+as\\s+${head_}`
+    + `|${head_}\\s*:\\s*[\\w$.:]*${landed_}`,
+    "u",
   ).test(source);
 }
 
@@ -3822,7 +3817,7 @@ function wildcardBrings(specifier: string, name: string, space: Space, side: Cal
     const first = specifier.replace(/^::/, "").split("::")[0] ?? "";
     if (/^(crate|self|super|Self)$/.test(first)) return "unknown";
     // A module of this file's own, written `use parser::*` (2018 paths).
-    if (new RegExp(`\\bmod\\s+${escapeName(first)}\\b`).test(side.source)) return "unknown";
+    if (new RegExp(`\\bmod\\s+${escapeName(first)}${NAME_END}`, "u").test(side.source)) return "unknown";
     return "outside";
   }
   let answer: WildcardAnswer = "lacks";

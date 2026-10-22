@@ -152,17 +152,28 @@ describe("whether the file was read completely", () => {
    * This repo's own case. `font.ts` builds a cache key as `${size}\0${text}`
    * with a real NUL byte in the template, which tree-sitter cannot read -- and
    * which also makes grep treat the file as binary. Recovery is local, so the
-   * import 60 lines below it is still found; the file just cannot be vouched
-   * for, which is exactly the distinction that matters.
+   * import 60 lines below it is still found.
+   *
+   * Since #462 the line it could not read is blanked and kept, and it costs
+   * the file only what it could hide: a line that writes no import cannot
+   * hide one, so the file is vouched for. One that writes `import` still
+   * cannot be.
    */
-  it("still finds the dependencies in a file it cannot vouch for", () => {
+  it("still finds the dependencies in a file it could not read a line of", () => {
     const found = read(
       "src/a.ts",
       ['const key = `${size}\u0000${text}`;', 'import { thing } from "./b";'].join("\n"),
       { "src/b.ts": "" },
     );
-    expect(found.complete).toBe(false);
+    expect(found.complete).toBe(true);
     expect(dependencyFiles(found)).toEqual(["src/b.ts"]);
+  });
+
+  it("refuses to vouch for one whose unread line writes an import", () => {
+    for (const first of ["import { other } from ;", "import { other } frm \"./c\";"]) {
+      const found = read("src/a.ts", [first, 'import { thing } from "./b";'].join("\n"), { "src/b.ts": "", "src/c.ts": "" });
+      expect(found.complete, first).toBe(false);
+    }
   });
 });
 
@@ -369,9 +380,10 @@ describe("both channels over this repository", () => {
     expect(measured.dynamic.length).toBeLessThan(measured.files.length / 4);
   });
 
-  it("names the one file it cannot read to the end", () => {
-    // The NUL byte in font.ts's cache key. Committed, deliberate, and it costs
-    // that file the right to be part of any "there is no such dependency" claim.
-    expect(measured.incomplete).toEqual(["src/engine/font.ts"]);
+  it("reads every file to the end", () => {
+    // The NUL byte in font.ts's cache key used to cost that file the right to
+    // be part of any "there is no such dependency" claim. Since #462 the line
+    // is blanked and remembered, and it writes no import, so it hides none.
+    expect(measured.incomplete).toEqual([]);
   });
 });

@@ -49,6 +49,7 @@
  * about the code.
  */
 
+import { declarationName } from "./declared";
 import { ownerIsHere, writtenName } from "./lines";
 import { each, parseSource, type Language, type Node, type Tree } from "./parse";
 
@@ -718,7 +719,7 @@ export function findDispatches(tree: Tree, source: string, _language: Language):
 function bodiesNamed(root: Node, symbol: string): Node[] {
   const found: Node[] = [];
   each(root, (node) => {
-    if (node.childForFieldName("name")?.text !== symbol) return;
+    if (node.type === "impl_item" || declarationName(node)?.text !== symbol) return;
     const body = node.childForFieldName("body");
     if (body) found.push(body);
   });

@@ -33,6 +33,8 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { existsSync } from "node:fs";
 
+import { blankUnreadable, type ParseError } from "./recover";
+
 /** The whole language table. */
 const GRAMMARS = {
   ts: "typescript",
@@ -142,6 +144,10 @@ export interface Node {
   hasError: boolean;
   /** Byte offset of the node's first character, for naming the line evidence sits on. */
   startIndex: number;
+  /** Offset just past the node's last character. */
+  endIndex: number;
+  /** The tree the node belongs to, which knows the lines it could not read (`incomplete`). */
+  tree: Tree;
   /**
    * False for the punctuation and keywords a grammar keeps in the tree -- `,`,
    * `(`, `extends`, `for`.
@@ -240,7 +246,7 @@ export function parseSource(source: string, language: Language): Tree | undefine
     return cached;
   }
 
-  const tree = parser.parse(source);
+  const tree = readable(parser, source, language);
   trees.set(key, tree);
   if (trees.size > CACHE_LIMIT) {
     const oldest = trees.keys().next();
@@ -289,12 +295,107 @@ function release(tree: Tree): void {
 export function withParsed<T>(source: string, language: Language, use: (tree: Tree) => T): T | undefined {
   const parser = parsers.get(language);
   if (!parser) return undefined;
-  const tree = parser.parse(source);
+  const tree = readable(parser, source, language);
   try {
     return use(tree);
   } finally {
     tree.delete();
   }
+}
+
+/**
+ * A stretch of the source the parser could not read: offsets, the text that
+ * was there, and the whole lines it is on -- a word blanked out of an import
+ * leaves the rest of that import read, but not vouched for.
+ */
+export interface Unread { start: number; end: number; text: string; lines: string }
+
+const unreadOf = new WeakMap<Tree, readonly Unread[]>();
+
+/**
+ * Parse, and when the parse fails, blank the statements it could not read and
+ * parse again (`recover.ts`, #462). The blanked stretches are kept with the
+ * tree; a file that cannot be read whole keeps the parser's own tree, errors
+ * and all, as it always did.
+ */
+function readable(parser: Parser, source: string, language: Language): Tree {
+  const tree = parser.parse(source);
+  if (!tree.rootNode.hasError) return tree;
+  const repaired = blankUnreadable(source, language, (text) => errorIn(parser, text));
+  if (!repaired) return tree;
+  tree.delete();
+  const read = parser.parse(repaired.text);
+  unreadOf.set(read, repaired.unread.map(([start, end]) => {
+    const from = source.lastIndexOf("\n", start - 1) + 1;
+    const to = source.indexOf("\n", end);
+    return { start, end, text: source.slice(start, end), lines: source.slice(from, to < 0 ? source.length : to) };
+  }));
+  return read;
+}
+
+/** Where `text` as written first fails to parse, or undefined. */
+function errorIn(parser: Parser, text: string): ParseError | undefined {
+  const attempt = parser.parse(text);
+  try {
+    return attempt.rootNode.hasError ? errorAt(attempt.rootNode) : undefined;
+  } finally {
+    attempt.delete();
+  }
+}
+
+/** Node types that are a whole statement or member wherever they stand. */
+const WHOLE = /(_statement|_declaration|_definition|_item|_signature|comment)$/;
+
+/**
+ * Where the parse first went wrong, and what it could not read there. Inside
+ * an `ERROR`, the whole statements it wraps are skipped: MobX's recovery
+ * wrapped the entire file in one, and its first line is an import that was
+ * never the trouble.
+ */
+function errorAt(root: Node): ParseError {
+  type Positioned = Node & { startPosition: { row: number }; isError: boolean; isMissing: boolean };
+  const at = (node: Node): ParseError => ({ row: (node as Positioned).startPosition.row, start: node.startIndex, end: node.endIndex });
+  const visit = (node: Node): ParseError | undefined => {
+    if ((node as Positioned).isMissing) return at(node);
+    const error = (node as Positioned).isError;
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index)!;
+      if ((child as Positioned).isError || child.hasError || (child as Positioned).isMissing) return visit(child) ?? at(child);
+      if (error && (child.isNamed ? !WHOLE.test(child.type) : !/^[;,]$/.test(child.type))) return at(child);
+    }
+    return error ? at(node) : undefined;
+  };
+  return visit(root) ?? { row: 0, start: 0, end: 0 };
+}
+
+/**
+ * The 0-based line the parser first fails on in `source` as written, with no
+ * recovery; undefined when it parses. For measuring recovery, not for readers.
+ */
+export function firstUnreadableRow(source: string, language: Language): number | undefined {
+  const parser = parsers.get(language);
+  return parser ? errorIn(parser, source)?.row : undefined;
+}
+
+/** What the parser could not read in this node's file, blanked so the rest could be. */
+export function unreadIn(tree: Tree): readonly Unread[] {
+  return unreadOf.get(tree) ?? [];
+}
+
+/**
+ * Whether a reading of this node may have missed something: the parser hit an
+ * error inside it, or a line it could not read was blanked inside it. Every
+ * reader asks this rather than `hasError`, which a blanked line no longer
+ * sets. Asked of a file's root, it is true whenever anything was blanked.
+ */
+export function incomplete(node: Node): boolean {
+  if (node.hasError) return true;
+  return unreadIn(node.tree).some((one) => one.start < node.endIndex && node.startIndex < one.end);
+}
+
+/** Whether a line this tree could not read all of writes something this pattern finds: an import, or a name. */
+export function unreadWrites(tree: Tree, pattern: RegExp): boolean {
+  return unreadIn(tree).some((one) => pattern.test(one.lines));
 }
 
 /** Free every cached tree. For tests and for the end of a long-lived run. */
