@@ -145,8 +145,9 @@ describe("Python: a call on a module reached through a module", () => {
 
   it("calls the wrong arrow wrong", async () => {
     write(FILES);
-    // `os.path` is an expression, not a name: the text cannot place `join`.
-    expect((await textOnly("run.py#run", "render.py#render")).claims.callsNotClosed.receiver).toBe(1);
+    // `os.path` is an expression, not a name -- but a path into a library's
+    // module, so the text places `join` outside on its own (#469).
+    expect(accusations(await textOnly("run.py#run", "render.py#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
 
     const report = await checked("run.py#run", "render.py#render");
     expect(accusations(report).map((finding) => finding.kind)).toEqual(["calls-refuted"]);

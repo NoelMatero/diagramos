@@ -34,6 +34,8 @@ beforeAll(async () => { await initEngine(); }, 60_000);
  * TypeScript needs none any more (#468): `JSON`, `Object` and `console` are
  * names nothing in the file binds, so they are the language's, and a member
  * of one is outside the repository -- read from the scopes, not asked.
+ * Python neither (#469): `asdict` from `dataclasses`, `json.dumps` and a
+ * `logging` call are the standard library's by the import alone.
  */
 const COMPILER = true;
 type Shape = [shape: string, from: string, to: string, member: string, needsCompiler?: boolean];
@@ -121,10 +123,10 @@ const PYTHON: Shapes = {
     ["asdict", "r.py#as_dict", "c.py#Config", "width"],
     ["astuple", "r.py#as_tuple", "c.py#Config", "width"],
     ["dataclass ==", "r.py#compare", "c.py#Config", "width"],
-    ["asdict beside other reads", "r.py#as_dict_mixed", "c.py#Config", "width", COMPILER],
-    ["json.dumps(asdict(c))", "r.py#dumped", "c.py#Config", "width", COMPILER],
+    ["asdict beside other reads", "r.py#as_dict_mixed", "c.py#Config", "width"],
+    ["json.dumps(asdict(c))", "r.py#dumped", "c.py#Config", "width"],
     ["print(c)", "r.py#printed", "c.py#Config", "width"],
-    ["own walker (object param)", "r.py#own_walker", "c.py#Config", "width", COMPILER],
+    ["own walker (object param)", "r.py#own_walker", "c.py#Config", "width"],
   ],
   wrong: [
     ["never touches Config", "r.py#other", "c.py#Config", "width"],

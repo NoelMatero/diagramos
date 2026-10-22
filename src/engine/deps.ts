@@ -39,7 +39,10 @@ import path from "node:path";
 
 import { licenceFor } from "./licence";
 import { each, languageOf, parseSource, type Node } from "./parse";
-import { resolveDependency, type ConfigCache } from "./resolve";
+import { builtinModules } from "node:module";
+
+import { declaredHere, namesNothingHere } from "./repo-names";
+import { isNickname, resolveDependency, type ConfigCache } from "./resolve";
 import { crateOf, readRustLayout, type RustLayout } from "./rust";
 import { readRustDependencies } from "./deps-rust";
 import { readPythonDependencies } from "./deps-python";
@@ -217,6 +220,14 @@ export interface FileDependency {
    * the range is where the compiler is asked instead.
    */
   unplaced?: { start: number; end: number };
+  /**
+   * The path resolved to nothing here because it names a library: the
+   * language's own (`node:fs`, Python's `json`, Rust's `std`), or a package
+   * whose name is no workspace sibling, no nickname, and no file or directory
+   * anywhere in this repository (#469). A call into one runs no code of
+   * this repository's. Absent whenever any of that is in doubt.
+   */
+  library?: true;
 }
 
 export interface FileDependencies {
@@ -406,6 +417,7 @@ function readUncached(
   ): boolean => {
     const resolved = resolveDependency(specifier, filePath, workspace, configs);
     const unplaced = !resolved && mayLandHere(specifier, filePath, workspace);
+    const library = !resolved && !unplaced && isLibrary(specifier, filePath, workspace, configs);
     dependencies.push({
       specifier,
       ...(resolved ? { file: resolved.rel } : {}),
@@ -414,6 +426,7 @@ function readUncached(
       ...(star ? { star: true } : {}),
       ...(names.length > 0 ? { names } : {}),
       ...(unplaced ? { unplaced: { start: node.startIndex, end: node.startIndex + node.text.length } } : {}),
+      ...(library ? { library: true } : {}),
     });
     return resolved !== undefined;
   };
@@ -521,6 +534,27 @@ function readUncached(
     complete: !tree.rootNode.hasError,
     dynamic: [...dynamic],
   };
+}
+
+const NODE_BUILTINS = new Set(builtinModules);
+
+/**
+ * Whether a specifier nothing here resolved is a library's (#469): Node's
+ * own module, or a bare package name that is not one of this repository's
+ * nicknames and names nothing in the tree. `mayLandHere` has already ruled
+ * out a relative path and a workspace sibling. A bundler alias written in a
+ * config this reader does not read (`@/x`, `~/x`) is the case the last test
+ * is for: its first segment is a directory here.
+ */
+function isLibrary(specifier: string, fromFile: string, workspace: Workspace, configs: ConfigCache): boolean {
+  if (specifier.startsWith("node:") || NODE_BUILTINS.has(specifier)) return true;
+  if (specifier.startsWith(".") || specifier.startsWith("@/")) return false;
+  if (!/^(@[\w.-]+\/)?[\w.-]+(\/|$)/.test(specifier)) return false;
+  if (isNickname(specifier, fromFile, workspace, configs) || declaredHere(specifier, workspace)) return false;
+  const parts = specifier.split("/");
+  const scoped = specifier.startsWith("@");
+  const name = scoped ? parts[1]! : parts[0]!;
+  return namesNothingHere(name, workspace) && (!scoped || namesNothingHere(parts[0]!.slice(1), workspace));
 }
 
 /**

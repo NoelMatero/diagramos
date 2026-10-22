@@ -43,6 +43,7 @@
  */
 import { each, parseSource, type Node } from "./parse";
 import type { DynamicReason, FileDependencies, FileDependency } from "./deps";
+import { namesNothingHere } from "./repo-names";
 import type { Workspace } from "./workspace";
 
 /**
@@ -199,6 +200,18 @@ function resolveAbsolute(parts: string[], roots: string[], workspace: Workspace)
 }
 
 /**
+ * Whether an absolute module path whose first segment resolves at no import
+ * root is a library's (#469): the standard library's, unless a file at one of
+ * the roots shadows it, or a name no file or directory in the repository goes
+ * by -- the roots are a guess at `sys.path`, and a package under a directory
+ * they miss is still this repository's.
+ */
+function isLibrary(first: string, roots: string[], workspace: Workspace): boolean {
+  if (STANDARD_LIBRARY.has(first)) return roots.every((root) => fileForModule([first], root, workspace) === undefined);
+  return namesNothingHere(first, workspace);
+}
+
+/**
  * The package a relative import counts its dots from.
  *
  * One dot is the directory holding this file; each further dot is one level up.
@@ -308,6 +321,7 @@ export function readPythonDependencies(
     star = false,
     names: string[] = [],
     unplaced = false,
+    library = false,
   ) => {
     const key = `${specifier}\0${file ?? ""}\0${deferred}`;
     if (seen.has(key)) return;
@@ -320,6 +334,7 @@ export function readPythonDependencies(
       ...(star ? { star: true } : {}),
       ...(names.length > 0 ? { names } : {}),
       ...(unplaced && !file ? { unplaced: { start: node.startIndex, end: node.startIndex + node.text.length } } : {}),
+      ...(library && !file ? { library: true as const } : {}),
     });
   };
 
@@ -342,6 +357,7 @@ export function readPythonDependencies(
      * name is not this repository's.
      */
     const here = specifier.startsWith(".") || resolveAbsolute(parts.slice(0, 1), roots, workspace) !== undefined;
+    const library = !here && isLibrary(parts[0]!, roots, workspace);
     for (let length = from; length <= parts.length; length += 1) {
       const prefix = parts.slice(0, length);
       const file = resolveAbsolute(prefix, roots, workspace);
@@ -352,7 +368,8 @@ export function readPythonDependencies(
         declare(node, length === parts.length ? specifier : prefix.join("."), file, deferred,
           star && length === parts.length,
           length === parts.length ? names : [],
-          length === parts.length && here);
+          length === parts.length && here,
+          length === parts.length && library);
       }
     }
   };

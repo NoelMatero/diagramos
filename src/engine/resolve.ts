@@ -450,6 +450,27 @@ export function resolveDependency(
 }
 
 /**
+ * Whether a specifier is one of this repository's own names for its code --
+ * a tsconfig `paths` pattern, a package.json `imports` entry, or the nearest
+ * package's own name -- whether or not the file it names was found (#469).
+ * One that resolved to nothing is still the repository's code, never a
+ * library's.
+ */
+export function isNickname(
+  specifier: string,
+  fromFile: string,
+  workspace: Workspace,
+  cache: ConfigCache = new Map(),
+): boolean {
+  const rules = rulesFor(fromFile, workspace, cache);
+  if (rules && hasPattern(specifier, rules.paths)) return true;
+  const own = importsFor(fromFile, workspace, cache);
+  if (!own) return false;
+  if (own.name && (specifier === own.name || specifier.startsWith(`${own.name}/`))) return true;
+  return specifier.startsWith("#") && hasPattern(specifier, own.imports);
+}
+
+/**
  * A package reaching for itself by its published name.
  *
  * `@vitejs/self-referencing/test` from inside that very package is a dependency

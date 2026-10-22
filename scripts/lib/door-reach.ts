@@ -31,7 +31,7 @@ import path from "node:path";
 import { refereeRoutines, stripNoise } from "./call-scan";
 import { sourceFiles } from "./source-files";
 
-import { callSitesIn, type CallSide } from "../../src/engine/calls";
+import { callImports, callSitesIn, type CallSide } from "../../src/engine/calls";
 import { readDependencies } from "../../src/engine/deps";
 import { createWorkspace } from "../../src/engine/drift";
 import { outsideCallsIn, type OutsideKind } from "../../src/engine/outside";
@@ -354,7 +354,7 @@ export function readRepo(dir: string): Read {
     const cached = importsOf.get(rel);
     if (cached) return cached;
     const declared = readDependencies(rel, source, workspace, configs)?.dependencies ?? [];
-    const list = declared.map((one) => ({ specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
+    const list = callImports(declared);
     importsOf.set(rel, list);
     return list;
   };

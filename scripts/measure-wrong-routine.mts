@@ -54,7 +54,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-import {
+import { callImports,
   callSitesIn, EXTERNAL_RECEIVER, type CallSide, type CallSitePlaced, type ReceiverResolution,
 } from "../src/engine/calls";
 import { readDependencies } from "../src/engine/deps";
@@ -331,8 +331,7 @@ for (const tree of trees) {
     const cached = importsOf.get(rel);
     if (cached) return cached;
     const declared = readDependencies(rel, source, workspace, configs)?.dependencies ?? [];
-    const list = declared.map((one) => (
-      { specifier: one.specifier, ...(one.file ? { file: one.file } : {}) }));
+    const list = callImports(declared);
     importsOf.set(rel, list);
     return list;
   };
