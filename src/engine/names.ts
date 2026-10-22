@@ -1003,7 +1003,7 @@ function judgeWildcard(specifier: string, name: string, tree: Tree, side: LookUp
  * Generous on purpose -- a name counted here that a wildcard would not
  * actually carry turns an answer into "not known", never into a wrong one.
  */
-type Top = { scope: Scope; inner: Scope[]; broken: boolean } | null;
+type Top = { scope: Scope; inner: Scope[]; broken: boolean; unreadLines: string[] } | null;
 const TOPS_LIMIT = 512;
 /**
  * A file's top, by its text -- not by its tree, which the parse cache lets go
@@ -1031,6 +1031,11 @@ export function moduleScope(
    * call signatures turns `export function isAction` into a stray method.
    */
   broken: boolean;
+  /**
+   * Whether a line the parser could not read and blanked writes this name
+   * (#462): the file may declare it there, so "not here" is not known.
+   */
+  unread: (name: string) => boolean;
 } | undefined {
   const key = `${language}:${source}`;
   let top = tops.get(key);
@@ -1051,7 +1056,7 @@ export function moduleScope(
         if (one) inner.push(one);
       });
     }
-    top = scope ? { scope, inner, broken: incomplete(tree.rootNode) } : null;
+    top = scope ? { scope, inner, broken: incomplete(tree.rootNode), unreadLines: unreadIn(tree).map((one) => one.lines) } : null;
     tops.set(key, top);
     if (tops.size > TOPS_LIMIT) tops.delete(tops.keys().next().value!);
   } else {
@@ -1059,7 +1064,7 @@ export function moduleScope(
     tops.set(key, top);
   }
   if (!top) return undefined;
-  const { scope, inner, broken } = top;
+  const { scope, inner, broken, unreadLines } = top;
   const declaredInside = (name: string, space: Space) => inner.some((one) =>
     space === "type" ? one.types.has(name) : space === "macro" ? one.macros.has(name) : one.values.get(name)?.entry === "declared");
   return {
@@ -1077,5 +1082,6 @@ export function moduleScope(
     // Python's `__all__` decides what a wildcard over the module carries.
     limited: language === "python" && scope.values.has("__all__"),
     broken,
+    unread: (name) => unreadLines.some((lines) => wholeName(name).test(lines)),
   };
 }

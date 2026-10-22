@@ -3842,6 +3842,7 @@ function exportsName(name: string, space: Space, file: string, side: CallSide, s
   if (!top || top.limited) return "unknown";
   const has = top.has(name, space);
   if (has) return { has: has === "declared" ? file : undefined };
+  if (top.unread(name)) return "unknown";
   let answer: WildcardAnswer = "lacks";
   for (const specifier of top.wildcards) {
     const { files, known } = filesFor(specifier, opened.imports);
