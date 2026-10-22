@@ -77,6 +77,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { waitForQuiet } from "./lib/bench-busy";
+import { CENSUS_SET_ORDER, censusSets, isTestPath } from "./lib/census-sets";
 import { CLASSY, FN, ISSUE_OF, shapeOf, type Node } from "./lib/call-census-shapes";
 import { sourceFiles } from "./lib/source-files";
 
@@ -98,33 +99,8 @@ const flag = (name: string): string | undefined => argv.find((one) => one.starts
 
 /* ------------------------------------------------------------------ the sets */
 
-interface CensusSet { corpus: string; libraries: string; projects: () => string[] }
-
-const projectsOfScopes = (folder: string, corpus: string) => (): string[] => {
-  const scopes = path.join(REPO, folder, "scopes.json");
-  if (existsSync(scopes)) {
-    const rows = JSON.parse(readFileSync(scopes, "utf8")) as Array<{ project: string }>;
-    return [...new Set(rows.map((one) => one.project))].sort();
-  }
-  return readdirSync(corpus).filter((one) => !one.startsWith(".")).sort();
-};
-
-const MAIN_CORPUS = process.env.CENSUS_MAIN_CORPUS ?? "/Users/noelmatero/board-ai/.corpus";
-const holdout = (letter: string): CensusSet => {
-  const base = path.join(HOME, `.board-ai-holdout${letter}`);
-  return {
-    corpus: path.join(base, "corpus"),
-    libraries: path.join(base, ".corpus-libs"),
-    projects: projectsOfScopes(`bench-holdout${letter}`, path.join(base, "corpus")),
-  };
-};
-/** holdout-c is not here on purpose: it is the score-only set, and the census reads arrows' code. */
-const SETS: Record<string, CensusSet> = {
-  main: { corpus: MAIN_CORPUS, libraries: path.join(path.dirname(MAIN_CORPUS), ".corpus-libs"), projects: projectsOfScopes("bench", MAIN_CORPUS) },
-  holdout: holdout(""),
-  "holdout-b": holdout("-b"),
-};
-const SET_ORDER = ["main", "holdout", "holdout-b"];
+const SETS = censusSets(REPO);
+const SET_ORDER = CENSUS_SET_ORDER;
 
 /* ------------------------------------------------------------- run directory */
 
@@ -196,21 +172,6 @@ interface Summary {
   diagnostics: string[];
 }
 
-const TEST_DIRS = new Set(["test", "tests", "__tests__", "__test__", "testing", "spec", "__mocks__", "__testfixtures__", "__fixtures__", "fixtures"]);
-/**
- * Folders that hold bundles, vendored copies and documentation sites rather
- * than a project's own source: zx's `build/*.cjs`, MobX's `docs/assets`, a
- * Django app's `static/` jQuery, pip's `_vendor` copies of other libraries. No bench board draws from them, and in the
- * first run they made a quarter of holdout-b's TypeScript calls.
- */
-const GENERATED_DIRS = new Set(["build", "docs", "static", "assets", "_vendor"]);
-const isTestPath = (rel: string): boolean => {
-  const parts = rel.split(path.sep);
-  const base = parts[parts.length - 1]!;
-  if (parts.slice(0, -1).some((one) => TEST_DIRS.has(one) || GENERATED_DIRS.has(one))) return true;
-  return /\.(test|spec)\.[cm]?[jt]sx?$/.test(base) || /^test_.*\.py$|_test\.py$|^conftest\.py$/.test(base)
-    || /(^|_)tests?\.rs$/.test(base) || base.endsWith(".d.ts") || /\.min\.[cm]?js$/.test(base);
-};
 
 /** The leaf a call names, by the same rules `calleeOf` reads it with, or undefined for a computed callee. */
 function nameLeaf(call: Node): Node | undefined {

@@ -1829,7 +1829,7 @@ export function refFromLabel(label: string): string | undefined {
  * counts as still present. That asymmetry is deliberate: a missed rename is
  * invisible, while a wrong "this is gone" costs trust in the whole check.
  */
-function mentions(source: string, symbol: string): boolean {
+export function mentions(source: string, symbol: string): boolean {
   return new RegExp(`\\b${symbol.replace(REGEX_SPECIAL, "\\$&")}\\b`).test(source);
 }
 

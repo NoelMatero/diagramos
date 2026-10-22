@@ -1395,7 +1395,7 @@ const named_ = new WeakMap<Tree, Map<string, Named>>();
  * type on a `type` field; and a box that names a *type* is scanned through the
  * routines inside it, because nobody draws a box for one method of a class.
  */
-function routinesNamed(
+export function routinesNamed(
   source: string,
   routine: string,
   language: Language,
