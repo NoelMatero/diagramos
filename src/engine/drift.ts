@@ -45,6 +45,7 @@ import { checkHandles, type HandlesWithheld } from "./handles";
 import { runTimeChoices } from "./choices";
 import { connects, refIsStale, type CodeGraphOption } from "./codegraph";
 import { readDependencies, readerCanPlace } from "./deps";
+import { spelledHere, wholeName } from "./declared";
 import type { BindingFault } from "./damage";
 import { partsInclude, type DeclaredAt, type ImportTarget, type MemberTarget, type TypeParts } from "./compiler-questions";
 import {
@@ -1829,8 +1830,8 @@ export function refFromLabel(label: string): string | undefined {
  * counts as still present. That asymmetry is deliberate: a missed rename is
  * invisible, while a wrong "this is gone" costs trust in the whole check.
  */
-function mentions(source: string, symbol: string): boolean {
-  return new RegExp(`\\b${symbol.replace(REGEX_SPECIAL, "\\$&")}\\b`).test(source);
+export function mentions(source: string, symbol: string): boolean {
+  return wholeName(symbol).test(source);
 }
 
 function lineNumbers(base: Omit<DriftFinding, "kind" | "detail">, file: string, lines: string): DriftFinding {
@@ -2262,7 +2263,9 @@ function inspect(
   const unowned = strangeOwner([absolute], target);
   if (unowned) return unowned;
   if (!assertion) return "ok";
-  const verdict = judgeAssertion(target, source, symbol, assertion, tally);
+  const language = languageOf(absolute);
+  const spelled = language ? spelledHere(source, symbol, language) : symbol;
+  const verdict = judgeAssertion(target, source, spelled, assertion, tally);
   return typeof verdict === "object" ? failed(verdict, target) : "ok";
 }
 
@@ -3128,8 +3131,14 @@ export function viaNamesRoute(via: readonly string[] | undefined, route: readonl
   });
 }
 
-function symbolsOf(node: { ref?: string; refs?: string[] }, file: string): string[] {
-  if (!languageOf(file)) return [];
+/**
+ * The names a box gives for its function, as `file` spells them (#451): a
+ * board writes `dispatch` for a private `#dispatch`, and `spelledHere` is the
+ * one place that reads it so.
+ */
+function symbolsOf(node: { ref?: string; refs?: string[] }, file: string, workspace: Workspace): string[] {
+  const language = languageOf(file);
+  if (!language) return [];
   const anchors = [node.ref, ...(node.refs ?? [])];
   const symbols = new Set<string>();
   for (const anchor of anchors) {
@@ -3145,7 +3154,7 @@ function symbolsOf(node: { ref?: string; refs?: string[] }, file: string): strin
     // the search would come back empty -- but it was load-bearing when symbols
     // were matched as raw text and says outright what a route is not.
     if ("garbled" in parsed || routeOf(parsed.symbol)) continue;
-    symbols.add(parsed.symbol);
+    symbols.add(spelledHere(workspace.read(file), parsed.symbol, language));
   }
   return [...symbols];
 }
@@ -3179,7 +3188,8 @@ function membersByFile(
     if (!language) continue;
     const entry = byFile.get(absolute)
       ?? { file: { path: target, absolute, language }, symbols: [] };
-    if (!entry.symbols.includes(parsed.symbol)) entry.symbols.push(parsed.symbol);
+    const spelled = spelledHere(workspace.read(absolute), parsed.symbol, language);
+    if (!entry.symbols.includes(spelled)) entry.symbols.push(spelled);
     byFile.set(absolute, entry);
   }
   return [...byFile.values()].map((entry) => [entry.file, entry.symbols]);
@@ -4110,7 +4120,7 @@ export function checkDrift(
         const source = workspace.read(absolute);
         const numbers = named === undefined
           ? numbersIn(source, language)
-          : numbersInSymbol(source, named, language);
+          : numbersInSymbol(source, spelledHere(source, named, language), language);
         // No grammar, or a name this file does not declare: no answer, never a
         // no. The missing name is already the node check's own finding.
         if (!numbers) continue;
@@ -4303,7 +4313,7 @@ export function checkDrift(
      * As measured, this is `yes` in TypeScript and `no` in TSX, JavaScript,
      * Rust and Python. Rust is the square #206 predicted would be strongest.
      */
-    const reading = checkHandles(source, parsed.symbol, claim.cases, language, claim.of);
+    const reading = checkHandles(source, spelledHere(source, parsed.symbol, language), claim.cases, language, claim.of);
     if (reading.verdict === "wrong" && !mayAccuse("handles", language)) {
       claims.handlesWithheld.push({ label, why: "unlicensed", detail: language });
       continue;
@@ -4643,7 +4653,7 @@ export function checkDrift(
         const reading = outsideCallsIn(source, language);
         if (!reading.read) return false;
         return reading.calls.some((call) =>
-          call.routine === symbol && call.reading.verdict === "outside");
+          call.routine === spelledHere(source, symbol, language) && call.reading.verdict === "outside");
       };
       /*
        * An external box anchored at a type declared here is not outside at all
@@ -4673,7 +4683,7 @@ export function checkDrift(
         if (!absolute || workspace.stat(absolute) !== "file") return false;
         const source = workspace.read(absolute);
         if (source === undefined) return false;
-        const declared = declaredShapes(source, language)?.get(symbol) ?? [];
+        const declared = declaredShapes(source, language)?.get(spelledHere(source, symbol, language)) ?? [];
         return declared.length > 0 && declared.every(({ node: declaration, soup }) =>
           !soup
           && declaration.childForFieldName("body") !== null
@@ -5208,8 +5218,8 @@ export function checkDrift(
        * This runs before the TypeScript gate on purpose: the case it was built
        * for is Rust.
        */
-      const fromEnd = { file: fromFile, path: fromPath, symbols: symbolsOf(fromNode, fromFile) };
-      const toEnd = { file: toFile, path: toPath, symbols: symbolsOf(toNode, toFile) };
+      const fromEnd = { file: fromFile, path: fromPath, symbols: symbolsOf(fromNode, fromFile, workspace) };
+      const toEnd = { file: toFile, path: toPath, symbols: symbolsOf(toNode, toFile, workspace) };
       const bothNamed = fromEnd.symbols.length > 0 && toEnd.symbols.length > 0;
 
       /*

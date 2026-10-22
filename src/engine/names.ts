@@ -55,7 +55,8 @@
  * and the refusals this must keep are in `tests/engine-names.test.ts`.
  */
 import { providedByHost, providedByLanguage } from "./builtins";
-import { each, parseSource, type Language, type Node, type Tree } from "./parse";
+import { wholeName } from "./declared";
+import { each, incomplete, parseSource, unreadIn, type Language, type Node, type Tree } from "./parse";
 
 /**
  * What a name means at one spot.
@@ -853,6 +854,14 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
   const index = indexOf(tree);
   const language = side.language;
 
+  /*
+   * A line the parser could not read and blanked (#462) may declare this
+   * name: `const fetch = <T,>() => ..` would make `fetch()` the file's own,
+   * not the host's. Every scope holding such a line, met on the way out,
+   * answers "not known" rather than answering past it.
+   */
+  const unread = unreadIn(tree).filter((one) => wholeName(name).test(one.lines));
+
   /** Crossed a function, lambda or comprehension: a class body is out of sight. */
   let inFunction = false;
   /** Crossed a Rust function item: the locals around it are out of sight. */
@@ -874,6 +883,8 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
   let macrosOnly = false;
 
   for (let at: Node | undefined = site; at; below = at, at = index.parents.get(at.id)) {
+    const holder = at;
+    if (unread.some((one) => holder.startIndex <= one.start && one.end <= holder.endIndex)) return { at: "unknown", why: "unbound" };
     if (language === "rust" && at.type === "let_condition") continue;
     let scope = scopeAt(index, at, language);
     if (language === "rust" && at.type === "declaration_list") {
@@ -1040,7 +1051,7 @@ export function moduleScope(
         if (one) inner.push(one);
       });
     }
-    top = scope ? { scope, inner, broken: tree.rootNode.hasError } : null;
+    top = scope ? { scope, inner, broken: incomplete(tree.rootNode) } : null;
     tops.set(key, top);
     if (tops.size > TOPS_LIMIT) tops.delete(tops.keys().next().value!);
   } else {

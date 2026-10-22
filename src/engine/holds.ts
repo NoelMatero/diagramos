@@ -64,7 +64,7 @@ import { aliasesFor, aliasNames } from "./alias";
 import { typeParametersIn, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
 import {
-  declaresField, each, INSTANCE_NAMES, parseSource, qualifiedTail,
+  declaresField, each, incomplete, INSTANCE_NAMES, parseSource, qualifiedTail,
   type Language, type Node,
 } from "./parse";
 
@@ -428,7 +428,7 @@ export function heldTypes(
 ): HoldsVerdict {
   const tree = parseSource(source, language);
   if (!tree) return { verdict: "withheld", why: "unreadable" };
-  if (tree.rootNode.hasError) return { verdict: "withheld", why: "incomplete" };
+  if (incomplete(tree.rootNode)) return { verdict: "withheld", why: "incomplete" };
 
   /*
    * `type X = { ... }` carries its name on the alias and its fields on the

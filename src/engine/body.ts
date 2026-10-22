@@ -40,7 +40,7 @@
  * than a name inside it.
  */
 
-import { each, parseSource, type Language, type Node, type Tree } from "./parse";
+import { each, incomplete, parseSource, type Language, type Node, type Tree } from "./parse";
 
 /**
  * Node types that mean "this introduces a name", by suffix.
@@ -299,7 +299,7 @@ export function symbolCounts(
   return {
     declared: declaring.size > 0,
     used: Math.max(0, total - declaring.size),
-    unreadable: tree.rootNode.hasError === true,
+    unreadable: incomplete(tree.rootNode),
   };
 }
 
