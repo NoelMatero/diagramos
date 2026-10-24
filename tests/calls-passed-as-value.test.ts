@@ -141,10 +141,30 @@ shapes("TypeScript", {
   wrong: [
     ["the body hands on a function from another file", "a.ts#unrelated", "b.ts#double"],
     ["the body hands on a function, the head in the same file", "a.ts#unrelated", "a.ts#local"],
-    // Found by bench:planted: a type's name written as a type is not a function handed on.
-    ["the head is a type the body only writes as a type", "a.ts#pair", "b.ts#Pair"],
   ],
 }, 120_000);
+
+/*
+ * Found by bench:planted: a type's name written as a type is not a function
+ * handed on. That case was red here, and it was excalidraw's `pointFrom ->
+ * GlobalPoint` -- a function returning the alias's shape, which #476 holds
+ * back as an arrow at an interface is held back. What this pins now is the
+ * half that was #359's: the mention is still not read as handing a function
+ * on, so the reason given is the alias, never `named`.
+ */
+describe("TypeScript, a type written as a type", () => {
+  it("is not a function handed on, and an arrow at the alias is not sure for that reason (#476)", async () => {
+    write({
+      "tsconfig.json": "{ \"compilerOptions\": { \"strict\": true } }\n",
+      "b.ts": TS_B,
+      "a.ts": "import type { Pair } from \"./b\";\n\n"
+        + "export function pair<P extends Pair>(x: number): P {\n  return [x, x] as Pair as P;\n}\n",
+    });
+    const report = await checked("a.ts#pair", "b.ts#Pair");
+    expect(accusations(report)).toEqual([]);
+    expect(report.claims.callsNotClosed).toEqual({ "type-alias": 1 });
+  }, 120_000);
+});
 
 shapes("TSX", {
   files: {
