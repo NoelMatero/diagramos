@@ -1060,8 +1060,10 @@ describe("a Python read or write by name that runs nothing (#431)", () => {
     expect(verdictOf(run("    return getattr(obj, name, None) is None\n", "__getattr__"))).not.toBe("refuted");
   });
 
-  it("stays quiet when `getattr` is the file's own and not the builtin", () => {
-    // The repository's own `getattr` is a call to it, and a walk can follow it on.
+  it("reads the file's own `getattr` as the function it is, not the builtin (#470)", () => {
+    // The repository's own `getattr` is a call to it: placed, so the body
+    // closes, and a walk can follow it on. Read by its name alone it was a
+    // doubt about every name.
     const verdict = ask({
       ...far,
       "app/a.py": {
@@ -1071,7 +1073,7 @@ describe("a Python read or write by name that runs nothing (#431)", () => {
       },
       "app/c.py": { source: "def getattr(obj, name):\n    return name\n", language: "python" },
     }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["render"] });
-    expect(verdictOf(verdict)).toBe("withheld/dynamic");
+    expect(verdictOf(verdict)).toBe("refuted");
   });
 });
 

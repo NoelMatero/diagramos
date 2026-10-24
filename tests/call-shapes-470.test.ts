@@ -17,7 +17,7 @@
  *   - `this.instruments.call("x")` runs the method `call` of a class, not
  *     the field `instruments`.
  *   - Rust's `(self.f)(x)` runs the function stored in a field, not a method
- *     named `f`.
+ *     named `f`, and TypeScript's `this.cb!(x)` an optional field's function.
  *   - `eval`, `getattr` and the others that really can run anything still
  *     can.
  *
@@ -76,7 +76,7 @@ async function checked(fromRef: string, toRef: string, live: boolean): Promise<D
 }
 
 const accusations = (report: DriftReport) => report.edges.filter((finding) => ACCUSES.has(finding.kind)).map((finding) => finding.kind);
-const confirmed = (report: DriftReport) => Number((report.claims as Record<string, unknown>).callsConfirmed ?? 0) > 0;
+const confirmed = (report: DriftReport) => (report.claims.callsConfirmed ?? 0) > 0;
 
 beforeEach(() => {
   // Outside the worktree: a scratch source file inside one is read by the
@@ -96,7 +96,11 @@ interface Shapes {
   confirms?: Array<[string, string, string]>;
   /** Wrong arrows: the red expected, `calls-refuted` when left out. */
   wrong?: Array<[string, string, string] | [string, string, string, string]>;
-  /** Only with the compilers live: the text alone cannot type the receiver. */
+  /**
+   * Only with the compilers live: the text alone cannot say what the receiver
+   * is -- that `/a+/` is a regular expression, that `Object.prototype` is the
+   * language's.
+   */
   wrongLive?: Array<[string, string, string] | [string, string, string, string]>;
 }
 
@@ -150,6 +154,7 @@ describe("refusals: what runs is not in the text, so the arrow stays unjudged", 
         "export function viaObject(): number {\n  return registry.call(1);\n}",
         "export function evil(code: string): unknown {\n  return eval(code);\n}",
         "export function stored(this: { cb?: (x: number) => number }): number {\n  return this.cb!(1);\n}",
+        "export class Panel {\n  cb?: (x: number) => number;\n\n  bang(): number {\n    return this.cb!(1);\n  }\n\n  viaCall(): number {\n    return this.cb!.call(this, 1);\n  }\n}",
         "",
       ].join("\n\n"),
     },
@@ -160,17 +165,21 @@ describe("refusals: what runs is not in the text, so the arrow stays unjudged", 
       ["an object's own method named call reaches the head", "work.ts#viaObject", "target.ts#b"],
       ["eval can run anything", "work.ts#evil", "target.ts#b"],
       ["a field holding a function, called with !", "work.ts#stored", "target.ts#b"],
+      ["a class field holding a function, called with !", "work.ts#Panel.bang", "target.ts#b"],
+      ["a class field holding a function, called through .call", "work.ts#Panel.viaCall", "target.ts#b"],
     ],
   });
 
   shapes("Python", {
     files: {
       "target.py": "def b(x):\n    return x\n\n\nclass Instruments:\n    def call(self, name):\n        return b(name)\n",
+      "own.py": "from target import b\n\n\ndef getattr(obj, name):\n    return b(name)\n",
       "work.py": [
-        "from target import b, Instruments",
+        "from target import b, Instruments\nimport own",
         "def handed(vd):\n    return vd.call(1)",
         "class Holder:\n    def __init__(self):\n        self.instruments = Instruments()\n\n    def run(self):\n        return self.instruments.call(\"x\")",
         "def by_name(obj, name):\n    return getattr(obj, name)()",
+        "def own_getattr(obj, name):\n    return own.getattr(obj, name)",
         "",
       ].join("\n\n\n"),
     },
@@ -178,6 +187,7 @@ describe("refusals: what runs is not in the text, so the arrow stays unjudged", 
       ["a parameter's method named call may be the head's class's", "work.py#handed", "target.py#Instruments.call"],
       ["a field's method named call is the field's class's", "work.py#Holder.run", "target.py#Instruments.call"],
       ["getattr can run anything", "work.py#by_name", "target.py#b"],
+      ["the repository's own getattr reaches the head", "work.py#own_getattr", "target.py#b"],
     ],
   });
 
@@ -250,18 +260,21 @@ describe("the call is read off the call node", () => {
       ["await g<T>() is the only call", "work.ts#awaited", "other.ts#other"],
       ["(f)(x) is the only call", "work.ts#parens", "other.ts#other"],
       ["a function named apply is the only call", "work.ts#bareApply", "other.ts#other"],
+      ["super(...) is the only call", "work.ts#Child.constructor", "other.ts#other"],
+    ],
+    wrongLive: [
       ["Object.prototype.hasOwnProperty.call is a library's", "work.ts#own", "other.ts#other"],
       ["a regular expression's exec is a library's", "work.ts#match", "other.ts#other"],
-      ["super(...) is the only call", "work.ts#Child.constructor", "other.ts#other"],
     ],
   });
 
   shapes("Python", {
     files: {
-      "target.py": "def b(x):\n    return x\n\n\ndef call(x):\n    return x\n\n\nclass Instruments:\n    def call(self, name):\n        return name\n\n    def other(self):\n        return 1\n",
+      "target.py": "def b(x):\n    return x\n\n\ndef call(x):\n    return x\n",
+      "ins.py": "class Instruments:\n    def call(self, name):\n        return name\n",
       "other.py": "def other(x):\n    return x\n",
       "work.py": [
-        "from target import b, call, Instruments",
+        "from target import b, call\nfrom ins import Instruments",
         "def parens():\n    return (b)(1)",
         "def bare_call():\n    return call(1)",
         "def method_call():\n    ins = Instruments()\n    return ins.call(\"x\")",
@@ -277,7 +290,7 @@ describe("the call is read off the call node", () => {
       ["a function named call is the only call", "work.py#bare_call", "other.py#other"],
     ],
     wrongLive: [
-      ["a method named call is an ordinary method", "work.py#method_call", "target.py#Instruments.other", "calls-wrong-routine"],
+      ["a method named call is an ordinary method", "work.py#method_call", "other.py#other"],
     ],
   });
 
