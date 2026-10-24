@@ -2,7 +2,7 @@
  * A call written in a valid but unusual shape is read as the call it is (#470).
  *
  * The callee comes from the call node itself, in every grammar: type
- * arguments, `await`, parentheses and TypeScript's `!` are taken off, and
+ * arguments, a misread `await` and parentheses are taken off, and
  * `super(...)` is read as the class it extends. `.call` and `.apply` are
  * JavaScript's way of running a function value, so they are special only
  * there, and only when what they are called on is a function. A Python
