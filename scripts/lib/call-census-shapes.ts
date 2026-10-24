@@ -80,6 +80,7 @@ export const ISSUE_OF: Record<string, string> = {
   "imported value called": "#469",
   "untyped value — method name nowhere in the repo": "#469",
   "computed: generic call": "#470",
+  "super(...) constructor call": "#470",
   "TS generic call after await read as an expression": "#470",
   "a method named call/apply": "#470",
   "a repo method named call read as dynamic": "#470",
