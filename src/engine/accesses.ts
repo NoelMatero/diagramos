@@ -78,13 +78,11 @@
  *    behind them. Widening what it enumerates would silently change what those
  *    numbers were counting, and the measurement would not notice.
  */
+import { declarationName } from "./declared";
 import { mayAccuse } from "./licence";
 import { writtenName } from "./lines";
 import type { MemberTarget } from "./compiler-questions";
-import {
-  declaresField, each, INSTANCE_NAMES, languageOf, MEMBER_ACCESS, parseSource, qualifiedTail,
-  type Language, type Node,
-} from "./parse";
+import { declaresField, each, incomplete, INSTANCE_NAMES, languageOf, MEMBER_ACCESS, parseSource, qualifiedTail, type Language, type Node } from "./parse";
 import { memberReadsIn, type HandedWhole, type RoutineReads } from "./resolution";
 
 /**
@@ -321,8 +319,8 @@ function memberOn(node: Node): Node | undefined {
 
 /** The name a declaration goes by. Python annotates through `left`, not `name`. */
 function nameOf(node: Node): string | undefined {
-  const name = node.childForFieldName("name") ?? node.childForFieldName("left");
-  return name && name.childCount === 0 ? name.text : undefined;
+  // An `impl` is read as its type's methods below, not as a declaration of its own.
+  return node.type === "impl_item" ? undefined : declarationName(node)?.text;
 }
 
 /** 1-based line of a byte offset, counted the way an editor counts. */
@@ -564,7 +562,7 @@ export function declaresMember(
 ): TypeEnd {
   const tree = parseSource(source, language);
   if (!tree) return { why: "unreadable" };
-  if (tree.rootNode.hasError) return { why: "incomplete" };
+  if (incomplete(tree.rootNode)) return { why: "incomplete" };
 
   /*
    * The sort check, before anything else is read -- including before the
@@ -662,7 +660,7 @@ function inheritedMember(declaration: Node, member: string, inherited: Inherited
     const language = languageOf(ancestor.file);
     if (text === undefined || !language) return undefined;
     const tree = parseSource(text, language);
-    if (!tree || tree.rootNode.hasError) return undefined;
+    if (!tree || incomplete(tree.rootNode)) return undefined;
     let found: Node | undefined;
     each(tree.rootNode, (node) => {
       if (found || !TYPE_DECLARATION.test(node.type)) return;
@@ -695,10 +693,7 @@ function routinesNamed(root: Node, routine: string): { routines: Node[]; declare
   each(root, (node) => {
     // Rust puts a type's routines in `impl Foo`, which carries the name on a
     // `type` field and has no `name` at all.
-    const name = node.type === "impl_item"
-      ? node.childForFieldName("type")
-      : node.childForFieldName("name") ?? node.childForFieldName("left");
-    if (!name || name.childCount !== 0 || name.text !== routine) return;
+    if (declarationName(node)?.text !== routine) return;
     declared = true;
     const value = node.childForFieldName("value");
     if (node.childForFieldName("parameters") ?? value?.childForFieldName("parameters")) {
@@ -797,7 +792,7 @@ export function memberAccesses(
 
   const tree = parseSource(source, language);
   if (!tree) return { verdict: "withheld", why: "unreadable" };
-  if (tree.rootNode.hasError) return { verdict: "withheld", why: "incomplete" };
+  if (incomplete(tree.rootNode)) return { verdict: "withheld", why: "incomplete" };
   const { routines, declared: isThere } = routinesNamed(tree.rootNode, routine);
   if (routines.length === 0) {
     return { verdict: "withheld", why: isThere ? "no-members" : "not-declared" };

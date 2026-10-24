@@ -46,6 +46,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { symbolCounts } from "./body";
+import { wholeName } from "./declared";
 import { inNeverWalk } from "./generated";
 import { languageOf } from "./parse";
 
@@ -330,7 +331,6 @@ export function followAnchors(
   return followed;
 }
 
-const REGEX_SPECIAL = /[.*+?^${}()|[\]\\]/g;
 
 /**
  * The real repository, read through git.
@@ -490,7 +490,7 @@ export function createGitTrail(root: string): Trail {
           declarations.set(symbol, found);
           return found;
         }
-        const word = new RegExp(`\\b${symbol.replace(REGEX_SPECIAL, "\\$&")}\\b`);
+        const word = wholeName(symbol);
         for (const file of files) {
           const language = languageOf(file);
           if (!language) continue;

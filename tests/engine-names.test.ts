@@ -374,6 +374,24 @@ describe("a far file the parser could not read whole", () => {
       open: (file) => files[file] && { ...files[file]!, language: "ts" as const },
     })).toEqual(["action.ts"]);
   });
+
+  it("never says it lacks a name it may declare on a line the parser could not read (#462)", () => {
+    // The declaration is on the blanked line, so the far file's top no longer
+    // shows it. A barrel whose other file lacks the name must not settle it.
+    const files: Record<string, { source: string; imports: CallSide["imports"] }> = {
+      "internal.ts": { source: "export * from \"./action\"\nexport * from \"./other\"\n", imports: [
+        { specifier: "./action", file: "action.ts" }, { specifier: "./other", file: "other.ts" },
+      ] },
+      "action.ts": { source: "export const isAction = ~~~;\nexport function setup() {}\n", imports: [] },
+      "other.ts": { source: "export function other() {}\n", imports: [] },
+    };
+    const sites = placed("import { isAction } from \"./internal\";\nfunction f(v) {\n  isAction(v);\n}\n", "f", "ts", {
+      imports: [{ specifier: "./internal", file: "internal.ts" }],
+      open: (file) => files[file] && { ...files[file]!, language: "ts" as const },
+    });
+    expect(sites).toHaveLength(1);
+    expect(sites[0]).toMatch(/^\?/);
+  });
 });
 
 describe("reading one call opens other files", () => {

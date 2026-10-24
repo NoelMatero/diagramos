@@ -140,9 +140,10 @@
  * in `docs/claim-vocabulary.md` and is the licence grid.
  */
 import { aliasesFor, aliasNames } from "./alias";
+import { declarationName } from "./declared";
 import { typeParametersIn, unwrittenNames, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
-import { INSTANCE_NAMES, parseSource, qualifiedTail, type Language, type Node } from "./parse";
+import { incomplete, INSTANCE_NAMES, parseSource, qualifiedTail, type Language, type Node } from "./parse";
 
 /** Which half of a signature a claim is about. */
 export type SignaturePosition = "parameter" | "return";
@@ -582,7 +583,7 @@ export function signatureNames(
 
   const tree = parseSource(source, language) as Tree | undefined;
   if (!tree) return { verdict: "withheld", why: "unreadable" };
-  if (tree.rootNode.hasError) return { verdict: "withheld", why: "incomplete" };
+  if (incomplete(tree.rootNode)) return { verdict: "withheld", why: "incomplete" };
 
   const shadows = aliasNames(tree.rootNode);
   if (subject) for (const name of aliasesFor(subject.source, subject.language, targets)) shadows.add(name);
@@ -622,8 +623,7 @@ export function signatureNames(
   const collect = (node: Node, self: string | undefined): void => {
     const here = selfTypeOf(node, self);
     if (node.type !== "token_tree") {
-      const name = node.childForFieldName("name") ?? node.childForFieldName("left");
-      if (name && name.childCount === 0 && name.text === symbol) declarations.push({ node, self: here });
+      if (node.type !== "impl_item" && declarationName(node)?.text === symbol) declarations.push({ node, self: here });
     }
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);

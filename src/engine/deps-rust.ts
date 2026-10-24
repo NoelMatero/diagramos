@@ -25,7 +25,8 @@
  * loose tokens -- so a macro at item position could be hiding anything, and the
  * file says so with a flag instead of pretending to have read it.
  */
-import { each, parseSource, type Node } from "./parse";
+import { each, parseSource, unreadWrites, type Node } from "./parse";
+import { escapeName, NAME_END } from "./declared";
 import type { DynamicReason, FileDependencies, FileDependency } from "./deps";
 import {
   PUNCTUATION,
@@ -120,7 +121,8 @@ export function readRustDependencies(
 
   const dependencies: FileDependency[] = [];
   const dynamic = new Set<DynamicReason>();
-  let complete = !tree.rootNode.hasError;
+  // A blanked line hides a module or a `use` only if it writes one, or a macro that may (#462).
+  let complete = !tree.rootNode.hasError && !unreadWrites(tree, /\b(use|mod|extern|include\w*)\b|!/);
   const own = moduleDirectory(filePath, layout);
   const scope = new Map([...(pasted?.scope ?? []), ...boundModules(filePath, tree.rootNode, layout, workspace, own)]);
   const fileDirectory = filePath.includes("/") ? filePath.slice(0, filePath.lastIndexOf("/")) : "";
@@ -264,7 +266,7 @@ export function readRustDependencies(
     if (!/^[a-z_][a-z0-9_]*$/.test(first) || /^(crate|self|super)$/.test(first)) return false;
     if (layout.byName.has(first) || layout.byName.has(first.replace(/_/g, "-"))) return false;
     if (position?.scope?.has(first) || scope?.has(first)) return false;
-    if (new RegExp(`\\b(mod|fn|struct|enum|union|trait|type|const|static)\\s+${first}\\b|\\bas\\s+${first}\\b|macro_rules!\\s*${first}\\b`).test(source)) return false;
+    if (new RegExp(`\\b(mod|fn|struct|enum|union|trait|type|const|static)\\s+${escapeName(first)}${NAME_END}|\\bas\\s+${escapeName(first)}${NAME_END}|macro_rules!\\s*${escapeName(first)}${NAME_END}`, "u").test(source)) return false;
     return namesNothingHere(first, workspace);
   };
 

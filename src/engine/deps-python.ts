@@ -41,7 +41,7 @@
  * pyright assumes when a project says nothing -- and the reason a Python
  * accusation is a licence question rather than a coding question.
  */
-import { each, parseSource, type Node } from "./parse";
+import { each, parseSource, unreadWrites, type Node } from "./parse";
 import type { DynamicReason, FileDependencies, FileDependency } from "./deps";
 import { namesNothingHere } from "./repo-names";
 import type { Workspace } from "./workspace";
@@ -494,7 +494,8 @@ export function readPythonDependencies(
 
   return {
     dependencies,
-    complete: !root.hasError,
+    // A blanked line hides an import only if it writes one (#462).
+    complete: !root.hasError && !unreadWrites(root.tree, /\bimport\b|__import__/),
     dynamic: [...dynamic],
   };
 }

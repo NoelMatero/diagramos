@@ -38,7 +38,7 @@ import { realpathSync } from "node:fs";
 import path from "node:path";
 
 import { licenceFor } from "./licence";
-import { each, languageOf, parseSource, type Node } from "./parse";
+import { each, languageOf, parseSource, unreadWrites, type Node } from "./parse";
 import { builtinModules } from "node:module";
 
 import { declaredHere, namesNothingHere } from "./repo-names";
@@ -530,8 +530,10 @@ function readUncached(
     dependencies,
     // Recovery is local, so the rest of the file was still read -- but a claim
     // judged against a file we could not fully read should be visible as such,
-    // the same call `symbolEvidence` makes with `downgraded`.
-    complete: !tree.rootNode.hasError,
+    // the same call `symbolEvidence` makes with `downgraded`. A line the
+    // parser could not read and blanked hides an import only if it writes one
+    // (#462): an interface's call signature cannot.
+    complete: !tree.rootNode.hasError && !unreadWrites(tree, /\b(import|require|export)\b/),
     dynamic: [...dynamic],
   };
 }

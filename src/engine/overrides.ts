@@ -27,6 +27,7 @@
  * trait's default method is already withheld where the definition is judged.
  */
 import { basesOfDeclaration } from "./conforms";
+import { wholeName } from "./declared";
 import { each, withParsed, type Language, type Node } from "./parse";
 
 export interface Overrides {
@@ -69,7 +70,7 @@ export function overridesIn(sources: () => readonly OverrideSource[] | undefined
     const known = derivedFrom.get(name);
     if (known) return known;
     const found: Derived[] = [];
-    const word = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`);
+    const word = wholeName(name);
     for (const file of files ?? []) {
       if (file.language === "rust" || !word.test(file.source)) continue;
       found.push(...derivedIn(file, name, word));

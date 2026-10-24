@@ -55,7 +55,8 @@
  * and the refusals this must keep are in `tests/engine-names.test.ts`.
  */
 import { providedByHost, providedByLanguage } from "./builtins";
-import { each, parseSource, type Language, type Node, type Tree } from "./parse";
+import { wholeName } from "./declared";
+import { each, incomplete, parseSource, unreadIn, type Language, type Node, type Tree } from "./parse";
 
 /**
  * What a name means at one spot.
@@ -853,6 +854,14 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
   const index = indexOf(tree);
   const language = side.language;
 
+  /*
+   * A line the parser could not read and blanked (#462) may declare this
+   * name: `const fetch = <T,>() => ..` would make `fetch()` the file's own,
+   * not the host's. Every scope holding such a line, met on the way out,
+   * answers "not known" rather than answering past it.
+   */
+  const unread = unreadIn(tree).filter((one) => wholeName(name).test(one.lines));
+
   /** Crossed a function, lambda or comprehension: a class body is out of sight. */
   let inFunction = false;
   /** Crossed a Rust function item: the locals around it are out of sight. */
@@ -874,6 +883,8 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
   let macrosOnly = false;
 
   for (let at: Node | undefined = site; at; below = at, at = index.parents.get(at.id)) {
+    const holder = at;
+    if (unread.some((one) => holder.startIndex <= one.start && one.end <= holder.endIndex)) return { at: "unknown", why: "unbound" };
     if (language === "rust" && at.type === "let_condition") continue;
     let scope = scopeAt(index, at, language);
     if (language === "rust" && at.type === "declaration_list") {
@@ -992,7 +1003,7 @@ function judgeWildcard(specifier: string, name: string, tree: Tree, side: LookUp
  * Generous on purpose -- a name counted here that a wildcard would not
  * actually carry turns an answer into "not known", never into a wrong one.
  */
-type Top = { scope: Scope; inner: Scope[]; broken: boolean } | null;
+type Top = { scope: Scope; inner: Scope[]; broken: boolean; unreadLines: string[] } | null;
 const TOPS_LIMIT = 512;
 /**
  * A file's top, by its text -- not by its tree, which the parse cache lets go
@@ -1020,6 +1031,11 @@ export function moduleScope(
    * call signatures turns `export function isAction` into a stray method.
    */
   broken: boolean;
+  /**
+   * Whether a line the parser could not read and blanked writes this name
+   * (#462): the file may declare it there, so "not here" is not known.
+   */
+  unread: (name: string) => boolean;
 } | undefined {
   const key = `${language}:${source}`;
   let top = tops.get(key);
@@ -1040,7 +1056,7 @@ export function moduleScope(
         if (one) inner.push(one);
       });
     }
-    top = scope ? { scope, inner, broken: tree.rootNode.hasError } : null;
+    top = scope ? { scope, inner, broken: incomplete(tree.rootNode), unreadLines: unreadIn(tree).map((one) => one.lines) } : null;
     tops.set(key, top);
     if (tops.size > TOPS_LIMIT) tops.delete(tops.keys().next().value!);
   } else {
@@ -1048,7 +1064,7 @@ export function moduleScope(
     tops.set(key, top);
   }
   if (!top) return undefined;
-  const { scope, inner, broken } = top;
+  const { scope, inner, broken, unreadLines } = top;
   const declaredInside = (name: string, space: Space) => inner.some((one) =>
     space === "type" ? one.types.has(name) : space === "macro" ? one.macros.has(name) : one.values.get(name)?.entry === "declared");
   return {
@@ -1066,5 +1082,6 @@ export function moduleScope(
     // Python's `__all__` decides what a wildcard over the module carries.
     limited: language === "python" && scope.values.has("__all__"),
     broken,
+    unread: (name) => unreadLines.some((lines) => wholeName(name).test(lines)),
   };
 }
