@@ -1,0 +1,2430 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "task-parking-and-waking-in-trio-channels-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 646.8000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 629345169,
+      "version": 1,
+      "versionNonce": 1245834651,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "role": "title"
+      },
+      "text": "Task Parking and Waking in Trio Channels and Sync",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Task Parking and Waking in Trio Channels and Sync",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-0",
+      "type": "rectangle",
+      "x": 1860,
+      "y": 220,
+      "width": 160,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 2016777080,
+      "version": 1,
+      "versionNonce": 84255700,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-node-0-label"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "node": "task",
+        "ref": "src/trio/_core/_run.py#Task"
+      }
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-1",
+      "type": "rectangle",
+      "x": 1200,
+      "y": 180,
+      "width": 160,
+      "height": 180,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1654150177,
+      "version": 1,
+      "versionNonce": 681133291,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-node-1-label"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "node": "parkinglot",
+        "ref": "src/trio/_core/_parking_lot.py#ParkingLot"
+      }
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-2",
+      "type": "rectangle",
+      "x": 580,
+      "y": 360,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1358393110,
+      "version": 1,
+      "versionNonce": 1015455482,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-node-2-label"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "node": "lock",
+        "ref": "src/trio/_sync.py#Lock"
+      }
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-3",
+      "type": "rectangle",
+      "x": 620,
+      "y": 200,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 546476967,
+      "version": 1,
+      "versionNonce": 983577153,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-node-3-label"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "node": "semaphore",
+        "ref": "src/trio/_sync.py#Semaphore"
+      }
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-4",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1426055540,
+      "version": 1,
+      "versionNonce": 758487104,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-node-4-label"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "node": "event",
+        "ref": "src/trio/_sync.py#Event"
+      }
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-5",
+      "type": "rectangle",
+      "x": 560,
+      "y": 520,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 619054029,
+      "version": 1,
+      "versionNonce": 1971536055,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-node-5-label"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "node": "capacitylimiter",
+        "ref": "src/trio/_sync.py#CapacityLimiter"
+      }
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-6",
+      "type": "rectangle",
+      "x": 20,
+      "y": 80,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 497180722,
+      "version": 1,
+      "versionNonce": 315154406,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-node-6-label"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "node": "condition",
+        "ref": "src/trio/_sync.py#Condition"
+      }
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-7",
+      "type": "rectangle",
+      "x": 1860,
+      "y": 480,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 879021987,
+      "version": 1,
+      "versionNonce": 1251632445,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-node-7-label"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "node": "memchannelstate",
+        "ref": "src/trio/_channel.py#MemoryChannelState"
+      }
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-8",
+      "type": "rectangle",
+      "x": 1200,
+      "y": 620,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 962605360,
+      "version": 1,
+      "versionNonce": 759737228,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-node-8-label"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "node": "sendchan",
+        "ref": "src/trio/_channel.py#MemorySendChannel"
+      }
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-9",
+      "type": "rectangle",
+      "x": 1160,
+      "y": 440,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1636883385,
+      "version": 1,
+      "versionNonce": 1077817731,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-node-9-label"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "task-parking-and-waking-in-trio-channels-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "node": "receivechan",
+        "ref": "src/trio/_channel.py#MemoryReceiveChannel"
+      }
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-0",
+      "type": "arrow",
+      "x": 1864,
+      "y": 268.6666666666667,
+      "width": 509.5999999999999,
+      "height": 36.666666666666686,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1948587183,
+      "version": 1,
+      "versionNonce": 1799676681,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "task",
+          "to": "parkinglot",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          -108,
+          0
+        ],
+        [
+          -108,
+          -36.666666666666686
+        ],
+        [
+          -236.4666666666667,
+          -36.666666666666686
+        ],
+        [
+          -304.75,
+          -36.666666666666686
+        ],
+        [
+          -373.0333333333333,
+          -36.666666666666686
+        ],
+        [
+          -509.0999999999999,
+          -36.666666666666686
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-0",
+        "focus": 0.30476190476190373,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-1",
+        "focus": -0.4222222222222225,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-1",
+      "type": "arrow",
+      "x": 1354.4,
+      "y": 292,
+      "width": 509.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 408459614,
+      "version": 1,
+      "versionNonce": 1254234242,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "parkinglot",
+          "to": "task",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          254.79999999999995,
+          0
+        ],
+        [
+          509.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-1",
+        "focus": 0.244444444444445,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-0",
+        "focus": -0.02857142857142811,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-2",
+      "type": "arrow",
+      "x": 747.6,
+      "y": 404,
+      "width": 446.80000000000007,
+      "height": 124,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2072558601,
+      "version": 1,
+      "versionNonce": 1515913107,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "lock",
+          "to": "parkinglot",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          142.69999999999993,
+          0
+        ],
+        [
+          214.04999999999995,
+          0
+        ],
+        [
+          285.4,
+          0
+        ],
+        [
+          298.80000000000007,
+          0
+        ],
+        [
+          298.80000000000007,
+          -124
+        ],
+        [
+          446.30000000000007,
+          -124
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-2",
+        "focus": 0.1,
+        "gap": 7.600000000000023
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-1",
+        "focus": -0.11111111111111124,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-3",
+      "type": "arrow",
+      "x": 777.6,
+      "y": 244,
+      "width": 416.80000000000007,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 324512960,
+      "version": 1,
+      "versionNonce": 1007421596,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "semaphore",
+          "to": "parkinglot",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          208.39999999999998,
+          0
+        ],
+        [
+          416.30000000000007,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-3",
+        "focus": 0.1,
+        "gap": 2.3999999999999773
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-1",
+        "focus": 0.28888888888888875,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-4",
+      "type": "arrow",
+      "x": 777.6,
+      "y": 564,
+      "width": 416.80000000000007,
+      "height": 248,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 513523083,
+      "version": 1,
+      "versionNonce": 1471877637,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "capacitylimiter",
+          "to": "parkinglot",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          292.80000000000007,
+          0
+        ],
+        [
+          292.80000000000007,
+          -39.59999999999991
+        ],
+        [
+          292.80000000000007,
+          -248
+        ],
+        [
+          416.30000000000007,
+          -248
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-5",
+        "focus": 0.1,
+        "gap": 2.3999999999999773
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-1",
+        "focus": -0.5111111111111112,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-5",
+      "type": "arrow",
+      "x": 1434.4,
+      "y": 52,
+      "width": 429.5999999999999,
+      "height": 193.33333333333334,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 823567738,
+      "version": 1,
+      "versionNonce": 1040096462,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "event",
+          "to": "task",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          77.86666666666679,
+          0
+        ],
+        [
+          155.73333333333335,
+          0
+        ],
+        [
+          311.4666666666667,
+          0
+        ],
+        [
+          345.5999999999999,
+          0
+        ],
+        [
+          345.5999999999999,
+          193.33333333333331
+        ],
+        [
+          429.0999999999999,
+          192.83333333333334
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-4",
+        "focus": -0.2,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-0",
+        "focus": 0.6380952380952378,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-6",
+      "type": "arrow",
+      "x": 172,
+      "y": 156.33333333333331,
+      "width": 415.6,
+      "height": 247.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1446811733,
+      "version": 1,
+      "versionNonce": 984869471,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "condition",
+          "to": "lock",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          247.66666666666669
+        ],
+        [
+          83.96666666666664,
+          247.66666666666669
+        ],
+        [
+          249.7833333333333,
+          247.66666666666669
+        ],
+        [
+          332.69166666666666,
+          247.66666666666669
+        ],
+        [
+          415.1,
+          247.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-6",
+        "focus": 0.5266666666666661,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-2",
+        "focus": -0.1,
+        "gap": 7.600000000000023
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-7",
+      "type": "arrow",
+      "x": 172,
+      "y": 123,
+      "width": 1022.4000000000001,
+      "height": 85,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1839698364,
+      "version": 1,
+      "versionNonce": 1380784968,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "condition",
+          "to": "parkinglot",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          138.425,
+          0
+        ],
+        [
+          276.85,
+          0
+        ],
+        [
+          553.7,
+          0
+        ],
+        [
+          874.4000000000001,
+          0
+        ],
+        [
+          874.4000000000001,
+          85
+        ],
+        [
+          1021.9000000000001,
+          85
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-6",
+        "focus": -0.14,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-1",
+        "focus": 0.6888888888888888,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-8",
+      "type": "arrow",
+      "x": 1434.4,
+      "y": 678.6666666666665,
+      "width": 429.5999999999999,
+      "height": 146.66666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1600176631,
+      "version": 1,
+      "versionNonce": 60770129,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "sendchan",
+          "to": "memchannelstate",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          23.466666666666697
+        ],
+        [
+          276.39999999999986,
+          23.466666666666697
+        ],
+        [
+          369.5999999999999,
+          23.466666666666697
+        ],
+        [
+          369.5999999999999,
+          -123.19999999999993
+        ],
+        [
+          429.0999999999999,
+          -123.69999999999982
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-8",
+        "focus": 0.17333333333333095,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-7",
+        "focus": -0.5093333333333339,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-9",
+      "type": "arrow",
+      "x": 1434.4,
+      "y": 498.66666666666663,
+      "width": 429.5999999999999,
+      "height": 23.466666666666697,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 720197542,
+      "version": 1,
+      "versionNonce": 129688714,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "receivechan",
+          "to": "memchannelstate",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          5.684341886080802e-14
+        ],
+        [
+          32,
+          23.466666666666697
+        ],
+        [
+          203.0666666666666,
+          23.466666666666697
+        ],
+        [
+          259.6999999999998,
+          23.466666666666697
+        ],
+        [
+          316.33333333333326,
+          23.466666666666697
+        ],
+        [
+          429.0999999999999,
+          23.466666666666697
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-9",
+        "focus": 0.17333333333332662,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-7",
+        "focus": 0.1573333333333336,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-10",
+      "type": "arrow",
+      "x": 1434.4,
+      "y": 645.3333333333333,
+      "width": 429.5999999999999,
+      "height": 306.6666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1212419024,
+      "version": 1,
+      "versionNonce": 1647465132,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "sendchan",
+          "to": "task",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          345.5999999999999,
+          0
+        ],
+        [
+          345.5999999999999,
+          -22.533333333333303
+        ],
+        [
+          345.5999999999999,
+          -306.6666666666666
+        ],
+        [
+          429.0999999999999,
+          -306.6666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-8",
+        "focus": -0.49333333333333546,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-0",
+        "focus": -0.6952380952380963,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-11",
+      "type": "arrow",
+      "x": 1434.4,
+      "y": 465.3333333333333,
+      "width": 429.5999999999999,
+      "height": 150,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 483448025,
+      "version": 1,
+      "versionNonce": 263692835,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-parking-and-waking-in-trio-channels-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels",
+        "edge": {
+          "from": "receivechan",
+          "to": "task",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          72.45000000000005,
+          0
+        ],
+        [
+          144.9000000000001,
+          0
+        ],
+        [
+          289.79999999999995,
+          0
+        ],
+        [
+          321.5999999999999,
+          0
+        ],
+        [
+          321.5999999999999,
+          -150
+        ],
+        [
+          429.0999999999999,
+          -150.49999999999994
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-9",
+        "focus": -0.49333333333333307,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "task-parking-and-waking-in-trio-channels-node-0",
+        "focus": -0.3619047619047642,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-0-label",
+      "type": "text",
+      "x": 1918,
+      "y": 277.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1073635653,
+      "version": 1,
+      "versionNonce": 1518186831,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "Task",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-node-0",
+      "originalText": "Task",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-1-label",
+      "type": "text",
+      "x": 1225,
+      "y": 257.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 685676280,
+      "version": 1,
+      "versionNonce": 521545300,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "ParkingLot",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-node-1",
+      "originalText": "ParkingLot",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-2-label",
+      "type": "text",
+      "x": 638,
+      "y": 387.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1628461127,
+      "version": 1,
+      "versionNonce": 1527811937,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "Lock",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-node-2",
+      "originalText": "Lock",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-3-label",
+      "type": "text",
+      "x": 650.5,
+      "y": 227.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1381775266,
+      "version": 1,
+      "versionNonce": 634958230,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "Semaphore",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-node-3",
+      "originalText": "Semaphore",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-4-label",
+      "type": "text",
+      "x": 1332.5,
+      "y": 47.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1554262977,
+      "version": 1,
+      "versionNonce": 1434214923,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "Event",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-node-4",
+      "originalText": "Event",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-5-label",
+      "type": "text",
+      "x": 587.5,
+      "y": 547.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 887388932,
+      "version": 1,
+      "versionNonce": 2005463056,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "CapacityLimiter",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-node-5",
+      "originalText": "CapacityLimiter",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-6-label",
+      "type": "text",
+      "x": 50.49999999999999,
+      "y": 117.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1099181395,
+      "version": 1,
+      "versionNonce": 1462341805,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "Condition",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-node-6",
+      "originalText": "Condition",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-7-label",
+      "type": "text",
+      "x": 1891,
+      "y": 517.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 2119020734,
+      "version": 1,
+      "versionNonce": 1422130530,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "MemoryChannelState",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-node-7",
+      "originalText": "MemoryChannelState",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-8-label",
+      "type": "text",
+      "x": 1226.5,
+      "y": 657.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1291189389,
+      "version": 1,
+      "versionNonce": 1503226231,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "MemorySendChannel",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-node-8",
+      "originalText": "MemorySendChannel",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-node-9-label",
+      "type": "text",
+      "x": 1190,
+      "y": 477.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 68056768,
+      "version": 1,
+      "versionNonce": 734791324,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "MemoryReceiveChannel",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-node-9",
+      "originalText": "MemoryReceiveChannel",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-0-label",
+      "type": "text",
+      "x": 1570.3333333333333,
+      "y": 222,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 233551354,
+      "version": 1,
+      "versionNonce": 1634178638,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "park() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-0",
+      "originalText": "park() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-1-label",
+      "type": "text",
+      "x": 1543.2,
+      "y": 282,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 626028735,
+      "version": 1,
+      "versionNonce": 1206469849,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "unpark() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-1",
+      "originalText": "unpark() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-2-label",
+      "type": "text",
+      "x": 984.6,
+      "y": 394,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1685465168,
+      "version": 1,
+      "versionNonce": 1159016492,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "_lot @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-2",
+      "originalText": "_lot @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-3-label",
+      "type": "text",
+      "x": 937.6,
+      "y": 234,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 2084674077,
+      "version": 1,
+      "versionNonce": 475136391,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "_lot @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-3",
+      "originalText": "_lot @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-4-label",
+      "type": "text",
+      "x": 1022.0000000000001,
+      "y": 514.4000000000001,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 342839478,
+      "version": 1,
+      "versionNonce": 1379821850,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "_lot @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-4",
+      "originalText": "_lot @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-5-label",
+      "type": "text",
+      "x": 1688.6666666666667,
+      "y": 42,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1859645675,
+      "version": 1,
+      "versionNonce": 1182815973,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "_tasks @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-5",
+      "originalText": "_tasks @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-6-label",
+      "type": "text",
+      "x": 203.16666666666663,
+      "y": 394,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 448555900,
+      "version": 1,
+      "versionNonce": 953821192,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "_lock @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-6",
+      "originalText": "_lock @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-7-label",
+      "type": "text",
+      "x": 677.3000000000001,
+      "y": 113,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1318663897,
+      "version": 1,
+      "versionNonce": 1848240163,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "_lot @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-7",
+      "originalText": "_lot @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-8-label",
+      "type": "text",
+      "x": 1653.6,
+      "y": 692.1333333333332,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1809160050,
+      "version": 1,
+      "versionNonce": 1559239974,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "_state @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-8",
+      "originalText": "_state @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-9-label",
+      "type": "text",
+      "x": 1580.2666666666667,
+      "y": 512.1333333333333,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 692159127,
+      "version": 1,
+      "versionNonce": 1237083761,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "_state @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-9",
+      "originalText": "_state @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-10-label",
+      "type": "text",
+      "x": 1705.2,
+      "y": 612.8,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1744470317,
+      "version": 1,
+      "versionNonce": 1102536599,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "reschedule @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-10",
+      "originalText": "reschedule @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-parking-and-waking-in-trio-channels-edge-11-label",
+      "type": "text",
+      "x": 1649.4,
+      "y": 455.3333333333333,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 826288480,
+      "version": 1,
+      "versionNonce": 1564927164,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-parking-and-waking-in-trio-channels"
+      },
+      "text": "reschedule @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-parking-and-waking-in-trio-channels-edge-11",
+      "originalText": "reschedule @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
