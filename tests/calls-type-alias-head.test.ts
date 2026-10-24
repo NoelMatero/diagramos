@@ -29,6 +29,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { emptyBoard, type BoardFile } from "../src/engine/board-file";
 import { createDiagram } from "../src/engine/diagram";
+import { onlyATypeAlias } from "../src/engine/alias";
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, type DriftReport } from "../src/engine/drift";
 import { initEngine } from "../src/engine/parse";
 import { refereedCheckLive } from "../src/engine/referee-live";
@@ -251,4 +252,33 @@ describe("Rust", () => {
   it("still calls wrong an arrow at a routine the tail never calls", async () => {
     expect((await ask("src/lib.rs#via_nothing", "src/lib.rs#run")).said).toBe("red");
   }, 120_000);
+});
+
+describe("which names count as a type alias", () => {
+  /*
+   * By the word the declaration opens with, `type`, which all three grammars
+   * share -- and only where the name is that and nothing else, and names
+   * something. Each "no" below would otherwise have withheld an arrow at a
+   * name that is not a type alias at all.
+   */
+  const cases: Array<[string, "ts" | "rust" | "python", string, string, boolean]> = [
+    ["a TypeScript alias", "ts", "export type H = (n: number) => number;", "H", true],
+    ["an alias beside an interface member of that name", "ts", "interface I { H: () => void }\nexport type H = number;", "H", true],
+    ["an imported type, which names nothing here", "ts", "import { type H } from './x';", "H", false],
+    ["a re-exported type", "ts", "export type { H } from './x';", "H", false],
+    ["an alias that shares its name with a routine", "ts", "export type M = { n: number };\nexport function M() {}", "M", false],
+    ["a value", "ts", "export const H = 1;", "H", false],
+    ["a Rust alias", "rust", "pub type Named = Shape;", "Named", true],
+    ["a Rust name that is a trait as well as an associated type", "rust", "pub trait Reducer {}\nimpl X for Y { type Reducer = Z; }", "Reducer", false],
+    ["Python's type statement", "python", "type H = Callable[[int], int]", "H", true],
+    ["Python's TypeAlias annotation", "python", "H: TypeAlias = Callable[[int], int]", "H", true],
+    ["Python's TypeAlias annotation, qualified", "python", "H: typing.TypeAlias = int", "H", true],
+    ["a bare Python assignment, which the text cannot tell from a value", "python", "H = Callable[[int], int]", "H", false],
+    ["an annotated Python value", "python", "H: int = 3", "H", false],
+  ];
+  for (const [shape, language, source, name, expected] of cases) {
+    it(`${expected ? "counts" : "does not count"} ${shape}`, () => {
+      expect(onlyATypeAlias(source, name, language)).toBe(expected);
+    });
+  }
 });
