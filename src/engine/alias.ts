@@ -204,7 +204,8 @@ export function aliasesFor(
  */
 export function isTypeAlias(node: Node): boolean {
   const name = declaredName(node);
-  if (!name) return false;
+  // Something it names, too: `import { type X }` opens with the word and names nothing.
+  if (!name || !valueOf(node)) return false;
   if (keywordOf(node, name) === "type") return true;
   const annotation = node.childForFieldName("type");
   return node.childForFieldName("right") !== null && annotation !== null
