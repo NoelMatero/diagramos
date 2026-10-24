@@ -30,7 +30,7 @@
  * Neither is alias *resolution*, which would need a type checker: an alias
  * found here withholds the answer, and never turns one into a confirmation.
  */
-import { each, parseSource, type Language, type Node } from "./parse";
+import { each, keywordOf, parseSource, type Language, type Node } from "./parse";
 
 /** Node types that can rename something on the way in, if they actually do. */
 const RENAMES = new Set([
@@ -184,4 +184,64 @@ export function aliasesFor(
     if (stands) names.add(name.text);
   });
   return names;
+}
+
+/**
+ * Whether a declaration gives a type a second name: `type Handler = (n: number)
+ * => number` in TypeScript, `type Named = Shape;` in Rust, `type Handler =
+ * Callable[[int], int]` in Python -- or Python's older spelling, which says so
+ * on the line: `Handler: TypeAlias = Callable[[int], int]`.
+ *
+ * By the word the declaration opens with, which is the same word in all three
+ * grammars and is an anonymous token, so its type is its own text -- the
+ * reading `parts.ts` already makes for "is this a type or a value". Not
+ * `isAlias` above: that one is generous on purpose and counts every `const x =
+ * y` and every Python `x = y`, which is right for "might this name be hiding
+ * another" and wrong for "is this name a type" -- a value declared with
+ * `const` is called by its own name, and an arrow at it is a question about
+ * the value. A bare Python `Alias = Shape` stays out for the same reason: the
+ * text cannot tell it from a module-level value.
+ */
+export function isTypeAlias(node: Node): boolean {
+  const name = declaredName(node);
+  if (!name) return false;
+  if (keywordOf(node, name) === "type") return true;
+  const annotation = node.childForFieldName("type");
+  return node.childForFieldName("right") !== null && annotation !== null
+    && /^(?:typing(?:_extensions)?\.)?TypeAlias$/.test(annotation.text);
+}
+
+/**
+ * The plain name a declaration introduces, or none. Python's `type X = ...`
+ * wraps its name in a `type` node of one child, so that one is looked through.
+ */
+function declaredName(node: Node): Node | undefined {
+  let name = node.childForFieldName("name") ?? node.childForFieldName("left");
+  if (name && name.childCount === 1) name = name.child(0);
+  return name && name.childCount === 0 ? name : undefined;
+}
+
+/**
+ * Whether `name` is declared in this file as a type alias and as nothing else
+ * (#476).
+ *
+ * Every declaration counts. TypeScript keeps types and values apart, so
+ * `type Make = { .. }` and `function Make() {}` can share a name, and an arrow
+ * at that name may mean the routine -- which is read as one, as before. What
+ * counts as a declaration is `isTypeName`'s rule in `calls.ts`: a name with a
+ * body, parameters or a value beside it. A member's signature in an object
+ * type (`{ Handler: () => void }`) or a struct's field has only a type beside
+ * it, and declares nothing here.
+ */
+export function onlyATypeAlias(source: string, name: string, language: Language): boolean {
+  const tree = parseSource(source, language);
+  if (!tree) return false;
+  let aliases = 0;
+  let other = 0;
+  each(tree.rootNode, (node) => {
+    if (declaredName(node)?.text !== name) return;
+    if (isTypeAlias(node)) aliases += 1;
+    else if (["body", "parameters", "value", "right"].some((field) => node.childForFieldName(field))) other += 1;
+  });
+  return aliases > 0 && other === 0;
 }

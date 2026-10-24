@@ -404,6 +404,22 @@ export function resetEngineCache(): void {
   trees.clear();
 }
 
+/**
+ * The word a declaration opens with, where it has one: `const`, `static`,
+ * `type`, `class`. A keyword is an anonymous token, so its type is its own
+ * text -- the reading `parts.ts`' `nounOf` uses for the sentence, and the one
+ * `alias.ts` tells a type alias by (`type`, in TypeScript, Rust and Python).
+ */
+export function keywordOf(node: Node, nameNode: Node): string | undefined {
+  let keyword: string | undefined;
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (!child || child.startIndex >= nameNode.startIndex) break;
+    if (!child.isNamed && /^[a-z]+$/.test(child.type)) keyword = child.type;
+  }
+  return keyword;
+}
+
 /** Depth-first over every node, including the root. */
 export function each(node: Node, visit: (node: Node) => void): void {
   visit(node);
