@@ -57,7 +57,7 @@
 import type { ArrowClaim } from "./claim";
 import { declaredShapes } from "./body";
 import { bindingsIn } from "./calls";
-import { each, parseSource, type Language, type Node, type Tree } from "./parse";
+import { each, keywordOf, parseSource, type Language, type Node, type Tree } from "./parse";
 
 export const PARTS = [
   "body", "signature", "result", "fields", "bases", "type", "callable", "implementable",
@@ -203,22 +203,6 @@ function isLiteral(value: Node): boolean {
    * full, and a type would be told it is not a type.
    */
   return plain && written;
-}
-
-/**
- * The word a declaration opens with, where it has one: `const`, `static`,
- * `type`, `class`. A keyword is an anonymous token, so its type is its own
- * text -- the reading `nounOf` uses for the sentence, used here to keep one
- * word out of the literal rule.
- */
-function keywordOf(node: Node, nameNode: Node): string | undefined {
-  let keyword: string | undefined;
-  for (let index = 0; index < node.childCount; index += 1) {
-    const child = node.child(index);
-    if (!child || child.startIndex >= nameNode.startIndex) break;
-    if (!child.isNamed && /^[a-z]+$/.test(child.type)) keyword = child.type;
-  }
-  return keyword;
 }
 
 /**

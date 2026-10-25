@@ -151,6 +151,8 @@ export const UNDECIDED_BUCKETS: Record<Labelled, BucketLabel> & Record<string, B
     why: "the head is a class with a base, and a call lands on another class's method -- on a value of the head's type that is its own inherited method (#374)" },
   "declined: not-closed may-create": { bucket: "work", cost: 3,
     why: "the head is a class, no call is its own, and @builds' reading could not close on 'creates none' -- its name is written in the body, or a construction could not be followed (#374)" },
+  "declined: not-closed type-alias": { bucket: "work", cost: 3,
+    why: "the head is a type alias, answered as an interface is: a value of that type may be what is called and a literal may make one -- what an arrow at an alias means is #476's open question" },
   "declined: not-closed overridden": { bucket: "never", cost: 1,
     why: "the call is to a method a subclass replaces, so the subclass's can be what runs" },
   "declined: not-closed same-name": { bucket: "never", cost: 1,

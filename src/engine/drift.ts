@@ -73,6 +73,7 @@ import {
   membersReadByName, readsMember, routineReadAt, routinesReadByName,
 } from "./accesses";
 import type { HandedWhole, RoutineReads } from "./resolution";
+import { onlyATypeAlias } from "./alias";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { conformedTypes, declaredBases, type ConformsWithheld } from "./conforms";
 import { overridesIn, type Overrides } from "./overrides";
@@ -930,6 +931,8 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
   inherits: "the class has a base, and one call is to another class's method -- which on one of these "
     + "is its own, inherited",
   "may-create": "no call is to the class, and the caller may still create one",
+  "type-alias": "the arrow's end is a type alias -- a value of that type may be what is called, "
+    + "or a literal may make one, and neither is written under the alias's name",
 };
 
 export { lackingPhrase };
@@ -6033,6 +6036,34 @@ export function checkDrift(
               if (claimed && own.verdict === "closed" && made?.verdict === "absent" && made.awaitsCompiler) {
                 claims.callsCompilable += 1;
               }
+            }
+
+            /*
+             * A type alias at the head (#476): answered the way an interface
+             * there is, which is never with a red.
+             *
+             * The readings above take the head for a routine that has to be
+             * called by its own name, and an alias is never called by its own
+             * name. `viaConst` calling `handle`, declared as a `Handler`, *is*
+             * calling a Handler, and it went red as "the one that reaches
+             * a.ts calls `handle`" -- while the same arrow at an interface was
+             * "not sure", because a literal may make one and a value of it may
+             * be what is called. Both hold for an alias whatever it names: a
+             * function type or a call signature (any value of it, under any
+             * name), an object type (a literal), a union or an intersection
+             * (any member), a generic (what it names), another type (a
+             * declaration somewhere else). So the shape is not read; the
+             * accusations are withheld, and a confirmation stands.
+             *
+             * Any one name is enough. A box standing for several names, one of
+             * them an alias, may be drawn at the alias, and a red would be an
+             * answer about the others.
+             */
+            if (
+              (verdict.verdict === "refuted" || verdict.verdict === "wrong-routine" || verdict.verdict === "backwards")
+              && toEnd.symbols.some((name) => onlyATypeAlias(head.source, name, head.language))
+            ) {
+              verdict = { verdict: "absent", notClosed: "type-alias" };
             }
 
             /*
