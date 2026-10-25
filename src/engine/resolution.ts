@@ -1402,6 +1402,8 @@ function resolveRoutine(
   };
   const parameterList = parametersOf(routine);
   if (parameterList) noteHazards(parameterList);
+  // `x => ..`: the lone parameter is the whole list (#477).
+  if (parameterList && parameterList.childCount === 0) paramNames.push(parameterName(parameterList));
   for (let index = 0; index < (parameterList?.childCount ?? 0); index += 1) {
     const parameter = parameterList!.child(index);
     if (parameter?.isNamed && parameter.type !== "comment") paramNames.push(parameterName(parameter));

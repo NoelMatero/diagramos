@@ -3998,9 +3998,12 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
   /** Which class each routine is a member of (#353), read on the first body that is placed. */
   let holders: Map<number, Node> | undefined;
   each(tree.rootNode, (node) => {
+    // A key in an object literal is a routine here exactly where `routinesNamed` finds it (#477).
     const name = node.type === "impl_item"
       ? node.childForFieldName("type")
-      : node.childForFieldName("name") ?? node.childForFieldName("left");
+      : node.childForFieldName("key")
+        ? declarationName(node) ?? null
+        : node.childForFieldName("name") ?? node.childForFieldName("left");
     if (!name || name.childCount !== 0) return;
     const value = node.childForFieldName("value");
     /*

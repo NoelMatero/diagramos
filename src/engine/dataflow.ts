@@ -1836,6 +1836,8 @@ function tailExpression(block: Node): Node | undefined {
  * slot is still counted.
  */
 function parameterNames(list: Node): Node[] {
+  // `x => ..`: the lone parameter is the whole list (#477).
+  if (isName(list)) return [list];
   const found: Node[] = [];
   for (let index = 0; index < list.childCount; index += 1) {
     const child = list.child(index);
