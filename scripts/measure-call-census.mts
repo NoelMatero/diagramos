@@ -169,6 +169,9 @@ function binOf(checker: CheckerAnswer, compiler: CompilerAnswer): Bin {
 
 /* --------------------------------------------------------------- one project */
 
+/** Which of a batch's answers to keep (#481): every one, places and the "nothing here"s that followed one, or none. */
+type Trust = "all" | "places" | "nothing";
+
 interface Row {
   set: string; project: string; lang: Lang; file: string; line: number; key: string;
   routine: string; name: string; text: string;
@@ -566,10 +569,11 @@ async function measureOne(setName: string, project: string): Promise<void> {
     list: Array<{ file: string; at: { start: number; end: number } }>,
     one: (file: string, at: { start: number; end: number }) => Promise<LocationOutcome>,
     outside: (absolute: string) => boolean,
-    keepAs?: { group: string; key: AnswerKey | undefined; trusted: () => boolean },
+    keepAs?: { group: string; key: AnswerKey | undefined; trusted: () => Trust },
   ): Promise<void> => {
     let cursor = 0;
-    const trusted: Array<{ q: (typeof list)[number]; answer: KeptAnswer }> = [];
+    const trusted: Array<{ q: (typeof list)[number]; answer: KeptAnswer; asked: number }> = [];
+    let firstPlace = Infinity;
     const worker = async (): Promise<void> => {
       for (;;) {
         const q = list[cursor++];
@@ -578,12 +582,13 @@ async function measureOne(setName: string, project: string): Promise<void> {
         if (raw.has(key)) continue;
         raw.set(key, undefined);
         asked++;
+        const askedAt = performance.now();
         try {
           const found = await one(q.file, q.at);
           const answer = keptAnswerOf(found, root, outside);
           if (answer === undefined) { failures.push("failed" in found ? found.failed : "no answer"); continue; }
-          if (answer !== "none") raw.set(key, answer);
-          trusted.push({ q, answer });
+          if (answer !== "none") { raw.set(key, answer); firstPlace = Math.min(firstPlace, performance.now()); }
+          trusted.push({ q, answer, asked: askedAt });
         } catch (error) {
           raw.set(key, "threw");
           errors.push(`${q.file}: ${error instanceof Error ? error.message : String(error)}`);
@@ -591,10 +596,19 @@ async function measureOne(setName: string, project: string): Promise<void> {
       }
     };
     await Promise.all(Array.from({ length: Math.min(32, list.length) }, worker));
-    // A server that never got ready has nothing worth keeping, its places included.
-    if (keepAs?.key && keepAs.trusted()) {
-      for (const { q, answer } of trusted) kept.keep(keepAs.group, keepAs.key, q.file, shaOf(q.file), q.at.start, q.at.end, answer);
+    /*
+     * A server that never got ready has nothing worth keeping, its places
+     * included. One whose readiness nobody saw keeps its places -- a place is
+     * never a server that was not ready -- and a "nothing here" only when it
+     * was asked after the server's first place came back.
+     */
+    const trust = keepAs?.key ? keepAs.trusted() : "nothing";
+    let left = 0;
+    for (const { q, answer, asked: at } of trusted) {
+      if (trust === "nothing" || (trust === "places" && answer === "none" && at < firstPlace)) { left++; continue; }
+      kept.keep(keepAs!.group, keepAs!.key!, q.file, shaOf(q.file), q.at.start, q.at.end, answer);
     }
+    if (left > 0 && trust === "places") say(`${left} "nothing here" answers came before the server's first place; not kept`);
   };
   const located = (found: { file: string; line: number } | undefined): LocationOutcome => (found ? { at: found } : { none: true });
   const noServer = new Set<Lang>();
@@ -612,7 +626,7 @@ async function measureOne(setName: string, project: string): Promise<void> {
       if (!referee) { say("tsc: no referee for this tree"); noServer.add("ts"); }
       else {
         await ask(tsQuestions, async (file, at) => located(referee!.symbolDeclarationLocationAt(path.resolve(root, file), at.start, at.end)),
-          (abs) => isOutsideTree(abs, root), { group: "ts", key, trusted: () => true });
+          (abs) => isOutsideTree(abs, root), { group: "ts", key, trusted: () => "all" });
         say(`tsc: ${tsQuestions.length} questions in ${Math.round((Date.now() - t0) / 1000)}s`);
       }
     }
@@ -630,9 +644,8 @@ async function measureOne(setName: string, project: string): Promise<void> {
           await referee.warmUp(pyQuestions.slice(0, 8).map((q) => ({ file: path.resolve(root, q.file), source: read(q.file)!, start: q.at.start })));
         } catch (error) { say(`pyright: warm-up failed: ${error instanceof Error ? error.message : String(error)}`); }
         await ask(pyQuestions, async (file, at) => referee.methodDeclarationOutcomeAt(path.resolve(root, file), read(file)!, at.start, at.end),
-          (abs) => isOutsideTree(abs, root), { group: "python", key, trusted: () => referee.warmedUp() });
+          (abs) => isOutsideTree(abs, root), { group: "python", key, trusted: () => (referee.warmedUp() ? "all" : "places") });
         referee.close();
-        if (!referee.warmedUp()) say("pyright: never had an answer while warming up; this run's answers are not kept");
         say(`pyright: ${pyQuestions.length} questions in ${Math.round((Date.now() - t0) / 1000)}s`);
       } catch (error) {
         say(`pyright: did not start: ${error instanceof Error ? error.message : String(error)}`);
@@ -660,7 +673,7 @@ async function measureOne(setName: string, project: string): Promise<void> {
         await referee.warmUp();
         if (!referee.primedCleanly()) say(`rust-analyzer ${path.relative(root, crate) || "."}: never said it finished indexing; answers may be missing`);
         await ask(mineQ, async (file, at) => referee.methodDeclarationOutcomeAt(path.resolve(root, file), read(file)!, at.start, at.end),
-          (abs) => isOutsideRustTree(abs, root), { group, key, trusted: () => referee.primedCleanly() });
+          (abs) => isOutsideRustTree(abs, root), { group, key, trusted: () => (referee.primedCleanly() ? "all" : "nothing") });
         referee.close();
         say(`rust-analyzer ${path.relative(root, crate) || "."} (${referee.version()}): ${mineQ.length} questions in ${Math.round((Date.now() - t0) / 1000)}s`);
       } catch (error) {
@@ -674,7 +687,7 @@ async function measureOne(setName: string, project: string): Promise<void> {
   for (const [message, count] of groupBy(errors, (one) => one.replace(/^[^:]*: /, "").slice(0, 160))) {
     say(`compiler threw ${count}x: ${message}`);
   }
-  for (const [message, count] of groupBy(failures, (one) => one.slice(0, 160))) {
+  for (const [message, count] of groupBy(failures, (one) => one.replace(/\/\S+/g, "<path>").slice(0, 160))) {
     say(`compiler gave no answer ${count}x (asked again next run): ${message}`);
   }
   kept.write(answersPath(RUN, setName, project));

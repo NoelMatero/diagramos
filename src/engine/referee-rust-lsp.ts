@@ -781,8 +781,14 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
         // Only a not-ready signal is worth asking again; anything else is a
         // real refusal and retrying it would spend the whole ladder to learn
         // what the first answer already said.
-        if (!isNotReadyError(error) || attempt >= RETRY_MS.length || closed) {
-          return { failed: error instanceof Error ? error.message : String(error) };
+        const message = error instanceof Error ? error.message : String(error);
+        if (closed) return { failed: message };
+        // The server's own refusal is its answer; a request that timed out is not (#481).
+        if (!isNotReadyError(error)) return typeof (error as { code?: unknown }).code === "number" ? { none: true } : { failed: message };
+        if (attempt >= RETRY_MS.length) {
+          // Still "file not found" on a server that said it was ready, past every
+          // retry: the file is in no crate it loaded -- axum's `examples/*`.
+          return primed && /file not found/i.test(message) ? { none: true } : { failed: message };
         }
         await new Promise((resolve) => setTimeout(resolve, RETRY_MS[attempt]));
         continue;
