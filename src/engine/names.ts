@@ -56,7 +56,7 @@
  */
 import { providedByHost, providedByLanguage } from "./builtins";
 import { wholeName } from "./declared";
-import { each, incomplete, parseSource, unreadIn, type Language, type Node, type Tree } from "./parse";
+import { each, incomplete, parametersOf, parseSource, unreadIn, type Language, type Node, type Tree } from "./parse";
 
 /**
  * What a name means at one spot.
@@ -275,7 +275,7 @@ function tsPattern(node: Node | null, into: (name: string) => void): void {
 function tsParameters(fn: Node, scope: Scope): void {
   const single = fn.childForFieldName("parameter");
   if (single) tsPattern(single, (name) => put(scope, name, "bound"));
-  const list = fn.childForFieldName("parameters");
+  const list = parametersOf(fn);
   if (!list) return;
   for (const one of kids(list)) {
     if (!one.isNamed) continue;
@@ -449,7 +449,7 @@ function pyTarget(node: Node | null, into: (name: string) => void): void {
 
 /** The parameters a Python function or lambda binds. */
 function pyParameters(fn: Node, scope: Scope): void {
-  const list = fn.childForFieldName("parameters");
+  const list = parametersOf(fn);
   if (!list) return;
   for (const one of kids(list)) {
     if (one.type === "identifier") put(scope, one.text, "bound");
@@ -667,7 +667,7 @@ function rustScope(node: Node, root = false): Scope | null {
     case "function_item":
     case "closure_expression": {
       const scope = emptyScope();
-      const list = node.childForFieldName("parameters");
+      const list = parametersOf(node);
       if (list) {
         for (const one of kids(list)) {
           if (one.type === "parameter") rustPattern(one.childForFieldName("pattern"), (name) => put(scope, name, "bound"));

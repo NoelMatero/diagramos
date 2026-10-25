@@ -28,7 +28,7 @@
  */
 import { basesOfDeclaration } from "./conforms";
 import { wholeName } from "./declared";
-import { each, withParsed, type Language, type Node } from "./parse";
+import { each, parametersOf, withParsed, type Language, type Node } from "./parse";
 
 export interface Overrides {
   /**
@@ -115,7 +115,7 @@ function derivedInTree(root: Node, name: string, word: RegExp): Derived[] {
   const found: Derived[] = [];
   each(root, (node) => {
     const body = node.childForFieldName("body");
-    if (!body || node.childForFieldName("parameters")) return;
+    if (!body || parametersOf(node)) return;
     const bases = basesOfDeclaration(node);
     const names = bases.names.map((base) => base.split(/::|\./).pop()!);
     /*
@@ -201,7 +201,7 @@ function onlyNamedChild(node: Node): Node | undefined {
 export function holdersIn(root: Node): Map<number, Node> {
   const holders = new Map<number, Node>();
   const visit = (node: Node, holder: Node | undefined): void => {
-    const routine = node.childForFieldName("parameters") !== null;
+    const routine = parametersOf(node) !== null;
     if (holder && (node.childForFieldName("name") ?? node.childForFieldName("left"))) holders.set(node.id, holder);
     const holds = !routine && node.childForFieldName("body") !== null
       && (node.childForFieldName("name") ?? node.childForFieldName("type")) !== null;

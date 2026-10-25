@@ -86,7 +86,7 @@ import { declaredShapes } from "./body";
 import { escapeName, NAME_END, NAME_START } from "./declared";
 import type { Site } from "./gate";
 import { mayAccuse } from "./licence";
-import { each, incomplete, parseSource, type Language, type Node } from "./parse";
+import { each, incomplete, parametersOf, parseSource, type Language, type Node } from "./parse";
 
 /**
  * Why no verdict was reached. Every one is a reason to stay quiet, and the
@@ -432,7 +432,7 @@ function isRoutine(source: string, language: Language, name: string): boolean {
   each(tree.rootNode, (node) => {
     if (routine) return;
     if (nameOf(node) !== name) return;
-    if (node.childForFieldName("body") && node.childForFieldName("parameters")) routine = true;
+    if (node.childForFieldName("body") && parametersOf(node)) routine = true;
   });
   return routine;
 }

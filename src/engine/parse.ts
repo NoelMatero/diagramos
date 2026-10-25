@@ -420,6 +420,19 @@ export function keywordOf(node: Node, nameNode: Node): string | undefined {
   return keyword;
 }
 
+/**
+ * What a routine takes, as the grammar writes it: the node on its
+ * `parameters` field, or `null` when it has none.
+ *
+ * `parse.ts`'s rule says a routine is a declaration that takes parameters,
+ * and every reader that tells a routine from anything else with a name and a
+ * body asks this one question (#477). It is asked here, once, so that what
+ * counts as "takes parameters" cannot differ from one reader to the next.
+ */
+export function parametersOf(node: Node | null | undefined): Node | null {
+  return node?.childForFieldName("parameters") ?? null;
+}
+
 /** Depth-first over every node, including the root. */
 export function each(node: Node, visit: (node: Node) => void): void {
   visit(node);

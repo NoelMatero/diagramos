@@ -73,7 +73,7 @@ import {
 } from "./calls";
 import { declarationName, escapeName, NAME_END } from "./declared";
 import { mayAccuse } from "./licence";
-import { each, incomplete, parseSource, type Language, type Node } from "./parse";
+import { each, incomplete, parametersOf, parseSource, type Language, type Node } from "./parse";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -302,8 +302,8 @@ function routinesNamed(
     // The parameters may sit on the declaration or on the value assigned to it:
     // `function f()` has its own, `const f = () => x` has the arrow function's.
     const value = node.childForFieldName("value");
-    const takesParameters = node.childForFieldName("parameters")
-      ?? value?.childForFieldName("parameters");
+    const takesParameters = parametersOf(node)
+      ?? parametersOf(value);
     if (takesParameters) { routines.push(node); return; }
 
     /*
@@ -406,12 +406,12 @@ function onlyNewCreates(source: string, tailLanguage: Language, language: Langua
     if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
     // A method or a parameter that happens to share the name is not a
     // declaration of the type, and says nothing about how it is created.
-    if (node.childForFieldName("parameters")) return;
+    if (parametersOf(node)) return;
     const body = node.childForFieldName("body");
     if (node.type !== "class_declaration" || !body) { doubt = true; return; }
     let behaves = false;
     for (let at = 0; at < body.childCount; at += 1) {
-      if (body.child(at)?.childForFieldName("parameters")) behaves = true;
+      if (parametersOf(body.child(at))) behaves = true;
     }
     if (behaves) {
       buildable.add(name.text);
@@ -454,7 +454,7 @@ function onlyStructs(source: string, names: string[]): boolean {
     if (MAKES.test(node.type) || writtenAsUse(node)) return;
     const name = node.childForFieldName("name");
     if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
-    if (node.childForFieldName("parameters")) return;
+    if (parametersOf(node)) return;
     if (/^(struct|enum|union)_item$/.test(node.type)) buildable.add(name.text);
     else doubt = true;
   });
@@ -603,7 +603,7 @@ function handedInTypes(routine: Node, language: Language): Array<{ start: number
   const spans: Array<{ start: number; end: number; name?: string }> = [];
   const maker = MAKER_WORDS[language];
   each(routine, (node) => {
-    const parameters = node.childForFieldName("parameters");
+    const parameters = parametersOf(node);
     if (!parameters) return;
     for (let at = 0; at < parameters.childCount; at += 1) {
       const written = parameters.child(at)?.childForFieldName("type");
@@ -611,7 +611,7 @@ function handedInTypes(routine: Node, language: Language): Array<{ start: number
       let makes = false;
       each(written, (inner) => {
         if (makes) return;
-        if (inner.childForFieldName("parameters")) makes = true;
+        if (parametersOf(inner)) makes = true;
         else if (inner.childCount === 0 && maker?.test(inner.text)) makes = true;
       });
       if (makes) continue;
@@ -779,12 +779,12 @@ function unwrittenMethods(source: string, language: Language, wanted: Set<string
   each(tree.rootNode, (node) => {
     const own = node.childForFieldName("name");
     const body = node.childForFieldName("body");
-    if (!own || !body || node.childForFieldName("parameters") || !wanted.has(own.text)) return;
+    if (!own || !body || parametersOf(node) || !wanted.has(own.text)) return;
     if (node.childForFieldName("superclasses")) based = true;
     for (let at = 0; at < node.childCount; at += 1) if (node.child(at)?.type === "class_heritage") based = true;
     each(body, (member) => {
       const named = member.childForFieldName("name");
-      if (named && member.childForFieldName("parameters")) methods.push(named.text.replace(/\s+/g, ""));
+      if (named && parametersOf(member)) methods.push(named.text.replace(/\s+/g, ""));
     });
   });
   return based ? "any" : methods;
@@ -903,7 +903,7 @@ function declaredApart(
     const declaredName = node.childForFieldName("name");
     if (!declaredName || declaredName.childCount !== 0 || declaredName.text !== name) return;
     const value = node.childForFieldName("value");
-    if (node.childForFieldName("parameters") ?? value?.childForFieldName("parameters")) { declared += 1; return; }
+    if (parametersOf(node) ?? parametersOf(value)) { declared += 1; return; }
     const body = node.childForFieldName("body");
     if (!/class_declaration$/.test(node.type) || !body) { apart = false; return; }
     declared += 1;
@@ -963,7 +963,7 @@ function holdsRoutines(node: Node): boolean {
   let found = false;
   each(node, (child) => {
     if (found || child.id === node.id) return;
-    if (child.childForFieldName("parameters")) found = true;
+    if (parametersOf(child)) found = true;
   });
   return found;
 }
@@ -992,7 +992,7 @@ export function routineNamesIn(source: string, language: Language): string[] {
     const name = node.childForFieldName("name") ?? node.childForFieldName("left");
     if (!name || name.childCount !== 0) return;
     const value = node.childForFieldName("value");
-    if (node.childForFieldName("parameters") ?? value?.childForFieldName("parameters")) {
+    if (parametersOf(node) ?? parametersOf(value)) {
       names.add(name.text);
     }
   });
@@ -1099,7 +1099,7 @@ function declaresClass(source: string, name: string): boolean {
     if (found) return;
     const declared = node.childForFieldName("name");
     if (!declared || declared.childCount !== 0 || declared.text !== name) return;
-    if (!node.childForFieldName("body") || node.childForFieldName("parameters")) return;
+    if (!node.childForFieldName("body") || parametersOf(node)) return;
     found = true;
   });
   return found;
@@ -1274,7 +1274,7 @@ function onlyCalledClasses(source: string, names: string[]): boolean {
   each(tree.rootNode, (node) => {
     const name = node.childForFieldName("name") ?? assigned(node);
     if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
-    if (!node.childForFieldName("body") || node.childForFieldName("parameters")) { doubt = true; return; }
+    if (!node.childForFieldName("body") || parametersOf(node)) { doubt = true; return; }
     const bases = node.childForFieldName("superclasses")?.text ?? "";
     if (/\b(TypedDict|Protocol)\b/.test(bases)) doubt = true;
     else classes.add(name.text);
@@ -1369,7 +1369,7 @@ function declaresRoutine(source: string, name: string): boolean {
   each(tree.rootNode, (node) => {
     const declared = node.childForFieldName("name") ?? assigned(node);
     if (!declared || declared.childCount !== 0 || declared.text !== name) return;
-    if (node.childForFieldName("parameters") && node.childForFieldName("body")) routine = true;
+    if (parametersOf(node) && node.childForFieldName("body")) routine = true;
     else if (node.childForFieldName("body") || assigned(node)) other = true;
   });
   return routine && !other;

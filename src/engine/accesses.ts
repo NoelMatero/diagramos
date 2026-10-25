@@ -82,7 +82,7 @@ import { declarationName } from "./declared";
 import { mayAccuse } from "./licence";
 import { writtenName } from "./lines";
 import type { MemberTarget } from "./compiler-questions";
-import { declaresField, each, incomplete, INSTANCE_NAMES, languageOf, MEMBER_ACCESS, parseSource, qualifiedTail, type Language, type Node } from "./parse";
+import { declaresField, each, incomplete, INSTANCE_NAMES, languageOf, MEMBER_ACCESS, parametersOf, parseSource, qualifiedTail, type Language, type Node } from "./parse";
 import { memberReadsIn, type HandedWhole, type RoutineReads } from "./resolution";
 
 /**
@@ -365,7 +365,7 @@ function isRoutine(root: Node, name: string): boolean {
   each(root, (node) => {
     if (routine) return;
     if (nameOf(node) !== name) return;
-    if (node.childForFieldName("body") && node.childForFieldName("parameters")) routine = true;
+    if (node.childForFieldName("body") && parametersOf(node)) routine = true;
   });
   return routine;
 }
@@ -448,7 +448,7 @@ function membersIn(body: Node): Set<string> {
          * makes the type look like it declares everything and refutes nothing.
          * The one thing wanted from in there is handled by `selfAssigned`.
          */
-        const parameters = member.childForFieldName("parameters");
+        const parameters = parametersOf(member);
         if (parameters) {
           if (name === "constructor") {
             for (const property of parameterProperties(parameters)) members.add(property);
@@ -696,7 +696,7 @@ function routinesNamed(root: Node, routine: string): { routines: Node[]; declare
     if (declarationName(node)?.text !== routine) return;
     declared = true;
     const value = node.childForFieldName("value");
-    if (node.childForFieldName("parameters") ?? value?.childForFieldName("parameters")) {
+    if (parametersOf(node) ?? parametersOf(value)) {
       routines.push(node);
       return;
     }
@@ -710,7 +710,7 @@ function holdsRoutines(node: Node): boolean {
   let found = false;
   each(node, (child) => {
     if (found || child.id === node.id) return;
-    if (child.childForFieldName("parameters")) found = true;
+    if (parametersOf(child)) found = true;
   });
   return found;
 }
