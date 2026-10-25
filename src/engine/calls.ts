@@ -370,6 +370,14 @@ export type CallsNotClosed =
    * C()` could not be followed, or the Rust compiler has no body for it.
    */
   | "may-create"
+  /**
+   * The head is a type alias (#476), answered as an interface there is. A
+   * value of that type may be what the tail calls, under its own name --
+   * `handle(1)` with `handle: Handler` -- and a literal may make one, and
+   * neither is written under the alias's name. Whatever the alias names: a
+   * function type, an object type, a union, a generic, another type.
+   */
+  | "type-alias"
   | SiteUnresolved;
 
 /** One end of the question: a file, its text, and what its imports point at. */
