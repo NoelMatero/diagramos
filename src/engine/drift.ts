@@ -58,7 +58,7 @@ import { licenceFor, mayAccuse } from "./licence";
 import { outsideCallsIn } from "./outside";
 import { lackingPhrase } from "./summary";
 import { lackingEnd, PART_NEEDED, PART_WORDS, type LackingEnd, type ValueKind } from "./parts";
-import { languageOf, type Language } from "./parse";
+import { languageOf, parametersOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
@@ -4690,7 +4690,7 @@ export function checkDrift(
         return declared.length > 0 && declared.every(({ node: declaration, soup }) =>
           !soup
           && declaration.childForFieldName("body") !== null
-          && declaration.childForFieldName("parameters") === null);
+          && parametersOf(declaration) === null);
       };
       /*
        * An external box anchored at a whole file in this repo (#435). A file

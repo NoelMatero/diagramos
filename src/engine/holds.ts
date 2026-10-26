@@ -64,7 +64,7 @@ import { aliasesFor, aliasNames } from "./alias";
 import { typeParametersIn, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
 import {
-  declaresField, each, incomplete, INSTANCE_NAMES, parseSource, qualifiedTail,
+  declaresField, each, incomplete, INSTANCE_NAMES, parametersOf, parseSource, qualifiedTail,
   type Language, type Node,
 } from "./parse";
 
@@ -267,7 +267,7 @@ function quotedTypeIn(body: Node): boolean {
   let quoted = false;
   const visit = (member: Node, depth: number) => {
     if (quoted) return;
-    if (depth > 0 && member.childForFieldName("parameters")) return;
+    if (depth > 0 && parametersOf(member)) return;
     if (depth > 0 && (member.type === "object_type" || TYPE_DECLARATION.test(member.type))) return;
     const type = member.childForFieldName("type");
     if (depth > 0 && type) {
@@ -316,7 +316,7 @@ function declaredInRoutine(
 ): Array<{ name: string; line: number }> {
   const found: Array<{ name: string; line: number }> = [];
 
-  const parameters = routine.childForFieldName("parameters");
+  const parameters = parametersOf(routine);
   if (parameters) {
     for (let index = 0; index < parameters.childCount; index += 1) {
       const parameter = parameters.child(index);
@@ -395,7 +395,7 @@ function isRoutine(source: string, language: Language, name: string): boolean {
   each(tree.rootNode, (node) => {
     if (routine) return;
     if (nameOf(node) !== name) return;
-    if (node.childForFieldName("body") && node.childForFieldName("parameters")) routine = true;
+    if (node.childForFieldName("body") && parametersOf(node)) routine = true;
   });
   return routine;
 }
@@ -523,7 +523,7 @@ export function heldTypes(
        * is an `enum_variant` carrying a body, and a variant's payload is held by
        * the enum in exactly the sense a struct field is.
        */
-      if (depth > 0 && member.childForFieldName("parameters")) {
+      if (depth > 0 && parametersOf(member)) {
         // ... unless it declares one on the way. A constructor is where
         // TypeScript and Python put most of a real class's fields (#303).
         found.push(...declaredInRoutine(member, sites, generic));
@@ -646,7 +646,7 @@ export function heldTypes(
  * `left` identifier. A dunder is the language's.
  */
 function untypedField(member: Node): Node | undefined {
-  if (member.childForFieldName("type") || member.childForFieldName("parameters")) return undefined;
+  if (member.childForFieldName("type") || parametersOf(member)) return undefined;
   const name = member.childForFieldName("name") ?? member.childForFieldName("property");
   if (name && name.childCount === 0 && member.type.endsWith("field_definition")) return name;
   const left = member.childForFieldName("left");

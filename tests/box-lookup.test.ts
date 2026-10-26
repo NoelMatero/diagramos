@@ -48,12 +48,12 @@ function write(files: Record<string, string>): void {
 }
 
 /** One arrow, checked the way the MCP server checks a board: compilers live. */
-async function checked(fromRef: string, toRef: string, claim = "calls"): Promise<DriftReport> {
+async function checked(fromRef: string, toRef: string, claim = "calls", headState?: "external"): Promise<DriftReport> {
   const { board } = await createDiagram(emptyBoard(), {
     name: "arch",
     nodes: [
       { id: "tail", label: "tail", ref: fromRef },
-      { id: "head", label: "head", ref: toRef },
+      { id: "head", label: "head", ref: toRef, ...(headState ? { state: headState } : {}) },
     ],
     edges: [{ from: "tail", to: "head", claim: claim as never }],
   });
@@ -264,4 +264,253 @@ describe("names outside ASCII, and Rust raw identifiers", () => {
     expect(unfound(report)).toEqual([]);
     expect(outcome(report)).not.toBe("red");
   }, 180_000);
+});
+
+/* ------------------------------------------------- #477: refusals first */
+
+/*
+ * Three more shapes a board names and the checker could not find (#477): a
+ * function stored under a key of an object literal, an arrow function whose
+ * one parameter has no brackets, and a TypeScript namespace. Each refusal
+ * below is a place where finding more would find the wrong thing, so each
+ * must stay "not sure" -- before the change, where nothing is found, and
+ * after it.
+ */
+describe("refusals (#477): a key is a box only where it names one thing", () => {
+  for (const [label, file] of [["TypeScript", "ws.ts"], ["JavaScript", "ws.js"]] as const) {
+    it(`${label}: a key on an object handed to a call is not a box`, async () => {
+      write({
+        ...TSCONFIG,
+        [file]: [
+          "export function helper() { return 1; }",
+          "export function other() { return 2; }",
+          "function createWSContext(events) { return events; }",
+          "export const ctx = createWSContext({ send: (data) => helper(data) });",
+          "",
+        ].join("\n"),
+      });
+      expect(outcome(await checked(`${file}#send`, `${file}#other`))).toBe("not sure");
+      expect(outcome(await checked(`${file}#send`, `${file}#helper`))).toBe("not sure");
+    }, 120_000);
+
+    it(`${label}: a key nested in another object, returned, or in an array is not a box`, async () => {
+      write({
+        ...TSCONFIG,
+        [file]: [
+          "export function helper() { return 1; }",
+          "export function other() { return 2; }",
+          "export const config = { server: { onRequest: () => helper() } };",
+          "export function make() { return { run: () => helper() }; }",
+          "export const routes = [{ load: () => helper() }];",
+          "",
+        ].join("\n"),
+      });
+      for (const name of ["onRequest", "run", "load"]) {
+        expect(outcome(await checked(`${file}#${name}`, `${file}#other`))).toBe("not sure");
+      }
+    }, 120_000);
+
+    it(`${label}: two objects with the same key withhold, and neither answers for the box`, async () => {
+      write({
+        ...TSCONFIG,
+        [file]: [
+          "export function one() { return 1; }",
+          "export function two() { return 2; }",
+          "export const a = { run: () => one() };",
+          "export const b = { run: () => two() };",
+          "",
+        ].join("\n"),
+      });
+      expect(outcome(await checked(`${file}#run`, `${file}#one`))).toBe("not sure");
+      expect(outcome(await checked(`${file}#run`, `${file}#two`))).toBe("not sure");
+    }, 120_000);
+  }
+
+  it("a key never joins a function of the same name: the box stays the function", async () => {
+    write({
+      ...TSCONFIG,
+      "app.ts": [
+        "export function one(): number { return 1; }",
+        "export function two(): number { return 2; }",
+        "export function run(): number { return one(); }",
+        "export const api = { run: () => two() };",
+        "",
+      ].join("\n"),
+    });
+    expect(outcome(await checked("app.ts#run", "app.ts#one"))).toBe("green");
+    expect(outcome(await checked("app.ts#run", "app.ts#two"))).toBe("red");
+  }, 120_000);
+
+  it("a quoted or computed key is not a name a board writes", async () => {
+    write({
+      ...TSCONFIG,
+      "app.ts": [
+        "export function helper(): number { return 1; }",
+        "export function other(): number { return 2; }",
+        "const key = \"dyn\";",
+        "export const api = { \"quoted\": () => helper(), [key]: () => helper() };",
+        "",
+      ].join("\n"),
+    });
+    expect(outcome(await checked("app.ts#quoted", "app.ts#other"))).toBe("not sure");
+  }, 120_000);
+
+  it("a bare call never lands on a key: it is not reached through one", async () => {
+    write({
+      ...TSCONFIG,
+      "app.ts": [
+        "export function target(): number { return 1; }",
+        "export const api = { send: () => target() };",
+        "declare function send(): void;",
+        "export function go(): void { send(); }",
+        "",
+      ].join("\n"),
+    });
+    expect(outcome(await checked("app.ts#go", "app.ts#target"))).not.toBe("green");
+  }, 120_000);
+
+  it("a catch clause takes a parameter and is still not a routine: its calls stay the function's own", async () => {
+    write({
+      ...TSCONFIG,
+      "app.ts": [
+        "export function risky(): number { return 1; }",
+        "export function recover(): number { return 2; }",
+        "export function other(): number { return 3; }",
+        "export function run(): number {",
+        "  try { return risky(); } catch (error) { return recover(); }",
+        "}",
+        "",
+      ].join("\n"),
+    });
+    expect(outcome(await checked("app.ts#run", "app.ts#recover"))).toBe("green");
+    expect(outcome(await checked("app.ts#run", "app.ts#other"))).toBe("red");
+  }, 120_000);
+
+  it("a namespace merged with a function adds nothing to the function's box", async () => {
+    write({
+      ...TSCONFIG,
+      "driver.ts": [
+        "export function connect(): number { return 1; }",
+        "export function other(): number { return 2; }",
+        "export function drizzle(): number { return connect(); }",
+        "export namespace drizzle { export const mock = 1; }",
+        "export function go(): number { return drizzle(); }",
+        "",
+      ].join("\n"),
+    });
+    expect(outcome(await checked("driver.ts#go", "driver.ts#drizzle"))).toBe("green");
+    expect(outcome(await checked("driver.ts#drizzle", "driver.ts#connect"))).toBe("green");
+    expect(outcome(await checked("driver.ts#drizzle", "driver.ts#other"))).toBe("red");
+  }, 120_000);
+});
+
+/* --------------------------------------------------------- #477: finds */
+
+describe("a function stored under a key of an object assigned to a name (#477)", () => {
+  it("TypeScript: reads the key's function as the box, through `as const` and `satisfies` too", async () => {
+    write({
+      ...TSCONFIG,
+      "ssg.ts": [
+        "export function writeOut(path: string): string { return path; }",
+        "export function unrelated(): number { return 2; }",
+        "export const fs = { writeFile: async (path: string) => { writeOut(path); } };",
+        "export const frozen = { flush: () => writeOut(\"x\") } as const;",
+        "export const store = { save: () => { writeOut(\"y\"); } } satisfies Record<string, () => void>;",
+        "",
+      ].join("\n"),
+    });
+    for (const name of ["writeFile", "flush", "save"]) {
+      expect(outcome(await checked(`ssg.ts#${name}`, "ssg.ts#writeOut"))).toBe("green");
+      expect(outcome(await checked(`ssg.ts#${name}`, "ssg.ts#unrelated"))).toBe("red");
+    }
+  }, 180_000);
+
+  it("JavaScript: a function expression under a key of module.exports", async () => {
+    write({
+      "lib.js": [
+        "function helper() { return 1; }",
+        "function unrelated() { return 2; }",
+        "module.exports = { handle: function (req) { return helper(req); } };",
+        "",
+      ].join("\n"),
+    });
+    expect(outcome(await checked("lib.js#handle", "lib.js#helper"))).toBe("green");
+    // Plain JavaScript has not earned a red for @calls (`licence.ts`); found, it is read and stays quiet.
+    expect(outcome(await checked("lib.js#handle", "lib.js#unrelated"))).toBe("not sure");
+  }, 120_000);
+
+  it("confirms an arrow into the key's function from a call through the object", async () => {
+    write({
+      ...TSCONFIG,
+      "keys.ts": "export const movieKeys = { list: () => [\"movies\"], detail: (id: string) => [\"movies\", id] };\n",
+      "app.ts": [
+        "import { movieKeys } from \"./keys\";",
+        "export function load(id: string): string[] { return movieKeys.detail(id); }",
+        "",
+      ].join("\n"),
+    });
+    expect(outcome(await checked("app.ts#load", "keys.ts#detail"))).not.toBe("red");
+  }, 120_000);
+});
+
+describe("an arrow function whose one parameter has no brackets (#477)", () => {
+  for (const [label, file, typed] of [
+    ["TypeScript", "renderer.ts", ": NextFn"],
+    ["JavaScript", "bench.mjs", ""],
+  ] as const) {
+    it(`${label}: reads \`x => ..\` exactly as \`(x) => ..\``, async () => {
+      write({
+        ...TSCONFIG,
+        [file]: [
+          typed ? "type NextFn = (n: number) => number;" : "",
+          "export function hostNode(n) { return n; }",
+          "export function unrelated() { return 2; }",
+          `export const getNextHostNode${typed} = vnode => hostNode(vnode);`,
+          `export const bracketed${typed} = (vnode) => hostNode(vnode);`,
+          "export function go() { return getNextHostNode(1); }",
+          "",
+        ].join("\n"),
+      });
+      for (const name of ["getNextHostNode", "bracketed"]) {
+        expect(outcome(await checked(`${file}#${name}`, `${file}#hostNode`))).toBe("green");
+      }
+      // Red in TypeScript; in plain JavaScript @calls has not earned a red, and both spellings stay quiet alike.
+      const wrong = await checked(`${file}#getNextHostNode`, `${file}#unrelated`);
+      expect(outcome(wrong)).toBe(typed ? "red" : "not sure");
+      expect(outcome(wrong)).toBe(outcome(await checked(`${file}#bracketed`, `${file}#unrelated`)));
+      expect(outcome(await checked(`${file}#go`, `${file}#getNextHostNode`))).toBe("green");
+    }, 180_000);
+  }
+});
+
+describe("a TypeScript namespace (#477)", () => {
+  it("finds a namespace that is the only thing with its name, and reads the functions in it", async () => {
+    write({
+      ...TSCONFIG,
+      "util.ts": [
+        "export function helper(): number { return 1; }",
+        "export function unrelated(): number { return 2; }",
+        "export namespace util {",
+        "  export function assertNever(): number { return helper(); }",
+        "}",
+        "",
+      ].join("\n"),
+    });
+    expect(outcome(await checked("util.ts#util", "util.ts#helper"))).toBe("green");
+    // A box at a type is read through its routines, to confirm only -- the same as a class.
+    expect(outcome(await checked("util.ts#util", "util.ts#unrelated"))).toBe("not sure");
+  }, 120_000);
+
+  it("reads a box marked external at a namespace in the repo like a built one, as it does a class (#435)", async () => {
+    write({
+      ...TSCONFIG,
+      "util.ts": "export namespace util {\n  export function assertNever(): number { return 1; }\n}\n",
+      "app.ts": "import { util } from \"./util\";\nexport function go(): number { return util.assertNever(); }\n",
+    });
+    // Before, both arrows were left unread: "endpoint-external".
+    const needs = await checked("app.ts", "util.ts#util", "needs", "external");
+    expect(needs.unreadEdges).toEqual([]);
+    expect((needs.claims as unknown as Record<string, number>).needsChecked).toBe(1);
+    expect(outcome(await checked("app.ts#go", "util.ts#util", "calls", "external"))).toBe("green");
+  }, 120_000);
 });

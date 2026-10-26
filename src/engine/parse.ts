@@ -420,6 +420,34 @@ export function keywordOf(node: Node, nameNode: Node): string | undefined {
   return keyword;
 }
 
+/**
+ * What a routine takes, as the grammar writes it: the node on its
+ * `parameters` field, or the one unbracketed parameter of `x => ..`, or
+ * `null` when it takes none.
+ *
+ * `parse.ts`'s rule says a routine is a declaration that takes parameters,
+ * and every reader that tells a routine from anything else with a name and a
+ * body asks this one question (#477). It is asked here, once, so that what
+ * counts as "takes parameters" cannot differ from one reader to the next.
+ *
+ * TypeScript and JavaScript put a lone parameter written without brackets on
+ * `parameter`, singular, so `index => ..` was not a routine anywhere while
+ * `(index) => ..` was: 37 functions a board could name, Vue's
+ * `getNextHostNode` among them, that no arrow at was ever read. A `catch`
+ * clause writes its binding on that field too, and a clause is a part of the
+ * routine around it, not a routine of its own.
+ *
+ * A lone parameter comes back as itself rather than inside a list, so a
+ * reader that walks the list's children has to take it as a list of one
+ * (`dataflow.ts`, `resolution.ts`); one that only reads types finds none,
+ * which is what `(index)` without a type gives too.
+ */
+export function parametersOf(node: Node | null | undefined): Node | null {
+  if (!node) return null;
+  return node.childForFieldName("parameters")
+    ?? (node.type.endsWith("_clause") ? null : node.childForFieldName("parameter"));
+}
+
 /** Depth-first over every node, including the root. */
 export function each(node: Node, visit: (node: Node) => void): void {
   visit(node);

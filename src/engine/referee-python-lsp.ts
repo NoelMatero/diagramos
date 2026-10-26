@@ -64,7 +64,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import type { LspDocumentSymbol } from "./lsp-symbols";
-import { each, parseSource, type Node } from "./parse";
+import { each, parametersOf, parseSource, type Node } from "./parse";
 import type { ValueKind } from "./parts";
 import { isOutsideTree } from "./referee-ts";
 import { spawnServer, stopServer } from "./server-process";
@@ -1332,7 +1332,7 @@ function hoverSeesEverything(source: string, start: number): boolean {
   each(tree.rootNode, (node) => {
     const body = node.childForFieldName("body");
     if (!body || !node.childForFieldName("name")) return;
-    const parameters = node.childForFieldName("parameters");
+    const parameters = parametersOf(node);
     const inside = (part: Node) => start >= part.startIndex && start < part.startIndex + part.text.length;
     if (parameters && inside(parameters) && (!inner || parameters.startIndex > inner.at)) {
       inner = { at: parameters.startIndex, scope: "parameter" };
@@ -1356,7 +1356,7 @@ function classOnLine(source: string, line: number): Node | undefined {
     if (found) return;
     const name = node.childForFieldName("name");
     // A class is a declaration with a body and no parameters (`parts.ts`).
-    if (!name || !node.childForFieldName("body") || node.childForFieldName("parameters")) return;
+    if (!name || !node.childForFieldName("body") || parametersOf(node)) return;
     if (name.startIndex >= from && name.startIndex < to) found = node;
   });
   return found;
