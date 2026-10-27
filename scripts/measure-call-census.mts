@@ -7,6 +7,7 @@
  *   npm run measure:call-census -- --set=holdout --only=psf-requests
  *   npm run measure:call-census -- --table              -- the tables from a finished run, nothing re-run
  *   npm run measure:call-census -- --compare=<run dir>  -- this run against an earlier one, site by site
+ *   npm run measure:call-census -- --reuse=<run dir>    -- ask the compilers only what that run has no answer for
  *
  * ## Why
  *
@@ -64,19 +65,30 @@
  * errors, files where no call got an answer -- is printed, because probes trip
  * on project settings and a silent compiler reads as "the checker is right".
  *
+ * Every answer a run trusts is kept under `answers/<set>/<project>.json`, and
+ * `--reuse=<run dir>` answers from there what it can (#481): the compilers'
+ * answers do not move with the checker, and asking them is nearly all of an
+ * hour-long run. An answer is reused only while the clone, its libraries, the
+ * compiler and the asking code are unchanged, and the file it was asked in has
+ * the same content -- `scripts/lib/census-answers.ts` has the whole key. A
+ * question that failed is never kept, so it is asked, and printed, again.
+ * `run.log` says per project and in all how many were reused and how many
+ * asked.
+ *
  * holdout-c is score only: its projects are never read, and asking for it is
  * an error.
  *
  * Measure only. Nothing in `src/` changes.
  */
 import { execFileSync, spawnSync } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { waitForQuiet } from "./lib/bench-busy";
+import { ProjectAnswers, answersPath, keptAnswerOf, sha1, type AnswerKey, type KeptAnswer } from "./lib/census-answers";
 import { CENSUS_SET_ORDER, censusSets, isTestPath } from "./lib/census-sets";
 import { CLASSY, FN, ISSUE_OF, shapeOf, type Node } from "./lib/call-census-shapes";
 import { sourceFiles } from "./lib/source-files";
@@ -86,10 +98,11 @@ import { readDependencies } from "../src/engine/deps";
 import { createWorkspace } from "../src/engine/drift";
 import { initEngine, languageOf, parseSource, type Language } from "../src/engine/parse";
 import type { ConfigCache } from "../src/engine/resolve";
-import { createPyrightLspReferee } from "../src/engine/referee-python-lsp";
+import type { LocationOutcome } from "../src/engine/lsp-symbols";
+import { PYRIGHT_VERSION, createPyrightLspReferee } from "../src/engine/referee-python-lsp";
 import { cargoRootsIn } from "../src/engine/referee-rust";
 import { createRustAnalyzerReferee, isOutsideRustTree } from "../src/engine/referee-rust-lsp";
-import { createTsReferee, isOutsideTree } from "../src/engine/referee-ts";
+import { createTsReferee, isOutsideTree, typescriptModule } from "../src/engine/referee-ts";
 
 const HOME = os.homedir();
 const SELF = fileURLToPath(import.meta.url);
@@ -156,6 +169,9 @@ function binOf(checker: CheckerAnswer, compiler: CompilerAnswer): Bin {
 
 /* --------------------------------------------------------------- one project */
 
+/** Which of a batch's answers to keep (#481): every one, places and the "nothing here"s that followed one, or none. */
+type Trust = "all" | "places" | "nothing";
+
 interface Row {
   set: string; project: string; lang: Lang; file: string; line: number; key: string;
   routine: string; name: string; text: string;
@@ -170,6 +186,8 @@ interface Summary {
   /** Per arm and bin, the count of each shape (gap and neither carry shapes). */
   shapes: Record<Lang, Record<Arm, Record<string, Record<string, number>>>>;
   diagnostics: string[];
+  /** Compiler questions answered from an earlier run's kept answers, and asked of the compiler (#481). */
+  answers?: { reused: number; asked: number };
 }
 
 
@@ -519,12 +537,43 @@ async function measureOne(setName: string, project: string): Promise<void> {
     .filter(([file]) => want(langOf(languageOf(file)!)))
     .flatMap(([file, mine]) => [...mine.values()].filter((one) => one.askAt).map((one) => ({ file, at: one.askAt! })));
   const errors: string[] = [];
+  const failures: string[] = [];
+
+  /*
+   * Answers an earlier run kept (#481), and the ones this run keeps. A group
+   * is one language, or one crate, under the key its answers depend on; a
+   * project whose root is not a git checkout has no commit to key on, so
+   * nothing of it is reused or kept.
+   */
+  const reuseFrom = flag("reuse");
+  const kept = new ProjectAnswers(reuseFrom ? answersPath(path.resolve(reuseFrom), setName, project) : undefined);
+  const projectKey = projectKeyOf(root, set.libraries, libraries);
+  if (!projectKey) say("answers: the root is not a git checkout; none reused or kept");
+  const groupKey = (lang: Lang, crate?: string): AnswerKey | undefined => projectKey && { ...projectKey, ...compilerKeyOf(lang, crate) };
+  const shas = new Map<string, string>();
+  const shaOf = (file: string): string => shas.get(file) ?? shas.set(file, sha1(read(file)!)).get(file)!;
+  let reused = 0;
+  let asked = 0;
+  /** The questions of a group with no kept answer; the rest go straight into `raw`. */
+  const unanswered = (group: string, key: AnswerKey | undefined, list: Array<{ file: string; at: { start: number; end: number } }>) => list.filter((q) => {
+    const k = rawKey(q.file, q.at.start);
+    if (raw.has(k)) return false;
+    const got = key && kept.reuse(group, key, q.file, shaOf(q.file), q.at.start, q.at.end);
+    if (got === undefined) return true;
+    raw.set(k, got === "none" ? undefined : got);
+    kept.keep(group, key!, q.file, shaOf(q.file), q.at.start, q.at.end, got);
+    reused++;
+    return false;
+  });
   const ask = async (
     list: Array<{ file: string; at: { start: number; end: number } }>,
-    one: (file: string, at: { start: number; end: number }) => Promise<{ file: string; line: number } | undefined>,
+    one: (file: string, at: { start: number; end: number }) => Promise<LocationOutcome>,
     outside: (absolute: string) => boolean,
+    keepAs?: { group: string; key: AnswerKey | undefined; trusted: () => Trust },
   ): Promise<void> => {
     let cursor = 0;
+    const trusted: Array<{ q: (typeof list)[number]; answer: KeptAnswer; asked: number }> = [];
+    let firstPlace = Infinity;
     const worker = async (): Promise<void> => {
       for (;;) {
         const q = list[cursor++];
@@ -532,9 +581,14 @@ async function measureOne(setName: string, project: string): Promise<void> {
         const key = rawKey(q.file, q.at.start);
         if (raw.has(key)) continue;
         raw.set(key, undefined);
+        asked++;
+        const askedAt = performance.now();
         try {
           const found = await one(q.file, q.at);
-          if (found) raw.set(key, outside(found.file) ? "outside" : { file: path.relative(root, found.file), line: found.line + 1 });
+          const answer = keptAnswerOf(found, root, outside);
+          if (answer === undefined) { failures.push("failed" in found ? found.failed : "no answer"); continue; }
+          if (answer !== "none") { raw.set(key, answer); firstPlace = Math.min(firstPlace, performance.now()); }
+          trusted.push({ q, answer, asked: askedAt });
         } catch (error) {
           raw.set(key, "threw");
           errors.push(`${q.file}: ${error instanceof Error ? error.message : String(error)}`);
@@ -542,35 +596,61 @@ async function measureOne(setName: string, project: string): Promise<void> {
       }
     };
     await Promise.all(Array.from({ length: Math.min(32, list.length) }, worker));
+    /*
+     * A server that never got ready has nothing worth keeping, its places
+     * included. One whose readiness nobody saw keeps its places -- a place is
+     * never a server that was not ready -- and a "nothing here" only when it
+     * was asked after the server's first place came back.
+     */
+    const trust = keepAs?.key ? keepAs.trusted() : "nothing";
+    let left = 0;
+    for (const { q, answer, asked: at } of trusted) {
+      if (trust === "nothing" || (trust === "places" && answer === "none" && at < firstPlace)) { left++; continue; }
+      kept.keep(keepAs!.group, keepAs!.key!, q.file, shaOf(q.file), q.at.start, q.at.end, answer);
+    }
+    if (left > 0 && trust === "places") say(`${left} "nothing here" answers came before the server's first place; not kept`);
   };
+  const located = (found: { file: string; line: number } | undefined): LocationOutcome => (found ? { at: found } : { none: true });
   const noServer = new Set<Lang>();
 
-  const tsQuestions = questions((lang) => lang === "ts");
-  if (tsQuestions.length > 0) {
+  const tsAll = questions((lang) => lang === "ts");
+  if (tsAll.length > 0) {
     const t0 = Date.now();
     tsConfigDiagnostics(root, say);
-    let referee: ReturnType<typeof createTsReferee> | undefined;
-    try { referee = createTsReferee(root); } catch (error) { say(`tsc: could not build: ${error instanceof Error ? error.message : String(error)}`); }
-    if (!referee) { say("tsc: no referee for this tree"); noServer.add("ts"); }
+    const key = groupKey("ts");
+    const tsQuestions = unanswered("ts", key, tsAll);
+    if (tsQuestions.length === 0) say(`tsc: all ${tsAll.length} questions answered by the kept run`);
     else {
-      await ask(tsQuestions, async (file, at) => referee!.symbolDeclarationLocationAt(path.resolve(root, file), at.start, at.end), (abs) => isOutsideTree(abs, root));
-      say(`tsc: ${tsQuestions.length} questions in ${Math.round((Date.now() - t0) / 1000)}s`);
+      let referee: ReturnType<typeof createTsReferee> | undefined;
+      try { referee = createTsReferee(root); } catch (error) { say(`tsc: could not build: ${error instanceof Error ? error.message : String(error)}`); }
+      if (!referee) { say("tsc: no referee for this tree"); noServer.add("ts"); }
+      else {
+        await ask(tsQuestions, async (file, at) => located(referee!.symbolDeclarationLocationAt(path.resolve(root, file), at.start, at.end)),
+          (abs) => isOutsideTree(abs, root), { group: "ts", key, trusted: () => "all" });
+        say(`tsc: ${tsQuestions.length} questions in ${Math.round((Date.now() - t0) / 1000)}s`);
+      }
     }
   }
-  const pyQuestions = questions((lang) => lang === "python");
-  if (pyQuestions.length > 0) {
+  const pyAll = questions((lang) => lang === "python");
+  if (pyAll.length > 0) {
     const t0 = Date.now();
-    try {
-      const referee = await createPyrightLspReferee(root);
+    const key = groupKey("python");
+    const pyQuestions = unanswered("python", key, pyAll);
+    if (pyQuestions.length === 0) say(`pyright: all ${pyAll.length} questions answered by the kept run`);
+    else {
       try {
-        await referee.warmUp(pyQuestions.slice(0, 8).map((q) => ({ file: path.resolve(root, q.file), source: read(q.file)!, start: q.at.start })));
-      } catch (error) { say(`pyright: warm-up failed: ${error instanceof Error ? error.message : String(error)}`); }
-      await ask(pyQuestions, async (file, at) => referee.methodDeclarationLocationAt(path.resolve(root, file), read(file)!, at.start, at.end), (abs) => isOutsideTree(abs, root));
-      referee.close();
-      say(`pyright: ${pyQuestions.length} questions in ${Math.round((Date.now() - t0) / 1000)}s`);
-    } catch (error) {
-      say(`pyright: did not start: ${error instanceof Error ? error.message : String(error)}`);
-      noServer.add("python");
+        const referee = await createPyrightLspReferee(root);
+        try {
+          await referee.warmUp(pyQuestions.slice(0, 8).map((q) => ({ file: path.resolve(root, q.file), source: read(q.file)!, start: q.at.start })));
+        } catch (error) { say(`pyright: warm-up failed: ${error instanceof Error ? error.message : String(error)}`); }
+        await ask(pyQuestions, async (file, at) => referee.methodDeclarationOutcomeAt(path.resolve(root, file), read(file)!, at.start, at.end),
+          (abs) => isOutsideTree(abs, root), { group: "python", key, trusted: () => (referee.warmedUp() ? "all" : "places") });
+        referee.close();
+        say(`pyright: ${pyQuestions.length} questions in ${Math.round((Date.now() - t0) / 1000)}s`);
+      } catch (error) {
+        say(`pyright: did not start: ${error instanceof Error ? error.message : String(error)}`);
+        noServer.add("python");
+      }
     }
   }
   const rsQuestions = questions((lang) => lang === "rust");
@@ -578,17 +658,22 @@ async function measureOne(setName: string, project: string): Promise<void> {
     const crates = cargoRootsIn(root, new Set(["node_modules", ".git", "target", "vendor"]));
     if (crates.length === 0) { say("rust-analyzer: no Cargo.toml in this tree"); noServer.add("rust"); }
     for (const crate of crates) {
-      const mineQ = rsQuestions.filter((q) => {
+      const crateQ = rsQuestions.filter((q) => {
         const abs = path.resolve(root, q.file);
         return crates.filter((one) => abs === one || abs.startsWith(one + path.sep)).sort((a, b) => b.length - a.length)[0] === crate;
       });
-      if (mineQ.length === 0) continue;
+      if (crateQ.length === 0) continue;
       const t0 = Date.now();
+      const group = `rust:${path.relative(root, crate) || "."}`;
+      const key = groupKey("rust", crate);
+      const mineQ = unanswered(group, key, crateQ);
+      if (mineQ.length === 0) { say(`rust-analyzer ${path.relative(root, crate) || "."}: all ${crateQ.length} questions answered by the kept run`); continue; }
       try {
         const referee = await createRustAnalyzerReferee(crate);
         await referee.warmUp();
         if (!referee.primedCleanly()) say(`rust-analyzer ${path.relative(root, crate) || "."}: never said it finished indexing; answers may be missing`);
-        await ask(mineQ, async (file, at) => referee.methodDeclarationLocationAt(path.resolve(root, file), read(file)!, at.start, at.end), (abs) => isOutsideRustTree(abs, root));
+        await ask(mineQ, async (file, at) => referee.methodDeclarationOutcomeAt(path.resolve(root, file), read(file)!, at.start, at.end),
+          (abs) => isOutsideRustTree(abs, root), { group, key, trusted: () => (referee.primedCleanly() ? "all" : "nothing") });
         referee.close();
         say(`rust-analyzer ${path.relative(root, crate) || "."} (${referee.version()}): ${mineQ.length} questions in ${Math.round((Date.now() - t0) / 1000)}s`);
       } catch (error) {
@@ -602,6 +687,11 @@ async function measureOne(setName: string, project: string): Promise<void> {
   for (const [message, count] of groupBy(errors, (one) => one.replace(/^[^:]*: /, "").slice(0, 160))) {
     say(`compiler threw ${count}x: ${message}`);
   }
+  for (const [message, count] of groupBy(failures, (one) => one.replace(/\/\S+/g, "<path>").slice(0, 160))) {
+    say(`compiler gave no answer ${count}x (asked again next run): ${message}`);
+  }
+  kept.write(answersPath(RUN, setName, project));
+  say(`answers: ${reused} reused, ${asked} asked`);
   // Files where the compiler answered none of its calls -- the usual sign of a
   // file outside every program or crate, rather than of hard calls.
   const silentFiles: string[] = [];
@@ -744,10 +834,57 @@ async function measureOne(setName: string, project: string): Promise<void> {
 
   const summary: Summary = {
     set: setName, project, root, libraries, seconds: Math.round((Date.now() - started) / 1000),
-    files: fileCount, routines: routineCount, bins, neitherWhy, shapes, diagnostics,
+    files: fileCount, routines: routineCount, bins, neitherWhy, shapes, diagnostics, answers: { reused, asked },
   };
   writeFileSync(path.join(RUN, setName, `${project}.json`), JSON.stringify(summary, null, 1));
   writeFileSync(path.join(RUN, setName, `${project}.done`), new Date().toString());
+}
+
+/* ------------------------------------------------- what a kept answer rests on */
+
+/**
+ * What every answer in a project depends on (#481): the clone's commit and
+ * working tree, the root read, and the libraries installed for it. Undefined
+ * when the root is not the top of a git checkout -- there is no commit to key
+ * on, and a guess would let a changed tree reuse old answers.
+ */
+function projectKeyOf(root: string, librariesDir: string, libraries: string): AnswerKey | undefined {
+  const git = (...args: string[]): string => execFileSync("git", ["-C", root, ...args], { encoding: "utf8", maxBuffer: 1 << 30, stdio: ["ignore", "pipe", "ignore"] });
+  let commit: string;
+  try {
+    if (path.resolve(git("rev-parse", "--show-toplevel").trim()) !== realpathSync(root)) return undefined;
+    commit = git("rev-parse", "HEAD").trim();
+  } catch { return undefined; }
+  const tree = sha1(git("status", "--porcelain", "--untracked-files=all") + git("diff", "HEAD"));
+  const installed = path.join(librariesDir, "installed.json");
+  const pins = libraries === "none" ? "none" : existsSync(installed) ? sha1(readFileSync(installed, "utf8")) : "unrecorded";
+  return { commit, tree, root, libraries, pins };
+}
+
+/** The files that ask the compilers and decide what is outside the tree: a change in any of them asks everything again. */
+const ASKING_FILES = ["referee-ts.ts", "referee-python-lsp.ts", "referee-rust-lsp.ts", "lsp-symbols.ts", "server-process.ts"]
+  .map((one) => path.join(REPO, "src", "engine", one));
+let askingHash: string | undefined;
+const compilerKeys = new Map<string, AnswerKey>();
+
+/** What a language's answers depend on beyond the project: the compiler's version and the code that asks it. */
+function compilerKeyOf(lang: Lang, crate?: string): AnswerKey {
+  const id = `${lang}:${crate ?? ""}`;
+  const had = compilerKeys.get(id);
+  if (had) return had;
+  askingHash ??= sha1(ASKING_FILES.map((one) => readFileSync(one, "utf8")).join("\0"));
+  const run = (command: string, args: string[], cwd?: string): string => {
+    try { return execFileSync(command, args, { cwd, encoding: "utf8", timeout: 60_000, stdio: ["ignore", "pipe", "pipe"] }).trim(); } catch { return "unavailable"; }
+  };
+  const key: AnswerKey = { asking: askingHash };
+  if (lang === "ts") key.compiler = `typescript ${typescriptModule()?.version ?? "unavailable"}`;
+  else if (lang === "python") {
+    key.compiler = `pyright ${PYRIGHT_VERSION}`;
+    // pyright finds the project's libraries through whichever Python is first on PATH.
+    key.python = run("sh", ["-c", "for p in python python3; do command -v $p && $p --version; done; true"]);
+  } else key.compiler = run("rust-analyzer", ["--version"], crate); // rustup picks the toolchain per crate
+  compilerKeys.set(id, key);
+  return key;
 }
 
 /** Every tsconfig the TypeScript referee may read, with its own errors printed. */
@@ -985,6 +1122,8 @@ if (compareTo) {
 }
 
 const only = flag("only")?.split(",");
+const reuse = flag("reuse");
+if (reuse && !existsSync(path.join(path.resolve(reuse), "answers"))) throw new Error(`--reuse=${reuse}: no answers/ there; it is not a census run that kept its compiler answers`);
 const minutes = Number(flag("timeout-min") ?? 90);
 const failed: string[] = [];
 const log = (line: string) => {
@@ -996,7 +1135,7 @@ const log = (line: string) => {
 
 if (!argv.includes("--table")) {
   mkdirSync(RUN, { recursive: true });
-  log(`census into ${RUN}`);
+  log(`census into ${RUN}${reuse ? `, reusing compiler answers from ${path.resolve(reuse)}` : ""}`);
   for (const setName of wanted) {
     mkdirSync(path.join(RUN, setName), { recursive: true });
     for (const project of SETS[setName]!.projects()) {
@@ -1005,7 +1144,7 @@ if (!argv.includes("--table")) {
       await waitForQuiet(log);
       log(`${setName}/${project}`);
       // The child's notes go to the terminal and to run.log as they happen.
-      const run = spawnSync(process.execPath, [...process.execArgv, SELF, `--one=${setName}/${project}`, `--out=${RUN}`], {
+      const run = spawnSync(process.execPath, [...process.execArgv, SELF, `--one=${setName}/${project}`, `--out=${RUN}`, ...(reuse ? [`--reuse=${reuse}`] : [])], {
         stdio: ["ignore", "inherit", "inherit"], timeout: minutes * 60_000,
       });
       if (run.status !== 0 || !existsSync(path.join(RUN, setName, `${project}.done`))) {
@@ -1018,6 +1157,11 @@ if (!argv.includes("--table")) {
 }
 
 const summaries = loadRun(RUN).filter((s) => wanted.includes(s.set) && (!only || only.includes(s.project)));
+if (!argv.includes("--table")) {
+  const reusedAll = summaries.reduce((t, s) => t + (s.answers?.reused ?? 0), 0);
+  const askedAll = summaries.reduce((t, s) => t + (s.answers?.asked ?? 0), 0);
+  log(`compiler questions: ${reusedAll} reused, ${askedAll} asked, over ${summaries.length} projects`);
+}
 const table = tables(summaries, failed);
 writeFileSync(path.join(RUN, "tables.md"), table + "\n");
 console.log(table);

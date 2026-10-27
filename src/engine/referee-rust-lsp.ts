@@ -84,7 +84,7 @@ import { PassThrough } from "node:stream";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { MessageConnection } from "vscode-jsonrpc/node";
 
-import type { LspDocumentSymbol } from "./lsp-symbols";
+import type { LocationOutcome, LspDocumentSymbol } from "./lsp-symbols";
 import { spawnServer, stopServer } from "./server-process";
 
 /**
@@ -459,6 +459,8 @@ export interface RustLspReferee {
   methodDeclarationLocationAt(
     file: string, source: string, start: number, end: number,
   ): Promise<{ file: string; line: number } | undefined>;
+  /** `methodDeclarationLocationAt`'s question with a failed request told apart from "nothing here" (#481). */
+  methodDeclarationOutcomeAt(file: string, source: string, start: number, end: number): Promise<LocationOutcome>;
   /** `typeDeclarationAt`'s question with the declaration's line kept. */
   typeDeclarationLocationAt(
     file: string, source: string, start: number, end: number,
@@ -747,13 +749,20 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
   async function askLocation(
     method: "typeDefinition" | "definition", file: string, source: string, at: number,
   ): Promise<{ file: string; line: number } | undefined> {
-    if (closed) return undefined;
+    const outcome = await askLocationOutcome(method, file, source, at);
+    return "at" in outcome ? outcome.at : undefined;
+  }
+
+  async function askLocationOutcome(
+    method: "typeDefinition" | "definition", file: string, source: string, at: number,
+  ): Promise<LocationOutcome> {
+    if (closed) return { failed: "rust-analyzer already closed" };
     // Never ask a server that has not said it is ready: an answer from before
     // priming can be an empty array for a receiver it resolves correctly a
     // second later, which is a false refusal and indistinguishable after the
     // fact from a real one.
     await whenPrimed();
-    if (closed) return undefined;
+    if (closed) return { failed: "rust-analyzer closed while priming" };
     const params = {
       textDocument: { uri: pathToFileURL(file).toString() },
       position: positionAt(startsFor(file, source), at),
@@ -772,18 +781,26 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
         // Only a not-ready signal is worth asking again; anything else is a
         // real refusal and retrying it would spend the whole ladder to learn
         // what the first answer already said.
-        if (!isNotReadyError(error) || attempt >= RETRY_MS.length || closed) return undefined;
+        const message = error instanceof Error ? error.message : String(error);
+        if (closed) return { failed: message };
+        // The server's own refusal is its answer; a request that timed out is not (#481).
+        if (!isNotReadyError(error)) return typeof (error as { code?: unknown }).code === "number" ? { none: true } : { failed: message };
+        if (attempt >= RETRY_MS.length) {
+          // Still "file not found" on a server that said it was ready, past every
+          // retry: the file is in no crate it loaded -- axum's `examples/*`.
+          return primed && /file not found/i.test(message) ? { none: true } : { failed: message };
+        }
         await new Promise((resolve) => setTimeout(resolve, RETRY_MS[attempt]));
         continue;
       }
       const declaring = firstLocation(result);
-      if (declaring !== undefined) return declaring;
+      if (declaring !== undefined) return { at: declaring };
       // Past the readiness gate, an empty array is a real "no answer here" and
       // is taken at face value. `null` still means analysis has not run for
       // this file -- possible after priming, since it can run a second round --
       // so that one is asked again.
-      if (result !== null && result !== undefined) return undefined;
-      if (attempt >= RETRY_MS.length || closed) return undefined;
+      if (result !== null && result !== undefined) return { none: true };
+      if (attempt >= RETRY_MS.length || closed) return { failed: "no analysis for this file" };
       await new Promise((resolve) => setTimeout(resolve, RETRY_MS[attempt]));
     }
   }
@@ -854,6 +871,7 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
     },
     methodDeclarationAt: (file, source, start) => ask("definition", file, source, start),
     methodDeclarationLocationAt: (file, source, start) => askLocation("definition", file, source, start),
+    methodDeclarationOutcomeAt: (file, source, start) => askLocationOutcome("definition", file, source, start),
     typePartsAt,
     importTargetAt,
     documentSymbols: async (file) => {
