@@ -138,11 +138,14 @@ describe("a body the reader must leave open", () => {
     )).toEqual(["elsewhere"]);
   });
 
-  it("leaves a body open around a macro, because a call inside one is invisible", () => {
+  it("leaves a body open around a macro it cannot read, because a call inside one is invisible", () => {
     // Unlike `callsTo`, which raises this only when the name asked after is in
-    // the tokens. A body cannot be closed around calls nobody can see.
-    const reasons = why("fn f() {\n    println!(\"{}\", g());\n}\n", "f", "rust");
+    // the tokens. A body cannot be closed around calls nobody can see. std's
+    // `println!` is read since #471 (`engine-macro-args.test.ts`); a macro
+    // nobody can find is not.
+    const reasons = why("fn f() {\n    my_macro!(\"{}\", g());\n}\n", "f", "rust");
     expect(reasons).toContain("macro");
+    expect(why("fn f() {\n    println!(\"{}\", g());\n}\n", "f", "rust")).toEqual(["unbound"]);
   });
 });
 
@@ -592,19 +595,18 @@ describe("a call on a name the language itself provides", () => {
     expect(why("fn f() {\n    mystery();\n}\n", "f", "rust")).toEqual(["unbound"]);
   });
 
-  it("places a std macro's name, and still leaves the body open on its tokens", () => {
+  it("places a std macro's name, and reads what is inside it", () => {
     /*
      * `calleeOf` reads a `macro_invocation` through its `macro` field, so
      * `vec![1]` arrives as the bare name `vec` and is placed like any other
-     * prelude name. The body stays open all the same: what is *inside* a
-     * macro is loose tokens rather than a tree, and a call written in there
-     * is invisible. Both facts, because the first one alone would read as a
-     * Rust body that closes and no Rust body with a macro in it does.
+     * prelude name. Until #471 the body stayed open all the same, because
+     * what is inside a macro is loose tokens; std's macros are now read as
+     * the code they hold, so `vec![1]` holds nothing and the body closes.
      */
     const body = sitesIn("fn f() {\n    let v = vec![1];\n}\n", "rust")
       .find((one) => one.routine === "f")!;
     expect(body.sites.map((one) => one.file ?? `?${one.why}`))
-      .toEqual([EXTERNAL_RECEIVER, "?macro"]);
+      .toEqual([EXTERNAL_RECEIVER]);
   });
 
   it("places a global in TSX too, and leaves an ordinary unbound name open", () => {

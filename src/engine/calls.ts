@@ -65,6 +65,8 @@
  *   re-exports, barrels    the name binds to a file that forwards    -> `elsewhere`
  *   macros                 the call site is generated, not written   -> `macro`
  */
+import path from "node:path";
+
 import { providedByLanguage } from "./builtins";
 import {
   compiledBodiesOf, compiledRefutes, ownCallIn, traitImplsOf, type CompiledBody, type CompiledCrate,
@@ -72,6 +74,7 @@ import {
 import { declaredBases } from "./conforms";
 import { declarationName, escapeName, NAME_END, NAME_START, wholeName } from "./declared";
 import { mayAccuse } from "./licence";
+import { macroArguments } from "./macro-args";
 import { enclosing, lookUp, moduleScope, type Meaning, type Space, type WildcardAnswer } from "./names";
 import { declaresMember, holdersIn } from "./overrides";
 import { each, incomplete, parametersOf, parseSource, type Language, type Node, type Tree } from "./parse";
@@ -1944,18 +1947,25 @@ function callsTo(
     if (incomplete(body)) { why ??= "incomplete"; continue; }
     let found: CallsEvidence | undefined;
     const quiet = side.language === "python" && !target.hooked ? quietReads(body, bindings, side) : undefined;
-    each(body, (node) => {
+    const nested = new Set<number>();
+    const visit = (node: Node): void => {
       if (found) return;
       /*
-       * A macro's arguments are loose tokens rather than a tree, so a call
-       * written inside one is invisible. Only a doubt when the name being asked
-       * after is somewhere in those tokens -- otherwise every `println!` in
-       * Rust would silence every question.
+       * A macro's arguments are loose tokens rather than a tree. Where they
+       * are read as code (#471), the calls in them are asked about like any
+       * other; what is left is a doubt only when the expansion may run more
+       * than is written and the name being asked after is somewhere in those
+       * tokens -- otherwise every unread `println!` in Rust would silence
+       * every question.
        */
       if (node.type === "token_tree") {
-        if ([...target.names].some((name) => wholeName(name).test(node.text))) {
+        if (nested.has(node.id)) return;
+        each(node, (inner) => { if (inner !== node && inner.type === "token_tree") nested.add(inner.id); });
+        const macro = readMacro(node, side, bindings);
+        if (macro.open && [...target.names].some((name) => wholeName(name).test(node.text))) {
           why ??= "macro";
         }
+        for (const top of macro.tops ?? []) each(top, visit);
         return;
       }
       const written = calleeOf(node);
@@ -1976,7 +1986,8 @@ function callsTo(
         return;
       }
       why ??= answer;
-    });
+    };
+    each(body, visit);
     if (found) return { evidence: found };
   }
   return why ? { why } : {};
@@ -3850,6 +3861,16 @@ function placeOf(
     if (member) return member;
   }
   const meaning = meaningOf(bound, side, bindings, site, callee.kind === "bare" && site?.type === "macro_invocation" ? "macro" : "value");
+  /*
+   * A macro written in another file of the crate, in textual scope from a
+   * parent module (#471): `tri!` used in `de.rs`, written in `lib.rs` above
+   * `mod de;`; `debug!` from `#[macro_use] mod macros;`. Placed at the file
+   * that writes it, as one written in this file is.
+   */
+  if (meaning.at === "unknown" && meaning.why === "unbound" && callee.kind === "bare" && site?.type === "macro_invocation" && side.language === "rust") {
+    const files = new Set(crateMacros(bound, side.file, side.open)?.map((one) => one.file));
+    if (files.size === 1) return { file: [...files][0]!, as: callee.name };
+  }
   switch (meaning.at) {
     case "unknown":
       // Ambiguous as a *value* name (declared twice over) does not mean the
@@ -4221,21 +4242,29 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
     holders ??= holdersIn(tree.rootNode);
     const holder = holders.get(node.id);
     const quiet = side.language === "python" ? quietReads(node, bindings, side) : undefined;
-    each(node, (inner) => {
+    const nested = new Set<number>();
+    const visit = (inner: Node): void => {
       /*
-       * A macro's arguments are loose tokens rather than a tree, so a call
-       * written inside one is invisible. That is a doubt about the whole body
-       * here -- unlike `callsTo`, which only raises it when the name asked
-       * after is in the tokens. A body cannot be closed around calls nobody
-       * can see.
+       * A macro's arguments are loose tokens rather than a tree. Where they
+       * are read as code (#471) their calls are sites like any other. What is
+       * left -- tokens that are not code, a macro whose expansion may run more
+       * than is written -- is a doubt about the whole body here, unlike
+       * `callsTo`, which only raises it when the name asked after is in the
+       * tokens. A body cannot be closed around calls nobody can see.
        */
       if (inner.type === "token_tree") {
-        body.sites.push({
-          name: "",
-          line: lineOf(side.source, inner.startIndex),
-          why: "macro",
-          receiver: false,
-        });
+        if (nested.has(inner.id)) return;
+        each(inner, (one) => { if (one !== inner && one.type === "token_tree") nested.add(one.id); });
+        const macro = readMacro(inner, side, bindings);
+        if (macro.open) {
+          body.sites.push({
+            name: "",
+            line: lineOf(side.source, inner.startIndex),
+            why: "macro",
+            receiver: false,
+          });
+        }
+        for (const top of macro.tops ?? []) each(top, visit);
         return;
       }
       const written = calleeOf(inner) ?? constructedBy(inner) ?? renderedBy(inner);
@@ -4262,8 +4291,317 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
         return;
       }
       body.sites.push(siteOf(callee, side.source, inner, where));
-    });
+    };
+    each(node, visit);
     bodies.push(body);
   });
   return { read: true, bodies };
+}
+
+/* ------------------------------------------------------ Rust macros (#471) */
+
+/** A `macro_rules!` the repository writes, and the file it is written in. */
+interface MacroDefinition { file: string; node: Node }
+
+/**
+ * Where a macro comes from, as far as its arguments go: std's, whose
+ * arguments are code that runs and whose expansion calls nothing of the
+ * repository's; one the repository defines with `macro_rules!`; or one nobody
+ * here can read -- a library's, which may be a procedural macro free to do
+ * anything with its tokens.
+ */
+type MacroOrigin =
+  | { kind: "std"; name: string }
+  | { kind: "repo"; name: string; definitions: MacroDefinition[] }
+  | { kind: "unknown" };
+
+/**
+ * std's macros whose arguments are not code that runs here (`stringify!`), or
+ * that paste in code nobody wrote at the call (`include!`, `concat_idents!`).
+ */
+const UNREAD_STD_MACROS = new Set([
+  "stringify", "include", "concat_idents", "trace_macros", "log_syntax", "cfg_accessible", "cfg_eval",
+  "define_opaque", "derive_const", "type_ascribe",
+]);
+
+/** A call a macro's expansion makes that runs only std: `Ok(v)`, `Box::new(x)`. */
+const STD_CALLS = new Set([
+  "Ok", "Err", "Some", "None", "drop", "Box::new", "String::new", "String::from", "Vec::new", "Vec::with_capacity",
+  "Default::default", "From::from", "Into::into",
+]);
+
+const STANDARD_CRATE = /^(?:std|core|alloc)$/;
+
+/** Attributes whose tokens are a condition or a lint name, and that run nothing. */
+const INERT_ATTRIBUTES = new Set(["cfg", "allow", "warn", "deny", "forbid", "expect", "doc"]);
+
+/**
+ * What a macro's argument tokens are, read (#471): the code written in them
+ * when the macro is one whose arguments are code -- std's, or a
+ * `macro_rules!` the repository writes -- and whether the expansion may still
+ * run something not written there (`open`, the doubt every macro was before).
+ *
+ * A library's macro is not read: it may be procedural, and a procedural macro
+ * can drop, rename or paste its tokens. Nor are tokens that are not a list of
+ * expressions (`$x`, `=>`, a pattern, a DSL), nor any `token_tree` that is not
+ * a macro's argument (an attribute's, a `macro_rules!` body).
+ */
+function readMacro(tokens: Node, side: CallSide, bindings: Bindings): { tops?: Node[]; open: boolean } {
+  if (side.language !== "rust") return { open: true };
+  const invocation = enclosing(side.source, side.language, tokens)[0];
+  /*
+   * `#[cfg(not(feature = "x"))]` on a statement is not a macro: its tokens
+   * are a condition, and the statement under it is read like any other, in
+   * both settings. Nor do `allow`, `doc` and the other lint and doc
+   * attributes run anything. Any other attribute may be a procedural one.
+   */
+  if (invocation?.type === "attribute") return { open: !INERT_ATTRIBUTES.has(invocation.child(0)?.text ?? "") };
+  if (invocation?.type !== "macro_invocation") return { open: true };
+  const origin = macroOrigin(invocation, side, bindings);
+  if (origin.kind === "unknown") return { open: true };
+  const form = origin.kind === "std" && origin.name === "matches" ? "match" : "list";
+  const tops = macroArguments(invocation, tokens, side.source, form);
+  if (!tops) return { open: true };
+  const open = origin.kind === "repo" ? expansionOpen(origin.definitions, side, 0, new Set()) : false;
+  return { tops, open };
+}
+
+/** Which macro an invocation runs, as far as `readMacro` needs to know. */
+function macroOrigin(invocation: Node, side: CallSide, bindings: Bindings): MacroOrigin {
+  const written = invocation.childForFieldName("macro");
+  if (!written) return { kind: "unknown" };
+  const steps = written.text.split("::").map((step) => step.trim());
+  const name = steps[steps.length - 1]!;
+  if (steps.length > 1) {
+    // `std::println!`, `core::ptr::addr_of!`. A path into a crate -- this one's
+    // `#[macro_export]` or a library's -- is not followed here.
+    const first = steps[0] === "" ? steps[1] : steps[0];
+    return first !== undefined && STANDARD_CRATE.test(first) && !UNREAD_STD_MACROS.has(name) ? { kind: "std", name } : { kind: "unknown" };
+  }
+  if (UNREAD_STD_MACROS.has(name)) return { kind: "unknown" };
+  const meaning = meaningOf(name, side, bindings, invocation, "macro");
+  switch (meaning.at) {
+    case "declared": {
+      const definitions = macroRulesIn(side.file, side.source, name);
+      return definitions.length > 0 ? { kind: "repo", name, definitions } : { kind: "unknown" };
+    }
+    case "outside":
+      return providedByLanguage(name, "rust") ? { kind: "std", name } : { kind: "unknown" };
+    case "imported": {
+      const specifier = bindings.imported.get(name)?.specifier ?? "";
+      const first = specifier.replace(/^::/, "").split("::")[0] ?? "";
+      if (STANDARD_CRATE.test(first)) return { kind: "std", name };
+      const definitions = [...filesFor(specifier, side.imports).files]
+        .flatMap((file) => {
+          const far = file === side.file ? side : side.open?.(file);
+          return far && far.language === "rust" ? macroRulesIn(file, far.source, name) : [];
+        });
+      return definitions.length > 0 ? { kind: "repo", name, definitions } : { kind: "unknown" };
+    }
+    case "unknown": {
+      if (meaning.why !== "unbound") return { kind: "unknown" };
+      const definitions = crateMacros(name, side.file, side.open);
+      if (definitions) return { kind: "repo", name, definitions };
+      return providedByLanguage(name, "rust") ? { kind: "std", name } : { kind: "unknown" };
+    }
+    default:
+      return { kind: "unknown" };
+  }
+}
+
+/** Every `macro_rules! name` written in one file. */
+function macroRulesIn(file: string, source: string, name: string): MacroDefinition[] {
+  const tree = parseSource(source, "rust");
+  if (!tree) return [];
+  const out: MacroDefinition[] = [];
+  each(tree.rootNode, (node) => {
+    if (node.type === "macro_definition" && node.childForFieldName("name")?.text === name) out.push({ file, node });
+  });
+  return out;
+}
+
+/**
+ * Whether expanding these definitions may run something their arguments do
+ * not show: a call nobody can place from a template -- a method, a path into
+ * this crate (`$crate::x()`), a function whose name is passed in (`$f()`), a
+ * library's call -- or a macro of the repository's that may itself. A call
+ * into std (`core::result::Result::Err(e)`, `Ok(v)`) and std's macros are
+ * not; neither is a library's macro, whose expansion can only reach its own
+ * crate and what it is handed.
+ */
+function expansionOpen(definitions: MacroDefinition[], side: CallSide, depth: number, seen: Set<string>): boolean {
+  if (depth > 4) return true;
+  for (const definition of definitions) {
+    const key = `${definition.file}:${definition.node.startIndex}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    for (let at = 0; at < definition.node.childCount; at += 1) {
+      const rule = definition.node.child(at);
+      if (rule?.type !== "macro_rule") continue;
+      const right = rule.childForFieldName("right");
+      if (right && templateOpen(right, definition, side, depth, seen)) return true;
+    }
+  }
+  return false;
+}
+
+function templateOpen(tokens: Node, definition: MacroDefinition, side: CallSide, depth: number, seen: Set<string>): boolean {
+  for (let at = 0; at < tokens.childCount; at += 1) {
+    const token = tokens.child(at)!;
+    if (token.type === "token_tree") {
+      // `#[cfg(feature = "x")]` written in the template is an attribute, not a call of `cfg`.
+      const attribute = tokens.child(at - 1)?.type === "#" || (tokens.child(at - 1)?.type === "!" && tokens.child(at - 2)?.type === "#");
+      if (!attribute && templateOpen(token, definition, side, depth, seen)) return true;
+      continue;
+    }
+    if (token.type !== "identifier" && token.type !== "metavariable") continue;
+    const next = tokens.child(at + 1);
+    const call = next?.type === "token_tree" && next.text.startsWith("(");
+    const macro = next?.type === "!" && tokens.child(at + 2)?.type === "token_tree";
+    if (!call && !macro) continue;
+    // The path written before the name: `a::b::name(..)`, `::core::x(..)`.
+    const steps = [token.text];
+    let before = at - 1;
+    while (before >= 1 && tokens.child(before)?.type === "::" && /^(identifier|metavariable)$/.test(tokens.child(before - 1)?.type ?? "")) {
+      steps.unshift(tokens.child(before - 1)!.text);
+      before -= 2;
+    }
+    const leading = before >= 0 && tokens.child(before)?.type === "::";
+    if (!leading && before >= 0 && tokens.child(before)?.type === ".") return true;
+    const first = steps[0]!;
+    if (STANDARD_CRATE.test(first)) continue;
+    if (first.startsWith("$")) return true;
+    if (macro) {
+      if (steps.length > 1 || leading) {
+        if (/^(crate|self|super)$/.test(first)) return true;
+        continue;
+      }
+      const inner = macroRulesIn(definition.file, sourceOf(definition, side) ?? "", token.text);
+      const found = inner.length > 0 ? inner : crateMacros(token.text, definition.file, side.open);
+      if (found) {
+        if (expansionOpen(found, side, depth + 1, seen)) return true;
+        continue;
+      }
+      if (providedByLanguage(token.text, "rust") && !UNREAD_STD_MACROS.has(token.text)) continue;
+      return true;
+    }
+    if (!leading && STD_CALLS.has(steps.join("::"))) continue;
+    return true;
+  }
+  return false;
+}
+
+function sourceOf(definition: MacroDefinition, side: CallSide): string | undefined {
+  return definition.file === side.file ? side.source : side.open?.(definition.file)?.source;
+}
+
+const crateMacroCache = new WeakMap<object, Map<string, MacroDefinition[] | null>>();
+
+/**
+ * The `macro_rules! name` in textual scope at `file` from the modules around
+ * it (#471): one written in a parent module above the `mod` that leads here,
+ * or in a `#[macro_use] mod` declared above it -- the usual
+ * `#[macro_use] mod macros;` at the top of a crate's `lib.rs`. Read up the
+ * module tree by the 2018 file layout (`a/b.rs` or `a/b/mod.rs` is declared
+ * by `a.rs`, `a/mod.rs`, `lib.rs` or `main.rs`); a module declared any other
+ * way (`#[path]`) ends the climb, and the name stays unknown.
+ *
+ * The nearest level that defines the name wins, all its definitions together:
+ * a crate writes one per `#[cfg]` (`debug!` with and without a feature), and
+ * either may be the one compiled.
+ */
+function crateMacros(name: string, file: string, open: CallSide["open"]): MacroDefinition[] | undefined {
+  if (!open) return undefined;
+  const cache = crateMacroCache.get(open) ?? crateMacroCache.set(open, new Map()).get(open)!;
+  const key = `${file}\0${name}`;
+  const known = cache.get(key);
+  if (known !== undefined) return known ?? undefined;
+  let found: MacroDefinition[] | undefined;
+  let child = file;
+  for (let depth = 0; depth < 16 && !found; depth += 1) {
+    const parent = parentModule(child, open);
+    if (!parent) break;
+    const here = macrosAbove(parent.file, parent.root, parent.declared, name, open, 0);
+    if (here.length > 0) found = here;
+    child = parent.file;
+  }
+  cache.set(key, found ?? null);
+  return found;
+}
+
+/** The files a module directory's own module may be written in. */
+function ownersOf(dir: string): string[] {
+  if (dir === "." || dir === "") return ["lib.rs", "main.rs", "mod.rs"];
+  return [`${dir}/lib.rs`, `${dir}/main.rs`, `${dir}/mod.rs`, `${dir}.rs`];
+}
+
+/** The directory a file's `mod x;` declarations are looked for in. */
+function childDirectory(file: string): string {
+  const dir = path.posix.dirname(file);
+  const base = path.posix.basename(file, ".rs");
+  if (base === "lib" || base === "main" || base === "mod") return dir;
+  return dir === "." ? base : `${dir}/${base}`;
+}
+
+/** The module that declares `file` with `mod name;`, and that declaration. */
+function parentModule(file: string, open: NonNullable<CallSide["open"]>): { file: string; root: Node; declared: number } | undefined {
+  if (!file.endsWith(".rs")) return undefined;
+  const dir = path.posix.dirname(file);
+  const base = path.posix.basename(file, ".rs");
+  if (base === "lib" || base === "main") return undefined;
+  const [owner, child] = base === "mod" ? [path.posix.dirname(dir), path.posix.basename(dir)] : [dir, base];
+  if (base === "mod" && (dir === "." || dir === "")) return undefined;
+  for (const candidate of ownersOf(owner)) {
+    if (candidate === file) continue;
+    const read = open(candidate);
+    if (!read || read.language !== "rust") continue;
+    const root = parseSource(read.source, "rust")?.rootNode;
+    if (!root) continue;
+    for (let at = 0; at < root.childCount; at += 1) {
+      const item = root.child(at)!;
+      if (item.type === "mod_item" && !item.childForFieldName("body") && item.childForFieldName("name")?.text === child) {
+        return { file: candidate, root, declared: item.startIndex };
+      }
+    }
+  }
+  return undefined;
+}
+
+/** The `macro_rules! name` a module's top writes above `before`, itself or through a `#[macro_use] mod`. */
+function macrosAbove(file: string, root: Node, before: number, name: string, open: NonNullable<CallSide["open"]>, depth: number): MacroDefinition[] {
+  const out: MacroDefinition[] = [];
+  for (let at = 0; at < root.childCount; at += 1) {
+    const item = root.child(at)!;
+    if (item.startIndex >= before) break;
+    if (item.type === "macro_definition" && item.childForFieldName("name")?.text === name) out.push({ file, node: item });
+    if (item.type !== "mod_item" || depth > 2 || !macroUse(root, at)) continue;
+    const body = item.childForFieldName("body");
+    if (body) {
+      out.push(...macrosAbove(file, body, Infinity, name, open, depth + 1));
+      continue;
+    }
+    const module = item.childForFieldName("name")?.text;
+    if (!module) continue;
+    const dir = childDirectory(file);
+    for (const candidate of [`${dir}/${module}.rs`, `${dir}/${module}/mod.rs`].map((one) => one.replace(/^\.\//, ""))) {
+      const read = open(candidate);
+      const inner = read?.language === "rust" ? parseSource(read.source, "rust")?.rootNode : undefined;
+      if (!inner) continue;
+      out.push(...macrosAbove(candidate, inner, Infinity, name, open, depth + 1));
+      break;
+    }
+  }
+  return out;
+}
+
+/** Whether the item at `at` carries `#[macro_use]`, among the attributes written right above it. */
+function macroUse(parent: Node, at: number): boolean {
+  for (let above = at - 1; above >= 0; above -= 1) {
+    const one = parent.child(above);
+    if (!one) break;
+    if (/comment/.test(one.type)) continue;
+    if (one.type !== "attribute_item") break;
+    if (/^#\[\s*macro_use\b/.test(one.text)) return true;
+  }
+  return false;
 }
