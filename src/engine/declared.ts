@@ -26,7 +26,7 @@
  * `addFn`, five times in Elysia and zod) and a tuple label
  * (`[trackResult: () => T]`, read as TanStack's `#trackResult`).
  */
-import { declaredShapes } from "./body";
+import { declaredShapes, indexedName } from "./body";
 import type { Language, Node } from "./parse";
 
 /** A character that continues a name in any language read here. */
@@ -80,8 +80,15 @@ const ASSIGNS = /^(assignment|assignment_expression|augmented_assignment|augment
  * else on `name`, or on `left` when it is an assignment -- `left` is also an
  * operator's operand. A parameter's name, a tuple label among them, is not a
  * box.
+ *
+ * A key in an object literal names the function stored under it only where
+ * the declaration index counted it (#477): the literal is the whole value of
+ * a name, and nothing else in the file has that name. `body.ts` holds that
+ * rule, beside the rest of what counts as a declaration, so every lookup
+ * reads the same answer.
  */
 export function declarationName(node: Node): Node | undefined {
+  if (node.childForFieldName("key")) return indexedName(node);
   const name = node.type === "impl_item"
     ? node.childForFieldName("type")
     : /parameter$/.test(node.type)

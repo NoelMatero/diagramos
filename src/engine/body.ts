@@ -40,7 +40,7 @@
  * than a name inside it.
  */
 
-import { each, incomplete, parseSource, type Language, type Node, type Tree } from "./parse";
+import { each, incomplete, keywordOf, parametersOf, parseSource, type Language, type Node, type Tree } from "./parse";
 
 /**
  * Node types that mean "this introduces a name", by suffix.
@@ -123,6 +123,89 @@ interface Declaration {
 
 const declarationCache = new WeakMap<Tree, Map<string, Declaration[]>>();
 
+/**
+ * Wrappers that hand the literal inside them on unchanged: `{..} as const`,
+ * `{..} satisfies T`, `({..})`, `{..}!`.
+ */
+const PASSES_ON = /^(as_expression|satisfies_expression|parenthesized_expression|non_null_expression)$/;
+
+/** Assignment nodes, whose `left` is the name they give their `right`. */
+const ASSIGNS = /^(assignment|assignment_expression|augmented_assignment|augmented_assignment_expression)$/;
+
+/**
+ * The functions an object literal stores under a key, when the literal is
+ * the value a name is given (#477): `const fs = { writeFile: async (p) =>
+ * {..} }`, `module.exports = { handle: function () {..} }`.
+ *
+ * A method written `writeFile() {..}` was always a declaration -- the
+ * grammar calls it one -- and half of the functions in object literals were
+ * written that way. The other half sit on a `key` with the function as its
+ * `value`, and nothing read them. A board writes `ssg.ts#writeFile` for
+ * either.
+ *
+ * Only where the literal is the whole value of a name. A key on a literal
+ * handed to a call (`createWSContext({ send: .. })`), returned, nested in
+ * another literal or sitting in an array is one of many with that name --
+ * every route table and config object writes `handler:` and `onRequest:` --
+ * and naming a box after one of them would pick a body at random. Measured
+ * over the census projects, those are four in five of the keys.
+ *
+ * A key is a name a board writes: an identifier, never a quoted, numbered or
+ * computed one. The value is a function as written, `parse.ts`'s rule: it
+ * takes parameters and has a body.
+ */
+function literalKeys(node: Node): Array<{ node: Node; nameNode: Node }> {
+  const named = node.childForFieldName("name") ?? (ASSIGNS.test(node.type) ? node.childForFieldName("left") : null);
+  if (!named) return [];
+  let literal = node.childForFieldName("value") ?? (ASSIGNS.test(node.type) ? node.childForFieldName("right") : null);
+  while (literal && PASSES_ON.test(literal.type)) literal = firstNamedChild(literal);
+  if (literal?.type !== "object") return [];
+  const keys: Array<{ node: Node; nameNode: Node }> = [];
+  for (let index = 0; index < literal.childCount; index += 1) {
+    const entry = literal.child(index);
+    const key = entry?.childForFieldName("key");
+    const value = entry?.childForFieldName("value");
+    if (!entry || !key || !value || !isName(key)) continue;
+    if (parametersOf(value) && value.childForFieldName("body")) keys.push({ node: entry, nameNode: key });
+  }
+  return keys;
+}
+
+function firstNamedChild(node: Node): Node | null {
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (child?.isNamed) return child;
+  }
+  return null;
+}
+
+/**
+ * The words that open a namespace: TypeScript's `namespace X {..}` and the
+ * older `module X {..}` (#477). The keyword is an anonymous token, so its
+ * type is its own text and no node name is needed. `declare module "x"` names
+ * a string, not a name, and `declare global {..}` names nothing.
+ */
+const NAMESPACE_WORDS = new Set(["namespace", "module"]);
+
+function namespaceName(node: Node): Node | undefined {
+  const name = node.childForFieldName("name");
+  if (!name || !isName(name) || !node.childForFieldName("body")) return undefined;
+  return NAMESPACE_WORDS.has(keywordOf(node, name) ?? "") ? name : undefined;
+}
+
+/**
+ * The name the declaration index gives this node, or nothing (#477).
+ *
+ * How the lookups that walk a tree learn whether a key in an object literal
+ * names a declaration: only where the index counted it, so a key is never a
+ * declaration to one reader and not to another.
+ */
+export function indexedName(node: Node): Node | undefined {
+  const nameNode = node.childForFieldName("key") ?? node.childForFieldName("name");
+  if (!nameNode) return undefined;
+  return declarationNodes(node.tree).get(nameNode.text)?.some((one) => one.node.id === node.id) ? nameNode : undefined;
+}
+
 /** Every name this file introduces, and where. */
 function declarationNodes(tree: Tree): Map<string, Declaration[]> {
   const hit = declarationCache.get(tree);
@@ -130,6 +213,8 @@ function declarationNodes(tree: Tree): Map<string, Declaration[]> {
 
   const found = new Map<string, Declaration[]>();
   declarationCache.set(tree, found);
+  /** Keys in object literals and namespaces, counted once the rest is known (#477). */
+  const latecomers = new Map<string, Declaration[]>();
   const record = (declaration: Declaration) => {
     const list = found.get(declaration.nameNode.text) ?? [];
     list.push(declaration);
@@ -153,9 +238,28 @@ function declarationNodes(tree: Tree): Map<string, Declaration[]> {
     const name = (declares ? node.childForFieldName("name") : null)
       // `parameter` is what `catch (error)` calls the name it introduces.
       ?? (binds ? node.childForFieldName("left") ?? node.childForFieldName("parameter") : null);
+    const extra = (one: { node: Node; nameNode: Node }) =>
+      latecomers.set(one.nameNode.text, [...(latecomers.get(one.nameNode.text) ?? []), { ...one, soup: false }]);
+    if (declares || ASSIGNS.test(node.type)) for (const key of literalKeys(node)) extra(key);
+    if (!declares && !binds) {
+      const namespace = namespaceName(node);
+      if (namespace) extra({ node, nameNode: namespace });
+    }
     if (!name || name.childCount > 0) return; // a destructuring pattern, not a name
     record({ node, nameNode: name, soup: false });
   });
+  /*
+   * A key in an object literal, or a namespace, is a declaration only where it
+   * is the one thing in the file with its name (#477). Two literals with a
+   * `run` key, or a `run` key beside `function run`, leave the box `#run`
+   * meaning one of several bodies; the name stays with what already held it,
+   * or with nothing. A namespace merged with a function or class of its name
+   * (drizzle's `drizzle`, `SQL`) is found through that one already, and adding
+   * it would hand readers a second declaration that cannot be called.
+   */
+  for (const [name, list] of latecomers) {
+    if (!found.has(name) && list.length === 1) record(list[0]!);
+  }
   return found;
 }
 
@@ -857,11 +961,18 @@ export function reaches(
   if (!tree) return undefined;
 
   const bodies = new Map<string, Node[]>();
+  /*
+   * A callee is a name written in a call, `send()` or `this.send()`, and
+   * neither lands on a key in an object literal (#477): `send()` means a
+   * binding in scope, never `api.send`. Only the box's own name may be one.
+   */
   const bodiesFor = (name: string): Node[] => {
     if (!bodies.has(name)) {
       bodies.set(
         name,
-        declarationsIn(tree, name).map((d) => d.body).filter((b): b is Node => b !== undefined),
+        declarationsIn(tree, name)
+          .filter((d) => name === from || d.node.childForFieldName("key") === null)
+          .map((d) => d.body).filter((b): b is Node => b !== undefined),
       );
     }
     return bodies.get(name)!;

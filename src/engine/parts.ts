@@ -57,7 +57,7 @@
 import type { ArrowClaim } from "./claim";
 import { declaredShapes } from "./body";
 import { bindingsIn } from "./calls";
-import { each, keywordOf, parseSource, type Language, type Node, type Tree } from "./parse";
+import { each, keywordOf, parametersOf, parseSource, type Language, type Node, type Tree } from "./parse";
 
 export const PARTS = [
   "body", "signature", "result", "fields", "bases", "type", "callable", "implementable",
@@ -143,7 +143,7 @@ function holdsCode(node: Node): boolean {
   each(node, (current) => {
     if (found || current === node) return;
     if (has(current, "function") || has(current, "macro") || has(current, "arguments")
-      || has(current, "parameters")) found = true;
+      || parametersOf(current) !== null) found = true;
   });
   return found;
 }
@@ -176,7 +176,7 @@ function isLiteral(value: Node): boolean {
   each(value, (current) => {
     if (!plain) return;
     if (has(current, "function") || has(current, "macro") || has(current, "arguments")
-      || has(current, "parameters") || has(current, "body")) plain = false;
+      || parametersOf(current) !== null || has(current, "body")) plain = false;
     if (current.childCount !== 0) return;
     const text = current.text;
     if (LITERAL_WORDS.has(text)) { written = true; return; }
@@ -226,7 +226,7 @@ function isConstruction(value: Node): boolean {
  * settles `type` and leaves `callable` exactly as unsure as it found it.
  */
 function isWrittenValue(value: Node): boolean {
-  return has(value, "parameters") || has(value, "body");
+  return parametersOf(value) !== null || has(value, "body");
 }
 
 /**
@@ -374,7 +374,7 @@ export type AskKind = (at: { start: number; end: number }) => ValueKind | undefi
  * nothing more; a type alias is a type whatever it aliases.
  */
 function isValue(node: Node, language: Language): boolean {
-  if (has(node, "parameters") || isContainer(node) || aliasesAType(node)) return false;
+  if (parametersOf(node) !== null || isContainer(node) || aliasesAType(node)) return false;
   const written = node.childForFieldName("type");
   return !(language === "python" && written && aliasesByAnnotation(written.text));
 }
@@ -424,13 +424,13 @@ function readDeclaration(node: Node, nameNode: Node, language: Language, ask?: A
  */
 function isContainer(node: Node): boolean {
   return has(node, "name") && has(node, "body")
-    && !has(node, "parameters") && !has(node, "value") && !has(node, "right") && !has(node, "type");
+    && parametersOf(node) === null && !has(node, "value") && !has(node, "right") && !has(node, "type");
 }
 
 type Shape = Record<Exclude<Part, "implementable">, PartReading>;
 
 function readShape(node: Node, language: Language): Shape {
-  if (has(node, "parameters")) {
+  if (parametersOf(node) !== null) {
     return {
       body: has(node, "body") ? "has" : "lacks",
       signature: "has",
@@ -611,7 +611,7 @@ function boundShapes(source: string, language: Language): Map<string, Bound[]> {
     found.set(nameNode.text, [...(found.get(nameNode.text) ?? []), { node, nameNode, kind }]);
   };
   each(tree.rootNode, (node) => {
-    const parameters = node.childForFieldName("parameters");
+    const parameters = parametersOf(node);
     if (parameters) {
       for (const parameter of namedChildren(parameters)) record(parameter, parameterName(parameter), "parameter");
     }
@@ -903,7 +903,7 @@ function writtenAsFunctions(source: string, name: string, language: Language): N
   const functions = declarations.filter(({ node, soup }) => {
     if (soup) return false;
     const value = node.childForFieldName("value") ?? node.childForFieldName("right");
-    return has(node, "parameters") || (value !== null && isWrittenValue(value));
+    return parametersOf(node) !== null || (value !== null && isWrittenValue(value));
   });
   return functions.length > 0 && functions.length === declarations.length
     ? functions.map(({ nameNode }) => nameNode)
@@ -934,7 +934,7 @@ function nounOf(source: string, name: string, language: Language): string {
     return bound?.kind === "parameter" ? "a parameter" : bound ? "a value" : "a type";
   }
   const { node, nameNode } = declaration;
-  if (has(node, "parameters")) return "a function";
+  if (parametersOf(node) !== null) return "a function";
   // `for`, `catch`: the word before a loop's binding is not what it is.
   if (bindsByLoop(node)) return "a value";
   let keyword: string | undefined;

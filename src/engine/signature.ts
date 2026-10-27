@@ -143,7 +143,7 @@ import { aliasesFor, aliasNames } from "./alias";
 import { declarationName } from "./declared";
 import { typeParametersIn, unwrittenNames, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
-import { incomplete, INSTANCE_NAMES, parseSource, qualifiedTail, type Language, type Node } from "./parse";
+import { incomplete, INSTANCE_NAMES, parametersOf, parseSource, qualifiedTail, type Language, type Node } from "./parse";
 
 /** Which half of a signature a claim is about. */
 export type SignaturePosition = "parameter" | "return";
@@ -396,12 +396,12 @@ function selfTypeOf(node: Node, inherited: string | undefined): string | undefin
 const FUNCTIONISH = /function|arrow|lambda|closure|method|fn/;
 
 function signatureNode(node: Node): Node | undefined {
-  if (node.childForFieldName("parameters")) return node;
+  if (parametersOf(node)) return node;
   // `const f = (a: A): B => c` binds the name on the outside and writes the
   // signature on the inside.
   for (const field of ["value", "right", "declarator"]) {
     const inner = node.childForFieldName(field);
-    if (inner && (FUNCTIONISH.test(inner.type) || inner.childForFieldName("parameters"))) {
+    if (inner && (FUNCTIONISH.test(inner.type) || parametersOf(inner))) {
       const found = signatureNode(inner);
       if (found) return found;
     }
@@ -409,7 +409,7 @@ function signatureNode(node: Node): Node | undefined {
   let found: Node | undefined;
   each(node, (current) => {
     if (!found && current !== node && FUNCTIONISH.test(current.type)
-      && current.childForFieldName("parameters")) found = current;
+      && parametersOf(current)) found = current;
   });
   return found;
 }
@@ -660,7 +660,7 @@ export function signatureNames(
     if (!signature) continue;
     sawSignature = true;
 
-    const parameters = signature.childForFieldName("parameters");
+    const parameters = parametersOf(signature);
     const returned = signature.childForFieldName("return_type");
     /*
      * Namespace segments, per half, which are not names the signature writes

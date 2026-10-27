@@ -56,7 +56,7 @@
  */
 import path from "node:path";
 
-import { parseSource, type Node } from "./parse";
+import { parametersOf, parseSource, type Node } from "./parse";
 
 /** One call rustc lists in a body. */
 export type CompiledCall =
@@ -822,7 +822,7 @@ function modulePathOf(file: string, root: string): string[] | undefined {
 }
 
 function parameterCount(declaration: Node): number {
-  const parameters = declaration.childForFieldName("parameters");
+  const parameters = parametersOf(declaration);
   let count = 0;
   for (let index = 0; index < (parameters?.childCount ?? 0); index += 1) {
     const child = parameters!.child(index);

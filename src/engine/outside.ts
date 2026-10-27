@@ -13,7 +13,7 @@
  * diagram and no word rests on it.
  */
 import { bindingsIn } from "./calls";
-import { parseSource, type Language, type Node } from "./parse";
+import { parametersOf, parseSource, type Language, type Node } from "./parse";
 
 /** The kinds of outside contact counted. Console output is deliberately not one. */
 export type OutsideKind = "file" | "network" | "process";
@@ -171,7 +171,7 @@ function routineNameOf(node: Node): string | undefined {
   const name = node.childForFieldName("name") ?? node.childForFieldName("left");
   if (!name || name.childCount !== 0) return undefined;
   const value = node.childForFieldName("value");
-  if (!(node.childForFieldName("parameters") ?? value?.childForFieldName("parameters"))) return undefined;
+  if (!(parametersOf(node) ?? parametersOf(value))) return undefined;
   if (!(node.childForFieldName("body") ?? value?.childForFieldName("body"))) return undefined;
   return name.text;
 }

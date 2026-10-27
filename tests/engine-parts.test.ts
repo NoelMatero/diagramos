@@ -123,12 +123,18 @@ describe("TypeScript", () => {
     expect(read(source, "size", "ts")).toMatchObject({ signature: "has", body: "lacks" });
   });
 
-  it("says nothing at all about a namespace", () => {
-    // `internal_module` is not one of the shapes `body.ts` counts as
-    // introducing a name, so no claim about it can ever be read here. Worth a
-    // test because the silence is load-bearing: the red must not appear for a
-    // declaration nothing looked at.
-    expect(read(source, "tools", "ts")).toBeUndefined();
+  it("reads a namespace like a Rust module: not a function, and nothing said about a body with code in it", () => {
+    // Until #477 a namespace was not a declaration at all, so nothing here was
+    // said about one. It is now, when it is the only thing with its name, and
+    // it reads as `mod plumbing` does above.
+    expect(read(source, "tools", "ts")).toMatchObject({ body: "unsure", signature: "lacks", result: "lacks" });
+  });
+
+  it("reads a namespace merged with a function as the function alone", () => {
+    // The merged namespace is found through the function (#477), and adds no
+    // second declaration that cannot be called.
+    const merged = "export function make(): number { return 1; }\nexport namespace make { export const x = 1; }\n";
+    expect(read(merged, "make", "ts")).toMatchObject({ signature: "has", body: "has" });
   });
 
   it("says nothing about a type alias or a const holding an arrow function", () => {
