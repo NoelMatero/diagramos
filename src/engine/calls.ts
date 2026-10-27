@@ -2145,7 +2145,15 @@ function closedBodyRefutes(
     const implicit = "evidence" in text ? runByTheLanguage(from, to) ?? handedOutside(from, to) : undefined;
     return implicit && "evidence" in text ? { evidence: { ...text.evidence, implicit } } : text;
   };
-  if (!("why" in text) && !known) return closedByText();
+  /*
+   * Closed only because a macro's tokens were read (#471): where rustc built
+   * the tail, its list judges the body as it did when every macro was a
+   * doubt. It sees past what a template does that the text reads as written
+   * (a local named like the head, a switched-off region). With no list, the
+   * text's own reading stands.
+   */
+  const macrosRead = !("why" in text) && text.readMacros === true;
+  if (!("why" in text) && !known && !macrosRead) return closedByText();
   /*
    * The text stopped, or the forward reading doubted before it got here
    * (`known`). For a Rust tail the compiler built, its list is the second
@@ -2155,10 +2163,10 @@ function closedBodyRefutes(
    * are. After a forward doubt the compiler's "never" is required first.
    */
   const compiled = known ?? compiledBodiesFor(from, to.names);
-  if (!compiled) return text;
+  if (!compiled) return macrosRead ? closedByText() : text;
   const verdict = compiledVerdict(compiled, to);
   if ("why" in verdict) return { why: verdict.why };
-  if (!("why" in text)) return closedByText();
+  if (!("why" in text) && !macrosRead) return closedByText();
   const first = routinesNamed(from.source, from.routine, "rust").routines[0];
   return {
     evidence: {
@@ -2527,7 +2535,7 @@ export function compiledBodiesFor(
   for (const body of seen.bodies) {
     if (body.routine !== from.routine) continue;
     for (const site of body.sites) {
-      if (site.name === "" || site.why === "macro") continue;
+      if (site.name === "" || site.why === "macro" || site.inMacro) continue;
       if (site.nameAt && unbuilt(site.nameAt.start)) continue;
       // `ok!(..)` is read as a call to `ok`; what rustc lists is what it expands to.
       if (site.nameAt && from.source[site.nameAt.end] === "!") continue;
@@ -2565,11 +2573,12 @@ function listedCall(
 function textClosed(
   from: CallSide & { routine: string },
   to: CallSide & { names: string[] },
-): { evidence: CallsRefutedEvidence } | { reached: CallsWrongRoutineEvidence } | { why: CallsNotClosed } {
+): { evidence: CallsRefutedEvidence; readMacros?: true } | { reached: CallsWrongRoutineEvidence; readMacros?: true } | { why: CallsNotClosed } {
   const reading = callSitesIn(from);
   if (!reading.read) return { why: "unreadable" };
   const bodies = reading.bodies.filter((body) => body.routine === from.routine);
   if (bodies.length === 0) return { why: "routine-not-found" };
+  const readMacros = bodies.some((body) => body.readMacros) ? { readMacros: true as const } : {};
 
   let sites = 0;
   const reached: Array<{ name: string; line: number }> = [];
@@ -2633,7 +2642,7 @@ function textClosed(
     }
   }
   if (reached.length === 0) {
-    return { evidence: { routine: from.routine, line: bodies[0]!.line, sites, ...(elsewhere.length > 0 ? { elsewhere } : {}) } };
+    return { evidence: { routine: from.routine, line: bodies[0]!.line, sites, ...(elsewhere.length > 0 ? { elsewhere } : {}) }, ...readMacros };
   }
   /*
    * An arrow drawn at a **type** is a different mistake and not this one
@@ -2645,7 +2654,7 @@ function textClosed(
   if (!to.names.every((name) => isRoutine(to.source, name, to.language))) {
     return { why: "reaches-the-file" };
   }
-  return { reached: { routine: from.routine, line: bodies[0]!.line, sites, reached } };
+  return { reached: { routine: from.routine, line: bodies[0]!.line, sites, reached }, ...readMacros };
 }
 
 /**
@@ -3113,6 +3122,13 @@ export interface CallSitePlaced {
    * one keeps it a doubt -- `runsOnRead`, asked where the head is known.
    */
   byName?: true;
+  /**
+   * Read out of a Rust macro's arguments (#471). rustc's list of a body is
+   * after expansion, and a macro switched off by a feature (`log!` under
+   * `#[cfg(feature = "logging")]`) drops its arguments from it: such a site
+   * is not one the list must hold before it is trusted.
+   */
+  inMacro?: true;
 }
 
 /** Every call site in one routine, placed or refused. */
@@ -3123,6 +3139,12 @@ export interface BodyCallSites {
   /** Lines the routine spans, so a report can weigh a closure by body size. */
   lines: number;
   sites: CallSitePlaced[];
+  /**
+   * A macro's tokens were read as code here and left no doubt (#471). Before,
+   * every one was a doubt, and a Rust body holding one was judged by rustc's
+   * list of it; `closedBodyRefutes` still is, wherever there is a list.
+   */
+  readMacros?: true;
 }
 
 export type CallSitesReading =
@@ -4256,6 +4278,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
         if (nested.has(inner.id)) return;
         each(inner, (one) => { if (one !== inner && one.type === "token_tree") nested.add(one.id); });
         const macro = readMacro(inner, side, bindings);
+        if (!macro.open) body.readMacros = true;
         if (macro.open) {
           body.sites.push({
             name: "",
@@ -4264,7 +4287,9 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
             receiver: false,
           });
         }
+        const before = body.sites.length;
         for (const top of macro.tops ?? []) each(top, visit);
+        for (let at = before; at < body.sites.length; at += 1) body.sites[at] = { ...body.sites[at]!, inMacro: true };
         return;
       }
       const written = calleeOf(inner) ?? constructedBy(inner) ?? renderedBy(inner);
@@ -4385,8 +4410,12 @@ function macroOrigin(invocation: Node, side: CallSide, bindings: Bindings): Macr
       const definitions = macroRulesIn(side.file, side.source, name);
       return definitions.length > 0 ? { kind: "repo", name, definitions } : { kind: "unknown" };
     }
-    case "outside":
+    case "outside": {
+      // A crate may write a macro of std's name in a parent module, which this file's own scopes cannot see.
+      const definitions = crateMacros(name, side.file, side.open);
+      if (definitions) return { kind: "repo", name, definitions };
       return providedByLanguage(name, "rust") ? { kind: "std", name } : { kind: "unknown" };
+    }
     case "imported": {
       const specifier = bindings.imported.get(name)?.specifier ?? "";
       const first = specifier.replace(/^::/, "").split("::")[0] ?? "";
