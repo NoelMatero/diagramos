@@ -30,7 +30,7 @@
  * Neither is alias *resolution*, which would need a type checker: an alias
  * found here withholds the answer, and never turns one into a confirmation.
  */
-import { each, keywordOf, parseSource, type Language, type Node } from "./parse";
+import { each, keywordOf, parametersOf, parseSource, type Language, type Node } from "./parse";
 
 /** Node types that can rename something on the way in, if they actually do. */
 const RENAMES = new Set([
@@ -64,7 +64,7 @@ function valueOf(node: Node): Node | undefined {
  * Python one, which is how this shipped wrong.
  */
 function isAlias(node: Node): boolean {
-  if (node.childForFieldName("parameters") || node.childForFieldName("body")) return false;
+  if (parametersOf(node) || node.childForFieldName("body")) return false;
   return nameOf(node) !== undefined && valueOf(node) !== undefined;
 }
 
@@ -137,7 +137,7 @@ function boundAtTopLevel(root: Node): string[] {
       if (name && name.childCount === 0) names.push(name.text);
       return;
     }
-    if (node.childForFieldName("parameters") || node.childForFieldName("body")) return;
+    if (parametersOf(node) || node.childForFieldName("body")) return;
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
       if (child) consider(child, depth + 1);
@@ -242,7 +242,7 @@ export function onlyATypeAlias(source: string, name: string, language: Language)
   each(tree.rootNode, (node) => {
     if (declaredName(node)?.text !== name) return;
     if (isTypeAlias(node)) aliases += 1;
-    else if (["body", "parameters", "value", "right"].some((field) => node.childForFieldName(field))) other += 1;
+    else if (parametersOf(node) || ["body", "value", "right"].some((field) => node.childForFieldName(field))) other += 1;
   });
   return aliases > 0 && other === 0;
 }

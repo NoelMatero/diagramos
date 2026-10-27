@@ -49,7 +49,7 @@
  */
 
 import { declarationName } from "./declared";
-import { each, incomplete, parseSource, type Language, type Node } from "./parse";
+import { each, incomplete, parametersOf, parseSource, type Language, type Node } from "./parse";
 
 /** Why a body could not be read at all. Each is a reason to say nothing. */
 export type DataflowWithheld =
@@ -936,8 +936,8 @@ function routinesIn(tree: Node): Array<{ name: string; node: Node }> {
     const name = node.childForFieldName("name");
     if (!name || name.childCount !== 0) return;
     const value = node.childForFieldName("value");
-    const parameters = node.childForFieldName("parameters")
-      ?? value?.childForFieldName("parameters");
+    const parameters = parametersOf(node)
+      ?? parametersOf(value);
     if (!parameters) return;
     if (value) named.add(value.id);
     found.push({ name: name.text, node });
@@ -1728,8 +1728,8 @@ function readRoutine(
    * ordinary walk records what happens to them for free -- returned, stored in
    * a field, handed on again -- and `escapesParameter` reads it off afterwards.
    */
-  const parameterList = node.childForFieldName("parameters")
-    ?? node.childForFieldName("value")?.childForFieldName("parameters");
+  const parameterList = parametersOf(node)
+    ?? parametersOf(node.childForFieldName("value"));
   if (parameterList) {
     for (const named of parameterNames(parameterList)) {
       const parameter: Local = {
@@ -1836,6 +1836,8 @@ function tailExpression(block: Node): Node | undefined {
  * slot is still counted.
  */
 function parameterNames(list: Node): Node[] {
+  // `x => ..`: the lone parameter is the whole list (#477).
+  if (isName(list)) return [list];
   const found: Node[] = [];
   for (let index = 0; index < list.childCount; index += 1) {
     const child = list.child(index);

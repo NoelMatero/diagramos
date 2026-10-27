@@ -28,6 +28,18 @@ export interface LspDocumentSymbol {
 
 export type RefereeReading = "has" | "lacks" | "unknown";
 
+/**
+ * A "go to definition" question's outcome with its failure kept (#481): a
+ * place, the server's own "nothing here", or no answer at all -- a request
+ * that timed out or errored, or a server already gone. The plain
+ * `...LocationAt` methods fold the last two into `undefined`; a caller that
+ * keeps answers for later must not keep the third.
+ */
+export type LocationOutcome =
+  | { at: { file: string; line: number } }
+  | { none: true }
+  | { failed: string };
+
 /** LSP `SymbolKind` numbers, the ones read here. */
 const KIND = {
   Module: 2, Namespace: 3, Class: 5, Method: 6, Constructor: 9, Enum: 10,

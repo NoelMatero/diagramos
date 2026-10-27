@@ -74,7 +74,7 @@ import { declarationName, escapeName, NAME_END, NAME_START, wholeName } from "./
 import { mayAccuse } from "./licence";
 import { enclosing, lookUp, moduleScope, type Meaning, type Space, type WildcardAnswer } from "./names";
 import { declaresMember, holdersIn } from "./overrides";
-import { each, incomplete, parseSource, type Language, type Node, type Tree } from "./parse";
+import { each, incomplete, parametersOf, parseSource, type Language, type Node, type Tree } from "./parse";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -1258,7 +1258,7 @@ function chosenCallees(routine: Node, name: string, call: Node, language: Langua
       return follow(consequence) && (!alternative || follow(alternative));
     }
     // A function written out: its calls are the routine's own and already read.
-    if (value.childForFieldName("parameters") || token(value, (text) => text === "lambda")) return true;
+    if (parametersOf(value) || token(value, (text) => text === "lambda")) return true;
     // Python's `f if c else g`: no fields, and the condition between the two words.
     const ifWord = token(value, (text) => text === "if");
     const elseWord = token(value, (text) => text === "else");
@@ -1347,8 +1347,8 @@ function chosenCallees(routine: Node, name: string, call: Node, language: Langua
       }
     }
     const container = node.childForFieldName("name") !== null && node.childForFieldName("body") !== null
-      && node.childForFieldName("parameters") === null;
-    const nested = language === "python" && node.id !== routine.id && node.childForFieldName("parameters") !== null;
+      && parametersOf(node) === null;
+    const nested = language === "python" && node.id !== routine.id && parametersOf(node) !== null;
     const inner = language !== "python" && /^(statement_block|block)$/.test(node.type) ? node : block;
     for (const child of children(node)) visit(child, inner, foreign || container || nested);
   };
@@ -1595,7 +1595,7 @@ export function routinesNamed(
     if (declarationName(node)?.text !== routine) return;
     declared = true;
     const value = node.childForFieldName("value");
-    if (node.childForFieldName("parameters") ?? value?.childForFieldName("parameters")) {
+    if (parametersOf(node) ?? parametersOf(value)) {
       routines.push(node);
       return;
     }
@@ -1611,7 +1611,7 @@ function holdsRoutines(node: Node): boolean {
   let found = false;
   each(node, (child) => {
     if (found || child.id === node.id) return;
-    if (child.childForFieldName("parameters")) found = true;
+    if (parametersOf(child)) found = true;
   });
   return found;
 }
@@ -1989,7 +1989,7 @@ function callsTo(
  * an `impl`'s type), and no parameters of its own.
  */
 function ownHolder(body: Node): Node | undefined {
-  const holds = body.childForFieldName("parameters") === null && body.childForFieldName("body") !== null
+  const holds = parametersOf(body) === null && body.childForFieldName("body") !== null
     && (body.childForFieldName("name") ?? body.childForFieldName("type")) !== null;
   return holds ? body : undefined;
 }
@@ -2279,7 +2279,7 @@ function handedOutside(
   if (!tree) return undefined;
   const holders = holdersIn(tree.rootNode);
   const name = to.names.find((one) => routinesNamed(to.source, one, to.language).routines
-    .some((routine) => routine.childForFieldName("parameters") && holders.has(routine.id)));
+    .some((routine) => parametersOf(routine) && holders.has(routine.id)));
   if (!name) return undefined;
 
   const reading = callSitesIn(from, from.routine);
@@ -2448,7 +2448,7 @@ export function handedOn(
   };
   const visit = (node: Node, holder: Node | undefined, line: number): void => {
     if (calleeOf(node) || constructedBy(node)) return;
-    if (node.childForFieldName("body") && (node.childForFieldName("parameters") ?? node.childForFieldName("parameter"))) return;
+    if (node.childForFieldName("body") && (parametersOf(node) ?? node.childForFieldName("parameter"))) return;
     if (MEMBER_READ.has(node.type) || node.type === "scoped_identifier") { take(node, holder, line); return; }
     if (node.childCount === 0) { if (node.isNamed) take(node, holder, line); return; }
     const value = node.childForFieldName("value");
@@ -2744,7 +2744,7 @@ function typeSpans(source: string, language: Language, type: string): Array<[num
     const own = node.childForFieldName("name");
     const typed = node.childForFieldName("type");
     const isType = own?.childCount === 0 && own.text === type
-      && !node.childForFieldName("parameters") && !node.childForFieldName("value");
+      && !parametersOf(node) && !node.childForFieldName("value");
     let impl = false;
     if (!own && typed && node.childForFieldName("body")) {
       let inner = typed;
@@ -2872,7 +2872,7 @@ function holdersOfRoutine(
   if (!tree) return [];
   const holders = holdersIn(tree.rootNode);
   return routinesNamed(source, routine, language).routines
-    .filter((node) => node.childForFieldName("parameters") ?? node.childForFieldName("value")?.childForFieldName("parameters"))
+    .filter((node) => parametersOf(node) ?? parametersOf(node.childForFieldName("value")))
     .map((node) => {
       const holder = holders.get(node.id);
       if (!holder) return { dispatched: false };
@@ -2909,7 +2909,7 @@ export function isTypeName(source: string, name: string, language: Language): bo
   let other = 0;
   const visit = (node: Node, inRoutine: boolean): void => {
     const named = node.childForFieldName("name");
-    const routine = node.childForFieldName("parameters") !== null;
+    const routine = parametersOf(node) !== null;
     if (named && named.childCount === 0 && named.text === name) {
       if (node.childForFieldName("body") && !routine && (!inRoutine || holdsRoutines(node))) types += 1;
       else if (routine || node.childForFieldName("value")) other += 1;
@@ -2937,8 +2937,8 @@ export function isTypeName(source: string, name: string, language: Language): bo
 function isRoutine(source: string, name: string, language: Language): boolean {
   const { routines } = routinesNamed(source, name, language);
   return routines.some((node) => Boolean(
-    node.childForFieldName("parameters")
-    ?? node.childForFieldName("value")?.childForFieldName("parameters"),
+    parametersOf(node)
+    ?? parametersOf(node.childForFieldName("value")),
   ));
 }
 
@@ -2974,7 +2974,7 @@ function runsWhenCalled(source: string, name: string, language: Language): boole
       const named = node.childForFieldName("name") ?? node.childForFieldName("left");
       if (!named || named.childCount !== 0 || named.text !== name) return;
       const held = node.childForFieldName("value") ?? node.childForFieldName("right");
-      if (held && !held.childForFieldName("parameters")) value = true;
+      if (held && !parametersOf(held)) value = true;
     });
     runs = !value || isRoutine(source, name, language) || isTypeName(source, name, language);
     known.set(name, runs);
@@ -2996,7 +2996,7 @@ function defaultExportRuns(source: string, language: Language): boolean {
   for (const node of children(tree.rootNode)) {
     const value = node.type === "export_statement" ? node.childForFieldName("value") : null;
     if (!value) continue;
-    if (value.childForFieldName("parameters") || value.childForFieldName("body")) return true;
+    if (parametersOf(value) || value.childForFieldName("body")) return true;
     if (value.childCount === 0) return runsWhenCalled(source, value.text, language);
     return false;
   }
@@ -3462,7 +3462,7 @@ function placeThroughDefinition(
  * function nested in another is not one.
  */
 function overriddenBelow(holder: Node, member: string, side: CallSide): boolean {
-  if (!side.overridden || holder.childForFieldName("parameters")) return false;
+  if (!side.overridden || parametersOf(holder)) return false;
   const name = holder.childForFieldName("name");
   if (!name || name.childCount !== 0) return false;
   return side.overridden(name.text, member);
@@ -3495,7 +3495,7 @@ export function routineDeclaredOn(
     const value = node.childForFieldName("value");
     if (
       name && name.childCount === 0
-      && (node.childForFieldName("parameters") ?? value?.childForFieldName("parameters"))
+      && (parametersOf(node) ?? parametersOf(value))
       && (node.childForFieldName("body") ?? value?.childForFieldName("body"))
       && lineOf(source, name.startIndex) === line
     ) {
@@ -4165,9 +4165,12 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
   /** Which class each routine is a member of (#353), read on the first body that is placed. */
   let holders: Map<number, Node> | undefined;
   each(tree.rootNode, (node) => {
+    // A key in an object literal is a routine here exactly where `routinesNamed` finds it (#477).
     const name = node.type === "impl_item"
       ? node.childForFieldName("type")
-      : node.childForFieldName("name") ?? node.childForFieldName("left");
+      : node.childForFieldName("key")
+        ? declarationName(node) ?? null
+        : node.childForFieldName("name") ?? node.childForFieldName("left");
     if (!name || name.childCount !== 0) return;
     const value = node.childForFieldName("value");
     /*
@@ -4176,7 +4179,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
      * asked about. An `impl` block passes `holdsRoutines` there and is not a
      * body, so it is left out -- its methods are found on their own.
      */
-    if (!(node.childForFieldName("parameters") ?? value?.childForFieldName("parameters"))) return;
+    if (!(parametersOf(node) ?? parametersOf(value))) return;
     /*
      * And it must actually have a body. A method *signature* -- in a TS
      * interface, a Rust trait, an overload declaration -- has parameters and no

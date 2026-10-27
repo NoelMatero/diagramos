@@ -64,7 +64,7 @@
  */
 import type { ReceiverResolution } from "./calls";
 import { COLLECTION_LITERAL, COLLECTION_MAKERS } from "./dataflow";
-import { each, MEMBER_ACCESS, parseSource, type Language, type Node } from "./parse";
+import { each, MEMBER_ACCESS, parametersOf, parseSource, type Language, type Node } from "./parse";
 
 /** The shapes carrying enough evidence in the text to name a type. */
 export type ResolutionShape =
@@ -338,7 +338,7 @@ export type ResolutionReading =
  * had anything to enumerate.
  */
 function isRoutineNode(node: Node): boolean {
-  return node.childForFieldName("parameters") !== null && node.childForFieldName("body") !== null;
+  return parametersOf(node) !== null && node.childForFieldName("body") !== null;
 }
 
 /**
@@ -1375,7 +1375,7 @@ function resolveRoutine(
   const generics = genericParamsOf(routine);
 
   const params = new Map<string, Classified>();
-  collectParams(routine.childForFieldName("parameters"), language, params);
+  collectParams(parametersOf(routine), language, params);
 
   const body = routine.childForFieldName("body");
   const bindings = new Map<string, Binding[]>();
@@ -1400,8 +1400,10 @@ function resolveRoutine(
       });
     });
   };
-  const parameterList = routine.childForFieldName("parameters");
+  const parameterList = parametersOf(routine);
   if (parameterList) noteHazards(parameterList);
+  // `x => ..`: the lone parameter is the whole list (#477).
+  if (parameterList && parameterList.childCount === 0) paramNames.push(parameterName(parameterList));
   for (let index = 0; index < (parameterList?.childCount ?? 0); index += 1) {
     const parameter = parameterList!.child(index);
     if (parameter?.isNamed && parameter.type !== "comment") paramNames.push(parameterName(parameter));

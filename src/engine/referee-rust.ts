@@ -34,7 +34,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { routineDeclaredOn } from "./calls";
-import { each, parseSource } from "./parse";
+import { each, parametersOf, parseSource } from "./parse";
 import { refereePool, type RefereePool } from "./referee-pool";
 import {
   createRustAnalyzerReferee, declaredTypeOnLine, isOutsideRustTree, rustTypeAnchorFor,
@@ -95,7 +95,7 @@ function signatureOn(source: string, line: number): boolean {
   each(tree.rootNode, (node) => {
     if (found) return;
     const name = node.childForFieldName("name");
-    if (!name || !node.childForFieldName("parameters")) return;
+    if (!name || !parametersOf(node)) return;
     if (source.slice(0, name.startIndex).split("\n").length === line) found = true;
   });
   return found;

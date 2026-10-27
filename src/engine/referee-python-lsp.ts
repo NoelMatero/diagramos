@@ -63,8 +63,8 @@ import { readdirSync, readFileSync, type Dirent } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import type { LspDocumentSymbol } from "./lsp-symbols";
-import { each, parseSource, type Node } from "./parse";
+import type { LocationOutcome, LspDocumentSymbol } from "./lsp-symbols";
+import { each, parametersOf, parseSource, type Node } from "./parse";
 import type { ValueKind } from "./parts";
 import { isOutsideTree } from "./referee-ts";
 import { spawnServer, stopServer } from "./server-process";
@@ -278,6 +278,8 @@ export interface PyrightLspReferee {
   methodDeclarationLocationAt(
     file: string, source: string, start: number, end: number,
   ): Promise<{ file: string; line: number } | undefined>;
+  /** `methodDeclarationLocationAt`'s question with a failed request told apart from "nothing here" (#481). */
+  methodDeclarationOutcomeAt(file: string, source: string, start: number, end: number): Promise<LocationOutcome>;
   /**
    * `typeDeclarationAt`'s own question, with the declaration's line kept
    * rather than thrown away (#243).
@@ -316,6 +318,11 @@ export interface PyrightLspReferee {
    * the whole ladder again on a server that was already bound.
    */
   warmUp(candidates: readonly WarmUpCandidate[]): Promise<void>;
+  /**
+   * Whether a warm-up sweep has had a real answer, so the binder has run. A
+   * "nothing here" from before that may only mean it had not (#481).
+   */
+  warmedUp(): boolean;
   /**
    * How many `typeDefinition` answers this referee has withheld because the
    * line they pointed at declares no type (#259) -- the cost of that rule,
@@ -746,7 +753,14 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
   async function askLocation(
     method: "typeDefinition" | "definition", file: string, source: string, start: number, retryMs: number[],
   ): Promise<{ file: string; line: number } | undefined> {
-    if (closed) return undefined;
+    const outcome = await askLocationOutcome(method, file, source, start, retryMs);
+    return "at" in outcome ? outcome.at : undefined;
+  }
+
+  async function askLocationOutcome(
+    method: "typeDefinition" | "definition", file: string, source: string, start: number, retryMs: number[],
+  ): Promise<LocationOutcome> {
+    if (closed) return { failed: "pyright-langserver already closed" };
     const uri = pathToFileURL(file).toString();
     const position = positionAt(source, start);
     const params = { textDocument: { uri }, position };
@@ -754,12 +768,13 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       let result: DefinitionResult;
       try {
         result = (await send(`textDocument/${method}`, params)) as DefinitionResult;
-      } catch {
-        return undefined;
+      } catch (error) {
+        return { failed: error instanceof Error ? error.message : String(error) };
       }
       const declaring = firstLocation(result);
-      if (declaring !== undefined) return declaring;
-      if (attempt >= retryMs.length || closed) return undefined;
+      if (declaring !== undefined) return { at: declaring };
+      if (closed) return { failed: "pyright-langserver closed while asking" };
+      if (attempt >= retryMs.length) return { none: true };
       await new Promise((resolve) => setTimeout(resolve, retryMs[attempt]));
     }
   }
@@ -1208,6 +1223,9 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     methodDeclarationAt: (file, source, start) => ask("definition", file, source, start, STEADY_RETRY_MS),
     methodDeclarationLocationAt: (file, source, start) =>
       askLocation("definition", file, source, start, STEADY_RETRY_MS),
+    methodDeclarationOutcomeAt: (file, source, start) =>
+      askLocationOutcome("definition", file, source, start, STEADY_RETRY_MS),
+    warmedUp: () => bound,
     /*
      * Each candidate asked with no ladder of its own (`[]`), so a sweep costs
      * what an unanswerable position costs -- single-figure milliseconds each.
@@ -1332,7 +1350,7 @@ function hoverSeesEverything(source: string, start: number): boolean {
   each(tree.rootNode, (node) => {
     const body = node.childForFieldName("body");
     if (!body || !node.childForFieldName("name")) return;
-    const parameters = node.childForFieldName("parameters");
+    const parameters = parametersOf(node);
     const inside = (part: Node) => start >= part.startIndex && start < part.startIndex + part.text.length;
     if (parameters && inside(parameters) && (!inner || parameters.startIndex > inner.at)) {
       inner = { at: parameters.startIndex, scope: "parameter" };
@@ -1356,7 +1374,7 @@ function classOnLine(source: string, line: number): Node | undefined {
     if (found) return;
     const name = node.childForFieldName("name");
     // A class is a declaration with a body and no parameters (`parts.ts`).
-    if (!name || !node.childForFieldName("body") || node.childForFieldName("parameters")) return;
+    if (!name || !node.childForFieldName("body") || parametersOf(node)) return;
     if (name.startIndex >= from && name.startIndex < to) found = node;
   });
   return found;
