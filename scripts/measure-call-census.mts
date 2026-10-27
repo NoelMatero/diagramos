@@ -193,13 +193,65 @@ interface Summary {
 
 /** The leaf a call names, by the same rules `calleeOf` reads it with, or undefined for a computed callee. */
 function nameLeaf(call: Node): Node | undefined {
-  const callee = call.type === "new_expression"
+  let callee = call.type === "new_expression"
     ? call.childForFieldName("constructor")
     : /^jsx_/.test(call.type) ? call.childForFieldName("name")
       : call.childForFieldName("arguments") ? call.childForFieldName("function") : call.childForFieldName("macro");
+  // `await g<T>()`, which TypeScript's grammar reads as a call of `await g` (#470).
+  if (callee?.type === "await_expression") callee = firstNamed(callee) ?? callee;
   return callee ? leafOf(callee) : undefined;
 }
-function leafOf(callee: Node): Node | undefined {
+function firstNamed(node: Node): Node | undefined {
+  for (let i = 0; i < node.childCount; i++) {
+    const child = node.child(i);
+    if (child?.isNamed && !/comment/.test(child.type)) return child;
+  }
+  return undefined;
+}
+/** `calleeOfNode`'s `unwrapped` (#470): parentheses, `!` and `<T>` taken off, an awaited value and a Rust field kept. */
+function unwrapped(callee: Node): Node {
+  let at = callee;
+  for (let depth = 0; depth < 8; depth++) {
+    if (!/^(parenthesized_expression|non_null_expression|instantiation_expression)$/.test(at.type)) return at;
+    const inner = firstNamed(at);
+    if (!inner || inner.type === "await_expression" || inner.type === "await" || inner.type === "field_expression") return at;
+    at = inner;
+  }
+  return at;
+}
+/**
+ * Where the checker names a JavaScript `x.call(...)` / `x.apply(...)` it reads
+ * as a call of `x` (#470): `x`'s own leaf. Undefined for any other call.
+ */
+function valueLeaf(call: Node): Node | undefined {
+  const f = call.childForFieldName("arguments") ? call.childForFieldName("function") : undefined;
+  if (!f) return undefined;
+  const member = unwrapped(f.type === "await_expression" ? firstNamed(f) ?? f : f);
+  const property = member.childForFieldName("property");
+  if (member.type !== "member_expression" || !property || !["call", "apply"].includes(property.text)) return undefined;
+  const object = member.childForFieldName("object");
+  return object ? leafOf(object) : undefined;
+}
+/** What `super(...)` names to the checker (#470): the leaf of the class's `extends` clause. */
+function superLeaf(call: Node): Node | undefined {
+  if (call.childForFieldName("function")?.type !== "super") return undefined;
+  for (let p = call.parent; p; p = p.parent) {
+    if (!CLASSY.has(p.type)) continue;
+    for (let i = 0; i < p.childCount; i++) {
+      const heritage = p.child(i)!;
+      if (heritage.type !== "class_heritage") continue;
+      for (let j = 0; j < heritage.childCount; j++) {
+        const clause = heritage.child(j)!;
+        const value = clause.type === "extends_clause" ? clause.childForFieldName("value") : null;
+        if (value) return leafOf(value);
+      }
+    }
+    return undefined;
+  }
+  return undefined;
+}
+function leafOf(written: Node): Node | undefined {
+  const callee = unwrapped(written);
   if (callee.childCount === 0) return /identifier$|^field_identifier$|^property_identifier$/.test(callee.type) ? callee : undefined;
   if (callee.childForFieldName("arguments")) return undefined;
   const inner = callee.childForFieldName("function");
@@ -269,8 +321,9 @@ function callsByName(root: Node): Map<number, Node> {
   const out = new Map<number, Node>();
   const visit = (n: Node): void => {
     if (isCall(n)) {
-      const leaf = nameLeaf(n);
-      if (leaf && !out.has(leaf.startIndex)) out.set(leaf.startIndex, n);
+      for (const leaf of [nameLeaf(n), valueLeaf(n), superLeaf(n)]) {
+        if (leaf && !out.has(leaf.startIndex)) out.set(leaf.startIndex, n);
+      }
     }
     for (let i = 0; i < n.namedChildCount; i++) visit(n.namedChild(i)!);
   };
@@ -407,6 +460,14 @@ async function measureOne(setName: string, project: string): Promise<void> {
   interface Entry {
     file: string; key: string; line: number; name: string; routine: string; rline: number;
     text: CheckerAnswer; askAt?: { start: number; end: number };
+    /**
+     * A JavaScript `x.call(...)` / `x.apply(...)`: `x`'s leaf and name. When
+     * the compiler places `call` outside -- the built-in
+     * `Function.prototype.call` -- it is asked again at `x`, which is what
+     * runs (#470). Asked only at `call`, every one was a gap the checker can
+     * only close by saying something it does not know.
+     */
+    valueAt?: { start: number; end: number; name: string };
   }
   const entries = new Map<string, Map<string, Entry>>();
   const answerOf = (site: CallSitePlaced): CheckerAnswer =>
@@ -470,7 +531,13 @@ async function measureOne(setName: string, project: string): Promise<void> {
       const text: CheckerAnswer = several
         ? { file: several[0]!.file, several: true }
         : answerOf(site);
-      mine.set(key, { file: rel, key, line: site.line, name: site.name, routine, rline, text, ...(site.nameAt && !several ? { askAt: site.nameAt } : {}) });
+      const called = lang === "ts" && site.nameAt && !several && ["call", "apply"].includes(site.name) ? calls.get(site.nameAt.start) : undefined;
+      const value = called ? valueLeaf(called) : undefined;
+      mine.set(key, {
+        file: rel, key, line: site.line, name: site.name, routine, rline, text,
+        ...(site.nameAt && !several ? { askAt: site.nameAt } : {}),
+        ...(value ? { valueAt: { start: value.startIndex, end: value.startIndex + value.text.length, name: value.text } } : {}),
+      });
     }
     if (tree) {
       // Computed calls: the name a person would ask about, when there is one.
@@ -618,18 +685,37 @@ async function measureOne(setName: string, project: string): Promise<void> {
     const t0 = Date.now();
     tsConfigDiagnostics(root, say);
     const key = groupKey("ts");
-    const tsQuestions = unanswered("ts", key, tsAll);
-    if (tsQuestions.length === 0) say(`tsc: all ${tsAll.length} questions answered by the kept run`);
-    else {
-      let referee: ReturnType<typeof createTsReferee> | undefined;
-      try { referee = createTsReferee(root); } catch (error) { say(`tsc: could not build: ${error instanceof Error ? error.message : String(error)}`); }
-      if (!referee) { say("tsc: no referee for this tree"); noServer.add("ts"); }
-      else {
-        await ask(tsQuestions, async (file, at) => located(referee!.symbolDeclarationLocationAt(path.resolve(root, file), at.start, at.end)),
-          (abs) => isOutsideTree(abs, root), { group: "ts", key, trusted: () => "all" });
-        say(`tsc: ${tsQuestions.length} questions in ${Math.round((Date.now() - t0) / 1000)}s`);
+    let referee: ReturnType<typeof createTsReferee> | undefined;
+    let built = false;
+    /** Asks what no kept run answered; builds the referee only when something is left. */
+    const tsAsk = async (list: Array<{ file: string; at: { start: number; end: number } }>): Promise<number> => {
+      const left = unanswered("ts", key, list);
+      if (left.length === 0) return 0;
+      if (!built) {
+        built = true;
+        try { referee = createTsReferee(root); } catch (error) { say(`tsc: could not build: ${error instanceof Error ? error.message : String(error)}`); }
+        if (!referee) { say("tsc: no referee for this tree"); noServer.add("ts"); }
+      }
+      if (!referee) return 0;
+      await ask(left, async (file, at) => located(referee!.symbolDeclarationLocationAt(path.resolve(root, file), at.start, at.end)),
+        (abs) => isOutsideTree(abs, root), { group: "ts", key, trusted: () => "all" });
+      return left.length;
+    };
+    const first = await tsAsk(tsAll);
+    // `x.call(...)` the compiler places at the built-in: ask at `x` (#470).
+    const again: Array<{ file: string; at: { start: number; end: number } }> = [];
+    for (const [file, mine] of entries) {
+      if (langOf(languageOf(file)!) !== "ts") continue;
+      for (const one of mine.values()) {
+        if (!one.valueAt || !one.askAt || raw.get(rawKey(file, one.askAt.start)) !== "outside") continue;
+        one.askAt = { start: one.valueAt.start, end: one.valueAt.end };
+        one.name = one.valueAt.name;
+        again.push({ file, at: one.askAt });
       }
     }
+    const second = await tsAsk(again);
+    if (first + second === 0) say(`tsc: all ${tsAll.length + again.length} questions answered by the kept run`);
+    else say(`tsc: ${first} questions, then ${second} of ${again.length} asked again at a function value, in ${Math.round((Date.now() - t0) / 1000)}s`);
   }
   const pyAll = questions((lang) => lang === "python");
   if (pyAll.length > 0) {
@@ -772,7 +858,8 @@ async function measureOne(setName: string, project: string): Promise<void> {
     const calls = tree ? callsByName(tree) : new Map<number, Node>();
     const liveSites = sitesOf(live, calls);
     for (const entry of mine.values()) {
-      const l = liveSites.get(entry.key);
+      // A `.call` the compilers place as a call of its function value is named there (#470).
+      const l = liveSites.get(entry.key) ?? (entry.valueAt ? liveSites.get(`n:${entry.valueAt.start}`) : undefined);
       const liveAnswer: CheckerAnswer = l?.several ? { file: l.several[0]!.file, several: true } : l ? answerOf(l.site) : entry.text;
       const compiler = interpret(file, entry.askAt, lang, entry.name, liveAnswer.as ?? entry.text.as);
       const bin = { live: binOf(liveAnswer, compiler), text: binOf(entry.text, compiler) };

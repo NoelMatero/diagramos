@@ -991,6 +991,15 @@ type Callee =
        * check it.
        */
       memberAt: { start: number; end: number };
+      /**
+       * JavaScript's `x.call(...)` or `x.apply(...)` where nothing says
+       * whether `x` is a function, which then runs whatever `x` holds (#470):
+       * a doubt about every name, as `dynamic` is. `receiver` while what `x`
+       * is waits on a compiler, which is the doubt a live check starts one
+       * for; `dynamic` when `x` is computed. Set by `valueCalled`, never by
+       * the name alone.
+       */
+      runs?: "receiver" | "dynamic";
     }
   /** `table[k]()` -- the name is not in the text. */
   | { kind: "computed" };
@@ -1009,9 +1018,53 @@ const NAME_LEAF = /identifier$|^field_identifier$|^property_identifier$/;
  * and the list was thrown away as untrusted (#366).
  */
 function calleeOf(node: Node): Callee | undefined {
-  const called = node.childForFieldName("arguments") ? node.childForFieldName("function") : undefined;
+  let called = node.childForFieldName("arguments") ? node.childForFieldName("function") : undefined;
+  // `super(...)` runs the class its own class extends: `constructedBy` reads it (#470).
+  if (called?.type === "super") return undefined;
+  /*
+   * `await g<T>()` is a call of `g` whose result is awaited, and TypeScript's
+   * grammar hands it back as a call of `await g` -- 153 calls in the #467
+   * census, every one of them read as computed. An `await` written as the
+   * callee itself is only ever that misreading: a call of an awaited value is
+   * written `(await g)()`, and the parentheses keep that one computed.
+   */
+  if (called?.type === "await_expression") called = firstNamed(called) ?? called;
   const callee = called ?? node.childForFieldName("macro");
   return callee ? calleeOfNode(callee) : undefined;
+}
+
+/** A node's first named child that is not a comment. */
+function firstNamed(node: Node): Node | undefined {
+  for (let at = 0; at < node.childCount; at += 1) {
+    const child = node.child(at);
+    if (child?.isNamed && !/comment/.test(child.type)) return child;
+  }
+  return undefined;
+}
+
+/**
+ * The callee with what only the type checker reads taken off (#470):
+ * parentheses and `<T>` written on a name -- `(f)(x)` and `(g<T>)(x)` call
+ * what is inside them.
+ *
+ * Two things in parentheses are a value and not a name, and stay computed:
+ * an awaited value, `(await g)()`, and a Rust field, `(self.f)(x)`, which
+ * runs the function stored there where `self.f(x)` would run a method.
+ *
+ * TypeScript's `!` stays computed too. `this.cb!(x)` is almost always an
+ * optional field holding a function, which runs whatever was stored there,
+ * and read as `this.cb(x)` it would close a body around a call nobody can
+ * place.
+ */
+function unwrapped(callee: Node): Node {
+  let at = callee;
+  for (let depth = 0; depth < 8; depth += 1) {
+    if (!/^(parenthesized_expression|instantiation_expression)$/.test(at.type)) return at;
+    const inner = firstNamed(at);
+    if (!inner || inner.type === "await_expression" || inner.type === "await" || inner.type === "field_expression") return at;
+    at = inner;
+  }
+  return at;
 }
 
 /**
@@ -1029,9 +1082,52 @@ function calleeOf(node: Node): Callee | undefined {
  * refutation and can never start one.
  */
 function constructedBy(node: Node): Callee | undefined {
+  /*
+   * `super(...)` in a constructor runs the constructor of the class this one
+   * extends, the way `new Base(...)` does, and is read the same way (#470):
+   * 557 TypeScript calls in the #467 census were computed for want of it.
+   * The class is the one the call is written in, which is not always the
+   * holder of the routine being read: a function that declares a class reads
+   * that class's constructor as part of its own body.
+   */
+  if (node.type === "call_expression" && node.childForFieldName("function")?.type === "super") {
+    const base = basesOfSuper(node.tree).get(node.id);
+    return base ? calleeOfNode(base) : { kind: "computed" };
+  }
   if (node.type !== "new_expression") return undefined;
   const made = node.childForFieldName("constructor");
   return made ? calleeOfNode(made) : { kind: "computed" };
+}
+
+const superBases = new WeakMap<Tree, Map<number, Node>>();
+
+/**
+ * Every `super(...)` call in a file, by node id, to what its class's
+ * `extends` clause names: `Base` in `class C extends Base<T>`. A call in a
+ * class nested in another belongs to the inner one; a class with no
+ * `extends` names nothing.
+ */
+function basesOfSuper(tree: Tree): Map<number, Node> {
+  const known = superBases.get(tree);
+  if (known) return known;
+  const found = new Map<number, Node>();
+  const visit = (node: Node, base: Node | undefined): void => {
+    let here = base;
+    if (node.childForFieldName("body")?.type === "class_body") {
+      here = undefined;
+      for (const heritage of children(node)) {
+        if (heritage.type !== "class_heritage") continue;
+        for (const clause of children(heritage)) {
+          if (clause.type === "extends_clause") here = clause.childForFieldName("value") ?? undefined;
+        }
+      }
+    }
+    if (here && node.type === "call_expression" && node.childForFieldName("function")?.type === "super") found.set(node.id, here);
+    for (const child of children(node)) visit(child, here);
+  };
+  visit(tree.rootNode, undefined);
+  superBases.set(tree, found);
+  return found;
 }
 
 /** The two grammar nodes a JSX tag that renders something is spelt with; a closing tag renders nothing. */
@@ -1053,7 +1149,8 @@ function renderedBy(node: Node): Callee | undefined {
   return calleeOfNode(name);
 }
 
-function calleeOfNode(callee: Node): Callee {
+function calleeOfNode(written: Node): Callee {
+  const callee = unwrapped(written);
   if (callee.childCount === 0) {
     return NAME_LEAF.test(callee.type)
       ? { kind: "bare", name: callee.text, nameAt: { start: callee.startIndex, end: callee.startIndex + callee.text.length } }
@@ -1262,14 +1359,81 @@ function chosenCallees(routine: Node, name: string, call: Node, language: Langua
 /**
  * The names a body can reach without naming them.
  *
- * All four languages have a way to call a string, and a body that uses one can
- * call anything at all -- so the doubt is raised whatever name was asked after,
- * the same way a computed callee is.
+ * Python and JavaScript have a built-in that calls a string, and a body that
+ * uses one can call anything at all -- so the doubt is raised whatever name
+ * was asked after, the same way a computed callee is.
+ *
+ * Each language's own, and only the built-in (#470): read by name in every
+ * language, Python's `vd.call(...)`, Rust's `service.call(req)`, a
+ * TypeScript `re.exec(s)` and Vue's own function `apply` all read as "could
+ * call anything". JavaScript's `.call` and `.apply` run a function value, not
+ * a name, and `valueCalled` reads them.
  */
-const REACHES_ANYTHING = new Set([
-  "getattr", "setattr", "eval", "exec", "__import__", "globals", "locals", "vars",
-  "apply", "call", "Function",
-]);
+const REACHES_ANYTHING_IN: Record<Language, ReadonlySet<string>> = (() => {
+  const python = new Set(["getattr", "setattr", "eval", "exec", "__import__", "globals", "locals", "vars"]);
+  const javascript = new Set(["eval", "Function"]);
+  return { python, ts: javascript, tsx: javascript, js: javascript, rust: new Set<string>() };
+})();
+
+/** Any language's, for a reading that has no language to hand (`calleeOfNode`). */
+const REACHES_ANYTHING = new Set(Object.values(REACHES_ANYTHING_IN).flatMap((names) => [...names]));
+
+/**
+ * Whether a bare call is one of its language's built-ins that call by name:
+ * not something this file declares or imports under that name.
+ */
+function reachesAnything(callee: Callee, side: CallSide, bindings: Bindings, site?: Node): boolean {
+  if (callee.kind !== "bare" || !REACHES_ANYTHING_IN[side.language].has(callee.name)) return false;
+  if (!site) return true;
+  const meaning = meaningOf(callee.name, side, bindings, site, "value").at;
+  return meaning !== "bound" && meaning !== "declared" && meaning !== "imported";
+}
+
+/** The members JavaScript runs a function value through. */
+const RUNS_A_VALUE = new Set(["call", "apply"]);
+const JAVASCRIPT = new Set<Language>(["ts", "tsx", "js"]);
+
+/**
+ * What JavaScript's `x.call(thisArg, ...)` and `x.apply(thisArg, xs)` run
+ * (#470): `x`, when `x` is a function -- `render.call(null, 1)` is a call of
+ * `render`, `Object.prototype.hasOwnProperty.call(o, k)` a library's. When
+ * `x` is a value the text can see is not a function, `call` is an ordinary
+ * method of it.
+ *
+ * When nothing says which, the call stays a doubt about every name (`runs`):
+ * a parameter's `handler.call(ctx, x)` runs whatever the caller passed, and
+ * the "go to definition" the compiler gives at `call` is the built-in
+ * `Function.prototype.call`, which says nothing about what runs. Asked
+ * there, an answer inside the repository means a method of the repository's
+ * named `call`; an answer outside means `x` is a function, read as the call
+ * of `x` it is.
+ */
+function valueCalled(callee: Callee, side: CallSide, bindings: Bindings, site: Node, holder?: Node): Callee {
+  if (!JAVASCRIPT.has(side.language) || callee.kind !== "through" || !RUNS_A_VALUE.has(callee.name)) return callee;
+  const member = unwrapped(site.childForFieldName("function") ?? site);
+  const object = member.childForFieldName("object");
+  const value = object ? calleeOfNode(object) : undefined;
+  if (!value || value.kind === "computed") return { ...callee, runs: "dynamic" };
+  const placed = placeOf(value, { ...side, declarationAt: undefined }, bindings, site, holder);
+  if ("why" in placed || placed.as === undefined) {
+    const asked = side.declarationAt ? placeThroughDefinition(callee.memberAt, side) : undefined;
+    if (asked?.file === EXTERNAL_RECEIVER) return value;
+    if (asked && asked.as !== undefined && RUNS_A_VALUE.has(asked.as)) return callee;
+    return { ...callee, runs: "receiver" };
+  }
+  if (placed.file === EXTERNAL_RECEIVER) return value;
+  const there = placed.file === side.file ? side : side.open?.(placed.file);
+  if (!there) return { ...callee, runs: "receiver" };
+  if (isRoutine(there.source, placed.as, there.language)) return value;
+  /*
+   * A value the text places but cannot see is a function -- a field, a
+   * constant: an object of its own with a `call` method, unless the compiler
+   * says `call` here is the built-in. Then it is a function value, read as a
+   * call of it, the way calling the value directly is.
+   */
+  const asked = side.declarationAt ? placeThroughDefinition(callee.memberAt, side) : undefined;
+  return asked?.file === EXTERNAL_RECEIVER ? value : callee;
+}
 
 /**
  * The ones that only read or write by name (#431). Python's `getattr` hands
@@ -1620,8 +1784,8 @@ function resolves(
   holder?: Node,
 ): "yes" | CallsWithheld | undefined {
   if (callee.kind === "computed") return "computed";
-  if (callee.kind === "bare" && REACHES_ANYTHING.has(callee.name)) return "dynamic";
-  if (callee.kind === "through" && REACHES_ANYTHING.has(callee.name)) return "dynamic";
+  if (callee.kind === "through" && callee.runs) return callee.runs;
+  if (reachesAnything(callee, side, bindings, site)) return "dynamic";
   /*
    * The gate: is this call even about the name being asked after? It is when
    * the call site spells it, and also when an import renamed it on the way in
@@ -1794,9 +1958,11 @@ function callsTo(
         }
         return;
       }
-      const callee = calleeOf(node);
-      if (!callee) return;
-      const answer = resolves(callee, side, bindings, target, node, holders.get(body.id) ?? ownHolder(body));
+      const written = calleeOf(node);
+      if (!written) return;
+      const holder = holders.get(body.id) ?? ownHolder(body);
+      const callee = valueCalled(written, side, bindings, node, holder);
+      const answer = resolves(callee, side, bindings, target, node, holder);
       if (answer === undefined) return;
       // Read or set by name, and the result runs nowhere: no call to the head (#431).
       if (answer === "dynamic" && quiet?.has(node.id)) return;
@@ -3636,7 +3802,8 @@ function placeOf(
   holder?: Node,
 ): Placement | { why: SiteUnresolved } {
   if (callee.kind === "computed") return { why: "computed" };
-  if (REACHES_ANYTHING.has(callee.name)) return { why: "dynamic" };
+  if (callee.kind === "through" && callee.runs) return { why: callee.runs };
+  if (reachesAnything(callee, side, bindings, site)) return { why: "dynamic" };
 
   if (callee.kind === "own") return placeOwn(callee, side, holder, site);
 
@@ -4071,8 +4238,9 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
         });
         return;
       }
-      const callee = calleeOf(inner) ?? constructedBy(inner) ?? renderedBy(inner);
-      if (!callee) return;
+      const written = calleeOf(inner) ?? constructedBy(inner) ?? renderedBy(inner);
+      if (!written) return;
+      const callee = valueCalled(written, side, bindings, inner, holder);
       const where = placeOf(callee, side, bindings, inner, holder);
       if ("why" in where && where.why === "dynamic" && quiet?.has(inner.id)) {
         body.sites.push({ ...siteOf(callee, side.source, inner, { file: EXTERNAL_RECEIVER }), byName: true });
