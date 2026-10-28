@@ -78,6 +78,14 @@ describe("macros whose tokens stay unread", () => {
     expect(sites(files, "src/a.rs", "run")).toEqual(["route -> src/a.rs", "?macro"]);
   });
 
+  it("leaves unread the arguments of a macro that takes them apart", () => {
+    // rayon's `convert_char!(self.drive(c))` calls `drive` on an iterator it builds, not on `self`.
+    const files: Files = {
+      "src/a.rs": { source: "macro_rules! convert {\n    ($self:ident . $method:ident ( $( $arg:expr ),* )) => { other().$method($( $arg ),*) };\n}\n\nstruct R;\nimpl R {\n    fn drive(&self, c: u8) -> u8 { convert!(self.drive(c)) }\n}\n" },
+    };
+    expect(sites(files, "src/a.rs", "drive")).toEqual(["convert -> src/a.rs", "?macro"]);
+  });
+
   it("reads the arguments of a macro whose expansion runs more, and keeps the body open", () => {
     // The template calls into this crate (`$crate::out::write`): that call is in nobody's arguments.
     const files: Files = {

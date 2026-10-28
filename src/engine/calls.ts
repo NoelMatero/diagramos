@@ -4384,6 +4384,7 @@ function readMacro(tokens: Node, side: CallSide, bindings: Bindings): { tops?: N
   if (invocation?.type !== "macro_invocation") return { open: true };
   const origin = macroOrigin(invocation, side, bindings);
   if (origin.kind === "unknown") return { open: true };
+  if (origin.kind === "repo" && !origin.definitions.every(takesExpressions)) return { open: true };
   const form = origin.kind === "std" && origin.name === "matches" ? "match" : "list";
   const tops = macroArguments(invocation, tokens, side.source, form);
   if (!tops) return { open: true };
@@ -4436,6 +4437,50 @@ function macroOrigin(invocation: Node, side: CallSide, bindings: Bindings): Macr
     default:
       return { kind: "unknown" };
   }
+}
+
+/**
+ * Whether every rule of a `macro_rules!` takes its arguments as expressions
+ * or passes tokens on whole (`$e:expr`, `$($arg:tt)*`, separated by `,` or
+ * `;`). A rule that takes them apart -- `$self:ident . $method:ident (..)`,
+ * a `$t:ty`, a keyword it matches on -- can run the call it was handed on
+ * something else entirely: rayon's `convert_char!(self.drive(c))` calls
+ * `drive` on an iterator it builds, not on `self`.
+ */
+function takesExpressions(definition: MacroDefinition): boolean {
+  let rules = 0;
+  for (let at = 0; at < definition.node.childCount; at += 1) {
+    const rule = definition.node.child(at);
+    if (rule?.type !== "macro_rule") continue;
+    rules += 1;
+    const left = rule.childForFieldName("left");
+    if (!left || !matcherOfExpressions(left, true)) return false;
+  }
+  return rules > 0;
+}
+
+function matcherOfExpressions(pattern: Node, outer: boolean): boolean {
+  for (let at = 0; at < pattern.childCount; at += 1) {
+    const token = pattern.child(at)!;
+    const edge = outer && (at === 0 || at === pattern.childCount - 1);
+    if (edge && /^[([{\])}]$/.test(token.type)) continue;
+    switch (token.type) {
+      case "token_binding_pattern": {
+        const kind = token.childForFieldName("type")?.text;
+        if (kind !== "expr" && kind !== "tt") return false;
+        break;
+      }
+      case "token_repetition_pattern":
+        if (!matcherOfExpressions(token, false)) return false;
+        break;
+      case "$": case "(": case ")": case "*": case "+": case "?": case ",": case ";":
+        break;
+      default:
+        if (/comment/.test(token.type)) break;
+        return false;
+    }
+  }
+  return true;
 }
 
 /** Every `macro_rules! name` written in one file. */
