@@ -125,6 +125,13 @@ interface Scope {
 interface Index {
   parents: Map<number, Node>;
   scopes: Map<number, Scope | null>;
+  /**
+   * A Rust macro's arguments read as code (#471) are a tree of their own,
+   * hung under the invocation they were written in: climbing out of one goes
+   * on in the file's tree. `parents` maps the top of what was read to the
+   * invocation, and every other parent is looked up here.
+   */
+  host?: { tree: Tree; index: Index };
 }
 
 const indexes = new WeakMap<Tree, Index>();
@@ -148,6 +155,34 @@ function indexOf(tree: Tree): Index {
 }
 
 /**
+ * Hang a tree read out of a Rust macro's arguments under the invocation it was
+ * written in (#471): `tops` are what was read, and a name looked up from inside
+ * them climbs into `under` and on through the file around it. Positions are
+ * the file's own, so "declared before this line" reads the same.
+ */
+export function graft(tree: Tree, under: Node, tops: Node[]): void {
+  const index = indexOf(tree);
+  index.host = { tree: under.tree, index: indexOf(under.tree) };
+  for (const top of tops) index.parents.set(top.id, under);
+}
+
+/** A node's parent, out of a grafted tree into the file's when the climb gets there. */
+function parentOf(index: Index, id: number): Node | undefined {
+  for (let at: Index | undefined = index; at; at = at.host?.index) {
+    const parent = at.parents.get(id);
+    if (parent) return parent;
+  }
+  return undefined;
+}
+
+/** The trees a node's climb passes through: its own, then each it was grafted into. */
+function treesOf(tree: Tree): Tree[] {
+  const out = [tree];
+  for (let at = indexes.get(tree)?.host; at; at = at.index.host) out.push(at.tree);
+  return out;
+}
+
+/**
  * The tree a node belongs to. Not `parseSource` again: reading one call can
  * open other files, the parse cache can let this one go meanwhile, and a
  * fresh tree has none of the old one's nodes -- every lookup from a call in
@@ -163,9 +198,9 @@ function treeOf(node: Node, source: string, language: Language): Tree | undefine
 export function enclosing(source: string, language: Language, node: Node): Node[] {
   const tree = treeOf(node, source, language);
   if (!tree) return [];
-  const { parents } = indexOf(tree);
+  const index = indexOf(tree);
   const out: Node[] = [];
-  for (let at = parents.get(node.id); at; at = parents.get(at.id)) out.push(at);
+  for (let at = parentOf(index, node.id); at; at = parentOf(index, at.id)) out.push(at);
   return out;
 }
 
@@ -787,7 +822,7 @@ function importNames(node: Node, scope: Scope, language: "ts" | "python" | "rust
 function scopeAt(index: Index, node: Node, language: Language): Scope | null {
   if (index.scopes.has(node.id)) return index.scopes.get(node.id)!;
   // The top of the tree is the module, whatever the parser could make of it.
-  const root = !index.parents.has(node.id);
+  const root = !parentOf(index, node.id);
   const made = language === "python" ? pyScope(node, root) : language === "rust" ? rustScope(node, root) : tsScope(node, root);
   index.scopes.set(node.id, made);
   return made;
@@ -795,7 +830,7 @@ function scopeAt(index: Index, node: Node, language: Language): Scope | null {
 
 /** Whether a node is the body of a Rust `mod name { .. }` written in place. */
 function inlineModule(index: Index, node: Node): boolean {
-  return node.type === "declaration_list" && index.parents.get(node.id)?.type === "mod_item";
+  return node.type === "declaration_list" && parentOf(index, node.id)?.type === "mod_item";
 }
 
 /** The `enum` this file declares under `name`, and its variants -- for `use Kind::*`. */
@@ -860,7 +895,7 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
    * not the host's. Every scope holding such a line, met on the way out,
    * answers "not known" rather than answering past it.
    */
-  const unread = unreadIn(tree).filter((one) => wholeName(name).test(one.lines));
+  const unread = treesOf(tree).flatMap(unreadIn).filter((one) => wholeName(name).test(one.lines));
 
   /** Crossed a function, lambda or comprehension: a class body is out of sight. */
   let inFunction = false;
@@ -882,14 +917,14 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
    */
   let macrosOnly = false;
 
-  for (let at: Node | undefined = site; at; below = at, at = index.parents.get(at.id)) {
+  for (let at: Node | undefined = site; at; below = at, at = parentOf(index, at.id)) {
     const holder = at;
     if (unread.some((one) => holder.startIndex <= one.start && one.end <= holder.endIndex)) return { at: "unknown", why: "unbound" };
     if (language === "rust" && at.type === "let_condition") continue;
     let scope = scopeAt(index, at, language);
     if (language === "rust" && at.type === "declaration_list") {
       // An `impl` or a `trait` body declares members, not names.
-      const owner = index.parents.get(at.id);
+      const owner = parentOf(index, at.id);
       if (owner && owner.type !== "mod_item") scope = null;
     }
     if (language === "rust" && (at.type === "if_expression" || at.type === "while_expression")) {
@@ -947,7 +982,7 @@ export function lookUp(name: string, site: Node, side: LookUp, space: Space = "v
           // `use super::*` in a module written inside this file: the module
           // around it, read below as the climb goes on.
           if (specifier === "super" && inlineModule(index, at)) { throughSuper = true; continue; }
-          const answer = judgeWildcard(specifier, name, tree, side, space);
+          const answer = judgeWildcard(specifier, name, treesOf(tree).at(-1)!, side, space);
           if (answer === "unknown") return { at: "unknown", why: "unbound" };
           if (typeof answer === "object") { carriers += 1; carried = answer.has; }
         }

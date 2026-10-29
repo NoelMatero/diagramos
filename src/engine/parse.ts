@@ -84,7 +84,7 @@ function wasmDirectory(): string | undefined {
 }
 
 interface Parser {
-  parse(source: string): Tree;
+  parse(source: string, oldTree?: null, options?: { includedRanges?: IncludedRange[] }): Tree;
   setLanguage(language: unknown): void;
 }
 
@@ -301,6 +301,31 @@ export function withParsed<T>(source: string, language: Language, use: (tree: Tr
   } finally {
     tree.delete();
   }
+}
+
+/** A stretch of a document the parser reads, in the units `Node` reports (UTF-16 code units). */
+export interface IncludedRange {
+  startIndex: number;
+  endIndex: number;
+  startPosition: { row: number; column: number };
+  endPosition: { row: number; column: number };
+}
+
+/**
+ * Parse only some stretches of `text`, with every node at the offset it has
+ * in the whole document (#471). Outside the cache: the caller keeps the tree,
+ * and it is freed once nothing can reach it, as an evicted tree is.
+ *
+ * For code that the grammar keeps as loose tokens -- a Rust macro's
+ * arguments -- read in place, so a call found there sits on the same line and
+ * the same offsets a compiler is asked at.
+ */
+export function parseIncluded(text: string, language: Language, ranges: IncludedRange[]): Tree | undefined {
+  const parser = parsers.get(language);
+  if (!parser) return undefined;
+  const tree = parser.parse(text, null, { includedRanges: ranges });
+  release(tree);
+  return tree;
 }
 
 /**

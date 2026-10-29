@@ -13,6 +13,10 @@
  * A switched-off region now blocks only when it names the head or holds a
  * macro. `cfg` on the routine, on what holds it, `cfg!()` and `cfg_attr` still
  * block the whole list.
+ *
+ * Since #471 the text reads `ok!(x)` when `ok!` is the crate's own
+ * `macro_rules!`; the macro here takes `ok!(=> x)`, tokens the text cannot
+ * read, so these stay about rustc's list.
  */
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -36,7 +40,7 @@ const ACCUSES = new Set<string>(ACCUSING_EDGE_KINDS);
 const FILES: Record<string, string> = {
   "Cargo.toml": '[package]\nname = "gates"\nversion = "0.1.0"\nedition = "2021"\n\n[features]\nextra = []\n',
   "src/lib.rs":
-    "macro_rules! ok {\n    ($e:expr) => {\n        $e\n    };\n}\n\npub mod callers;\npub mod helpers;\n",
+    "macro_rules! ok {\n    (=> $e:expr) => {\n        $e\n    };\n}\n\npub mod callers;\npub mod helpers;\n",
   "src/helpers.rs":
     "pub fn helper() -> u8 {\n    1\n}\n\npub fn unrelated() -> u8 {\n    2\n}\n\n"
     + "pub fn drop_it<T>() -> u8 {\n    3\n}\n\npub fn keep<T>() -> u8 {\n    4\n}\n",
@@ -47,20 +51,20 @@ const FILES: Record<string, string> = {
     "pub struct Flags {\n    pub on: bool,\n    #[cfg(feature = \"extra\")]\n    pub extra: u8,\n}",
     "pub struct Ops {\n    pub run: fn() -> u8,\n}",
     // anyhow's shape: a literal with a switched-off field and a function pointer.
-    "#[cfg(not(feature = \"extra\"))]\npub fn vtable<E>() -> Table {\n    let _n = ok!(helper());\n    Table {\n        run: drop_it::<E>,\n"
+    "#[cfg(not(feature = \"extra\"))]\npub fn vtable<E>() -> Table {\n    let _n = ok!(=> helper());\n    Table {\n        run: drop_it::<E>,\n"
       + "        #[cfg(feature = \"extra\")]\n        extra: 1,\n    }\n}",
-    "pub fn statement() -> u8 {\n    #[cfg(feature = \"extra\")]\n    let _x = 1;\n    ok!(helper())\n}",
-    "pub fn field() -> Flags {\n    let _n = ok!(helper());\n    Flags {\n        on: true,\n"
+    "pub fn statement() -> u8 {\n    #[cfg(feature = \"extra\")]\n    let _x = 1;\n    ok!(=> helper())\n}",
+    "pub fn field() -> Flags {\n    let _n = ok!(=> helper());\n    Flags {\n        on: true,\n"
       + "        #[cfg(feature = \"extra\")]\n        extra: 1,\n    }\n}",
     // `&Ops { .. }` is promoted to a constant of its own, so the pointer is in no body rustc lists.
-    "pub fn pointer<E>() -> u8 {\n    let _ops = &Ops { run: keep::<E> };\n    ok!(helper())\n}",
-    "#[cfg(not(feature = \"extra\"))]\npub fn only_here() -> u8 {\n    ok!(helper())\n}",
-    "pub fn names_head() -> u8 {\n    #[cfg(feature = \"extra\")]\n    let _x = unrelated();\n    ok!(helper())\n}",
-    "pub fn holds_macro() -> u8 {\n    #[cfg(feature = \"extra\")]\n    let _x = ok!(3);\n    ok!(helper())\n}",
-    "pub fn asks_cfg() -> u8 {\n    if cfg!(feature = \"extra\") {\n        return 5;\n    }\n    ok!(helper())\n}",
-    "#[cfg(not(feature = \"extra\"))]\npub fn gated() -> u8 {\n    ok!(helper())\n}",
-    "#[cfg(feature = \"extra\")]\npub fn gated() -> u8 {\n    ok!(unrelated())\n}",
-    "pub fn attr() -> u8 {\n    #[cfg_attr(feature = \"extra\", allow(unused))]\n    let _x = 1;\n    ok!(helper())\n}",
+    "pub fn pointer<E>() -> u8 {\n    let _ops = &Ops { run: keep::<E> };\n    ok!(=> helper())\n}",
+    "#[cfg(not(feature = \"extra\"))]\npub fn only_here() -> u8 {\n    ok!(=> helper())\n}",
+    "pub fn names_head() -> u8 {\n    #[cfg(feature = \"extra\")]\n    let _x = unrelated();\n    ok!(=> helper())\n}",
+    "pub fn holds_macro() -> u8 {\n    #[cfg(feature = \"extra\")]\n    let _x = ok!(=> 3);\n    ok!(=> helper())\n}",
+    "pub fn asks_cfg() -> u8 {\n    if cfg!(feature = \"extra\") {\n        return 5;\n    }\n    ok!(=> helper())\n}",
+    "#[cfg(not(feature = \"extra\"))]\npub fn gated() -> u8 {\n    ok!(=> helper())\n}",
+    "#[cfg(feature = \"extra\")]\npub fn gated() -> u8 {\n    ok!(=> unrelated())\n}",
+    "pub fn attr() -> u8 {\n    #[cfg_attr(feature = \"extra\", allow(unused))]\n    let _x = 1;\n    ok!(=> helper())\n}",
     "",
   ].join("\n\n"),
 };

@@ -284,6 +284,22 @@ function computedAsk(call: Node): Node | undefined {
   return member && member.childCount === 0 ? member : undefined;
 }
 
+/** Every top-level token tree that starts on a line inside one of the routines read. */
+function tokensInBodies(tree: Node, reading: ReturnType<typeof callSitesIn>): Node[] {
+  if (!reading.read) return [];
+  const inBody = (row: number) => reading.bodies.some((body) => body.line <= row && row < body.line + body.lines);
+  const out: Node[] = [];
+  const collect = (n: Node): void => {
+    if (n.type === "token_tree") {
+      if (inBody(n.startPosition.row + 1)) out.push(n);
+      return;
+    }
+    for (let i = 0; i < n.namedChildCount; i++) collect(n.namedChild(i)!);
+  };
+  collect(tree);
+  return out;
+}
+
 /** Calls written inside a Rust macro's arguments: `name (`, `.name (`, `path::name (`, `name ! (`. */
 function callsInTokens(tree: Node, out: Node[] = []): Node[] {
   for (let i = 0; i < tree.childCount; i++) {
@@ -481,12 +497,14 @@ async function measureOne(setName: string, project: string): Promise<void> {
    * (`Command::new("x")` then `.long_flag(..)` below it) names a member on a
    * later line and is still an ordinary call.
    */
-  const isChosen = (site: CallSitePlaced, calls: Map<number, Node>): boolean => {
+  const isChosen = (site: CallSitePlaced, calls: Map<number, Node>, inMacros: Set<number>): boolean => {
     if (!site.nameAt) return false;
+    // A call the checker read inside a Rust macro's arguments (#471) has no call node in the file's tree.
+    if (inMacros.has(site.nameAt.start)) return false;
     const call = calls.get(site.nameAt.start);
     return !call || call.startPosition.row + 1 !== site.line;
   };
-  const sitesOf = (reading: ReturnType<typeof callSitesIn>, calls: Map<number, Node>) => {
+  const sitesOf = (reading: ReturnType<typeof callSitesIn>, calls: Map<number, Node>, inMacros: Set<number>) => {
     const found = new Map<string, { site: CallSitePlaced; routine: string; rline: number; several?: CallSitePlaced[] }>();
     if (!reading.read) return found;
     for (const body of reading.bodies) {
@@ -495,7 +513,7 @@ async function measureOne(setName: string, project: string): Promise<void> {
         if (site.why === "macro") continue;
         let key: string;
         if (site.nameAt) {
-          if (isChosen(site, calls)) {
+          if (isChosen(site, calls, inMacros)) {
             key = `chosen:${site.line}:${body.line}`;
             const had = found.get(key);
             found.set(key, { site, routine: body.routine, rline: body.line, several: [...(had?.several ?? []), site] });
@@ -525,9 +543,17 @@ async function measureOne(setName: string, project: string): Promise<void> {
     const mine = new Map<string, Entry>();
     const inTests = language === "rust" && tree ? rustTestModules(tree) : [];
     const calls = tree ? callsByName(tree) : new Map<number, Node>();
+    /*
+     * Every token tree inside a routine, top-level ones only: the calls a
+     * person reads in a macro's arguments. Before #471 these were exactly the
+     * token trees the checker raised a `macro` doubt for; since it reads some
+     * of them, the population is fixed by where they are instead.
+     */
+    const topTokens = tree && language === "rust" ? tokensInBodies(tree, reading) : [];
+    const inMacros = new Set(topTokens.flatMap((tokens) => callsInTokens(tokens).map((ident) => ident.startIndex)));
     for (const body of reading.bodies) declared.get(lang)!.add(body.routine);
     routineCount[lang] += reading.bodies.length;
-    for (const [key, { site, routine, rline, several }] of sitesOf(reading, calls)) {
+    for (const [key, { site, routine, rline, several }] of sitesOf(reading, calls, inMacros)) {
       const text: CheckerAnswer = several
         ? { file: several[0]!.file, several: true }
         : answerOf(site);
@@ -542,9 +568,6 @@ async function measureOne(setName: string, project: string): Promise<void> {
     if (tree) {
       // Computed calls: the name a person would ask about, when there is one.
       const callsByLine = new Map<number, Node[]>();
-      const macroLines = new Set<number>();
-      if (reading.read) for (const body of reading.bodies) for (const site of body.sites) if (site.why === "macro") macroLines.add(site.line);
-      const topTokens: Node[] = [];
       const walk = (n: Node): void => {
         if (isCall(n) && !nameLeaf(n)) {
           const row = n.startPosition.row + 1;
@@ -552,10 +575,7 @@ async function measureOne(setName: string, project: string): Promise<void> {
           list.push(n);
           callsByLine.set(row, list);
         }
-        if (n.type === "token_tree") {
-          if (macroLines.has(n.startPosition.row + 1)) topTokens.push(n);
-          return;
-        }
+        if (n.type === "token_tree") return;
         for (let i = 0; i < n.namedChildCount; i++) walk(n.namedChild(i)!);
       };
       walk(tree);
@@ -566,7 +586,7 @@ async function measureOne(setName: string, project: string): Promise<void> {
         const ask = call ? computedAsk(call) : undefined;
         if (ask) entry.askAt = { start: ask.startIndex, end: ask.startIndex + ask.text.length };
       }
-      // Calls inside a macro's arguments: the checker lists the macro as one doubt.
+      // Calls inside a macro's arguments the checker did not read: it lists the macro as one doubt.
       for (const tokens of topTokens) {
         for (const ident of callsInTokens(tokens)) {
           const key = `n:${ident.startIndex}`;
@@ -856,7 +876,8 @@ async function measureOne(setName: string, project: string): Promise<void> {
     });
     const tree = parseSource(source, language)?.rootNode as Node | undefined;
     const calls = tree ? callsByName(tree) : new Map<number, Node>();
-    const liveSites = sitesOf(live, calls);
+    const liveTokens = tree && language === "rust" && live.read ? tokensInBodies(tree, live) : [];
+    const liveSites = sitesOf(live, calls, new Set(liveTokens.flatMap((tokens) => callsInTokens(tokens).map((ident) => ident.startIndex))));
     for (const entry of mine.values()) {
       // A `.call` the compilers place as a call of its function value is named there (#470).
       const l = liveSites.get(entry.key) ?? (entry.valueAt ? liveSites.get(`n:${entry.valueAt.start}`) : undefined);

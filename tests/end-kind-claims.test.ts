@@ -539,12 +539,15 @@ describe("an arrow into a constant (#307)", () => {
      * on, so the premise is gone and the trivially-closed body now refutes
      * in all three languages. The check itself did not change; what changed
      * is which arrows reach it.
+     *
+     * Since #471 std's `println!` is read like ordinary code and the body
+     * closes, so the macro here is one nobody can find, which still cannot be.
      */
     const board = await boardOf("src/lib.rs#build", "src/lib.rs#LIMIT", "calls");
     const report = checkDrift(board, fakeWorkspace({
       "src/lib.rs": [
         "pub const LIMIT: usize = 4;",
-        "pub fn build() -> usize { println!(\"{}\", LIMIT); LIMIT }",
+        "pub fn build() -> usize { log_it!(\"{}\", LIMIT); LIMIT }",
         "",
       ].join("\n"),
     }), { edges: true });
