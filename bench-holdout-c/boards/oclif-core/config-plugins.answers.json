@@ -847,8 +847,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "calls|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin#_manifest@declared|",
-      "truth": "true",
-      "why": "its routine findCommand calls it"
+      "truth": "false",
+      "why": "re-judged by hand (#470/#480): load() calls _manifest() (plugin.ts:226) and nothing _manifest() reaches calls load(); findCommand calls loadWithData, a module loader"
     },
     {
       "id": "calls|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#readManifest|",
