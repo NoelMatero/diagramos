@@ -1,0 +1,1356 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "format-function-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 264,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 78276998,
+      "version": 1,
+      "versionNonce": 95101418,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Format Function Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Format Function Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-node-0",
+      "type": "rectangle",
+      "x": 140,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 576789353,
+      "version": 1,
+      "versionNonce": 170343539,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-node-0-label"
+        },
+        {
+          "id": "format-function-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "format-function-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "format-function-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "format-function-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "node": "format_fn",
+        "ref": "pkgs/core/src/format/index.ts#format"
+      }
+    },
+    {
+      "id": "format-function-flow-node-1",
+      "type": "rectangle",
+      "x": 800,
+      "y": 400,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1016003232,
+      "version": 1,
+      "versionNonce": 1041920508,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-node-1-label"
+        },
+        {
+          "id": "format-function-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "node": "long_regex",
+        "ref": "pkgs/core/src/format/index.ts#longFormattingTokensRegExp"
+      }
+    },
+    {
+      "id": "format-function-flow-node-2",
+      "type": "rectangle",
+      "x": 400,
+      "y": 400,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 492490639,
+      "version": 1,
+      "versionNonce": 1834175593,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-node-2-label"
+        },
+        {
+          "id": "format-function-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "format-function-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "node": "long_formatters",
+        "ref": "pkgs/core/src/_lib/format/longFormatters/index.ts#longFormatters"
+      }
+    },
+    {
+      "id": "format-function-flow-node-3",
+      "type": "rectangle",
+      "x": 400,
+      "y": 800,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 315939390,
+      "version": 1,
+      "versionNonce": 629821922,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-node-3-label"
+        },
+        {
+          "id": "format-function-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "node": "token_regex",
+        "ref": "pkgs/core/src/format/index.ts#formattingTokensRegExp"
+      }
+    },
+    {
+      "id": "format-function-flow-node-4",
+      "type": "rectangle",
+      "x": 1100,
+      "y": 400,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 734949813,
+      "version": 1,
+      "versionNonce": 1703467327,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-node-4-label"
+        },
+        {
+          "id": "format-function-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "format-function-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "node": "formatters_obj",
+        "ref": "pkgs/core/src/_lib/format/formatters/index.ts#formatters"
+      }
+    },
+    {
+      "id": "format-function-flow-node-5",
+      "type": "rectangle",
+      "x": 1100,
+      "y": 800,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 383704988,
+      "version": 1,
+      "versionNonce": 1415387048,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-node-5-label"
+        },
+        {
+          "id": "format-function-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "node": "localize",
+        "ref": "pkgs/core/src/locale/types.ts#Localize"
+      }
+    },
+    {
+      "id": "format-function-flow-node-6",
+      "type": "ellipse",
+      "x": 20,
+      "y": 400,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1205013355,
+      "version": 1,
+      "versionNonce": 1506479717,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-node-6-label"
+        },
+        {
+          "id": "format-function-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "node": "output"
+      }
+    },
+    {
+      "id": "format-function-flow-edge-0",
+      "type": "arrow",
+      "x": 226,
+      "y": 92,
+      "width": 676,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1700563934,
+      "version": 1,
+      "versionNonce": 133748738,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "edge": {
+          "from": "format_fn",
+          "to": "long_regex",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          432.39999999999986,
+          56
+        ],
+        [
+          676,
+          56
+        ],
+        [
+          676,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "format-function-flow-node-0",
+        "focus": -0.075,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "format-function-flow-node-1",
+        "focus": -0.07272727272727184,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "format-function-flow-edge-1",
+      "type": "arrow",
+      "x": 194,
+      "y": 92,
+      "width": 358,
+      "height": 310.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1093207855,
+      "version": 1,
+      "versionNonce": 679191177,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "edge": {
+          "from": "format_fn",
+          "to": "long_formatters",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          254.39999999999998,
+          80
+        ],
+        [
+          358,
+          80
+        ],
+        [
+          358,
+          310.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "format-function-flow-node-0",
+        "focus": 0.325,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "format-function-flow-node-2",
+        "focus": -0.049999999999999996,
+        "gap": 2.8000000000000114
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "format-function-flow-edge-2",
+      "type": "arrow",
+      "x": 552,
+      "y": 482.8,
+      "width": 0,
+      "height": 310.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1616617280,
+      "version": 1,
+      "versionNonce": 2034419740,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "edge": {
+          "from": "long_formatters",
+          "to": "token_regex",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          155.39999999999992
+        ],
+        [
+          0,
+          310.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "format-function-flow-node-2",
+        "focus": 0.049999999999999996,
+        "gap": 2.8000000000000114
+      },
+      "endBinding": {
+        "elementId": "format-function-flow-node-3",
+        "focus": -0.049999999999999996,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "format-function-flow-edge-3",
+      "type": "arrow",
+      "x": 258,
+      "y": 92,
+      "width": 954,
+      "height": 310.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1217179273,
+      "version": 1,
+      "versionNonce": 395427603,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "edge": {
+          "from": "format_fn",
+          "to": "formatters_obj",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          600.4,
+          32
+        ],
+        [
+          954,
+          32
+        ],
+        [
+          954,
+          310.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "format-function-flow-node-0",
+        "focus": -0.47500000000000003,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "format-function-flow-node-4",
+        "focus": -0.06666666666666657,
+        "gap": 2.8000000000000114
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "format-function-flow-edge-4",
+      "type": "arrow",
+      "x": 1212,
+      "y": 482.8,
+      "width": 0,
+      "height": 310.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 2115672058,
+      "version": 1,
+      "versionNonce": 2067094606,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "edge": {
+          "from": "formatters_obj",
+          "to": "localize",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          155.39999999999992
+        ],
+        [
+          0,
+          310.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "format-function-flow-node-4",
+        "focus": 0.06666666666666672,
+        "gap": 2.8000000000000114
+      },
+      "endBinding": {
+        "elementId": "format-function-flow-node-5",
+        "focus": 0.018181818181818243,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "format-function-flow-edge-5",
+      "type": "arrow",
+      "x": 162,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1805627403,
+      "version": 1,
+      "versionNonce": 351392133,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "format-function-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow",
+        "edge": {
+          "from": "format_fn",
+          "to": "output",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "format-function-flow-node-0",
+        "focus": 0.725,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "format-function-flow-node-6",
+        "focus": -0.053333333333333316,
+        "gap": 7.256202893142378
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "format-function-flow-node-0-label",
+      "type": "text",
+      "x": 176,
+      "y": 47.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1777475888,
+      "version": 1,
+      "versionNonce": 587561868,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "format()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-node-0",
+      "originalText": "format()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-node-1-label",
+      "type": "text",
+      "x": 833,
+      "y": 425,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1715085693,
+      "version": 1,
+      "versionNonce": 244286055,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "longFormatting\nTokensRegExp",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-node-1",
+      "originalText": "longFormatting\nTokensRegExp",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-node-2-label",
+      "type": "text",
+      "x": 483,
+      "y": 415,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 978246746,
+      "version": 1,
+      "versionNonce": 230454574,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "longFormatters\nfunctions",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-node-2",
+      "originalText": "longFormatters\nfunctions",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-node-3-label",
+      "type": "text",
+      "x": 494,
+      "y": 815,
+      "width": 132,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1688597279,
+      "version": 1,
+      "versionNonce": 461657017,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "formatting\nTokensRegExp",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-node-3",
+      "originalText": "formatting\nTokensRegExp",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-node-4-label",
+      "type": "text",
+      "x": 1165,
+      "y": 415,
+      "width": 110.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2005301212,
+      "version": 1,
+      "versionNonce": 1009946088,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "formatters\nobject",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-node-4",
+      "originalText": "formatters\nobject",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-node-5-label",
+      "type": "text",
+      "x": 1127.5,
+      "y": 827.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 286362553,
+      "version": 1,
+      "versionNonce": 131285379,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "locale.localize",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-node-5",
+      "originalText": "locale.localize",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-node-6-label",
+      "type": "text",
+      "x": 81.93398282201787,
+      "y": 427.7157287525381,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1248476694,
+      "version": 1,
+      "versionNonce": 1816296442,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "formatted string",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-node-6",
+      "originalText": "formatted string",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-edge-0-label",
+      "type": "text",
+      "x": 587.9999999999999,
+      "y": 138,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1637928767,
+      "version": 1,
+      "versionNonce": 980289625,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "match P/p @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-edge-0",
+      "originalText": "match P/p @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-edge-1-label",
+      "type": "text",
+      "x": 356,
+      "y": 162,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1245451386,
+      "version": 1,
+      "versionNonce": 1407998414,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "lookup by char @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-edge-1",
+      "originalText": "lookup by char @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-edge-2-label",
+      "type": "text",
+      "x": 486,
+      "y": 618.1999999999999,
+      "width": 132,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 949090461,
+      "version": 1,
+      "versionNonce": 248956167,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "expanded format\n@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-edge-2",
+      "originalText": "expanded format @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-edge-3-label",
+      "type": "text",
+      "x": 761.5999999999999,
+      "y": 114,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 549881552,
+      "version": 1,
+      "versionNonce": 932836268,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "lookup by token @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-edge-3",
+      "originalText": "lookup by token @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-edge-4-label",
+      "type": "text",
+      "x": 1146,
+      "y": 618.1999999999999,
+      "width": 132,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 724062059,
+      "version": 1,
+      "versionNonce": 956635749,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "formatters call\n@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-edge-4",
+      "originalText": "formatters call @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "format-function-flow-edge-5-label",
+      "type": "text",
+      "x": 109.19999999999999,
+      "y": 232.4,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1354739510,
+      "version": 1,
+      "versionNonce": 1153641626,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "format-function-flow"
+      },
+      "text": "join @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "format-function-flow-edge-5",
+      "originalText": "join @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

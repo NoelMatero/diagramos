@@ -1,0 +1,27 @@
+# pytest-dev-pytest: its dependencies and extras, resolved as of its pinned commit (2026-10-06), the way the main set's unlocked projects were:
+#   uv pip compile --all-extras --python-version 3.14 --exclude-newer 2026-10-06T12:47:29Z pyproject.toml
+argcomplete==3.7.2
+attrs==26.1.0
+certifi==2026.7.22
+charset-normalizer==3.5.2
+coverage==7.16.2
+elementpath==5.1.4
+execnet==2.1.2
+hypothesis==6.168.5
+idna==3.20
+iniconfig==2.3.0
+mock==5.2.0
+numpy==2.5.3
+packaging==26.3
+pexpect==4.9.0
+pluggy==1.6.0
+ptyprocess==0.7.0
+pygments==2.21.0
+pytest==9.1.1
+pytest-xdist==3.8.0
+pyyaml==6.0.3
+requests==2.34.2
+setuptools==84.0.0
+sortedcontainers==2.4.0
+urllib3==2.8.0
+xmlschema==4.3.2

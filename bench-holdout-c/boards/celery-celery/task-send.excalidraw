@@ -1,0 +1,1469 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "task-apply-async-producer-publish-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 528,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 826879588,
+      "version": 1,
+      "versionNonce": 374261232,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Task.apply_async → Producer.publish flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Task.apply_async → Producer.publish flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-0",
+      "type": "rectangle",
+      "x": 240,
+      "y": 20,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 2126687571,
+      "version": 1,
+      "versionNonce": 1082986669,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-node-0-label"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "node": "apply_async",
+        "ref": "celery/app/task.py#apply_async"
+      }
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-1",
+      "type": "rectangle",
+      "x": 240,
+      "y": 400,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1649818658,
+      "version": 1,
+      "versionNonce": 1282262806,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-node-1-label"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "node": "send_task",
+        "ref": "celery/app/base.py#send_task"
+      }
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-2",
+      "type": "rectangle",
+      "x": 160,
+      "y": 780,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 878355389,
+      "version": 1,
+      "versionNonce": 804562343,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-node-2-label"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "node": "create_task_message",
+        "ref": "celery/app/amqp.py#create_task_message"
+      }
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-3",
+      "type": "rectangle",
+      "x": 200,
+      "y": 1160,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1271242020,
+      "version": 1,
+      "versionNonce": 1860411312,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-node-3-label"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "node": "as_task_v2",
+        "ref": "celery/app/amqp.py#as_task_v2"
+      }
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-4",
+      "type": "rectangle",
+      "x": 220,
+      "y": 1540,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1380130839,
+      "version": 1,
+      "versionNonce": 1464293105,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-node-4-label"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "node": "task_message",
+        "ref": "celery/app/amqp.py#task_message"
+      }
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-5",
+      "type": "rectangle",
+      "x": 220,
+      "y": 1920,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1437366598,
+      "version": 1,
+      "versionNonce": 807639210,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-node-5-label"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "node": "send_task_message",
+        "ref": "celery/app/amqp.py#send_task_message"
+      }
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-6",
+      "type": "rectangle",
+      "x": 240,
+      "y": 2300,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1507005329,
+      "version": 1,
+      "versionNonce": 608077211,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-node-6-label"
+        },
+        {
+          "id": "task-apply-async-producer-publish-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "node": "producer_publish",
+        "ref": "kombu.Producer.publish",
+        "state": "external"
+      }
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-0",
+      "type": "arrow",
+      "x": 352.40000000000003,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1193547044,
+      "version": 1,
+      "versionNonce": 614107056,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "edge": {
+          "from": "apply_async",
+          "to": "send_task",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-0",
+        "focus": 0.06333333333333302,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-1",
+        "focus": -0.06333333333333287,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-1",
+      "type": "arrow",
+      "x": 312.40000000000003,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 800660413,
+      "version": 1,
+      "versionNonce": 1705741735,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "edge": {
+          "from": "send_task",
+          "to": "create_task_message",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-1",
+        "focus": 0.3966666666666664,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-2",
+        "focus": -0.047499999999999765,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-2",
+      "type": "arrow",
+      "x": 312.40000000000003,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1572123682,
+      "version": 1,
+      "versionNonce": 35958550,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "edge": {
+          "from": "create_task_message",
+          "to": "as_task_v2",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-2",
+        "focus": 0.047499999999999765,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-3",
+        "focus": 0.021818181818181768,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-3",
+      "type": "arrow",
+      "x": 312.40000000000003,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 2048992595,
+      "version": 1,
+      "versionNonce": 1984166061,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "edge": {
+          "from": "as_task_v2",
+          "to": "task_message",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-3",
+        "focus": -0.021818181818181768,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-4",
+        "focus": 0.026666666666666734,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-4",
+      "type": "arrow",
+      "x": 392.40000000000003,
+      "y": 472.8,
+      "width": 120.00000000000006,
+      "height": 1443.1999999999998,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 752129256,
+      "version": 1,
+      "versionNonce": 1896896708,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "edge": {
+          "from": "send_task",
+          "to": "send_task_message",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          120.00000000000006,
+          32
+        ],
+        [
+          120.00000000000006,
+          711.6000000000001
+        ],
+        [
+          120.00000000000006,
+          1335.1999999999998
+        ],
+        [
+          20,
+          1335.1999999999998
+        ],
+        [
+          20,
+          1442.6999999999998
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-1",
+        "focus": -0.2700000000000007,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-5",
+        "focus": 0.2826666666666664,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-5",
+      "type": "arrow",
+      "x": 312.40000000000003,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1429310353,
+      "version": 1,
+      "versionNonce": 1509256603,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "edge": {
+          "from": "task_message",
+          "to": "send_task_message",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-4",
+        "focus": -0.026666666666666734,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-5",
+        "focus": -0.38399999999999995,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-6",
+      "type": "arrow",
+      "x": 362.40000000000003,
+      "y": 1995.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1359671622,
+      "version": 1,
+      "versionNonce": 1708818602,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "task-apply-async-producer-publish-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow",
+        "edge": {
+          "from": "send_task_message",
+          "to": "producer_publish",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-5",
+        "focus": 0.050666666666666416,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "task-apply-async-producer-publish-flow-node-6",
+        "focus": 0.02000000000000071,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-0-label",
+      "type": "text",
+      "x": 272,
+      "y": 47.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1363262126,
+      "version": 1,
+      "versionNonce": 711965650,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "Task.apply_async",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-node-0",
+      "originalText": "Task.apply_async",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-1-label",
+      "type": "text",
+      "x": 272,
+      "y": 427.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 416680195,
+      "version": 1,
+      "versionNonce": 890608157,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "Celery.send_task",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-node-1",
+      "originalText": "Celery.send_task",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-2-label",
+      "type": "text",
+      "x": 188,
+      "y": 807.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 2127562356,
+      "version": 1,
+      "versionNonce": 2145376064,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "AMQP.create_task_message",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-node-2",
+      "originalText": "AMQP.create_task_message",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-3-label",
+      "type": "text",
+      "x": 227.5,
+      "y": 1187.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1457668273,
+      "version": 1,
+      "versionNonce": 1663183419,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "AMQP.as_task_v2",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-node-3",
+      "originalText": "AMQP.as_task_v2",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-4-label",
+      "type": "text",
+      "x": 244,
+      "y": 1567.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1953680146,
+      "version": 1,
+      "versionNonce": 1558283078,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "task_message",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-node-4",
+      "originalText": "task_message",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-5-label",
+      "type": "text",
+      "x": 249,
+      "y": 1947.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1827273143,
+      "version": 1,
+      "versionNonce": 1479449105,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "AMQP.send_task_message",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-node-5",
+      "originalText": "AMQP.send_task_message",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-node-6-label",
+      "type": "text",
+      "x": 272,
+      "y": 2327.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1710330600,
+      "version": 1,
+      "versionNonce": 1504981700,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "Producer.publish",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-node-6",
+      "originalText": "Producer.publish",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-0-label",
+      "type": "text",
+      "x": 286.40000000000003,
+      "y": 222.4,
+      "width": 132,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1401747633,
+      "version": 1,
+      "versionNonce": 602001979,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "app.send_task()\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-edge-0",
+      "originalText": "app.send_task() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-1-label",
+      "type": "text",
+      "x": 228.8,
+      "y": 603.1999999999999,
+      "width": 167.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 2071641716,
+      "version": 1,
+      "versionNonce": 1084194624,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "amqp.create_task_me\nssage() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-edge-1",
+      "originalText": "amqp.create_task_message() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-2-label",
+      "type": "text",
+      "x": 250.8,
+      "y": 983.9999999999999,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 360759555,
+      "version": 1,
+      "versionNonce": 1976910365,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "resolves to v2\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-edge-2",
+      "originalText": "resolves to v2 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-3-label",
+      "type": "text",
+      "x": 246.40000000000003,
+      "y": 1364.7999999999997,
+      "width": 132,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1307341486,
+      "version": 1,
+      "versionNonce": 1798267858,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "returns message\n@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-edge-3",
+      "originalText": "returns message @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-4-label",
+      "type": "text",
+      "x": 428.80000000000007,
+      "y": 1164.4,
+      "width": 167.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 341573941,
+      "version": 1,
+      "versionNonce": 2086780863,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "amqp.send_task_mess\nage() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-edge-4",
+      "originalText": "amqp.send_task_message() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-5-label",
+      "type": "text",
+      "x": 250.8,
+      "y": 1755.6,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1654409960,
+      "version": 1,
+      "versionNonce": 443800260,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "message @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-edge-5",
+      "originalText": "message @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "task-apply-async-producer-publish-flow-edge-6-label",
+      "type": "text",
+      "x": 283.20000000000005,
+      "y": 2126.4,
+      "width": 158.4,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1771352503,
+      "version": 1,
+      "versionNonce": 418267665,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "task-apply-async-producer-publish-flow"
+      },
+      "text": "producer.publish()\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "task-apply-async-producer-publish-flow-edge-6",
+      "originalText": "producer.publish() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

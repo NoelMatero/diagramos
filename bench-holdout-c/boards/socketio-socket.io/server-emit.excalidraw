@@ -1,0 +1,2017 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "socket-io-server-emit-broadcast-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 501.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 132346578,
+      "version": 1,
+      "versionNonce": 1392503558,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "role": "title"
+      },
+      "text": "Socket.IO Server Emit & Broadcast Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Socket.IO Server Emit & Broadcast Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 480,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1436651061,
+      "version": 1,
+      "versionNonce": 1021228735,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-node-0-label"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "node": "rawsocket",
+        "ref": "node_modules/engine.io",
+        "state": "external"
+      }
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-1",
+      "type": "rectangle",
+      "x": 680,
+      "y": 480,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1085406236,
+      "version": 1,
+      "versionNonce": 733148456,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-node-1-label"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "node": "client",
+        "ref": "packages/socket.io/lib/client.ts#Client"
+      }
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-2",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 420,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1906714603,
+      "version": 1,
+      "versionNonce": 824241125,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-node-2-label"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "node": "namespace",
+        "ref": "packages/socket.io/lib/namespace.ts#Namespace"
+      }
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-3",
+      "type": "rectangle",
+      "x": 720,
+      "y": 200,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 495637082,
+      "version": 1,
+      "versionNonce": 1159771950,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-node-3-label"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "node": "socket",
+        "ref": "packages/socket.io/lib/socket.ts#Socket"
+      }
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-4",
+      "type": "rectangle",
+      "x": 1860,
+      "y": 240,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1278490601,
+      "version": 1,
+      "versionNonce": 1635588595,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-node-4-label"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "node": "adapter",
+        "ref": "packages/socket.io/lib/namespace.ts#_initAdapter"
+      }
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-5",
+      "type": "rectangle",
+      "x": 640,
+      "y": 20,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1717704480,
+      "version": 1,
+      "versionNonce": 359681916,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-node-5-label"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "node": "broadcast_op",
+        "ref": "packages/socket.io/lib/broadcast-operator.ts#BroadcastOperator"
+      }
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-6",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 120,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1194191887,
+      "version": 1,
+      "versionNonce": 1151937001,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-node-6-label"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "node": "packet",
+        "ref": "packages/socket.io/lib/socket.ts#Event"
+      }
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-7",
+      "type": "rectangle",
+      "x": 2440,
+      "y": 260,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1017640638,
+      "version": 1,
+      "versionNonce": 2095066978,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-node-7-label"
+        },
+        {
+          "id": "socket-io-server-emit-broadcast-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "node": "clients",
+        "state": "external"
+      }
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-0",
+      "type": "arrow",
+      "x": 292,
+      "y": 525.9333333333334,
+      "width": 381.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1317038490,
+      "version": 1,
+      "versionNonce": 121967726,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "edge": {
+          "from": "rawsocket",
+          "to": "client",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          190.8,
+          0
+        ],
+        [
+          381.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-0",
+        "focus": 0.14833333333333462,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-1",
+        "focus": -0.14833333333333598,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-1",
+      "type": "arrow",
+      "x": 833.6,
+      "y": 525.9333333333334,
+      "width": 460.80000000000007,
+      "height": 31.800000000000068,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 262759211,
+      "version": 1,
+      "versionNonce": 808975141,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "edge": {
+          "from": "client",
+          "to": "namespace",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          123.14999999999998,
+          0
+        ],
+        [
+          184.72500000000002,
+          0
+        ],
+        [
+          246.30000000000007,
+          0
+        ],
+        [
+          352.80000000000007,
+          0
+        ],
+        [
+          352.80000000000007,
+          -31.800000000000068
+        ],
+        [
+          460.30000000000007,
+          -31.800000000000068
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-1",
+        "focus": 0.14833333333333598,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-2",
+        "focus": -0.4826666666666657,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-2",
+      "type": "arrow",
+      "x": 1294.4,
+      "y": 469.1333333333333,
+      "width": 420.80000000000007,
+      "height": 180.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1588934492,
+      "version": 1,
+      "versionNonce": 717882472,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "edge": {
+          "from": "namespace",
+          "to": "socket",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          -75.1833333333334,
+          0
+        ],
+        [
+          -150.3666666666668,
+          0
+        ],
+        [
+          -300.73333333333335,
+          0
+        ],
+        [
+          -388.80000000000007,
+          0
+        ],
+        [
+          -388.80000000000007,
+          -180.66666666666669
+        ],
+        [
+          -420.30000000000007,
+          -180.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-2",
+        "focus": 0.017333333333334304,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-3",
+        "focus": 0.474444444444444,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-3",
+      "type": "arrow",
+      "x": 873.6,
+      "y": 264.46666666666664,
+      "width": 420.80000000000007,
+      "height": 179.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 110671989,
+      "version": 1,
+      "versionNonce": 259824127,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "edge": {
+          "from": "socket",
+          "to": "namespace",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          114.66666666666669
+        ],
+        [
+          185.56666666666672,
+          114.66666666666669
+        ],
+        [
+          312.80000000000007,
+          114.66666666666669
+        ],
+        [
+          312.80000000000007,
+          179.66666666666669
+        ],
+        [
+          420.30000000000007,
+          179.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-3",
+        "focus": 0.07444444444444401,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-2",
+        "focus": 0.5173333333333343,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-4",
+      "type": "arrow",
+      "x": 1454.4,
+      "y": 469.1333333333333,
+      "width": 403.20000000000005,
+      "height": 132.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 116119038,
+      "version": 1,
+      "versionNonce": 591228578,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "edge": {
+          "from": "namespace",
+          "to": "adapter",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          67,
+          0
+        ],
+        [
+          134,
+          0
+        ],
+        [
+          268,
+          0
+        ],
+        [
+          295.20000000000005,
+          0
+        ],
+        [
+          295.20000000000005,
+          -132.8
+        ],
+        [
+          402.70000000000005,
+          -132.8
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-2",
+        "focus": -0.017333333333334304,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-4",
+        "focus": -0.6055555555555546,
+        "gap": 2.3999999999998636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-5",
+      "type": "arrow",
+      "x": 873.6,
+      "y": 216.46666666666664,
+      "width": 420.80000000000007,
+      "height": 23.46666666666664,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1656246607,
+      "version": 1,
+      "versionNonce": 1561128489,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "edge": {
+          "from": "socket",
+          "to": "packet",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          55.53333333333342,
+          0
+        ],
+        [
+          111.06666666666672,
+          0
+        ],
+        [
+          222.13333333333333,
+          0
+        ],
+        [
+          312.80000000000007,
+          0
+        ],
+        [
+          312.80000000000007,
+          -23.46666666666664
+        ],
+        [
+          420.30000000000007,
+          -23.46666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-3",
+        "focus": -0.7255555555555558,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-6",
+        "focus": -0.4599999999999996,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-6",
+      "type": "arrow",
+      "x": 873.6,
+      "y": 240.46666666666664,
+      "width": 984.0000000000001,
+      "height": 65.86666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 32172384,
+      "version": 1,
+      "versionNonce": 1511204028,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "edge": {
+          "from": "socket",
+          "to": "adapter",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          65.86666666666667
+        ],
+        [
+          459.0666666666667,
+          65.86666666666667
+        ],
+        [
+          590.3000000000001,
+          65.86666666666667
+        ],
+        [
+          721.5333333333334,
+          65.86666666666667
+        ],
+        [
+          983.5000000000001,
+          65.86666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-3",
+        "focus": -0.3255555555555559,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-4",
+        "focus": -0.10555555555555463,
+        "gap": 2.3999999999998636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-7",
+      "type": "arrow",
+      "x": 873.6,
+      "y": 45.33333333333333,
+      "width": 984.0000000000001,
+      "height": 231,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 376969001,
+      "version": 1,
+      "versionNonce": 1340218163,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "edge": {
+          "from": "broadcast_op",
+          "to": "adapter",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          303.7499999999999,
+          0
+        ],
+        [
+          455.6249999999999,
+          0
+        ],
+        [
+          607.4999999999999,
+          0
+        ],
+        [
+          876.0000000000001,
+          0
+        ],
+        [
+          876.0000000000001,
+          231
+        ],
+        [
+          983.5000000000001,
+          231
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-5",
+        "focus": -0.49333333333333373,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-4",
+        "focus": 0.3944444444444436,
+        "gap": 2.3999999999998636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-8",
+      "type": "arrow",
+      "x": 873.6,
+      "y": 78.66666666666666,
+      "width": 420.80000000000007,
+      "height": 81,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 215954722,
+      "version": 1,
+      "versionNonce": 1108197910,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "edge": {
+          "from": "broadcast_op",
+          "to": "packet",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          81
+        ],
+        [
+          169.89999999999998,
+          81
+        ],
+        [
+          232.6249999999999,
+          81
+        ],
+        [
+          295.35,
+          81
+        ],
+        [
+          420.30000000000007,
+          81
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-5",
+        "focus": 0.17333333333333298,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-6",
+        "focus": 0.20666666666666647,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-9",
+      "type": "arrow",
+      "x": 2017.6000000000001,
+      "y": 306.3333333333333,
+      "width": 420.8000000000004,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 692823635,
+      "version": 1,
+      "versionNonce": 908921773,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-server-emit-broadcast-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow",
+        "edge": {
+          "from": "adapter",
+          "to": "clients",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          210.40000000000032,
+          0
+        ],
+        [
+          420.3000000000004,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-4",
+        "focus": 0.10555555555555463,
+        "gap": 2.3999999999998636
+      },
+      "endBinding": {
+        "elementId": "socket-io-server-emit-broadcast-flow-node-7",
+        "focus": -0.15833333333333327,
+        "gap": 1.5999999999994543
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-0-label",
+      "type": "text",
+      "x": 99.5,
+      "y": 495,
+      "width": 121.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1289531484,
+      "version": 1,
+      "versionNonce": 317554536,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "RawSocket\n(engine.io)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-node-0",
+      "originalText": "RawSocket\n(engine.io)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-1-label",
+      "type": "text",
+      "x": 727,
+      "y": 507.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1718076473,
+      "version": 1,
+      "versionNonce": 1586377475,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "Client",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-node-1",
+      "originalText": "Client",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-2-label",
+      "type": "text",
+      "x": 1330.5,
+      "y": 457.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 532706966,
+      "version": 1,
+      "versionNonce": 1123904890,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "Namespace",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-node-2",
+      "originalText": "Namespace",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-3-label",
+      "type": "text",
+      "x": 767,
+      "y": 247.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1016660555,
+      "version": 1,
+      "versionNonce": 1257548997,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "Socket",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-node-3",
+      "originalText": "Socket",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-4-label",
+      "type": "text",
+      "x": 1901.5,
+      "y": 287.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1061706160,
+      "version": 1,
+      "versionNonce": 2042653964,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "Adapter",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-node-4",
+      "originalText": "Adapter",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-5-label",
+      "type": "text",
+      "x": 666.5,
+      "y": 57.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 999315965,
+      "version": 1,
+      "versionNonce": 1699378151,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "BroadcastOperator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-node-5",
+      "originalText": "BroadcastOperator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-6-label",
+      "type": "text",
+      "x": 1347,
+      "y": 157.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 262477018,
+      "version": 1,
+      "versionNonce": 1685546670,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "Packet",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-node-6",
+      "originalText": "Packet",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-node-7-label",
+      "type": "text",
+      "x": 2466.5,
+      "y": 287.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 972827551,
+      "version": 1,
+      "versionNonce": 1916749113,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "Connected Clients",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-node-7",
+      "originalText": "Connected Clients",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-0-label",
+      "type": "text",
+      "x": 452,
+      "y": 515.9333333333334,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 765844491,
+      "version": 1,
+      "versionNonce": 78189957,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-edge-0",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-1-label",
+      "type": "text",
+      "x": 1009.5000000000001,
+      "y": 515.9333333333334,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1287508054,
+      "version": 1,
+      "versionNonce": 1905789754,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "doConnect @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-edge-1",
+      "originalText": "doConnect @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-2-label",
+      "type": "text",
+      "x": 940.8666666666668,
+      "y": 459.1333333333333,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1388119289,
+      "version": 1,
+      "versionNonce": 1384579011,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "_add @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-edge-2",
+      "originalText": "_add @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-3-label",
+      "type": "text",
+      "x": 1001.9666666666667,
+      "y": 369.1333333333333,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 562120732,
+      "version": 1,
+      "versionNonce": 302487848,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "nsp @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-edge-3",
+      "originalText": "nsp @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-4-label",
+      "type": "text",
+      "x": 1660.8000000000002,
+      "y": 459.1333333333333,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 86806111,
+      "version": 1,
+      "versionNonce": 258704121,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "adapter @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-edge-4",
+      "originalText": "adapter @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-5-label",
+      "type": "text",
+      "x": 1042.9333333333334,
+      "y": 206.46666666666664,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1078660506,
+      "version": 1,
+      "versionNonce": 692404334,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "emit @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-edge-5",
+      "originalText": "emit @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-6-label",
+      "type": "text",
+      "x": 1262.2666666666667,
+      "y": 296.3333333333333,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1970012093,
+      "version": 1,
+      "versionNonce": 508066215,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "broadcast @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-edge-6",
+      "originalText": "broadcast @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-7-label",
+      "type": "text",
+      "x": 1406.3,
+      "y": 35.33333333333333,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1385728880,
+      "version": 1,
+      "versionNonce": 511937484,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "adapter @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-edge-7",
+      "originalText": "adapter @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-8-label",
+      "type": "text",
+      "x": 990.7,
+      "y": 149.66666666666666,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1297037827,
+      "version": 1,
+      "versionNonce": 1339931933,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "emit @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-edge-8",
+      "originalText": "emit @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-server-emit-broadcast-flow-edge-9-label",
+      "type": "text",
+      "x": 2157.6000000000004,
+      "y": 296.3333333333333,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 96136110,
+      "version": 1,
+      "versionNonce": 1161289426,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-server-emit-broadcast-flow"
+      },
+      "text": "broadcast @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-server-emit-broadcast-flow-edge-9",
+      "originalText": "broadcast @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

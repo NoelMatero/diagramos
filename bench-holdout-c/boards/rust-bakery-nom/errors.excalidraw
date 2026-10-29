@@ -1,0 +1,2071 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "error-building-and-conversion-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 448.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1437972396,
+      "version": 1,
+      "versionNonce": 139500280,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "role": "title"
+      },
+      "text": "Error Building and Conversion Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Error Building and Conversion Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 280,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e3f2fd",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1295842139,
+      "version": 1,
+      "versionNonce": 1441423445,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-node-0-label"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "node": "error_kind",
+        "ref": "src/error.rs#ErrorKind"
+      }
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-1",
+      "type": "rectangle",
+      "x": 1260,
+      "y": 240,
+      "width": 200,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f5e9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1276353802,
+      "version": 1,
+      "versionNonce": 914281310,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-node-1-label"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "node": "parse_error_trait",
+        "ref": "src/error.rs#ParseError"
+      }
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-2",
+      "type": "rectangle",
+      "x": 2660,
+      "y": 160,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3e0",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 707443429,
+      "version": 1,
+      "versionNonce": 1623772271,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-node-2-label"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "node": "error_struct",
+        "ref": "src/error.rs#Error"
+      }
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-3",
+      "type": "rectangle",
+      "x": 3260,
+      "y": 40,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fce4ec",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1548249804,
+      "version": 1,
+      "versionNonce": 711845272,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-node-3-label"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "node": "err_enum",
+        "ref": "src/internal.rs#Err"
+      }
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-4",
+      "type": "rectangle",
+      "x": 2000,
+      "y": 180,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 220854655,
+      "version": 1,
+      "versionNonce": 56279449,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-node-4-label"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "node": "context_trait",
+        "ref": "src/error.rs#ContextError"
+      }
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-5",
+      "type": "rectangle",
+      "x": 1940,
+      "y": 20,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f1f8e9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 2137566190,
+      "version": 1,
+      "versionNonce": 1744413970,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-node-5-label"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "node": "external_error_trait",
+        "ref": "src/error.rs#FromExternalError"
+      }
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-6",
+      "type": "rectangle",
+      "x": 660,
+      "y": 280,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ede7f6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 346730073,
+      "version": 1,
+      "versionNonce": 1000933027,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-node-6-label"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "node": "make_error",
+        "ref": "src/error.rs#make_error"
+      }
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-7",
+      "type": "rectangle",
+      "x": 640,
+      "y": 120,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ede7f6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1075701072,
+      "version": 1,
+      "versionNonce": 237221676,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-node-7-label"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "node": "append_error",
+        "ref": "src/error.rs#append_error"
+      }
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-8",
+      "type": "rectangle",
+      "x": 3260,
+      "y": 200,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e0f2f1",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 992014531,
+      "version": 1,
+      "versionNonce": 1195151069,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-node-8-label"
+        },
+        {
+          "id": "error-building-and-conversion-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "node": "error_conversions",
+        "ref": "src/error.rs#Error"
+      }
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-0",
+      "type": "arrow",
+      "x": 172,
+      "y": 322,
+      "width": 484.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1108657900,
+      "version": 2,
+      "versionNonce": 1219080504,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "edge": {
+          "from": "error_kind",
+          "to": "make_error",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          242.39999999999998,
+          0
+        ],
+        [
+          484.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-building-and-conversion-flow-node-0",
+        "focus": 0.05,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "error-building-and-conversion-flow-node-6",
+        "focus": -0.049999999999999996,
+        "gap": 3.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": ""
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-1",
+      "type": "arrow",
+      "x": 836.8,
+      "y": 322,
+      "width": 432,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1714478085,
+      "version": 2,
+      "versionNonce": 1047432463,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "edge": {
+          "from": "make_error",
+          "to": "parse_error_trait",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          216,
+          0
+        ],
+        [
+          431.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-building-and-conversion-flow-node-6",
+        "focus": 0.049999999999999996,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "error-building-and-conversion-flow-node-1",
+        "focus": -0.36666666666666725,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": ""
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-2",
+      "type": "arrow",
+      "x": 1468.8,
+      "y": 332,
+      "width": 1196.8,
+      "height": 90,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1497680298,
+      "version": 2,
+      "versionNonce": 1525132926,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "edge": {
+          "from": "parse_error_trait",
+          "to": "error_struct",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          160.85000000000014,
+          0
+        ],
+        [
+          321.70000000000005,
+          0
+        ],
+        [
+          643.3999999999999,
+          0
+        ],
+        [
+          1088.8,
+          0
+        ],
+        [
+          1088.8,
+          -90
+        ],
+        [
+          1196.3,
+          -90
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-building-and-conversion-flow-node-1",
+        "focus": 0.5333333333333328,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "error-building-and-conversion-flow-node-2",
+        "focus": -0.3666666666666679,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": ""
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-3",
+      "type": "arrow",
+      "x": 2825.6,
+      "y": 192,
+      "width": 429.5999999999999,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 112015611,
+      "version": 2,
+      "versionNonce": 840102261,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "edge": {
+          "from": "error_struct",
+          "to": "err_enum",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -120
+        ],
+        [
+          154.79999999999973,
+          -120
+        ],
+        [
+          223.49999999999955,
+          -120
+        ],
+        [
+          292.1999999999998,
+          -120
+        ],
+        [
+          429.0999999999999,
+          -120
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-building-and-conversion-flow-node-2",
+        "focus": -0.4666666666666679,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "error-building-and-conversion-flow-node-3",
+        "focus": 0.2,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": "feeds"
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-4",
+      "type": "arrow",
+      "x": 1468.8,
+      "y": 302,
+      "width": 523.6000000000001,
+      "height": 90,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 677582704,
+      "version": 1,
+      "versionNonce": 744353740,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "edge": {
+          "from": "parse_error_trait",
+          "to": "context_trait",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -90
+        ],
+        [
+          216.79999999999995,
+          -90
+        ],
+        [
+          293.5,
+          -90
+        ],
+        [
+          370.20000000000005,
+          -90
+        ],
+        [
+          523.1000000000001,
+          -90
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-building-and-conversion-flow-node-1",
+        "focus": 0.03333333333333278,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "error-building-and-conversion-flow-node-4",
+        "focus": 0.2,
+        "gap": 7.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-5",
+      "type": "arrow",
+      "x": 2212.4,
+      "y": 212,
+      "width": 453.1999999999998,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 567953401,
+      "version": 2,
+      "versionNonce": 1570207939,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "edge": {
+          "from": "context_trait",
+          "to": "error_struct",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          226.5999999999999,
+          0
+        ],
+        [
+          452.6999999999998,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-building-and-conversion-flow-node-4",
+        "focus": -0.2,
+        "gap": 7.599999999999909
+      },
+      "endBinding": {
+        "elementId": "error-building-and-conversion-flow-node-2",
+        "focus": 0.13333333333333214,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": ""
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-6",
+      "type": "arrow",
+      "x": 1468.8,
+      "y": 272,
+      "width": 473.60000000000014,
+      "height": 220,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 211409038,
+      "version": 1,
+      "versionNonce": 166205234,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "edge": {
+          "from": "parse_error_trait",
+          "to": "external_error_trait",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -220
+        ],
+        [
+          126.79999999999995,
+          -220
+        ],
+        [
+          213.5,
+          -220
+        ],
+        [
+          300.20000000000005,
+          -220
+        ],
+        [
+          473.10000000000014,
+          -220
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-building-and-conversion-flow-node-1",
+        "focus": -0.46666666666666723,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "error-building-and-conversion-flow-node-5",
+        "focus": 0.19999999999999998,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-7",
+      "type": "arrow",
+      "x": 2262.4,
+      "y": 52,
+      "width": 403.1999999999998,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1227889311,
+      "version": 2,
+      "versionNonce": 1627423289,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "edge": {
+          "from": "external_error_trait",
+          "to": "error_struct",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          133.29999999999973,
+          0
+        ],
+        [
+          199.94999999999982,
+          0
+        ],
+        [
+          266.5999999999999,
+          0
+        ],
+        [
+          295.1999999999998,
+          0
+        ],
+        [
+          295.1999999999998,
+          130
+        ],
+        [
+          402.6999999999998,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-building-and-conversion-flow-node-5",
+        "focus": -0.19999999999999998,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "error-building-and-conversion-flow-node-2",
+        "focus": 0.6333333333333321,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": ""
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-8",
+      "type": "arrow",
+      "x": 856.8,
+      "y": 162,
+      "width": 412,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2080151732,
+      "version": 2,
+      "versionNonce": 1250877312,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "edge": {
+          "from": "append_error",
+          "to": "parse_error_trait",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          66.5,
+          0
+        ],
+        [
+          133,
+          0
+        ],
+        [
+          266,
+          0
+        ],
+        [
+          304,
+          0
+        ],
+        [
+          304,
+          120
+        ],
+        [
+          411.5,
+          120
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-building-and-conversion-flow-node-7",
+        "focus": 0.05,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "error-building-and-conversion-flow-node-1",
+        "focus": 0.3,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": ""
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-9",
+      "type": "arrow",
+      "x": 2825.6,
+      "y": 232,
+      "width": 429.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1697607693,
+      "version": 1,
+      "versionNonce": 2081045495,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "error-building-and-conversion-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow",
+        "edge": {
+          "from": "error_struct",
+          "to": "error_conversions",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          214.79999999999973,
+          0
+        ],
+        [
+          429.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "error-building-and-conversion-flow-node-2",
+        "focus": 0.2,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "error-building-and-conversion-flow-node-8",
+        "focus": 0.2,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-0-label",
+      "type": "text",
+      "x": 50.49999999999999,
+      "y": 307.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1926270726,
+      "version": 1,
+      "versionNonce": 1807231594,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "ErrorKind",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-node-0",
+      "originalText": "ErrorKind",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-1-label",
+      "type": "text",
+      "x": 1288.5,
+      "y": 287.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1618294459,
+      "version": 1,
+      "versionNonce": 888422709,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "ParseError<I>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-node-1",
+      "originalText": "ParseError<I>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-2-label",
+      "type": "text",
+      "x": 2696,
+      "y": 207.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1935092044,
+      "version": 1,
+      "versionNonce": 1990445336,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "Error<I>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-node-2",
+      "originalText": "Error<I>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-3-label",
+      "type": "text",
+      "x": 3307,
+      "y": 67.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 559008489,
+      "version": 1,
+      "versionNonce": 1594589939,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "Err<E>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-node-3",
+      "originalText": "Err<E>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-4-label",
+      "type": "text",
+      "x": 2027.5,
+      "y": 207.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 837163402,
+      "version": 1,
+      "versionNonce": 14209246,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "ContextError<I>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-node-4",
+      "originalText": "ContextError<I>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-5-label",
+      "type": "text",
+      "x": 1973.5,
+      "y": 47.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 101182351,
+      "version": 1,
+      "versionNonce": 903241833,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "FromExternalError<I, E>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-node-5",
+      "originalText": "FromExternalError<I, E>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-6-label",
+      "type": "text",
+      "x": 684,
+      "y": 307.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 746534624,
+      "version": 1,
+      "versionNonce": 1636377916,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "make_error()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-node-6",
+      "originalText": "make_error()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-7-label",
+      "type": "text",
+      "x": 673,
+      "y": 147.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1664716461,
+      "version": 1,
+      "versionNonce": 1173987351,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "append_error()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-node-7",
+      "originalText": "append_error()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-node-8-label",
+      "type": "text",
+      "x": 3284.5,
+      "y": 227.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2020368350,
+      "version": 1,
+      "versionNonce": 165909506,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "Error transformations",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-node-8",
+      "originalText": "Error transformations",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-0-label",
+      "type": "text",
+      "x": 322,
+      "y": 312,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1228024713,
+      "version": 1,
+      "versionNonce": 471172627,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "kind parameter @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-edge-0",
+      "originalText": "kind parameter @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-1-label",
+      "type": "text",
+      "x": 986.8,
+      "y": 312,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 70181484,
+      "version": 1,
+      "versionNonce": 1472396216,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "creates @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-edge-1",
+      "originalText": "creates @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-2-label",
+      "type": "text",
+      "x": 2015.3999999999999,
+      "y": 322,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 657486171,
+      "version": 1,
+      "versionNonce": 1882006101,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "default impl @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-edge-2",
+      "originalText": "default impl @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-3-label",
+      "type": "text",
+      "x": 2905.5999999999995,
+      "y": 62,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1508409510,
+      "version": 1,
+      "versionNonce": 2099015562,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "wrapped by @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-edge-3",
+      "originalText": "wrapped by @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-4-label",
+      "type": "text",
+      "x": 1615.1999999999998,
+      "y": 202,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1166841421,
+      "version": 1,
+      "versionNonce": 1539039287,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "extension @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-edge-4",
+      "originalText": "extension @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-5-label",
+      "type": "text",
+      "x": 2377.4,
+      "y": 202,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 164367488,
+      "version": 1,
+      "versionNonce": 137385564,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "impl @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-edge-5",
+      "originalText": "impl @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-6-label",
+      "type": "text",
+      "x": 1498.8,
+      "y": 42,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 197283631,
+      "version": 1,
+      "versionNonce": 398981769,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "for integration @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-edge-6",
+      "originalText": "for integration @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-7-label",
+      "type": "text",
+      "x": 2467.4,
+      "y": 42,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 147030570,
+      "version": 1,
+      "versionNonce": 526655486,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "impl @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-edge-7",
+      "originalText": "impl @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-8-label",
+      "type": "text",
+      "x": 1065.6,
+      "y": 152,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 536800129,
+      "version": 1,
+      "versionNonce": 958407883,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "append @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-edge-8",
+      "originalText": "append @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "error-building-and-conversion-flow-edge-9-label",
+      "type": "text",
+      "x": 2978.7999999999997,
+      "y": 222,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 983699652,
+      "version": 1,
+      "versionNonce": 1408160464,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "error-building-and-conversion-flow"
+      },
+      "text": "methods @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "error-building-and-conversion-flow-edge-9",
+      "originalText": "methods @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

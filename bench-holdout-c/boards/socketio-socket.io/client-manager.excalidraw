@@ -1,0 +1,2270 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "socket-io-client-manager-connection-reco-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 924.0000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 347991468,
+      "version": 1,
+      "versionNonce": 1111334136,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Socket.IO Client Manager: Connection, Reconnection, and Packet Routing",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Socket.IO Client Manager: Connection, Reconnection, and Packet Routing",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-0",
+      "type": "rectangle",
+      "x": 360,
+      "y": 400,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 120192347,
+      "version": 1,
+      "versionNonce": 100959829,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-node-0-label"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "node": "manager",
+        "ref": "packages/socket.io-client/lib/manager.ts#Manager"
+      }
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-1",
+      "type": "rectangle",
+      "x": 600,
+      "y": 780,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 100704010,
+      "version": 1,
+      "versionNonce": 1721301342,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-node-1-label"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "node": "engine",
+        "ref": "engine.io-client",
+        "state": "external"
+      }
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1679277285,
+      "version": 1,
+      "versionNonce": 283308655,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-node-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "node": "encoder",
+        "ref": "packages/socket.io-client/lib/manager.ts#Encoder"
+      }
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-3",
+      "type": "rectangle",
+      "x": 640,
+      "y": 1540,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 372600012,
+      "version": 1,
+      "versionNonce": 1518865304,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-node-3-label"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "node": "decoder",
+        "ref": "packages/socket.io-client/lib/manager.ts#Decoder"
+      }
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-4",
+      "type": "rectangle",
+      "x": 480,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1192688511,
+      "version": 1,
+      "versionNonce": 863299481,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-node-4-label"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "node": "socket",
+        "ref": "packages/socket.io-client/lib/socket.ts#Socket"
+      }
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-5",
+      "type": "rectangle",
+      "x": 360,
+      "y": 780,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 961916398,
+      "version": 1,
+      "versionNonce": 403950354,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-node-5-label"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "node": "backoff",
+        "ref": "packages/socket.io-client/lib/contrib/backo2.ts#Backoff"
+      }
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-6",
+      "type": "rectangle",
+      "x": 920,
+      "y": 400,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1318563929,
+      "version": 1,
+      "versionNonce": 1807953059,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-node-6-label"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "node": "open",
+        "ref": "packages/socket.io-client/lib/manager.ts#open"
+      }
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-7",
+      "type": "rectangle",
+      "x": 600,
+      "y": 1160,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 2047534928,
+      "version": 1,
+      "versionNonce": 1044241708,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-node-7-label"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "node": "ondata",
+        "ref": "packages/socket.io-client/lib/manager.ts#ondata"
+      }
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-8",
+      "type": "rectangle",
+      "x": 580,
+      "y": 1920,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1963848387,
+      "version": 1,
+      "versionNonce": 2002171101,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-node-8-label"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "node": "ondecoded",
+        "ref": "packages/socket.io-client/lib/manager.ts#ondecoded"
+      }
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-9",
+      "type": "rectangle",
+      "x": 720,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1623583826,
+      "version": 1,
+      "versionNonce": 1065693062,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-node-9-label"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "socket-io-client-manager-connection-reco-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "node": "reconnect",
+        "ref": "packages/socket.io-client/lib/manager.ts#reconnect"
+      }
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-0",
+      "type": "arrow",
+      "x": 457.73333333333335,
+      "y": 472.8,
+      "width": 213.33333333333326,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 2080491756,
+      "version": 1,
+      "versionNonce": 2026100536,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "manager",
+          "to": "engine",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          213.33333333333326,
+          32
+        ],
+        [
+          213.33333333333326,
+          43.73333333333329
+        ],
+        [
+          213.33333333333326,
+          107.99999999999994
+        ],
+        [
+          213.33333333333326,
+          172.2666666666666
+        ],
+        [
+          213.33333333333326,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-0",
+        "focus": -0.22166666666666743,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-1",
+        "focus": -0.40777777777777746,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-1",
+      "type": "arrow",
+      "x": 1031.7333333333333,
+      "y": 472.8,
+      "width": 280.66666666666674,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 538828293,
+      "version": 1,
+      "versionNonce": 1854452495,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "open",
+          "to": "engine",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          216.7999999999999
+        ],
+        [
+          -73.9333333333334,
+          216.7999999999999
+        ],
+        [
+          -280.66666666666674,
+          216.7999999999999
+        ],
+        [
+          -280.66666666666674,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-6",
+        "focus": -0.015757575757575866,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-1",
+        "focus": 0.2588888888888894,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-2",
+      "type": "arrow",
+      "x": 711.0666666666666,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 322030506,
+      "version": 1,
+      "versionNonce": 184669310,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "engine",
+          "to": "ondata",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-1",
+        "focus": 0.07444444444444401,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-7",
+        "focus": -0.07444444444444429,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-3",
+      "type": "arrow",
+      "x": 711.0666666666666,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1083849467,
+      "version": 1,
+      "versionNonce": 1647122293,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "ondata",
+          "to": "decoder",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-7",
+        "focus": 0.07444444444444429,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-3",
+        "focus": -0.11166666666666743,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-4",
+      "type": "arrow",
+      "x": 711.0666666666666,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1649416560,
+      "version": 1,
+      "versionNonce": 1551373772,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "decoder",
+          "to": "ondecoded",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-3",
+        "focus": 0.11166666666666743,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-8",
+        "focus": 0.008205128205127777,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-5",
+      "type": "arrow",
+      "x": 606.8666666666667,
+      "y": 92,
+      "width": 289.2,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1539787257,
+      "version": 1,
+      "versionNonce": 229744323,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "socket",
+          "to": "manager",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          153.39999999999998,
+          32
+        ],
+        [
+          153.39999999999998,
+          216.8
+        ],
+        [
+          151.89999999999998,
+          216.8
+        ],
+        [
+          79.97500000000002,
+          216.8
+        ],
+        [
+          8.049999999999955,
+          216.8
+        ],
+        [
+          -135.8,
+          216.8
+        ],
+        [
+          -135.8,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-4",
+        "focus": -0.5858333333333333,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-0",
+        "focus": 0.3883333333333331,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-6",
+      "type": "arrow",
+      "x": 404.4,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1183242894,
+      "version": 1,
+      "versionNonce": 973225266,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "manager",
+          "to": "backoff"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-0",
+        "focus": 0.4450000000000003,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-5",
+        "focus": -0.44500000000000006,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-7",
+      "type": "arrow",
+      "x": 813.5333333333333,
+      "y": 92,
+      "width": 355.79999999999995,
+      "height": 681.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 52239519,
+      "version": 1,
+      "versionNonce": 286959673,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "reconnect",
+          "to": "backoff"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          129.67499999999998
+        ],
+        [
+          0,
+          259.34999999999997
+        ],
+        [
+          0,
+          518.6999999999999
+        ],
+        [
+          0,
+          573.5999999999999
+        ],
+        [
+          -355.79999999999995,
+          573.5999999999999
+        ],
+        [
+          -355.79999999999995,
+          681.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-9",
+        "focus": 0.2805128205128207,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-5",
+        "focus": 0.22166666666666743,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-8",
+      "type": "arrow",
+      "x": 900.2,
+      "y": 92,
+      "width": 131.5333333333333,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 904501940,
+      "version": 1,
+      "versionNonce": 2057897344,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "reconnect",
+          "to": "open",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          131.5333333333333,
+          32
+        ],
+        [
+          131.5333333333333,
+          84.63333333333335
+        ],
+        [
+          131.5333333333333,
+          138.675
+        ],
+        [
+          131.5333333333333,
+          192.7166666666667
+        ],
+        [
+          131.5333333333333,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-9",
+        "focus": -0.38615384615384646,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-6",
+        "focus": 0.015757575757577524,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-9",
+      "type": "arrow",
+      "x": 566.8666666666667,
+      "y": 92,
+      "width": 135.8,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 521957901,
+      "version": 1,
+      "versionNonce": 740581879,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "socket",
+          "to": "manager",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.8
+        ],
+        [
+          -25.5,
+          192.8
+        ],
+        [
+          -135.8,
+          192.8
+        ],
+        [
+          -135.8,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-4",
+        "focus": -0.0858333333333334,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-0",
+        "focus": -0.111666666666666,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-10",
+      "type": "arrow",
+      "x": 391.06666666666666,
+      "y": 392.8,
+      "width": 135.8,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1768749737,
+      "version": 1,
+      "versionNonce": 1734622643,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "socket-io-client-manager-connection-reco-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco",
+        "edge": {
+          "from": "manager",
+          "to": "socket"
+        }
+      },
+      "points": [
+        [
+          0,
+          -0.5
+        ],
+        [
+          0,
+          -54.57499999999999
+        ],
+        [
+          0,
+          -109.15000000000003
+        ],
+        [
+          0,
+          -218.3
+        ],
+        [
+          0,
+          -268.8
+        ],
+        [
+          135.8,
+          -268.8
+        ],
+        [
+          135.8,
+          -300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-0",
+        "focus": -0.611666666666666,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "socket-io-client-manager-connection-reco-node-4",
+        "focus": 0.4141666666666666,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-0-label",
+      "type": "text",
+      "x": 401.5,
+      "y": 427.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 558203142,
+      "version": 1,
+      "versionNonce": 231809130,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "Manager",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-node-0",
+      "originalText": "Manager",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-1-label",
+      "type": "text",
+      "x": 632,
+      "y": 807.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 250226875,
+      "version": 1,
+      "versionNonce": 1460483893,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "Engine.IO Socket",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-node-1",
+      "originalText": "Engine.IO Socket",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-2-label",
+      "type": "text",
+      "x": 61.5,
+      "y": 47.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 567024460,
+      "version": 1,
+      "versionNonce": 415022872,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "Encoder",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-node-2",
+      "originalText": "Encoder",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-3-label",
+      "type": "text",
+      "x": 681.5,
+      "y": 1567.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1338424553,
+      "version": 1,
+      "versionNonce": 19167475,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "Decoder",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-node-3",
+      "originalText": "Decoder",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-4-label",
+      "type": "text",
+      "x": 527,
+      "y": 47.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1616579466,
+      "version": 1,
+      "versionNonce": 586270430,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "Socket",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-node-4",
+      "originalText": "Socket",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-5-label",
+      "type": "text",
+      "x": 401.5,
+      "y": 807.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 880598415,
+      "version": 1,
+      "versionNonce": 1475303017,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "Backoff",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-node-5",
+      "originalText": "Backoff",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-6-label",
+      "type": "text",
+      "x": 953,
+      "y": 427.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1525950688,
+      "version": 1,
+      "versionNonce": 60955452,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "Manager.open()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-node-6",
+      "originalText": "Manager.open()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-7-label",
+      "type": "text",
+      "x": 632,
+      "y": 1187.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 296648877,
+      "version": 1,
+      "versionNonce": 1746048535,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "Manager.ondata()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-node-7",
+      "originalText": "Manager.ondata()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-8-label",
+      "type": "text",
+      "x": 605.5,
+      "y": 1947.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 652300766,
+      "version": 1,
+      "versionNonce": 737970690,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "Manager.ondecoded()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-node-8",
+      "originalText": "Manager.ondecoded()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-node-9-label",
+      "type": "text",
+      "x": 745.5,
+      "y": 47.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1188736499,
+      "version": 1,
+      "versionNonce": 84472525,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "Manager.reconnect()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-node-9",
+      "originalText": "Manager.reconnect()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-0-label",
+      "type": "text",
+      "x": 583.0666666666666,
+      "y": 506.5333333333333,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 2007440777,
+      "version": 1,
+      "versionNonce": 1043233811,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "new Engine() @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-0",
+      "originalText": "new Engine() @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-1-label",
+      "type": "text",
+      "x": 891.8,
+      "y": 679.5999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 849597548,
+      "version": 1,
+      "versionNonce": 2044457400,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "creates @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-1",
+      "originalText": "creates @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-2-label",
+      "type": "text",
+      "x": 636.2666666666667,
+      "y": 993.9999999999999,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1436902235,
+      "version": 1,
+      "versionNonce": 306583637,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "data event @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-2",
+      "originalText": "data event @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-3-label",
+      "type": "text",
+      "x": 623.0666666666666,
+      "y": 1374.7999999999997,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 140341926,
+      "version": 1,
+      "versionNonce": 523593098,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "decoder.add() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-3",
+      "originalText": "decoder.add() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-4-label",
+      "type": "text",
+      "x": 649.4666666666666,
+      "y": 1745.6,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1946257485,
+      "version": 1,
+      "versionNonce": 2111100471,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "decoded packet\n@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-4",
+      "originalText": "decoded packet @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-5-label",
+      "type": "text",
+      "x": 679.5666666666666,
+      "y": 298.8,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 943783552,
+      "version": 1,
+      "versionNonce": 709446748,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "io: Manager @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-5",
+      "originalText": "io: Manager @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-6-label",
+      "type": "text",
+      "x": 329.59999999999997,
+      "y": 603.1999999999999,
+      "width": 149.60000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 976699695,
+      "version": 1,
+      "versionNonce": 971042953,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "manages reconnect\ndelay",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-6",
+      "originalText": "manages reconnect delay",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-7-label",
+      "type": "text",
+      "x": 747.5333333333333,
+      "y": 600.6999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 926446634,
+      "version": 1,
+      "versionNonce": 1098716670,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "uses duration()",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-7",
+      "originalText": "uses duration()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-8-label",
+      "type": "text",
+      "x": 948.1333333333333,
+      "y": 166.63333333333335,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1316216193,
+      "version": 1,
+      "versionNonce": 1530469067,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "retry open() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-8",
+      "originalText": "retry open() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-9-label",
+      "type": "text",
+      "x": 470.9666666666667,
+      "y": 274.8,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1763115716,
+      "version": 1,
+      "versionNonce": 1980221648,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "engine @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-9",
+      "originalText": "engine @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "socket-io-client-manager-connection-reco-edge-10-label",
+      "type": "text",
+      "x": 311.8666666666667,
+      "y": 164.5,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1405768432,
+      "version": 1,
+      "versionNonce": 2145425996,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "socket-io-client-manager-connection-reco"
+      },
+      "text": "emits packet event",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "socket-io-client-manager-connection-reco-edge-10",
+      "originalText": "emits packet event",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
