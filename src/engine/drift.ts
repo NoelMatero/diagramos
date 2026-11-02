@@ -933,6 +933,8 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
   "may-create": "no call is to the class, and the caller may still create one",
   "type-alias": "the arrow's end is a type alias -- a value of that type may be what is called, "
     + "or a literal may make one, and neither is written under the alias's name",
+  "handed-to-a-runner": "the caller hands a function to code that runs it, so it reaches whatever that function reaches",
+  "set-at-run-time": "one call is to something the code replaces while it runs, so what it calls is decided then",
 };
 
 export { lackingPhrase };
