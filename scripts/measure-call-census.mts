@@ -64,6 +64,11 @@
  * start or never finished indexing, a question that threw, a tsconfig with
  * errors, files where no call got an answer -- is printed, because probes trip
  * on project settings and a silent compiler reads as "the checker is right".
+ * A child whose servers stop answering is stopped (#486): no answer and
+ * almost no CPU for `--stall-min` (default 10) minutes of awake time, and the
+ * child kills its servers, exits without `.done`, and is named as not
+ * measured in run.log's last lines and in tables.md
+ * (`scripts/lib/stall-watchdog.ts`).
  *
  * Every answer a run trusts is kept under `answers/<set>/<project>.json`, and
  * `--reuse=<run dir>` answers from there what it can (#481): the compilers'
@@ -88,6 +93,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { waitForQuiet } from "./lib/bench-busy";
+import { STALLED_EXIT, stallWindowMs, watchForStall, type StallWatchdog } from "./lib/stall-watchdog";
 import { ProjectAnswers, answersPath, keptAnswerOf, sha1, type AnswerKey, type KeptAnswer } from "./lib/census-answers";
 import { CENSUS_SET_ORDER, censusSets, isTestPath } from "./lib/census-sets";
 import { CLASSY, FN, ISSUE_OF, shapeOf, type Node } from "./lib/call-census-shapes";
@@ -674,6 +680,7 @@ async function measureOne(setName: string, project: string): Promise<void> {
           const found = await one(q.file, q.at);
           const answer = keptAnswerOf(found, root, outside);
           if (answer === undefined) { failures.push("failed" in found ? found.failed : "no answer"); continue; }
+          watchdog?.answered();
           if (answer !== "none") { raw.set(key, answer); firstPlace = Math.min(firstPlace, performance.now()); }
           trusted.push({ q, answer, asked: askedAt });
         } catch (error) {
@@ -1208,11 +1215,30 @@ function compare(before: string, after: string): string {
 
 await initEngine();
 
+/** The child's watchdog (#486); `measureOne` tells it each answer. */
+let watchdog: StallWatchdog | undefined;
+const stallMs = stallWindowMs(argv);
+
 const one = flag("one");
 if (one) {
   const [setName, project] = one.split("/");
   if (!setName || !project || !SETS[setName]) throw new Error(`--one=${one}: want <set>/<project>`);
   mkdirSync(path.join(RUN, setName), { recursive: true });
+  /*
+   * A server that stops answering would hold this project, and every run
+   * queued behind this one, for as long as nobody looked (#486). Stalled, the
+   * child exits before it writes answers or `.done`, so a re-run or a
+   * `--reuse` run asks this project again rather than keeping a hole.
+   */
+  watchdog = watchForStall({
+    windowMs: stallMs,
+    say: (line) => {
+      const text = `${new Date().toLocaleString("sv-SE")}   [${setName}/${project}] ${line}\n`;
+      process.stderr.write(text);
+      appendFileSync(path.join(RUN, "run.log"), text);
+    },
+    onStall: () => process.exit(STALLED_EXIT),
+  });
   await measureOne(setName, project);
   process.exit(0);
 }
@@ -1252,11 +1278,14 @@ if (!argv.includes("--table")) {
       await waitForQuiet(log);
       log(`${setName}/${project}`);
       // The child's notes go to the terminal and to run.log as they happen.
-      const run = spawnSync(process.execPath, [...process.execArgv, SELF, `--one=${setName}/${project}`, `--out=${RUN}`, ...(reuse ? [`--reuse=${reuse}`] : [])], {
+      const run = spawnSync(process.execPath, [...process.execArgv, SELF, `--one=${setName}/${project}`, `--out=${RUN}`, ...(reuse ? [`--reuse=${reuse}`] : []),
+        ...argv.filter((arg) => arg.startsWith("--stall-min="))], {
         stdio: ["ignore", "inherit", "inherit"], timeout: minutes * 60_000,
       });
       if (run.status !== 0 || !existsSync(path.join(RUN, setName, `${project}.done`))) {
-        const why = run.error ? run.error.message : `exit ${run.status ?? run.signal}`;
+        const why = run.error ? run.error.message
+          : run.status === STALLED_EXIT ? `stalled: no answer and no work for ${stallMs / 60_000} awake min, its servers killed; run.log says which`
+          : `exit ${run.status ?? run.signal}`;
         failed.push(`${setName}/${project} (${why})`);
         log(`FAILED ${setName}/${project}: ${why}`);
       }
@@ -1266,6 +1295,8 @@ if (!argv.includes("--table")) {
 
 const summaries = loadRun(RUN).filter((s) => wanted.includes(s.set) && (!only || only.includes(s.project)));
 if (!argv.includes("--table")) {
+  // Every hole by name, last, so a run with one is never read as whole (#486).
+  if (failed.length > 0) log(`NOT MEASURED, ${failed.length}: ${failed.join("; ")}`);
   const reusedAll = summaries.reduce((t, s) => t + (s.answers?.reused ?? 0), 0);
   const askedAll = summaries.reduce((t, s) => t + (s.answers?.asked ?? 0), 0);
   log(`compiler questions: ${reusedAll} reused, ${askedAll} asked, over ${summaries.length} projects`);
