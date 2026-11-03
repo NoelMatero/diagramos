@@ -170,6 +170,21 @@ describe.skipIf(process.platform === "win32")("the machine gate", () => {
     expect(shared.stderr).toContain("fake beside");
   }, 60_000);
 
+  it("while it waits for an ungated run, shows the home-made gates a place holder, and takes it away", async () => {
+    // ~/bench-477/when-quiet.sh cannot see the lock; without this a chain behind it never lets the gate in.
+    const holders = () => spawnSync("ps", ["-axo", "ppid=,command="], { encoding: "utf8" }).stdout.split("\n")
+      .filter((line) => /node(\s|$).*measure-gate-hold\.mts --one=gate/.test(line));
+    const loose = start(fakeRun("loose"), { NO_WAIT: "1", HOLD_MS: "3000" });
+    for (let i = 0; i < 100 && lines().length === 0; i++) await pause(100);
+    const waiting = gate(sh(`echo start g >> '${events}'; echo end g >> '${events}'`));
+    let seen = 0;
+    for (let i = 0; i < 100 && seen === 0; i++) { await pause(100); seen = holders().length; }
+    expect(seen).toBe(1);
+    await Promise.all([loose.done, waiting.done]);
+    expect(lines()).toEqual(["start loose", "end loose", "start g", "end g"]);
+    expect(holders()).toEqual([]);
+  }, 60_000);
+
   it("exits with the command's own code and lets go of the lock", async () => {
     const ended = await gate(sh("exit 3")).done;
     expect(ended.code).toBe(3);

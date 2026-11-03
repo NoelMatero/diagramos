@@ -29,6 +29,8 @@
  * And `waitForQuiet` takes the machine before it looks (#489): a look alone
  * let two waiters see the same quiet second and both start.
  */
+import { spawn } from "node:child_process";
+
 import { logStart, loggedRuns, processes, stillGoing, takeMachine, waitingPids, type Proc } from "./machine-lock";
 
 export interface BusyProcess { pid: number; command: string }
@@ -42,7 +44,8 @@ const NAMES = process.env.BOARD_AI_GATE_RUNS ?? `(${["bench-plan" + "ted", "meas
 const RUNS = new RegExp(`^\\S*node(\\s|$).*(${NAMES})`);
 /** The script a run's command names, last mention first, so a wrapper and what it starts read alike. */
 const scriptOf = (command: string) => [...command.matchAll(new RegExp(NAMES, "g"))].at(-1)?.[0];
-const PLACE_HOLDER = /measure-queue-hold/;
+/** The home-made gate's place in the queue, and ours for it (`holdPlace`); neither is a run. */
+const PLACE_HOLDER = /measure-(queue|gate)-hold/;
 
 /** This process's own family: itself, every ancestor and every descendant. */
 function family(all: Proc[], self: number): Set<number> {
@@ -98,14 +101,37 @@ export async function waitForQuiet(say: (line: string) => void, pollMs = 2_000,
   { onSignal = true }: { onSignal?: boolean } = {}): Promise<void> {
   await takeMachine(process.argv.slice(1).join(" "), say, { pollMs: Math.min(pollMs, 1_000), onSignal });
   let last = "";
-  for (;;) {
-    const busy = otherRuns();
-    if (busy.length === 0) return;
-    const line = `waiting: another run is going -- pid ${busy[0]!.pid}: ${busy[0]!.command.slice(0, 120)}`;
-    if (line !== last) say(line);
-    last = line;
-    await new Promise((resolve) => { setTimeout(resolve, pollMs); });
+  let hold: (() => void) | undefined;
+  try {
+    for (;;) {
+      const busy = otherRuns();
+      if (busy.length === 0) return;
+      hold ??= holdPlace();
+      const line = `waiting: another run is going -- pid ${busy[0]!.pid}: ${busy[0]!.command.slice(0, 120)}`;
+      if (line !== last) say(line);
+      last = line;
+      await new Promise((resolve) => { setTimeout(resolve, pollMs); });
+    }
+  } finally {
+    hold?.();
   }
+}
+
+/*
+ * Until no brief names them, the home-made gates (`~/bench-477/when-quiet.sh`)
+ * start a chain's next run the moment its last one ends, and they cannot see
+ * the lock, so a holder waiting for that chain would wait until it ran dry
+ * (2026-11-03, behind #484's holdout run). This shows them a run that is not
+ * one, the same trick their own place holder plays on us: a node process
+ * their check counts as busy, gone when we start or when this process dies.
+ */
+function holdPlace(): () => void {
+  const watch = `const p = Number(process.argv[1]); setInterval(() => { try { process.kill(p, 0); } catch { process.exit(0); } }, 1000);`;
+  const child = spawn(process.execPath, ["-e", watch, String(process.pid), "measure-gate-hold.mts", "--one=gate"], { stdio: "ignore" });
+  child.unref();
+  const stop = () => { try { child.kill("SIGKILL"); } catch { /* gone */ } };
+  process.once("exit", stop);
+  return () => { stop(); process.removeListener("exit", stop); };
 }
 
 /** A measurement being recorded: `line()` says whether anything shared the machine with it so far. */
