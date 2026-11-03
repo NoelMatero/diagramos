@@ -7,6 +7,7 @@
  *   npm run bench:planted
  *   npm run bench:planted -- --language=rust --word=calls --details
  *   npm run bench:planted -- --source=wrong-kind
+ *   npm run bench:planted -- --stall-min=10
  *
  * ## The two halves of the same question
  *
@@ -51,6 +52,7 @@ import { waitForQuiet } from "./lib/bench-busy";
 import { librariesLine, useLibraries } from "./lib/bench-libraries";
 import { BENCH_DIR, HOLDOUT, SET } from "./lib/bench-set";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
+import { stallWindowMs, watchForStall } from "./lib/stall-watchdog";
 import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
 
 const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
@@ -325,20 +327,84 @@ let claimsScored = 0;
 let undecidableCount = 0;
 const started = Date.now();
 
+const wanted = (claim: KeyClaim): boolean => (!wantWord || claim.word === wantWord)
+  && (!wantLanguage || claim.language === wantLanguage) && (!wantSource || claim.source === wantSource);
+
+/*
+ * A language server that stops answering held one run 23 hours and every run
+ * queued behind it (#486). The watchdog kills the servers once nothing has
+ * moved for `--stall-min` minutes of awake time, and the project they served
+ * is left out of every count and named in the header: a score with a hole in
+ * it is not comparable with one without.
+ *
+ * It sees no answers from here -- the servers are behind `refereedCheckLive`
+ * -- so the bench's sign of life is CPU alone: a healthy run keeps a core
+ * busy, and a server waiting out one timeout after another uses almost none.
+ *
+ * Every claim is asked first and tallied after, so a project that stalls
+ * part-way contributes nothing. Nothing is printed while asking, so a run
+ * with no stall prints exactly what it did before.
+ */
+const stallMs = stallWindowMs(argv);
+const STALLED = Symbol("stalled");
+let stalled: ((reason: string) => void) | undefined;
+let stallReason = "";
+const newStall = () => new Promise<typeof STALLED>((resolve) => {
+  stalled = (reason) => { stallReason = reason; resolve(STALLED); };
+});
+watchForStall({
+  windowMs: stallMs,
+  say: (line) => console.error(`  ${line}`),
+  onStall: ({ reason }) => {
+    if (stalled) stalled(reason);
+    // After the last project: a server that will not exit, and nothing left to score.
+    else console.error("  after the run: the servers above were stopped so the run can exit");
+  },
+});
+const failedProjects = new Map<string, string>();
+type Asked = Awaited<ReturnType<typeof ask>> & { asked: typeof lastAsked };
+/** Per board, per claim: what the checker said. */
+const answers = new Map<Key, Map<KeyClaim, Asked>>();
+let stall = newStall();
+for (const key of loaded) {
+  if (failedProjects.has(key.project)) continue;
+  const said = new Map<KeyClaim, Asked>();
+  answers.set(key, said);
+  for (const claim of key.claims) {
+    if (!wanted(claim) || claim.truth === "undecidable") continue;
+    const asking = ask(key, claim);
+    const got = await Promise.race([asking, stall]);
+    if (got !== STALLED) {
+      said.set(claim, { ...got, asked: lastAsked });
+      continue;
+    }
+    failedProjects.set(key.project, stallReason);
+    console.error(`  ${key.project}: not measured, left out of every count`);
+    // The killed servers fail what was pending, so this ends soon; the pool goes after it.
+    let waited: ReturnType<typeof setTimeout> | undefined;
+    await Promise.race([asking.catch(() => undefined), new Promise((resolve) => { waited = setTimeout(resolve, stallMs); })]);
+    clearTimeout(waited);
+    pools?.pool.close();
+    pools = undefined;
+    stall = newStall();
+    break;
+  }
+}
+stalled = undefined;
+
 /** The project whose `--details` lines are being printed; each gets a header (#403). */
 let printedProject: string | undefined;
 for (const key of loaded) {
+  if (failedProjects.has(key.project)) continue;
   boards++;
   for (const claim of key.claims) {
-    if (wantWord && claim.word !== wantWord) continue;
-    if (wantLanguage && claim.language !== wantLanguage) continue;
-    if (wantSource && claim.source !== wantSource) continue;
+    if (!wanted(claim)) continue;
     if (claim.truth === "undecidable") {
       undecidableCount++;
       undecidable.set(claim.why, (undecidable.get(claim.why) ?? 0) + 1);
       continue;
     }
-    const { outcome, detail, reason } = await ask(key, claim);
+    const { outcome, detail, reason, asked } = answers.get(key)!.get(claim)!;
     claimsScored++;
     const planted = claim.source !== "drawn" && claim.source !== "labelled";
     if (outcome === "not sure" || outcome === "silent") {
@@ -370,13 +436,18 @@ for (const key of loaded) {
     }
     if (shown) console.log(`    ${outcome.padEnd(9)} ${claim.truth.padEnd(6)} ${claim.source.padEnd(10)} `
       + `${claim.language.padEnd(6)} [${reason}] @${claim.word} ${claim.from} -> ${claim.to} | ${detail}`
-      + ` | ${lastAsked.ms.toFixed(0)}ms | gate: ${lastAsked.gate || "-"}`);
+      + ` | ${asked.ms.toFixed(0)}ms | gate: ${asked.gate || "-"}`);
   }
 }
 
 console.log();
 console.log("#296 · PLANTED MISTAKES, AND WHAT THE CHECKER SAID");
 console.log(`  ${librariesLine()}`);
+if (failedProjects.size > 0) {
+  console.log(`  NOT MEASURED, ${failedProjects.size} project${failedProjects.size === 1 ? "" : "s"}, left out of every count below;`
+    + " compare this run with no other:");
+  for (const [project, reason] of failedProjects) console.log(`    ${project}: ${reason}`);
+}
 if (HOLDOUT) {
   console.log(`  set: ${SET} -- projects nobody tunes on.`
     + " Read the score, never the arrows: only safety failures are listed.");
