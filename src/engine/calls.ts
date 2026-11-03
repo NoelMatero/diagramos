@@ -381,6 +381,18 @@ export type CallsNotClosed =
    * function type, an object type, a union, a generic, another type.
    */
   | "type-alias"
+  /**
+   * A call in the tail hands a function to a routine of this repository
+   * that calls its own parameter (#484): what runs is the function handed,
+   * and what that reaches the tail reaches.
+   */
+  | "handed-to-a-runner"
+  /**
+   * A call in the tail is to a name the code sets again elsewhere (#484): a
+   * `let` a setter replaces, a global rebound. What runs is decided while
+   * the program runs.
+   */
+  | "set-at-run-time"
   | SiteUnresolved;
 
 /** One end of the question: a file, its text, and what its imports point at. */
@@ -2071,9 +2083,20 @@ export function callsBetween(
    * `absent` and is silence either way.
    */
   const back = { file: from.file, names: new Set([from.routine]), hooked: runsOnRead(from, [from.routine]) };
+  /*
+   * Unless the tail runs code its text does not show (#484): a function it
+   * hands to a routine that runs it, or a call to something replaced at run
+   * time. Then "no call this way round" was read off half the body, and
+   * whatever the head calls back says nothing about the arrow. Asked only
+   * here, where something is about to accuse.
+   */
+  let given: ReturnType<typeof runsWhatItIsGiven> | null = null;
+  const runsGiven = () => given === null ? (given = runsWhatItIsGiven(from)) : given;
   for (const name of backwards ? to.names : []) {
     const reverse = callsTo(to, name, back);
-    if (reverse.evidence) return { verdict: "backwards", evidence: reverse.evidence };
+    if (!reverse.evidence) continue;
+    if (!runsGiven()) return { verdict: "backwards", evidence: reverse.evidence };
+    break;
   }
 
   /*
@@ -2089,6 +2112,14 @@ export function callsBetween(
     return { verdict: "absent", notClosed: "unlicensed" };
   }
   const closed = closedBodyRefutes(from, to, compiled);
+  /*
+   * A reason the closed reading found comes first: it may be one a compiler
+   * can still answer, and a live check asks only about the reason it is
+   * shown. Where the reading closed, the code the tail runs without writing
+   * it keeps it open (#484).
+   */
+  const given_ = "why" in closed ? undefined : runsGiven();
+  if (given_) return { verdict: "absent", notClosed: given_ };
   if ("reached" in closed) return { verdict: "wrong-routine", evidence: closed.reached };
   if ("evidence" in closed) return { verdict: "refuted", evidence: closed.evidence };
   return { verdict: "absent", notClosed: closed.why };
@@ -2488,6 +2519,299 @@ export function handedOn(
       if (handed && outside.has(at.start)) visit(handed, holder, lineOf(side.source, call.startIndex));
     });
   }
+  return found;
+}
+
+/**
+ * Whether one of the tail's calls runs code the tail's own text does not
+ * show (#484), and which way:
+ *
+ *   - `handed-to-a-runner`: a call to a routine of this repository that calls
+ *     one of its own parameters, handed a function -- `runNow(helper)`,
+ *     `scheduler(runReactionsHelper)` with `scheduler = f => f()`. What runs
+ *     is `helper`, and whatever `helper` reaches the tail reaches.
+ *   - `set-at-run-time`: a call to a name the code sets again somewhere else
+ *     -- a `let` that a setter replaces, a Python global a function rebinds
+ *     through `global`, a member something assigns. What runs is whatever
+ *     was put there last, and the declaration the call was placed at is only
+ *     the first of those.
+ *
+ * mobx's `runReactions` does both: `reactionScheduler(runReactionsHelper)`,
+ * where the scheduler is `f => f()` and `setReactionScheduler` replaces it.
+ * Every call it writes was placed and none reaches `Reaction`, so the check
+ * turned a correct arrow round on the strength of `Reaction` calling
+ * `runReactions`.
+ *
+ * Asked only where an accusation is about to be made, and it only ever takes
+ * one away: a confirmation never comes from here. The function handed is a
+ * routine or a class of this repository's (`handsAFunction`), matched to the
+ * parameter the runner calls (`runAsGiven`). Code outside the repository
+ * that runs what it is handed is `handedOn`'s, a step for the route check.
+ */
+export function runsWhatItIsGiven(
+  from: CallSide & { routine: string },
+  /** Told which call it was, for a measurement to quote. */
+  noted?: (call: { line: number; wrote: string; at: string }) => void,
+): "handed-to-a-runner" | "set-at-run-time" | undefined {
+  const reading = callSitesIn(from, from.routine);
+  if (!reading.read) return undefined;
+  const placed = new Map<number, CallSitePlaced>();
+  for (const body of reading.bodies) {
+    if (body.routine !== from.routine) continue;
+    for (const site of body.sites) {
+      if (site.file === undefined ? site.why === "local-callee" : site.file !== EXTERNAL_RECEIVER) {
+        if (site.nameAt) placed.set(site.nameAt.start, site);
+      }
+    }
+  }
+  if (placed.size === 0) return undefined;
+  const tree = parseSource(from.source, from.language);
+  const bindings = bindingsIn(from.source, from.language);
+  if (!tree || !bindings) return undefined;
+  const holders = holdersIn(tree.rootNode);
+
+  let found: "handed-to-a-runner" | "set-at-run-time" | undefined;
+  for (const routine of routinesNamed(from.source, from.routine, from.language).routines) {
+    const holder = holders.get(routine.id);
+    each(routine, (call) => {
+      if (found) return;
+      const callee = calleeOf(call);
+      if (!callee || callee.kind === "computed") return;
+      const site = placed.get((callee.kind === "through" ? callee.memberAt : callee.nameAt).start);
+      if (!site) return;
+      /*
+       * A file's own name holding a value, not a routine -- Python's `hook =
+       * noop` -- is a call the reader leaves unplaced, and one a function
+       * may still rebind through `global`.
+       */
+      if (!site.file) {
+        if (
+          callee.kind === "bare" && moduleScope(from.source, from.language)?.has(callee.name, "value") !== undefined
+          && meaningOf(callee.name, from, bindings, call, "value").at === "declared" && setAgain(from, callee.name, false)
+        ) {
+          found = "set-at-run-time";
+          noted?.({ line: lineOf(from.source, call.startIndex), wrote: call.text.replace(/\s+/g, " ").slice(0, 80), at: `${from.file}#${callee.name}` });
+        }
+        return;
+      }
+      const opened = site.file === from.file ? from : from.open?.(site.file);
+      if (!opened) return;
+      const far: CallSide = { ...opened, file: site.file };
+      const name = site.declaredAs ?? site.name;
+      const handed = call.childForFieldName("arguments");
+      if (setAgain(far, name, callee.kind !== "bare")) found = "set-at-run-time";
+      else if (handed && runAsGiven(far, name, callee.kind !== "bare", handed).some((value) => handsAFunction(value, from, bindings, holder, routine))) {
+        found = "handed-to-a-runner";
+      }
+      if (found) noted?.({ line: lineOf(from.source, call.startIndex), wrote: call.text.replace(/\s+/g, " ").slice(0, 80), at: `${site.file}#${name}` });
+    });
+    if (found) return found;
+  }
+  return undefined;
+}
+
+/** Assignments, in the three grammars: `x = v`, `x += v`. A declaration (`let x = v`) is not one. */
+const ASSIGNS = new Set(["assignment_expression", "augmented_assignment_expression", "assignment", "augmented_assignment", "compound_assignment_expr"]);
+
+/** What a name inside these belongs to: a routine's locals, a class's members -- not the file's own names. */
+const OWN_SCOPE = /^(class_definition|class_declaration|class|abstract_class_declaration|class_body|impl_item|trait_item)$/;
+
+/**
+ * Whether `far` assigns `name` anywhere after declaring it (#484): as a bare
+ * name meaning the file's own binding, or -- for a call written on a
+ * receiver -- as a member of anything (`obj.handler = ..`, `self.run = ..`).
+ *
+ * Python declares a module's names by assigning them, so there the first
+ * assignment at the module's top, or a `def` (however many `@overload`s
+ * precede it), is the declaration, and it takes another assignment at the
+ * top, or one inside a function through `global`, to set it again.
+ * TypeScript and Rust declare with `let`, `var`, `static`, which are not
+ * assignments. Rust's methods are fixed: a field of the same name is not the
+ * method, so the member half is not asked there.
+ */
+function setAgain(far: CallSide, name: string, member: boolean): boolean {
+  if (member && far.language === "rust") return false;
+  const tree = parseSource(far.source, far.language);
+  const bindings = bindingsIn(far.source, far.language);
+  if (!tree || !bindings) return false;
+  const python = far.language === "python";
+  let top = 0;
+  let defined = false;
+  let inside = false;
+  /*
+   * TypeScript's and Rust's lookups answer "declared" for a function's own
+   * `let` too, so an assignment inside a function that declares the name
+   * itself -- hono's `let handler` in `dispatch` -- is that function's local.
+   */
+  const declaresHere = (fn: Node) => parametersInOrder(fn, far.language).some((one) => one.name === name) || (() => {
+    let found = false;
+    each(fn, (inner) => {
+      if (!found && (inner.type === "variable_declarator" || inner.type === "let_declaration")
+        && (inner.childForFieldName("name") ?? inner.childForFieldName("pattern"))?.text === name) found = true;
+    });
+    return found;
+  })();
+  const functions: Node[] = [];
+  const visit = (node: Node, nested: boolean): void => {
+    if (inside) return;
+    if (python && !nested && node.type === "function_definition" && node.childForFieldName("name")?.text === name) defined = true;
+    const left = ASSIGNS.has(node.type) ? node.childForFieldName("left") : null;
+    if (left && member) {
+      const field = MEMBER_READ.has(left.type)
+        ? left.childForFieldName("property") ?? left.childForFieldName("attribute") ?? left.childForFieldName("field")
+        : null;
+      if (field?.text === name) inside = true;
+    } else if (left?.type === "identifier" && left.text === name
+      && meaningOf(name, far, bindings, left, "value").at === "declared") {
+      if (python && !nested) top += 1;
+      else if (python || !functions.some(declaresHere)) inside = true;
+    }
+    const fn = parametersOf(node) !== null;
+    if (fn) functions.push(node);
+    const entering = nested || fn || OWN_SCOPE.test(node.type);
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child) visit(child, entering);
+    }
+    if (fn) functions.pop();
+  };
+  visit(tree.rootNode, false);
+  return inside || top + (defined ? 1 : 0) > 1;
+}
+
+/** One parameter of a routine, in order: the name it binds, and whether it takes every argument from there on. */
+interface Parameter { name: string; rest: boolean; keywordOnly: boolean }
+
+/** A node's named children. */
+function namedKids(node: Node): Node[] {
+  const out: Node[] = [];
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (child?.isNamed) out.push(child);
+  }
+  return out;
+}
+
+/** A routine's parameters in the order a call fills them; `self` and `this` are not among them. */
+function parametersInOrder(fn: Node, language: Language): Parameter[] {
+  const single = fn.childForFieldName("parameter");
+  const list = parametersOf(fn);
+  const nodes = single && !list ? [single] : list ? namedKids(list) : [];
+  const out: Parameter[] = [];
+  let keywordOnly = false;
+  for (const one of nodes) {
+    if (/separator$/.test(one.type)) { keywordOnly ||= one.type === "keyword_separator"; continue; }
+    if (one.type === "self_parameter" || one.type === "comment" || one.type === "dictionary_splat_pattern") continue;
+    const rest = one.type === "list_splat_pattern" || one.type === "rest_pattern"
+      || one.childForFieldName("pattern")?.type === "rest_pattern" || one.type === "variadic_parameter";
+    const written = one.type === "identifier" ? one
+      : one.childForFieldName("pattern") ?? one.childForFieldName("name")
+        ?? namedKids(one).find((child) => /identifier$/.test(child.type));
+    const named = written && /identifier$/.test(written.type) ? written
+      : written ? namedKids(written).find((child) => /identifier$/.test(child.type)) : undefined;
+    if (!named || named.text === "this") continue;
+    out.push({ name: named.text, rest, keywordOnly: keywordOnly || language === "python" && one.type === "dictionary_splat_pattern" });
+    if (rest && language === "python") keywordOnly = true;
+  }
+  return out;
+}
+
+/**
+ * The values a call hands to parameters the routine it calls runs (#484):
+ * `runNow(helper)` with `runNow(f) { f() }` hands `helper` to `f`. Every
+ * routine of the name in `far` is asked, as anywhere else a name stands for
+ * every declaration it has; a routine held in a declaration -- `let s = f =>
+ * f()`, Python's `s = lambda f: f()` -- is the function written there.
+ *
+ * Run means called where the routine stands: `f()`, and in JavaScript
+ * `f.call(..)` and `f.apply(..)`, in its own body or a function written in
+ * it. Matched by position, by keyword (Python's `f=helper`), and a rest
+ * parameter takes every argument from its own place on; a spread argument
+ * may fill any. A method's `self` or `cls` is the receiver, not the first
+ * argument.
+ */
+function runAsGiven(far: CallSide, name: string, onReceiver: boolean, handed: Node): Node[] {
+  const values: Node[] = [];
+  const written = namedKids(handed)
+    .filter((one) => one.type !== "comment");
+  const positional = written.filter((one) => one.type !== "keyword_argument");
+  const spread = positional.findIndex((one) => one.type === "spread_element" || one.type === "list_splat");
+  for (const declared of routinesNamed(far.source, name, far.language).routines) {
+    const fn = parametersOf(declared) ?? declared.childForFieldName("parameter") ? declared
+      : [declared.childForFieldName("value"), declared.childForFieldName("right")]
+        .find((one) => one && (parametersOf(one) ?? one.childForFieldName("parameter")));
+    if (!fn) continue;
+    let parameters = parametersInOrder(fn, far.language);
+    if (far.language === "python" && onReceiver && /^(self|cls)$/.test(parameters[0]?.name ?? "")) parameters = parameters.slice(1);
+    const names = new Set(parameters.map((one) => one.name));
+    const run = new Set<string>();
+    each(fn, (node) => {
+      const callee = calleeOf(node);
+      if (callee?.kind === "bare" && names.has(callee.name)) run.add(callee.name);
+      if (callee?.kind === "through" && JAVASCRIPT.has(far.language) && RUNS_A_VALUE.has(callee.name) && names.has(callee.through)) run.add(callee.through);
+    });
+    parameters.forEach((parameter, index) => {
+      if (!run.has(parameter.name)) return;
+      for (const one of written) {
+        if (one.type === "keyword_argument") {
+          const value = one.childForFieldName("value");
+          if (one.childForFieldName("name")?.text === parameter.name && value) values.push(value);
+        }
+      }
+      if (parameter.keywordOnly) return;
+      if (parameter.rest) values.push(...positional.slice(index));
+      else if (positional[index]) values.push(positional[index]!);
+      if (spread >= 0 && spread <= index) values.push(positional[spread]!);
+    });
+  }
+  return values;
+}
+
+/**
+ * Whether a value handed to a call is a function of this repository's
+ * (#484): a name or a member read placed, as a call of it would be, at a
+ * routine or a class here. A parameter or a local is not: what it holds is
+ * whatever the tail's own caller put there, and the backwards reading has
+ * never treated calling one directly as a doubt either -- handing it to a
+ * runner is the same call one step removed, and stays the same question.
+ * Read the way `handedOn` reads arguments:
+ * what a call among them returns is its own site, a function written out
+ * there -- or written inside the tail and handed by name, as marshmallow's
+ * `getter` is -- has its calls read as the routine's, and a keyword's own
+ * name is not a value.
+ */
+function handsAFunction(handed: Node, side: CallSide, bindings: Bindings, holder: Node | undefined, routine: Node): boolean {
+  let found = false;
+  /** A function written inside the tail: its calls are already read as the tail's own (`callSitesIn`). */
+  const writtenHere = (name: string) => routinesNamed(side.source, name, side.language).routines
+    .some((one) => one.id !== routine.id && one.startIndex >= routine.startIndex && one.endIndex <= routine.endIndex);
+  const take = (value: Node): void => {
+    const callee: Callee = value.childCount === 0
+      ? NAME_LEAF.test(value.type)
+        ? { kind: "bare", name: value.text, nameAt: { start: value.startIndex, end: value.startIndex + value.text.length } }
+        : { kind: "computed" }
+      : calleeOfNode(value);
+    if (callee.kind === "computed") return;
+    const placed = placeOf(callee, side, bindings, value, holder);
+    if ("why" in placed || placed.file === EXTERNAL_RECEIVER) return;
+    const far = placed.file === side.file ? side : side.open?.(placed.file);
+    const name = placed.as ?? callee.name;
+    if (!far || (placed.file === side.file && writtenHere(name))) return;
+    if (isRoutine(far.source, name, far.language) || isTypeName(far.source, name, far.language)) found = true;
+  };
+  const visit = (node: Node): void => {
+    if (found || calleeOf(node) || constructedBy(node)) return;
+    if (node.childForFieldName("body") && (parametersOf(node) ?? node.childForFieldName("parameter"))) return;
+    if (MEMBER_READ.has(node.type) || node.type === "scoped_identifier") { take(node); return; }
+    if (node.childCount === 0) { if (node.isNamed) take(node); return; }
+    const value = node.childForFieldName("value");
+    if (value && (node.childForFieldName("name") ?? node.childForFieldName("key"))) { visit(value); return; }
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child?.isNamed) visit(child);
+    }
+  };
+  visit(handed);
   return found;
 }
 
