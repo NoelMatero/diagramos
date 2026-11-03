@@ -246,3 +246,280 @@ export function onlyATypeAlias(source: string, name: string, language: Language)
   });
   return aliases > 0 && other === 0;
 }
+
+/**
+ * What an alias at an arrow's *type* end stands for (#479).
+ *
+ * The other direction from everything above. There, the code writes a name
+ * that may hide the target; here, the arrow names `Alias` where `type Alias =
+ * Shape`, and the code writes `Shape`. Looking for the word `Alias` in a
+ * signature or a field list finds nothing, and that absence is about the
+ * spelling rather than the code -- every one of #479's fifteen probe arrows
+ * was correct and red, in all three languages.
+ *
+ * So a written type that *is* what the alias stands for counts as "might be
+ * this one", which withholds and never confirms. What it stands for is
+ * compared whole, never by a name it shares: httpx's `HeaderTypes` is a union
+ * naming `Tuple` and `bytes`, and `Headers`' one field writes both, in a list
+ * of byte triples that is not a `HeaderTypes` at all -- a red on a wrong arrow
+ * that a shared-name rule would have thrown away.
+ *
+ * One hop, as `aliasesFor` is: an alias of an alias is a question for a type
+ * checker, and what a longer chain costs is a red that should have been
+ * silence, which is what there was before.
+ */
+export interface StandsFor {
+  /** The alias's value written canonically, as a whole match; its type parameters match anything. */
+  pattern: RegExp;
+  /**
+   * The type names the value writes, canonically, less its type parameters.
+   * A compiler's answer is a flat list of parts with no shape to compare, so
+   * the most it can say is "every one of these is in it" -- needed for the
+   * type to be the alias's value, and enough here, where it only withholds.
+   */
+  names: string[];
+}
+
+/** Stands for a type parameter in a canonical spelling. Not a character any type can write. */
+const PARAMETER = "\u0001";
+const QUALIFIED = /^[A-Za-z_$][\w$]*(?:(?:\.|::)[A-Za-z_$][\w$]*)*$/;
+/** `typing`'s capitalised spellings of builtins, which mean the same type (PEP 585). */
+const PYTHON_BUILTINS: Record<string, string> = {
+  List: "list", Dict: "dict", Set: "set", FrozenSet: "frozenset", Tuple: "tuple", Type: "type", Text: "str",
+};
+/** Wrappers that only say "one of these": not a part a compiler lists. */
+const NOT_A_PART = new Set(["Union", "Optional", "None", "undefined", "null"]);
+
+/** The named children of a node: what is left once its punctuation and keywords are. */
+function named(node: Node): Node[] {
+  const children: Node[] = [];
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (child?.isNamed) children.push(child);
+  }
+  return children;
+}
+
+function plainName(text: string, language: Language): string {
+  const last = text.split(/\.|::/).pop()!;
+  return language === "python" ? PYTHON_BUILTINS[last] ?? last : last;
+}
+
+/**
+ * The members of a union, flattened: `A | B | C` in TypeScript and Python,
+ * and Python's `Union[A, B]` and `Optional[A]`, which mean the same thing.
+ * Undefined for anything that is not a union.
+ */
+function unionMembers(node: Node, language: Language): Array<Node | "None"> | undefined {
+  const members: Array<Node | "None"> = [];
+  const flatten = (part: Node): void => {
+    if (part.type === "type" && named(part).length === 1) return flatten(named(part)[0]!);
+    if (part.type === "union_type") {
+      for (const member of named(part)) flatten(member);
+      return;
+    }
+    const operator = part.type === "binary_operator" ? part.childForFieldName("operator") : null;
+    if (operator?.text === "|") {
+      flatten(part.childForFieldName("left")!);
+      flatten(part.childForFieldName("right")!);
+      return;
+    }
+    const wrapped = language === "python" ? pythonUnion(part) : undefined;
+    if (wrapped) {
+      members.push(...wrapped);
+      return;
+    }
+    members.push(part);
+  };
+  flatten(node);
+  return members.length > 1 ? members : undefined;
+}
+
+/** Python's `Union[A, B]` and `Optional[A]` as members, or undefined. */
+function pythonUnion(node: Node): Array<Node | "None"> | undefined {
+  let head: Node | null = null;
+  let args: Node[] = [];
+  if (node.type === "subscript") {
+    head = node.childForFieldName("value");
+    for (let index = 0; index < node.childCount; index += 1) {
+      if (node.fieldNameForChild(index) === "subscript") args.push(node.child(index)!);
+    }
+  } else if (node.type === "generic_type") {
+    head = named(node)[0] ?? null;
+    const parameters = named(node).find((child) => child.type === "type_parameter");
+    args = parameters ? named(parameters) : [];
+  }
+  if (!head || !QUALIFIED.test(head.text)) return undefined;
+  const name = plainName(head.text, "python");
+  if (name === "Union") return args;
+  if (name === "Optional" && args.length === 1) return [args[0]!, "None"];
+  return undefined;
+}
+
+/**
+ * A type written the same way whatever spelling it was given: no whitespace,
+ * no namespace (`typing.List`, `crate::types::Shape`), no quotes round a Python
+ * forward reference, union members in one order, `T[]` as `Array<T>`, and a
+ * function type's parameter names left out. Type parameters become one mark.
+ */
+function canonical(node: Node, language: Language, parameters: Set<string>): string {
+  const text = node.text.replace(/\s+/g, "");
+  if (language === "python" && node.type === "string") {
+    const inner = text.replace(/^[rRbBuUfF]*("""|'''|"|')/, "").replace(/("""|'''|"|')$/, "");
+    return inner.replace(/[A-Za-z_][\w]*(?:\.[A-Za-z_]\w*)*/g, (name) => plainName(name, language));
+  }
+  if (node.type === "lifetime") return "";
+  if (QUALIFIED.test(text) && node.isNamed) {
+    if (parameters.has(text)) return PARAMETER;
+    return plainName(text, language);
+  }
+  if (node.childCount === 0) return text;
+  const members = unionMembers(node, language);
+  if (members) {
+    const each = members.map((member) => (member === "None" ? "None" : canonical(member, language, parameters)));
+    return `U(${[...new Set(each)].sort().join(",")})`;
+  }
+  const inner = named(node);
+  if (node.type === "array_type" && inner.length === 1) return `Array<${canonical(inner[0]!, language, parameters)}>`;
+  if ((node.type === "parenthesized_type" || node.type === "type") && inner.length === 1) {
+    return canonical(inner[0]!, language, parameters);
+  }
+  // A parameter of a function type is its type: `(n: number) => T` is `(x: number) => T`.
+  if (/^(required_parameter|optional_parameter|parameter)$/.test(node.type)) {
+    const type = node.childForFieldName("type");
+    if (type) return canonical(type, language, parameters) + (node.type === "optional_parameter" ? "?" : "");
+  }
+  let out = "";
+  for (let index = 0; index < node.childCount; index += 1) out += canonical(node.child(index)!, language, parameters);
+  return out;
+}
+
+/** Type names a value writes, each once and canonically, for a compiler's flat list of parts. */
+function typeNamesOf(value: Node, language: Language, parameters: Set<string>): string[] {
+  const names = new Set<string>();
+  const visit = (node: Node): void => {
+    const text = node.text.replace(/\s+/g, "");
+    const typeLike = language === "python"
+      ? node.type === "identifier" || node.type === "attribute"
+      : /^(type_identifier|predefined_type|primitive_type|nested_type_identifier|scoped_type_identifier)$/.test(node.type);
+    if (typeLike && QUALIFIED.test(text)) {
+      if (!parameters.has(text)) names.add(plainName(text, language));
+      return;
+    }
+    if (language === "python" && node.type === "string") {
+      for (const name of canonical(node, language, parameters).match(/[A-Za-z_]\w*/g) ?? []) names.add(name);
+      return;
+    }
+    for (let index = 0; index < node.childCount; index += 1) visit(node.child(index)!);
+  };
+  visit(value);
+  return [...names].filter((name) => !NOT_A_PART.has(name));
+}
+
+/** The name an alias declaration introduces, and its type parameters' names. */
+function aliasHead(node: Node): { name: string; parameters: Set<string> } | undefined {
+  const parameters = new Set<string>();
+  const declared = node.childForFieldName("type_parameters");
+  if (declared) {
+    each(declared, (part) => {
+      if (part.type === "type_parameter") {
+        const name = part.childForFieldName("name");
+        if (name) parameters.add(name.text);
+      }
+    });
+  }
+  if (node.type === "type_alias_statement") {
+    // Python 3.12: `type Box[T] = list[T]` puts the name and its parameters in a `generic_type`.
+    let left = node.childForFieldName("left");
+    if (left?.type === "type" && named(left).length === 1) left = named(left)[0]!;
+    if (left?.type === "generic_type") {
+      const name = named(left)[0];
+      each(left, (part) => {
+        if (part.type === "type_parameter") for (const one of named(part)) parameters.add(one.text);
+      });
+      return name ? { name: name.text, parameters } : undefined;
+    }
+    return left && left.childCount === 0 ? { name: left.text, parameters } : undefined;
+  }
+  const name = declaredName(node);
+  return name ? { name: name.text, parameters } : undefined;
+}
+
+/** The value of an alias declaration, in each grammar's field for it. */
+function aliasValue(node: Node): Node | undefined {
+  return node.childForFieldName("value")
+    ?? (node.type === "type_item" ? node.childForFieldName("type") : node.childForFieldName("right"))
+    ?? undefined;
+}
+
+/** Right-hand sides that can be a Python type: a name, a dotted name, a subscript, an `A | B`. */
+const PYTHON_TYPE_VALUE = /^(identifier|attribute|subscript|generic_type|binary_operator|none)$/;
+
+/**
+ * Python's plain `Alias = Shape` at module level, the spelling httpx and most
+ * Python code uses -- and only where the value could be a type. `isTypeAlias`
+ * leaves it out because an arrow at it may be about the value; here it only
+ * adds a reason to withhold, so a value that is really a value costs a red on
+ * an arrow that names a variable where a type belongs.
+ */
+function pythonAssignments(root: Node): Node[] {
+  const found: Node[] = [];
+  const consider = (node: Node, depth: number): void => {
+    if (depth > 3 || parametersOf(node) || node.type === "class_definition") return;
+    if (node.type === "assignment") {
+      const left = node.childForFieldName("left");
+      const right = node.childForFieldName("right");
+      if (left?.type === "identifier" && right && PYTHON_TYPE_VALUE.test(right.type)) {
+        if (right.type !== "binary_operator" || right.childForFieldName("operator")?.text === "|") found.push(node);
+      }
+      return;
+    }
+    for (let index = 0; index < node.childCount; index += 1) consider(node.child(index)!, depth + 1);
+  };
+  consider(root, 0);
+  return found;
+}
+
+/**
+ * What each of `targets` stands for, where the type end's own file declares it
+ * as an alias. Empty for a name that is not one, which is every name the
+ * readers asked about before this.
+ */
+export function standsFor(source: string, language: Language, targets: string[]): StandsFor[] {
+  const wanted = new Set(targets);
+  const tree = parseSource(source, language);
+  if (!tree) return [];
+  const declarations: Node[] = [];
+  each(tree.rootNode, (node) => {
+    if (node.type === "type_alias_statement" || isTypeAlias(node)) declarations.push(node);
+  });
+  if (language === "python") declarations.push(...pythonAssignments(tree.rootNode));
+  const found: StandsFor[] = [];
+  for (const declaration of declarations) {
+    const head = aliasHead(declaration);
+    const value = aliasValue(declaration);
+    if (!head || !value || !wanted.has(head.name)) continue;
+    const written = canonical(value, language, head.parameters);
+    const pattern = new RegExp(`^${written.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").split(PARAMETER).join(".+")}$`);
+    found.push({ pattern, names: typeNamesOf(value, language, head.parameters) });
+  }
+  return found;
+}
+
+/** Whether a written type, or any type inside it, is what one of the aliases stands for. */
+export function writesWhatItStandsFor(type: Node | null | undefined, language: Language, stands: StandsFor[]): boolean {
+  if (!type || stands.length === 0) return false;
+  let hit = false;
+  each(type, (part) => {
+    if (hit || !part.isNamed) return;
+    const written = canonical(part, language, new Set());
+    if (stands.some((one) => one.pattern.test(written))) hit = true;
+  });
+  return hit;
+}
+
+/** Whether a compiler's parts of a type include every name one of the aliases writes. */
+export function partsMayBe(parts: string[], language: Language, stands: StandsFor[]): boolean {
+  const have = new Set(parts.map((part) => plainName(part, language)));
+  return stands.some((one) => one.names.every((name) => have.has(name)));
+}

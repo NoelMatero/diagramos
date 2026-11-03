@@ -29,11 +29,18 @@ beforeAll(async () => { await initEngine(); }, 60_000);
 const repos: string[] = [];
 afterAll(() => { for (const repo of repos) dropRepo(repo); });
 
-/** One arrow on a board of its own, checked with no compiler, as CI and a user without one do. */
-async function verdict(files: Record<string, string>, from: string, to: string, claim: string): Promise<ArrowVerdict> {
+/**
+ * One arrow on a board of its own, checked with no compiler, as CI and a user
+ * without one do -- with whether the reader held its answer back for an alias.
+ */
+async function verdict(
+  files: Record<string, string>, from: string, to: string, claim: string,
+): Promise<ArrowVerdict & { aliased: boolean }> {
   const repo = scratchRepo(files, "alias-type-end-");
   repos.push(repo);
-  return (await verdicts(repo, [[from, to, claim]], { compiler: false })).each[0]!;
+  const { each, report } = await verdicts(repo, [[from, to, claim]], { compiler: false });
+  const aliased = (report.claims.signatureWithheld.aliased ?? 0) + (report.claims.holdsWithheld.aliased ?? 0) > 0;
+  return { ...each[0]!, aliased };
 }
 
 const RUST_CRATE = {
@@ -115,7 +122,7 @@ describe("an arrow naming a type by its alias, where the code writes the type", 
       for (const [from, to, claim] of [[alias, routine, "takes"], [alias, routine, "returns"], [holder, alias, "holds"]] as const) {
         const answer = await verdict(files, from, to, claim);
         expect(answer.reds, `${from} @${claim} ${to}`).toEqual([]);
-        expect(answer.unconfirmed, `${from} @${claim} ${to}`).toBe("aliased");
+        expect(answer.aliased, `${from} @${claim} ${to}`).toBe(true);
       }
     });
 
@@ -128,8 +135,8 @@ describe("an arrow naming a type by its alias, where the code writes the type", 
 
     it(`still confirms the arrow drawn at the type itself in ${language.name}`, async () => {
       const shape = `${language.types}#Shape`;
-      expect(await verdict(files, shape, routine, "takes")).toEqual({ reds: [] });
-      expect(await verdict(files, holder, shape, "holds")).toEqual({ reds: [] });
+      expect(await verdict(files, shape, routine, "takes")).toEqual({ reds: [], aliased: false });
+      expect(await verdict(files, holder, shape, "holds")).toEqual({ reds: [], aliased: false });
     });
   }
 });
@@ -233,10 +240,10 @@ describe("an alias for more than a bare name: compared whole", () => {
       const files = language.files(types, same);
       const takes = await verdict(files, alias, f, "takes");
       expect(takes.reds).toEqual([]);
-      expect(takes.unconfirmed).toBe("aliased");
+      expect(takes.aliased).toBe(true);
       const holds = await verdict(files, holder, alias, "holds");
       expect(holds.reds).toEqual([]);
-      expect(holds.unconfirmed).toBe("aliased");
+      expect(holds.aliased).toBe(true);
     });
 
     it(`is still called wrong when the code only shares names with it (${what}, ${language.name})`, async () => {
@@ -254,6 +261,8 @@ describe("the issue's guard: httpx's Headers does not hold HeaderTypes", () => {
    * `HeaderTypes` is what its constructor *takes*. The union names `Tuple` and
    * `bytes`, which the field writes too -- a rule that withheld on any shared
    * name would lose this red, and comparing the whole written type keeps it.
+   * The real field's type is a `# type:` comment, which only a compiler reads;
+   * it is annotated here so the red stands with none running.
    */
   const files = {
     "httpx/__init__.py": "",
@@ -279,7 +288,7 @@ describe("the issue's guard: httpx's Headers does not hold HeaderTypes", () => {
       "class Headers(typing.MutableMapping[str, str]):",
       "    def __init__(self, headers: HeaderTypes | None = None, encoding: str | None = None) -> None:",
       "        self._list: typing.List[typing.Tuple[bytes, bytes, bytes]] = []",
-      "        self._encoding = encoding",
+      "        self._encoding: str | None = encoding",
       "",
     ].join("\n"),
   };
@@ -288,4 +297,51 @@ describe("the issue's guard: httpx's Headers does not hold HeaderTypes", () => {
     const answer = await verdict(files, "httpx/_models.py#Headers", "httpx/_types.py#HeaderTypes", "holds");
     expect(answer.reds).toEqual(["holds-absent"]);
   });
+});
+
+describe("where the code leaves the type to the compiler", () => {
+  /*
+   * `s = new Shape()` writes no type, so the reader asks a compiler, which
+   * says `Shape` -- placed where `Shape` is declared, not where `Alias` is.
+   * Before this, that answer was a "no" to `Alias`, and the arrow went red
+   * with the compiler's word behind it.
+   */
+  const cases: Array<{ language: string; files: Record<string, string>; types: string; usage: string; takes: boolean }> = [
+    {
+      language: "ts",
+      files: {
+        "tsconfig.json": "{\"compilerOptions\":{\"strict\":true}}",
+        "src/types.ts": "export class Shape { n = 1 }\nexport class Other { m = \"\" }\nexport type Alias = Shape;\nexport type OtherAlias = Other;\n",
+        "src/use.ts": "import { Shape } from \"./types\";\nexport class Holder { s = new Shape(); }\nexport const takesShape: (s: Shape) => Shape = (s) => s;\n",
+      },
+      types: "src/types.ts", usage: "src/use.ts", takes: true,
+    },
+    {
+      language: "python",
+      files: {
+        "pkg/__init__.py": "",
+        "pkg/types.py": "class Shape:\n    n: int = 1\n\nclass Other:\n    m: str = ''\n\nAlias = Shape\nOtherAlias = Other\n",
+        "pkg/use.py": "from pkg.types import Shape\n\nclass Holder:\n    def __init__(self) -> None:\n        self.s = Shape()\n",
+      },
+      types: "pkg/types.py", usage: "pkg/use.py", takes: false,
+    },
+  ];
+
+  for (const { language, files, types, usage, takes } of cases) {
+    const live = async (from: string, to: string, claim: string) => {
+      const repo = scratchRepo(files, "alias-type-end-live-");
+      repos.push(repo);
+      return (await verdicts(repo, [[from, to, claim]])).each[0]!;
+    };
+
+    it(`is not called wrong on the compiler's word in ${language}`, async () => {
+      expect((await live(`${usage}#Holder`, `${types}#Alias`, "holds")).reds).toEqual([]);
+      if (takes) expect((await live(`${types}#Alias`, `${usage}#takesShape`, "takes")).reds).toEqual([]);
+    }, 120_000);
+
+    it(`still calls an alias for a different type wrong on the compiler's word in ${language}`, async () => {
+      expect((await live(`${usage}#Holder`, `${types}#OtherAlias`, "holds")).reds).toEqual(["holds-absent"]);
+      if (takes) expect((await live(`${types}#OtherAlias`, `${usage}#takesShape`, "takes")).reds).toEqual(["signature-absent"]);
+    }, 120_000);
+  }
 });
