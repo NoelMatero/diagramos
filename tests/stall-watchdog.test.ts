@@ -35,8 +35,10 @@ describe("a server that stops answering", () => {
     const [stops, slow] = results as [Unit, Unit];
     expect(stops.result).toBe("failed");
     expect(stops.reason).toMatch(/^stalled: nothing answered for 2\.\ds awake/);
-    // The stub and its child, never the process listing's own `ps`, whose pid is free once it exits.
-    expect(stops.reason).toMatch(/killed node \(pid \d+\), sleep \(pid \d+\) \[2 killed\]$/);
+    // The stub and its child by pid, never the process listing's own `ps`, whose pid is free once it exits.
+    expect(stops.reason, stops.reason).toContain(`(pid ${stops.serverPid})`);
+    expect(stops.reason, stops.reason).toContain(`(pid ${stops.childPid})`);
+    expect(stops.reason, stops.reason).not.toMatch(/\bps \(pid/);
     // Two answers take ~20 ms; then the 2 s window, plus up to two 0.2 s ticks and the process listing.
     expect(stops.ms).toBeGreaterThanOrEqual(2000);
     expect(stops.ms).toBeLessThan(4500);
