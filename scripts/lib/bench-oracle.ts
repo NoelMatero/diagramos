@@ -45,6 +45,13 @@ import {
   blankPython, blankRust, blankTs, isOutside, sourceOf,
   type Kind, type Language, type Loc, type Sym, type Tooling,
 } from "./bench-tooling";
+/*
+ * The one thing taken from the checker: how a board spells a name
+ * (`Parser.parse`, `Parser::parse`, `Parser#parse`), from the module that
+ * has no imports of its own (#465). It reads text, never code, so the key
+ * still shares no reading machinery with what it scores.
+ */
+import { writtenName } from "../../src/engine/lines";
 
 /*
  * `depends` is judged (`judgeDepends`) and deliberately not in this list: the
@@ -170,6 +177,9 @@ const describeKind = (s: Sym): string => ({
   impl: "impl block", module: "module", other: "declaration",
 } as Record<Kind, string>)[s.kind];
 
+/** Owners that mean "where this is written", not a declaration: `Self::new`, `crate::parse`, `self.run`. */
+const HERE_WORDS = new Set(["Self", "self", "crate", "super", "this", "cls"]);
+
 const isRoutine = (s: Sym) => s.kind === "routine";
 const isType = (s: Sym) => s.kind === "type" || s.kind === "alias";
 
@@ -185,12 +195,47 @@ export function createOracle(tooling: Tooling): Oracle {
     return symbolCache.get(file);
   }
 
+  /*
+   * A ref is read with the checker's own spelling rules (`writtenName`, the
+   * function `parseRef` reads every ref through), so `parser.ts#Parser.parse`,
+   * `Parser::parse` and `Parser#parse` all name the method `parse` with the
+   * owner `Parser` (#465). Only the spelling is shared: which declaration that
+   * is, and what is true of it, is still the tool's answer.
+   *
+   * Splitting on every `#` read `Parser#parse` as the class `Parser`, and
+   * `Parser.parse` as a name nothing declares, which left the claim out.
+   *
+   * The owner picks the declaration: the member of that class, interface,
+   * impl, trait, namespace or object, and never a same-named member of
+   * another owner in the file. An owner that is there but does not declare
+   * the name is nothing, not the name read alone. Only a word that stands for
+   * "here" (`Self::new`, `crate::parse`) or the file's own module name reads
+   * as the plain name.
+   */
   async function candidates(ref: string): Promise<Sym[] | undefined> {
-    const [file, name] = ref.split("#");
-    if (!name) return undefined;
-    const syms = await symbolsOf(file!);
+    const hash = ref.indexOf("#");
+    if (hash < 0) return undefined;
+    const file = ref.slice(0, hash);
+    const written = ref.slice(hash + 1);
+    if (!written) return undefined;
+    const { name, owner } = writtenName(written);
+    const syms = await symbolsOf(file);
     if (!syms) return undefined;
-    return syms.filter((s) => s.name === name || (language === "ts" && s.name === `#${name}`));
+    const named = syms.filter((s) => s.name === name || (language === "ts" && s.name === `#${name}`));
+    if (!owner) return named;
+    const owned = named.filter((s) => ownedBy(s, owner, syms));
+    if (owned.length > 0) return owned;
+    const stem = path.basename(file).replace(/\.[^.]*$/, "");
+    return HERE_WORDS.has(owner) || owner === stem ? named : [];
+  }
+
+  /** Whether `owner` is what a declaration sits in: its class, its impl's type or trait, or anything spanning it. */
+  function ownedBy(sym: Sym, owner: string, syms: Sym[]): boolean {
+    if (sym.container === owner) return true;
+    if (syms.some((d) => d !== sym && d.name === owner && d.start <= sym.start && sym.end <= d.end)) return true;
+    if (language !== "rust") return false;
+    return rustImplBlocks(sym.file).some((b) => b.start <= sym.start && sym.end <= b.end
+      && (b.selfName === owner || b.traitName === owner));
   }
 
   /** Whether a location the tool returned points at this declaration. */
