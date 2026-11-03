@@ -74,6 +74,12 @@ describe.skipIf(process.platform === "win32")("another run is using the machine"
     expect(counted(pid)).toBe(false);
   });
 
+  it("is not the home-made gate's place in the queue, which waits on us (#489)", () => {
+    // ~/bench-477/when-quiet.sh holds it while it waits; counting it deadlocked a bench twice on 2026-11-02.
+    const pid = running(process.execPath, ["-e", STAY, "/x/bench-477/measure-queue-hold.mts"]);
+    expect(counted(pid)).toBe(false);
+  });
+
   it("is not the process asking, nor what started it", () => {
     // This test runs inside vitest: its own worker and the vitest above it
     // are exactly what a careless check would wait on forever.

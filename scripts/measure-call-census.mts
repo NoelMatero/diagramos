@@ -92,7 +92,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { waitForQuiet } from "./lib/bench-busy";
+import { recordRun, waitForQuiet, type Recorded } from "./lib/bench-busy";
 import { STALLED_EXIT, stallWindowMs, watchForStall, type StallWatchdog } from "./lib/stall-watchdog";
 import { ProjectAnswers, answersPath, keptAnswerOf, sha1, type AnswerKey, type KeptAnswer } from "./lib/census-answers";
 import { CENSUS_SET_ORDER, censusSets, isTestPath } from "./lib/census-sets";
@@ -1267,9 +1267,12 @@ const log = (line: string) => {
   appendFileSync(path.join(RUN, "run.log"), `${stamp} ${line}\n`);
 };
 
+let machine: Recorded | undefined;
 if (!argv.includes("--table")) {
   mkdirSync(RUN, { recursive: true });
   log(`census into ${RUN}${reuse ? `, reusing compiler answers from ${path.resolve(reuse)}` : ""}`);
+  // Whether another run shared the machine meanwhile (#489); its line goes to run.log at the end.
+  machine = recordRun(`${path.basename(SELF)} ${argv.join(" ")}`);
   for (const setName of wanted) {
     mkdirSync(path.join(RUN, setName), { recursive: true });
     for (const project of SETS[setName]!.projects()) {
@@ -1302,5 +1305,12 @@ if (!argv.includes("--table")) {
   log(`compiler questions: ${reusedAll} reused, ${askedAll} asked, over ${summaries.length} projects`);
 }
 const table = tables(summaries, failed);
-writeFileSync(path.join(RUN, "tables.md"), table + "\n");
+if (machine) log(machine.line());
+// Every invocation that measured into this run said; a shared one marks the whole run.
+const said = existsSync(path.join(RUN, "run.log"))
+  ? readFileSync(path.join(RUN, "run.log"), "utf8").split("\n").map((line) => / (machine: .*)$/.exec(line)?.[1]).filter((line) => line !== undefined)
+  : [];
+const machineLine = said.find((line) => line.startsWith("machine: SHARED")) ?? said.at(-1);
+writeFileSync(path.join(RUN, "tables.md"), (machineLine ? `${machineLine}\n\n` : "") + table + "\n");
+if (machineLine) console.log(machineLine);
 console.log(table);

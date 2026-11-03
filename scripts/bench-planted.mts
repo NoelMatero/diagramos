@@ -48,7 +48,7 @@ import path from "node:path";
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type CheckCache } from "../src/engine/drift";
 import { liveRefereePool, refereedCheckLive, type LiveRefereePool } from "../src/engine/referee-live";
 import { initEngine } from "../src/engine/parse";
-import { waitForQuiet } from "./lib/bench-busy";
+import { recordRun, waitForQuiet } from "./lib/bench-busy";
 import { librariesLine, useLibraries } from "./lib/bench-libraries";
 import { BENCH_DIR, HOLDOUT, SET } from "./lib/bench-set";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
@@ -278,6 +278,8 @@ function table(title: string, note: string, rows: Map<string, Row>, caught: (row
  * `--details` run holds only the run.
  */
 if (!noWait) await waitForQuiet((line) => console.error(`  ${line}`));
+/* Whether another run shared the machine anyway (#489): `--no-wait`, a run started without the gate. */
+const machine = recordRun(`bench-planted ${argv.join(" ")}`);
 
 await initEngine();
 
@@ -443,6 +445,7 @@ for (const key of loaded) {
 console.log();
 console.log("#296 · PLANTED MISTAKES, AND WHAT THE CHECKER SAID");
 console.log(`  ${librariesLine()}`);
+console.log(`  ${machine.line()}`);
 if (failedProjects.size > 0) {
   console.log(`  NOT MEASURED, ${failedProjects.size} project${failedProjects.size === 1 ? "" : "s"}, left out of every count below;`
     + " compare this run with no other:");

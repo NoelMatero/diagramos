@@ -27,6 +27,24 @@ It waits before starting while another `bench:planted`, `measure-*` script or
 vitest is running, and says which; two at once starve the language servers and
 make reds that have nothing to do with the change. `--no-wait` skips that.
 
+To run anything that measures, from any session or worktree, put it behind
+the gate (#489):
+
+```
+npm run gate -- npm run bench:planted -- --project=regex
+npm run gate -- npm test
+```
+
+The gate is a lock (`~/.board-ai-gate/lock`): gated runs go one at a time, in
+the order they arrived, and a bench or census started inside one does not wait
+on it again. A bench or census started without the gate takes the same lock
+itself while it waits, so it queues too. A lock whose holder died is taken
+over. On macOS the gate keeps the Mac from idle sleep while it runs. Every run
+writes its start and end to `~/.board-ai-gate/runs.jsonl`, and `bench:planted`'s
+header, the census's and the box lookup's `tables.md` say `machine: SHARED --`
+when anything else measured during them (a `--no-wait` run, an ungated vitest),
+so a score taken beside another run is marked rather than read as clean.
+
 What one arrow costs, asked twice:
 
 ```

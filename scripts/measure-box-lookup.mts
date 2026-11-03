@@ -71,7 +71,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { waitForQuiet } from "./lib/bench-busy";
+import { recordRun, waitForQuiet, type Recorded } from "./lib/bench-busy";
 import { CENSUS_SET_ORDER, censusSets, isTestPath } from "./lib/census-sets";
 import { sourceFiles } from "./lib/source-files";
 
@@ -578,8 +578,11 @@ const log = (line: string) => {
   appendFileSync(path.join(RUN, "run.log"), `${stamp} ${line}\n`);
 };
 const failed: string[] = [];
+let machine: Recorded | undefined;
 if (!argv.includes("--table")) {
   log(`box lookup into ${RUN}`);
+  // Whether another run shared the machine meanwhile (#489); its line goes to run.log at the end.
+  machine = recordRun(`${path.basename(SELF)} ${argv.join(" ")}`);
   for (const setName of wanted) {
     mkdirSync(path.join(RUN, setName), { recursive: true });
     for (const project of SETS[setName]!.projects()) {
@@ -600,5 +603,12 @@ if (!argv.includes("--table")) {
 }
 const rows = loadRows(RUN, wanted).filter((row) => !only || only.includes(row.project));
 const table = tables(rows) + (failed.length ? `\n**Failed:** ${failed.join(", ")}\n` : "");
-writeFileSync(path.join(RUN, "tables.md"), table + "\n");
+if (machine) log(machine.line());
+// Every invocation that measured into this run said; a shared one marks the whole run.
+const said = existsSync(path.join(RUN, "run.log"))
+  ? readFileSync(path.join(RUN, "run.log"), "utf8").split("\n").map((line) => / (machine: .*)$/.exec(line)?.[1]).filter((line) => line !== undefined)
+  : [];
+const machineLine = said.find((line) => line.startsWith("machine: SHARED")) ?? said.at(-1);
+writeFileSync(path.join(RUN, "tables.md"), (machineLine ? `${machineLine}\n\n` : "") + table + "\n");
+if (machineLine) console.log(machineLine);
 console.log(table);

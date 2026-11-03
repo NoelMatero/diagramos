@@ -42,6 +42,7 @@
     "graph:refresh": "node scripts/refresh-code-graph.mjs",
     "typecheck": "tsc --noEmit",
     "check:drift": "tsx scripts/check-drift.mjs",
+    "gate": "tsx scripts/gate.mts",
     "bench:planted": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/bench-planted.mts",
     "bench:planted:runs": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/bench-planted-runs.mts",
     "bench:planted:compare": "tsx scripts/bench-planted-compare.mts",
