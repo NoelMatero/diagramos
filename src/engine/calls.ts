@@ -78,6 +78,7 @@ import { macroArguments } from "./macro-args";
 import { enclosing, lookUp, moduleScope, type Meaning, type Space, type WildcardAnswer } from "./names";
 import { declaresMember, holdersIn } from "./overrides";
 import { each, incomplete, parametersOf, parseSource, type Language, type Node, type Tree } from "./parse";
+import type { ReachVerdict } from "./reach";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -2040,6 +2041,13 @@ export function callsBetween(
    * and the question goes on to whether the tail's own calls close.
    */
   backwards = true,
+  /**
+   * The route walk (`reachBetween`), from a function the tail hands to a
+   * runner to `to` (#491). Without it every function handed on is a doubt,
+   * as #487 left it; `drift.ts` hands its own walk in, with its cache and its
+   * checker.
+   */
+  walk?: (handed: CallSide & { routine: string }) => ReachVerdict,
 ): CallsVerdict {
   const wanted = new Set(to.names);
   const forward = callsTo(from, from.routine, { file: to.file, names: wanted, hooked: runsOnRead(to, to.names) });
@@ -2091,7 +2099,13 @@ export function callsBetween(
    * here, where something is about to accuse.
    */
   let given: ReturnType<typeof runsWhatItIsGiven> | null = null;
-  const runsGiven = () => given === null ? (given = runsWhatItIsGiven(from)) : given;
+  /*
+   * A class at the far end is reached by a call to any of its routines, and
+   * the walk looks only for the names the box lists -- so its "never" proves
+   * nothing there, and the walk is not asked.
+   */
+  const handedWalk = walk && !to.names.some((name) => isTypeName(to.source, name, to.language)) ? walk : undefined;
+  const runsGiven = () => given === null ? (given = runsWhatItIsGiven(from, undefined, handedWalk)) : given;
   for (const name of backwards ? to.names : []) {
     const reverse = callsTo(to, name, back);
     if (!reverse.evidence) continue;
@@ -2552,6 +2566,12 @@ export function runsWhatItIsGiven(
   from: CallSide & { routine: string },
   /** Told which call it was, for a measurement to quote. */
   noted?: (call: { line: number; wrote: string; at: string }) => void,
+  /**
+   * The route walk from a function handed on to the arrow's far end (#491).
+   * A function it proves can't get there is no doubt; one it finds a route
+   * from, or can't decide, is. Without it, every function handed on is one.
+   */
+  walk?: (handed: CallSide & { routine: string }) => ReachVerdict,
 ): "handed-to-a-runner" | "set-at-run-time" | undefined {
   const reading = callSitesIn(from, from.routine);
   if (!reading.read) return undefined;
@@ -2571,6 +2591,28 @@ export function runsWhatItIsGiven(
   const holders = holdersIn(tree.rootNode);
 
   let found: "handed-to-a-runner" | "set-at-run-time" | undefined;
+  /**
+   * Whether a function handed on may lead to the far end (#491). drizzle's
+   * `construct` hands `createTableRelationsHelpers` to a runner, and nothing
+   * that reaches leads to `drizzle`: the doubt was about a route that is not
+   * there, and it hid two correct reds. The evidence asked for is the walk's
+   * own "never" -- every routine forward of the function read, every call
+   * placed -- the same a chain of direct calls gets.
+   *
+   * Read off the text alone: the tail's own receiver resolver belongs to the
+   * tail's file, and the walk is not handed a checker by `drift.ts`. A
+   * compiler's "declared outside the repository" settles a call for the
+   * walk, and it cannot see a library interface that this repository's own
+   * code implements -- which for a confirmation costs nothing and here would
+   * put a red back.
+   */
+  const mayLead = (handed: { file: string; name: string; type: boolean }): boolean => {
+    if (!walk || handed.type) return true;
+    const opened = handed.file === from.file ? from : from.open?.(handed.file);
+    if (!opened) return true;
+    const { source, language, imports } = opened;
+    return walk({ file: handed.file, source, language, imports, open: from.open, routine: handed.name }).verdict !== "never";
+  };
   for (const routine of routinesNamed(from.source, from.routine, from.language).routines) {
     const holder = holders.get(routine.id);
     each(routine, (call) => {
@@ -2600,7 +2642,8 @@ export function runsWhatItIsGiven(
       const name = site.declaredAs ?? site.name;
       const handed = call.childForFieldName("arguments");
       if (setAgain(far, name, callee.kind !== "bare")) found = "set-at-run-time";
-      else if (handed && runAsGiven(far, name, callee.kind !== "bare", handed).some((value) => handsAFunction(value, from, bindings, holder, routine))) {
+      else if (handed && runAsGiven(far, name, callee.kind !== "bare", handed)
+        .some((value) => handsAFunction(value, from, bindings, holder, routine).some(mayLead))) {
         found = "handed-to-a-runner";
       }
       if (found) noted?.({ line: lineOf(from.source, call.startIndex), wrote: call.text.replace(/\s+/g, " ").slice(0, 80), at: `${site.file}#${name}` });
@@ -2768,9 +2811,9 @@ function runAsGiven(far: CallSide, name: string, onReceiver: boolean, handed: No
 }
 
 /**
- * Whether a value handed to a call is a function of this repository's
- * (#484): a name or a member read placed, as a call of it would be, at a
- * routine or a class here. A parameter or a local is not: what it holds is
+ * The functions of this repository's a value handed to a call names
+ * (#484), and where each is declared: a name or a member read placed, as a
+ * call of it would be, at a routine or a class here (`type`). A parameter or a local is not: what it holds is
  * whatever the tail's own caller put there, and the backwards reading has
  * never treated calling one directly as a doubt either -- handing it to a
  * runner is the same call one step removed, and stays the same question.
@@ -2780,8 +2823,10 @@ function runAsGiven(far: CallSide, name: string, onReceiver: boolean, handed: No
  * `getter` is -- has its calls read as the routine's, and a keyword's own
  * name is not a value.
  */
-function handsAFunction(handed: Node, side: CallSide, bindings: Bindings, holder: Node | undefined, routine: Node): boolean {
-  let found = false;
+function handsAFunction(
+  handed: Node, side: CallSide, bindings: Bindings, holder: Node | undefined, routine: Node,
+): Array<{ file: string; name: string; type: boolean }> {
+  const found: Array<{ file: string; name: string; type: boolean }> = [];
   /** A function written inside the tail: its calls are already read as the tail's own (`callSitesIn`). */
   const writtenHere = (name: string) => routinesNamed(side.source, name, side.language).routines
     .some((one) => one.id !== routine.id && one.startIndex >= routine.startIndex && one.endIndex <= routine.endIndex);
@@ -2797,10 +2842,11 @@ function handsAFunction(handed: Node, side: CallSide, bindings: Bindings, holder
     const far = placed.file === side.file ? side : side.open?.(placed.file);
     const name = placed.as ?? callee.name;
     if (!far || (placed.file === side.file && writtenHere(name))) return;
-    if (isRoutine(far.source, name, far.language) || isTypeName(far.source, name, far.language)) found = true;
+    const type = isTypeName(far.source, name, far.language);
+    if (type || isRoutine(far.source, name, far.language)) found.push({ file: placed.file, name, type });
   };
   const visit = (node: Node): void => {
-    if (found || calleeOf(node) || constructedBy(node)) return;
+    if (calleeOf(node) || constructedBy(node)) return;
     if (node.childForFieldName("body") && (parametersOf(node) ?? node.childForFieldName("parameter"))) return;
     if (MEMBER_READ.has(node.type) || node.type === "scoped_identifier") { take(node); return; }
     if (node.childCount === 0) { if (node.isNamed) take(node); return; }

@@ -189,6 +189,7 @@ shapes("TypeScript", {
     ["the function handed on reaches the far end in steps (#491)", "a.ts#viaChain", "a.ts#work"],
     ["the function handed on makes a call nothing can place (#491)", "a.ts#unsure", "a.ts#again"],
     ["the far end is a class, and the function handed on calls its method (#491)", "widget.ts#kick", "widget.ts#Widget"],
+    ["the function handed on calls a method on a value (#491)", "a.ts#tally", "a.ts#again"],
   ],
   wrong: [
     ["a function is handed to a routine that only stores it", "a.ts#stored", "a.ts#work", "calls-backwards"],
@@ -197,7 +198,6 @@ shapes("TypeScript", {
     ["nothing is handed on, and the far end is in another file", "a.ts#plain", "b.ts#target", "calls-refuted"],
     ["the function handed on can't reach the far end (#491, drizzle)", "a.ts#apart", "a.ts#again", "calls-backwards"],
     ["the function handed on can't reach the far end, in another file (#491)", "a.ts#apartFar", "b.ts#target", "calls-refuted"],
-    ["the function handed on calls a library method on a value the compiler types (#491)", "a.ts#tally", "a.ts#again", "calls-backwards"],
   ],
 }, 120_000);
 
