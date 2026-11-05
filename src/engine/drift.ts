@@ -73,7 +73,7 @@ import {
   membersReadByName, readsMember, routineReadAt, routinesReadByName,
 } from "./accesses";
 import type { HandedWhole, RoutineReads } from "./resolution";
-import { onlyATypeAlias } from "./alias";
+import { onlyATypeAlias, partsMayBe, standsFor } from "./alias";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { conformedTypes, declaredBases, type ConformsWithheld } from "./conforms";
 import { overridesIn, type Overrides } from "./overrides";
@@ -2555,6 +2555,16 @@ function baseChain(
     frontier = next;
   }
   return unfollowed ? "unfollowed" : "closed";
+}
+
+/**
+ * For a compiler's answer about a place: whether its parts may be what the
+ * arrow's type end stands for, when that end is an alias (#479). Undefined for
+ * an end that is not one, which leaves the question as it was.
+ */
+function aliasParts(source: string, language: Language, symbols: string[]): ((parts: string[]) => boolean) | undefined {
+  const stands = standsFor(source, language, symbols);
+  return stands.length > 0 ? (parts) => partsMayBe(parts, language, stands) : undefined;
 }
 
 /**
@@ -5371,6 +5381,7 @@ export function checkDrift(
                 declaredIn(workspace.read(fromFile), fromLanguage ?? language, fromPath, fromEnd.symbols[0]!),
                 "is",
                 language === "python" ? aliasesIn(toAnchor, workspace, importCache.configs) : undefined,
+                aliasParts(workspace.read(fromFile), fromLanguage ?? language, fromEnd.symbols),
               ),
             } });
             continue;
@@ -5522,6 +5533,7 @@ export function checkDrift(
                 declaredIn(workspace.read(toFile), toLanguage ?? language, toPath, toEnd.symbols[0]!),
                 "is",
                 language === "python" ? aliasesIn(fromAnchor, workspace, importCache.configs) : undefined,
+                aliasParts(workspace.read(toFile), toLanguage ?? language, toEnd.symbols),
               ),
             } });
             continue;

@@ -271,6 +271,13 @@ export function askTypeParts(
    * answer naming one has not said what the place holds (#393).
    */
   alias?: (name: string) => boolean,
+  /**
+   * Whether a type with these parts may be what the head stands for, when the
+   * head is itself an alias (#479). The compiler places `Shape` where `Shape`
+   * is declared, and the head `Alias` is declared somewhere else, so without
+   * this a field the compiler says is a `Shape` was a "no" to `Alias`.
+   */
+  standsFor?: (parts: string[]) => boolean,
 ): CompilerSaid {
   if (!referee.typePartsAt || places.length === 0 || head.at.length === 0) return { does: undefined };
   let unsure: string | undefined;
@@ -284,7 +291,10 @@ export function askTypeParts(
     const unexpanded = alias !== undefined
       ? (answer?.parts ?? []).filter((part) => !part.expanded && alias(part.name)).map((part) => part.name)
       : [];
-    if ((found.includes(undefined) || unexpanded.length > 0) && !place.written) {
+    const mayBe = !place.written && answer !== undefined && standsFor?.(answer.parts.map((part) => part.name)) === true;
+    if (mayBe) {
+      unsure ??= `the compiler says \`${place.name}\` ${what} ${printed(answer)}, which ${head.name} may stand for`;
+    } else if ((found.includes(undefined) || unexpanded.length > 0) && !place.written) {
       unsure ??= unsettled(place.name, what, answer, unexpanded);
     } else nos.push(`\`${place.name}\` ${what} ${printed(answer)}`);
   }

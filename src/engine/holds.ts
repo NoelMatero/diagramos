@@ -60,7 +60,7 @@
  * The last clause is not decoration: a method declared in a class body carries a
  * return type, and counting it would make every method a field.
  */
-import { aliasesFor, aliasNames } from "./alias";
+import { aliasesFor, aliasNames, standsFor, writesWhatItStandsFor } from "./alias";
 import { typeParametersIn, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
 import {
@@ -313,6 +313,7 @@ function declaredInRoutine(
   routine: Node,
   sites: FieldSite[],
   generic: (type: Node) => boolean,
+  types: Node[] = [],
 ): Array<{ name: string; line: number }> {
   const found: Array<{ name: string; line: number }> = [];
 
@@ -322,7 +323,7 @@ function declaredInRoutine(
       const parameter = parameters.child(index);
       if (!parameter || !declaresField(parameter)) continue;
       const type = parameter.childForFieldName("type");
-      if (type) found.push(...typeNamesIn(type));
+      if (type) { found.push(...typeNamesIn(type)); types.push(type); }
       const name = parameter.childForFieldName("pattern") ?? parameter.childForFieldName("name");
       if (name) sites.push(site(name, type !== null && !generic(type), type));
     }
@@ -360,7 +361,7 @@ function declaredInRoutine(
       if (attribute && (type || object.text !== "cls") && !isDunder(attribute.text)) {
         sites.push(site(attribute, type !== null && !generic(type), type));
       }
-      if (type) found.push(...typeNamesIn(type));
+      if (type) { found.push(...typeNamesIn(type)); types.push(type); }
     });
   }
 
@@ -460,6 +461,8 @@ export function heldTypes(
    */
   const shadows = aliasNames(tree.rootNode);
   if (target) for (const name of aliasesFor(target.source, target.language, targets)) shadows.add(name);
+  /* The other way round (#479): the arrow names an alias, and a field may be typed with what it stands for. */
+  const stands = target ? standsFor(target.source, target.language, targets) : [];
   const wanted = new Set(targets);
   let sawFields = false;
   let quoted = "";
@@ -512,6 +515,8 @@ export function heldTypes(
     // `Node` here exposes no parent, and the census in #187 read 0 fields in
     // every language for exactly that reason.
     const found: Array<{ name: string; line: number; qualifier?: true }> = [];
+    /** Every field type written, for what an alias at the arrow's end stands for (#479). */
+    const types: Node[] = [];
     const fields = (member: Node, depth: number) => {
       /*
        * A routine, not a field. A method in a class body has a return type and
@@ -526,7 +531,7 @@ export function heldTypes(
       if (depth > 0 && parametersOf(member)) {
         // ... unless it declares one on the way. A constructor is where
         // TypeScript and Python put most of a real class's fields (#303).
-        found.push(...declaredInRoutine(member, sites, generic));
+        found.push(...declaredInRoutine(member, sites, generic, types));
         return;
       }
       // A nested type is its own declaration and `each` reaches it on its own;
@@ -545,11 +550,13 @@ export function heldTypes(
       }
       if (typed.length > 1 || (depth === 0 && typed.length > 0)) {
         for (const one of typed) found.push(...typeNamesIn(one));
+        types.push(...typed);
         return;
       }
       const type = member.childForFieldName("type");
       if (depth > 0 && type) {
         found.push(...typeNamesIn(type));
+        types.push(type);
         const name = member.childForFieldName("name") ?? member.childForFieldName("left");
         if (name) sites.push(site(name, !generic(type), type));
         return;
@@ -613,6 +620,15 @@ export function heldTypes(
      * warns about in the same breath as the false red.
      */
     if (!hit && found.some((candidate) => shadows.has(candidate.name))) {
+      withheld = "aliased";
+      continue;
+    }
+    /*
+     * And the arrow's own end may be the alias: `Holder @holds Alias`, `type
+     * Alias = Shape`, a field typed `Shape` (#479). Compared whole, so a field
+     * sharing a name with the alias's value is not it.
+     */
+    if (!hit && types.some((type) => writesWhatItStandsFor(type, language, stands))) {
       withheld = "aliased";
       continue;
     }

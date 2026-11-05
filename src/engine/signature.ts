@@ -139,7 +139,7 @@
  * will inherit that permission without having earned it. That hole has a name
  * in `docs/claim-vocabulary.md` and is the licence grid.
  */
-import { aliasesFor, aliasNames } from "./alias";
+import { aliasesFor, aliasNames, standsFor, writesWhatItStandsFor } from "./alias";
 import { declarationName } from "./declared";
 import { typeParametersIn, unwrittenNames, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
@@ -536,6 +536,16 @@ function typeRange(node: Node): { start: number; end: number } {
   return { start: target.startIndex, end: target.startIndex + target.text.length };
 }
 
+/** Each parameter's written type, where it has one. */
+function parameterTypeNodes(parameters: Node): Node[] {
+  const types: Node[] = [];
+  for (let index = 0; index < parameters.childCount; index += 1) {
+    const type = parameters.child(index)?.childForFieldName("type");
+    if (type) types.push(type);
+  }
+  return types;
+}
+
 function parameterTypes(
   parameters: Node,
   into: Set<string>,
@@ -587,6 +597,8 @@ export function signatureNames(
 
   const shadows = aliasNames(tree.rootNode);
   if (subject) for (const name of aliasesFor(subject.source, subject.language, targets)) shadows.add(name);
+  /* The other way round (#479): the arrow names an alias, and the signature may write what it stands for. */
+  const stands = subject ? standsFor(subject.source, subject.language, targets) : [];
   let sawName = false;
   let sawSignature = false;
 
@@ -767,6 +779,19 @@ export function signatureNames(
     if ([...spellings].some((name) => shadows.has(name))) {
       withheld ??= { verdict: "withheld", why: "aliased" };
       continue;
+    }
+    /*
+     * And the arrow's own end may be the alias: `Alias @takes takesShape`,
+     * `type Alias = Shape`, a signature that writes `Shape` (#479). Either
+     * half, as above -- the claimed half writing it is the arrow being right,
+     * and the other half is the arrow being misdrawn, which is not a red.
+     */
+    if (stands.length > 0) {
+      const written = [returned, ...(parameters ? parameterTypeNodes(parameters) : [])];
+      if (written.some((type) => writesWhatItStandsFor(type, language, stands))) {
+        withheld ??= { verdict: "withheld", why: "aliased" };
+        continue;
+      }
     }
     // `returns` asked of a function that declares no return type is a question
     // about lines that do not exist, not an absence.
