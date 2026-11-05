@@ -16,8 +16,8 @@
       "toLabel": "Request",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body constructs one here"
     },
     {
       "id": "needs|src/requests/sessions.py#Session.request|src/requests/models.py#Request|",
@@ -41,8 +41,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/requests/sessions.py#Session.request|src/requests/models.py#Request|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|src/requests/models.py#Request|src/requests/sessions.py#Session.request|",
@@ -79,8 +79,8 @@
       "toLabel": "Session.prepare_request",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "builds|src/requests/sessions.py#Session.prepare_request|src/requests/models.py#PreparedRequest|",
@@ -91,8 +91,8 @@
       "toLabel": "PreparedRequest",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body constructs one here"
     },
     {
       "id": "needs|src/requests/sessions.py#Session.prepare_request|src/requests/models.py#PreparedRequest|",
@@ -116,8 +116,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/requests/sessions.py#Session.prepare_request|src/requests/models.py#PreparedRequest|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|src/requests/models.py#PreparedRequest|src/requests/sessions.py#Session.prepare_request|",
@@ -154,8 +154,8 @@
       "toLabel": "Session.send",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|src/requests/sessions.py#Session.send|src/requests/sessions.py#Session.get_adapter|",
@@ -166,8 +166,8 @@
       "toLabel": "Session.get_adapter",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|src/requests/sessions.py#Session.send|src/requests/adapters.py#BaseAdapter.send|",
@@ -178,8 +178,8 @@
       "toLabel": "BaseAdapter.send",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|src/requests/sessions.py#Session.send|src/requests/adapters.py#BaseAdapter.send|",
@@ -203,8 +203,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/requests/sessions.py#Session.send|src/requests/adapters.py#BaseAdapter.send|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|src/requests/adapters.py#BaseAdapter.send|src/requests/sessions.py#Session.send|",
@@ -241,8 +241,8 @@
       "toLabel": "Response",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type can be a parameter or a return type"
     },
     {
       "id": "needs|src/requests/adapters.py#BaseAdapter.send|src/requests/models.py#Response|",
@@ -266,8 +266,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/requests/adapters.py#BaseAdapter.send|src/requests/models.py#Response|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|src/requests/models.py#Response|src/requests/adapters.py#BaseAdapter.send|",
@@ -304,8 +304,8 @@
       "toLabel": "Session.resolve_redirects",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|src/requests/sessions.py#SessionRedirectMixin.resolve_redirects|src/requests/sessions.py#Session.send|",
@@ -317,7 +317,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "a call to another send is here, and dispatch could reach this one"
     }
   ]
 }

@@ -28,8 +28,8 @@
       "toLabel": "BaseHandler.get_response",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|django/core/handlers/wsgi.py#WSGIHandler.__call__|django/core/handlers/base.py#BaseHandler.get_response|",
@@ -78,8 +78,8 @@
       "toLabel": "Middleware Chain",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the value is called here and resolves to it"
     },
     {
       "id": "calls|django/core/handlers/base.py#BaseHandler._middleware_chain|django/core/handlers/exception.py#convert_exception_to_response|",
@@ -90,8 +90,8 @@
       "toLabel": "convert_exception_to_response",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a value or field, and only something that runs can call"
     },
     {
       "id": "needs|django/core/handlers/base.py#BaseHandler._middleware_chain|django/core/handlers/exception.py#convert_exception_to_response|",
@@ -115,8 +115,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|django/core/handlers/base.py#BaseHandler._middleware_chain|django/core/handlers/exception.py#convert_exception_to_response|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a value or field, and only a type has fields"
     },
     {
       "id": "needs|django/core/handlers/exception.py#convert_exception_to_response|django/core/handlers/base.py#BaseHandler._middleware_chain|",
@@ -153,8 +153,8 @@
       "toLabel": "BaseHandler._get_response",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|django/core/handlers/base.py#BaseHandler._get_response|django/core/handlers/base.py#BaseHandler.resolve_request|",
@@ -165,8 +165,8 @@
       "toLabel": "resolve_request",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|django/core/handlers/base.py#BaseHandler._get_response|django/core/handlers/base.py#BaseHandler.process_exception_by_middleware|",
@@ -177,8 +177,8 @@
       "toLabel": "process_exception_by_middleware",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     }
   ]
 }

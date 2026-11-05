@@ -16,8 +16,8 @@
       "toLabel": "PipProvider",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body constructs one here"
     },
     {
       "id": "needs|src/pip/_internal/resolution/resolvelib/resolver.py#Resolver.resolve|src/pip/_internal/resolution/resolvelib/provider.py#PipProvider|",
@@ -41,8 +41,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/pip/_internal/resolution/resolvelib/resolver.py#Resolver.resolve|src/pip/_internal/resolution/resolvelib/provider.py#PipProvider|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|src/pip/_internal/resolution/resolvelib/provider.py#PipProvider|src/pip/_internal/resolution/resolvelib/resolver.py#Resolver.resolve|",
@@ -92,8 +92,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/pip/_internal/resolution/resolvelib/resolver.py#Resolver.resolve|src/pip/_internal/resolution/resolvelib/provider.py#PipProvider.find_matches|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "needs|src/pip/_internal/resolution/resolvelib/provider.py#PipProvider.find_matches|src/pip/_internal/resolution/resolvelib/resolver.py#Resolver.resolve|",
@@ -130,8 +130,8 @@
       "toLabel": "Factory.find_candidates()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|src/pip/_internal/resolution/resolvelib/provider.py#PipProvider.find_matches|src/pip/_internal/resolution/resolvelib/factory.py#Factory.find_candidates|",
@@ -180,8 +180,8 @@
       "toLabel": "PackageFinder.find_best_candidate()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|src/pip/_internal/resolution/resolvelib/factory.py#Factory._iter_found_candidates|src/pip/_internal/index/package_finder.py#PackageFinder.find_best_candidate|",
@@ -230,8 +230,8 @@
       "toLabel": "FoundCandidates (lazy)",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body constructs one here"
     },
     {
       "id": "needs|src/pip/_internal/resolution/resolvelib/factory.py#Factory._iter_found_candidates|src/pip/_internal/resolution/resolvelib/found_candidates.py#FoundCandidates|",
@@ -255,8 +255,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/pip/_internal/resolution/resolvelib/factory.py#Factory._iter_found_candidates|src/pip/_internal/resolution/resolvelib/found_candidates.py#FoundCandidates|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|src/pip/_internal/resolution/resolvelib/found_candidates.py#FoundCandidates|src/pip/_internal/resolution/resolvelib/factory.py#Factory._iter_found_candidates|",

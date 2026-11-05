@@ -119,7 +119,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "needs|django/urls/base.py#resolve|django/urls/resolvers.py#resolve@declared+used|",
@@ -168,8 +168,8 @@
       "toLabel": "URLResolver.resolve()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "calls|django/urls/resolvers.py#resolve@declared+used|django/urls/resolvers.py#match@declared+used|",
@@ -193,7 +193,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "calls|django/urls/resolvers.py#resolve|django/urls/resolvers.py#match@declared+used|",
@@ -318,8 +318,8 @@
       "toLabel": "ResolverMatch",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body constructs one here"
     },
     {
       "id": "builds|django/urls/resolvers.py#resolve@declared+used|django/urls/exceptions.py|",

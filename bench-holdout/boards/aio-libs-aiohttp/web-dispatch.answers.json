@@ -17,7 +17,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "it inherits from BaseProtocol, whose routines run as it and are written elsewhere"
     },
     {
       "id": "calls|aiohttp/web_app.py#Application|aiohttp/web_app.py#Application._handle|",
@@ -29,7 +29,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "its routine handler: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|aiohttp/web_app.py#Application._handle|aiohttp/web_urldispatcher.py#UrlDispatcher.resolve|",
@@ -40,8 +40,8 @@
       "toLabel": "resolve()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|aiohttp/web_app.py#Application._handle|aiohttp/web_urldispatcher.py#UrlDispatcher.resolve|",
@@ -91,7 +91,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "its routine resolve: a call to another resolve is here, and dispatch could reach this one"
     },
     {
       "id": "calls|aiohttp/web_urldispatcher.py#UrlDispatcher.resolve|aiohttp/web_urldispatcher.py#AbstractResource|",
@@ -102,8 +102,8 @@
       "toLabel": "Resource",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "it calls its routine resolve"
     },
     {
       "id": "returns|aiohttp/web_urldispatcher.py#AbstractResource|aiohttp/web_urldispatcher.py#UrlMappingMatchInfo|",
@@ -203,7 +203,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "its routine handle_expect_header: the tool would not walk this routine's calls"
     },
     {
       "id": "needs|aiohttp/web_urldispatcher.py#AbstractRoute|aiohttp/web_app.py#Application._handle|",
@@ -227,8 +227,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|aiohttp/web_urldispatcher.py#AbstractRoute|aiohttp/web_app.py#Application._handle|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type can be the type of a field"
     },
     {
       "id": "needs|aiohttp/web_app.py#Application._handle|aiohttp/web_urldispatcher.py#AbstractRoute|",
