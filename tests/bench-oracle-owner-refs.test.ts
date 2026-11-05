@@ -10,7 +10,9 @@
  *
  * The owner picks the declaration, which the checker's plain reading does
  * not: with two classes in a file declaring `parse`, `Lexer.parse` is
- * Lexer's. An owner that does not declare the name names nothing.
+ * Lexer's, and never a local or parameter called `parse` inside one of
+ * Parser's other methods. An owner that does not declare the name names
+ * nothing.
  *
  * Asked of the real tools.
  */
@@ -66,15 +68,26 @@ function oracleOver(language: Language, files: Record<string, string>) {
  */
 function ownerCases(file: string, impl: { parser: string; lexer: string }) {
   return (key: ReturnType<typeof oracleOver>) => {
-    it("reads a plain name as every declaration of it", async () => {
-      expect(await key.read(`${file}#parse`)).toEqual([`routine parse in ${impl.lexer}`, `routine parse in ${impl.parser}`]);
+    it("reads a plain name as every declaration of it, both methods among them", async () => {
+      expect(await key.read(`${file}#parse`))
+        .toEqual(expect.arrayContaining([`routine parse in ${impl.lexer}`, `routine parse in ${impl.parser}`]));
     }, LIVE_TIMEOUT_MS);
 
     for (const spelling of ["Parser.parse", "Parser::parse", "Parser#parse"]) {
-      it(`reads ${spelling} as Parser's method, not the class and not Lexer's`, async () => {
+      it(`reads ${spelling} as Parser's method, not the class, not Lexer's, not a local`, async () => {
         expect(await key.read(`${file}#${spelling}`)).toEqual([`routine parse in ${impl.parser}`]);
       }, LIVE_TIMEOUT_MS);
     }
+
+    for (const spelling of ["Parser#parse@declared+used", "Parser.parse@used", "Parser::parse@declared"]) {
+      it(`reads ${spelling} as Parser's method: what the box claims is not part of the name`, async () => {
+        expect(await key.read(`${file}#${spelling}`)).toEqual([`routine parse in ${impl.parser}`]);
+      }, LIVE_TIMEOUT_MS);
+    }
+
+    it("reads a plain name with a claim on it as the plain name", async () => {
+      expect(await key.read(`${file}#run@declared+used`)).toEqual(["routine run in -"]);
+    }, LIVE_TIMEOUT_MS);
 
     for (const spelling of ["Lexer.parse", "Lexer::parse", "Lexer#parse"]) {
       it(`reads ${spelling} as Lexer's`, async () => {
@@ -118,7 +131,10 @@ describe("TypeScript: a method written with its class", () => {
   const key = oracleOver("ts", {
     "tsconfig.json": JSON.stringify({ compilerOptions: { strict: true, target: "ES2022", module: "ESNext" } }),
     "shapes.ts": [
-      "export class Parser { parse(): number { return 1; } }",
+      "export class Parser {",
+      "  parse(): number { return 1; }",
+      "  size(): number { const parse = 3; return parse; }",
+      "}",
       "export class Lexer { parse(): number { return 2; } }",
       "export class Empty { size(): number { return 0; } }",
       "export function run(): number { return new Parser().parse(); }",
@@ -139,6 +155,9 @@ describe("Python: a method written with its class", () => {
       "class Parser:",
       "    def parse(self) -> int:",
       "        return 1",
+      "",
+      "    def size(self, parse: int = 0) -> int:",
+      "        return parse",
       "",
       "",
       "class Lexer:",

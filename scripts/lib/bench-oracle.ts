@@ -177,6 +177,9 @@ const describeKind = (s: Sym): string => ({
   impl: "impl block", module: "module", other: "declaration",
 } as Record<Kind, string>)[s.kind];
 
+/** A box's claim about its name, `@declared`, `@used` or `@declared+used`, as the checker spells it (`parseSymbol`). */
+const ASSERTION = /\s*@\s*(?:declared|used)(?:\s*\+\s*(?:declared|used))*\s*$/i;
+
 /** Owners that mean "where this is written", not a declaration: `Self::new`, `crate::parse`, `self.run`. */
 const HERE_WORDS = new Set(["Self", "self", "crate", "super", "this", "cls"]);
 
@@ -211,6 +214,9 @@ export function createOracle(tooling: Tooling): Oracle {
    * the name is nothing, not the name read alone. Only a word that stands for
    * "here" (`Self::new`, `crate::parse`) or the file's own module name reads
    * as the plain name.
+   *
+   * What a box claims about its name (`parse@declared+used`) is the
+   * checker's business, not part of the name: the key reads `parse`.
    */
   async function candidates(ref: string): Promise<Sym[] | undefined> {
     const hash = ref.indexOf("#");
@@ -218,15 +224,31 @@ export function createOracle(tooling: Tooling): Oracle {
     const file = ref.slice(0, hash);
     const written = ref.slice(hash + 1);
     if (!written) return undefined;
-    const { name, owner } = writtenName(written);
+    const { name: asWritten, owner } = writtenName(written);
+    const name = asWritten.replace(ASSERTION, "");
     const syms = await symbolsOf(file);
     if (!syms) return undefined;
     const named = syms.filter((s) => s.name === name || (language === "ts" && s.name === `#${name}`));
     if (!owner) return named;
-    const owned = named.filter((s) => ownedBy(s, owner, syms));
+    const members = named.filter((s) => !isLocal(s, syms));
+    const owned = members.filter((s) => ownedBy(s, owner, syms));
     if (owned.length > 0) return owned;
     const stem = path.basename(file).replace(/\.[^.]*$/, "");
-    return HERE_WORDS.has(owner) || owner === stem ? named : [];
+    if (!HERE_WORDS.has(owner) && owner !== stem) return [];
+    return members.length > 0 ? members : named;
+  }
+
+  /*
+   * A parameter or a local is not a member, though it sits inside the class:
+   * `Parser.parse` is not the `parse` local of another of Parser's methods.
+   * The language servers file a local under its routine; the TypeScript
+   * walker files it under the class, so there it is found by span. A
+   * Python `self.x` is filed under the class and stays a member.
+   */
+  function isLocal(sym: Sym, syms: Sym[]): boolean {
+    if (sym.containerKind === "routine") return true;
+    return language === "ts"
+      && syms.some((r) => r !== sym && r.kind === "routine" && r.start <= sym.start && sym.end <= r.end);
   }
 
   /** Whether `owner` is what a declaration sits in: its class, its impl's type or trait, or anything spanning it. */
