@@ -328,8 +328,8 @@
       "toLabel": "runqueue (Task deque)",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a value or field, and only a type declares members"
     },
     {
       "id": "feeds|src/trio/_core/_run.py#Runner.reschedule|src/trio/_core/_run.py#Runner.runq|",
@@ -340,8 +340,8 @@
       "toLabel": "runqueue (Task deque)",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a value or field, and only something that runs can be fed"
     },
     {
       "id": "takes|src/trio/_core/_run.py#Runner.reschedule|src/trio/_core/_run.py#Task|",
@@ -352,8 +352,8 @@
       "toLabel": "Task",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type can be a parameter or a return type"
     },
     {
       "id": "holds|src/trio/_core/_run.py#Runner|src/trio/_core/_io_epoll.py#EpollIOManager|",

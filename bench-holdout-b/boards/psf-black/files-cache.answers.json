@@ -168,8 +168,8 @@
       "toLabel": "filtered_cached",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "feeds|src/black/cache.py#Cache.filtered_cached|src/black/concurrency.py#reformat_many|",
@@ -181,7 +181,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "a value's journey cannot be enumerated"
     },
     {
       "id": "calls|src/black/concurrency.py#reformat_many|src/black/concurrency.py#schedule_formatting|",
@@ -306,8 +306,8 @@
       "toLabel": "Cache.write",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "needs|src/black/__init__.py#format_file_in_place|src/black/cache.py#Cache.write|",
@@ -331,8 +331,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/black/__init__.py#format_file_in_place|src/black/cache.py#Cache.write|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|src/black/cache.py#Cache.write|src/black/__init__.py#format_file_in_place|",

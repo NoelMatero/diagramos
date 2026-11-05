@@ -29,7 +29,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "it inherits from BaseRouter, whose routines run as it and are written elsewhere"
     },
     {
       "id": "calls|rest_framework/routers.py#SimpleRouter.get_urls|rest_framework/routers.py#SimpleRouter.get_routes|",
@@ -40,8 +40,8 @@
       "toLabel": "get_routes()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|rest_framework/routers.py#SimpleRouter.get_urls|rest_framework/routers.py#SimpleRouter.get_method_map|",
@@ -52,8 +52,8 @@
       "toLabel": "get_method_map()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|rest_framework/routers.py#SimpleRouter.get_urls|rest_framework/viewsets.py#ViewSetMixin.as_view|",
@@ -65,7 +65,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the tool could not say what as_view means at one call site"
     },
     {
       "id": "calls|rest_framework/views.py#APIView.dispatch|rest_framework/viewsets.py#ViewSetMixin.initialize_request|",
@@ -77,7 +77,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "a call to another initialize_request is here, and dispatch could reach this one"
     }
   ]
 }

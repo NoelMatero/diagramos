@@ -16,8 +16,8 @@
       "toLabel": "Request",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "nothing in it makes one"
     },
     {
       "id": "calls|src/async_impl/request.rs#Request|src/async_impl/client.rs#Client::execute_request|",
@@ -29,7 +29,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "an impl of Request's own type could not be resolved"
     },
     {
       "id": "needs|src/async_impl/request.rs#Request|src/async_impl/client.rs#Client::execute_request|",
@@ -53,8 +53,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|src/async_impl/request.rs#Request|src/async_impl/client.rs#Client::execute_request|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type can be the type of a field"
     },
     {
       "id": "needs|src/async_impl/client.rs#Client::execute_request|src/async_impl/request.rs#Request|",
@@ -92,7 +92,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "an impl of Client's own type could not be resolved"
     },
     {
       "id": "calls|src/async_impl/client.rs#Client|src/async_impl/client.rs#HyperService|",
@@ -178,8 +178,8 @@
       "toLabel": "Response",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body constructs one here"
     }
   ]
 }

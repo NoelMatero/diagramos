@@ -53,7 +53,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "calls|drizzle-orm/src/sql/sql.ts#SQL.toQuery|drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams|",
@@ -64,8 +64,8 @@
       "toLabel": "buildQueryFromSourceParams()",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "accesses|drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams|drizzle-orm/src/sql/sql.ts#Param|mapToDriverValue",
@@ -77,8 +77,8 @@
       "toLabel": "Param encoder",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the type declares no mapToDriverValue"
     },
     {
       "id": "calls|drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams|drizzle-orm/src/sql/sql.ts#mergeQueries|",
@@ -89,8 +89,8 @@
       "toLabel": "mergeQueries()",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "builds|drizzle-orm/src/sql/sql.ts#mergeQueries|drizzle-orm/src/sql/sql.ts#Query|",

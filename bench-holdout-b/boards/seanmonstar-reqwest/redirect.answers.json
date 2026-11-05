@@ -16,8 +16,8 @@
       "toLabel": "Policy::check()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|src/redirect.rs#Policy::check|src/redirect.rs#Policy::redirect|",
@@ -28,8 +28,8 @@
       "toLabel": "Policy::redirect()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "holds|src/redirect.rs#Action|src/redirect.rs#ActionKind|",
@@ -105,8 +105,8 @@
       "toLabel": "Policy",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the type declares no policy"
     },
     {
       "id": "calls|src/redirect.rs#TowerRedirectPolicy::on_request|src/redirect.rs#remove_sensitive_headers|",
@@ -117,8 +117,8 @@
       "toLabel": "remove_sensitive_headers()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|src/redirect.rs#TowerRedirectPolicy::on_request|src/redirect.rs#make_referer|",
@@ -129,8 +129,8 @@
       "toLabel": "make_referer()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     }
   ]
 }

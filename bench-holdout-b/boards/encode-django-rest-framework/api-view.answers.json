@@ -16,8 +16,8 @@
       "toLabel": "initialize_request",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|rest_framework/views.py#APIView.dispatch|rest_framework/views.py#APIView.initial|",
@@ -28,8 +28,8 @@
       "toLabel": "initial",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|rest_framework/views.py#APIView.initial|rest_framework/views.py#APIView.perform_authentication|",
@@ -40,8 +40,8 @@
       "toLabel": "perform_authentication",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|rest_framework/views.py#APIView.perform_authentication|rest_framework/request.py#Request._authenticate|",
@@ -53,7 +53,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the tool would not walk this routine's calls"
     },
     {
       "id": "needs|rest_framework/views.py#APIView.perform_authentication|rest_framework/request.py#Request._authenticate|",
@@ -77,8 +77,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|rest_framework/views.py#APIView.perform_authentication|rest_framework/request.py#Request._authenticate|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|rest_framework/request.py#Request._authenticate|rest_framework/views.py#APIView.perform_authentication|",
@@ -115,8 +115,8 @@
       "toLabel": "check_permissions",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|rest_framework/views.py#APIView.initial|rest_framework/views.py#APIView.check_throttles|",
@@ -127,8 +127,8 @@
       "toLabel": "check_throttles",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|rest_framework/views.py#APIView.dispatch|rest_framework/views.py#APIView.http_method_not_allowed|",
@@ -140,7 +140,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the name appears without being called (passed as a value, or a path)"
     },
     {
       "id": "calls|rest_framework/views.py#APIView.dispatch|rest_framework/views.py#APIView.handle_exception|",
@@ -151,8 +151,8 @@
       "toLabel": "handle_exception",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|rest_framework/views.py#APIView.dispatch|rest_framework/views.py#APIView.finalize_response|",
@@ -163,8 +163,8 @@
       "toLabel": "finalize_response",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     }
   ]
 }

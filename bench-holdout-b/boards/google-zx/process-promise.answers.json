@@ -193,8 +193,8 @@
       "toLabel": "ProcessPromise.build()",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "its routine constructor calls it"
     },
     {
       "id": "accesses|src/core.ts#ProcessPromise.build|src/core.ts#Snapshot|cmd",
@@ -207,7 +207,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the member list could not be read"
     },
     {
       "id": "calls|src/core.ts|src/core.ts#ProcessPromise.run|",
@@ -311,8 +311,8 @@
       "toLabel": "ProcessOutput",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body constructs one here"
     },
     {
       "id": "feeds|src/core.ts#ProcessOutput|src/core.ts#ProcessPromise.finalize|",
@@ -323,8 +323,8 @@
       "toLabel": "finalize()",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a type, and only something that runs has a result to feed onward"
     }
   ]
 }

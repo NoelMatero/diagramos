@@ -335,8 +335,8 @@
       "toLabel": "get_declared_fields",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "its routine __new__ calls it"
     },
     {
       "id": "builds|src/marshmallow/schema.py#SchemaMeta.get_declared_fields|src/marshmallow/schema.py#Schema|",
@@ -347,8 +347,8 @@
       "toLabel": "Schema",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "nothing in it makes one"
     },
     {
       "id": "calls|src/marshmallow/schema.py#SchemaMeta|src/marshmallow/schema.py#SchemaMeta.resolve_hooks|",
@@ -359,8 +359,8 @@
       "toLabel": "resolve_hooks",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "its routine __init__ calls it"
     },
     {
       "id": "accesses|src/marshmallow/schema.py#SchemaMeta.resolve_hooks|src/marshmallow/decorators.py#MarshmallowHook|__marshmallow_hook__",
@@ -373,7 +373,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the tool could not say whose __marshmallow_hook__ is read here"
     },
     {
       "id": "needs|src/marshmallow/schema.py#SchemaMeta.resolve_hooks|src/marshmallow/decorators.py#MarshmallowHook|",
@@ -397,8 +397,8 @@
       "language": "python",
       "source": "swap",
       "parent": "needs|src/marshmallow/schema.py#SchemaMeta.resolve_hooks|src/marshmallow/decorators.py#MarshmallowHook|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "it neither creates one nor calls any of its 1 members"
     },
     {
       "id": "needs|src/marshmallow/decorators.py#MarshmallowHook|src/marshmallow/schema.py#SchemaMeta.resolve_hooks|",

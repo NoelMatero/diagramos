@@ -17,7 +17,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "its routine include_extra_kwargs: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|rest_framework/serializers.py#BaseSerializer.is_valid|rest_framework/serializers.py#Serializer.run_validation|",
@@ -29,7 +29,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "a call to another run_validation is here, and dispatch could reach this one"
     },
     {
       "id": "calls|rest_framework/serializers.py#Serializer.run_validation|rest_framework/serializers.py#Serializer.to_internal_value|",
@@ -40,8 +40,8 @@
       "toLabel": "to_internal_value()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|rest_framework/serializers.py#Serializer.to_internal_value|rest_framework/fields.py#Field.run_validation|",
@@ -53,7 +53,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the tool could not say what run_validation means at one call site"
     },
     {
       "id": "needs|rest_framework/serializers.py#Serializer.to_internal_value|rest_framework/fields.py#Field.run_validation|",
@@ -102,8 +102,8 @@
       "toLabel": "Field.to_internal_value()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|rest_framework/serializers.py#ModelSerializer|rest_framework/serializers.py#BaseSerializer.save|",
@@ -115,7 +115,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "its routine update: the tool could not say what save means at one call site"
     },
     {
       "id": "calls|rest_framework/serializers.py#BaseSerializer.save|rest_framework/serializers.py#ModelSerializer.create|",
@@ -127,7 +127,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "a call to another create is here, and dispatch could reach this one"
     },
     {
       "id": "calls|rest_framework/serializers.py#ModelSerializer|rest_framework/serializers.py#Serializer.to_representation|",
@@ -139,7 +139,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "its routine include_extra_kwargs: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|rest_framework/serializers.py#Serializer.to_representation|rest_framework/fields.py#Field.to_representation|",
@@ -151,7 +151,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the tool could not say what to_representation means at one call site"
     },
     {
       "id": "needs|rest_framework/serializers.py#Serializer.to_representation|rest_framework/fields.py#Field.to_representation|",

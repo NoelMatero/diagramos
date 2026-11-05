@@ -565,8 +565,8 @@
       "toLabel": "Runner .spawn_impl",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "builds|src/trio/_core/_run.py#Runner.spawn_impl|src/trio/_core/_run.py#Task|",
@@ -578,7 +578,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "it is named here but not plainly constructed"
     },
     {
       "id": "calls|src/trio/_core/_run.py#Task|src/trio/_core/_run.py#Task._activate_cancel_status|",
@@ -589,8 +589,8 @@
       "toLabel": "Task._activate_ cancel_status",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "accesses|src/trio/_core/_run.py#Task._activate_cancel_status|src/trio/_core/_run.py#CancelStatus|links",
@@ -602,8 +602,8 @@
       "toLabel": "CancelStatus",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the type declares no links"
     },
     {
       "id": "feeds|src/trio/_core/_run.py#CancelScope.cancel|src/trio/_core/_run.py#CancelStatus|",
@@ -614,8 +614,8 @@
       "toLabel": "CancelStatus",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a type, and only something that runs can be fed"
     },
     {
       "id": "feeds|src/trio/_core/_run.py#CancelStatus|src/trio/_core/_run.py#Task|",

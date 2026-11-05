@@ -17,7 +17,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "builds|rayon-core/src/registry.rs#main_loop|rayon-core/src/registry.rs#WorkerThread|",
@@ -91,8 +91,8 @@
       "toLabel": "WorkerThread::wait_until",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|rayon-core/src/registry.rs#Registry::inject_or_push|rayon-core/src/registry.rs#Registry::inject|",
@@ -103,8 +103,8 @@
       "toLabel": "Registry::inject",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "feeds|rayon-core/src/registry.rs#Registry::inject|rayon-core/src/registry.rs#Registry::new|",
@@ -116,7 +116,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "a value's journey cannot be enumerated"
     },
     {
       "id": "calls|rayon-core/src/registry.rs#WorkerThread::wait_until|rayon-core/src/registry.rs#WorkerThread::find_work|",
@@ -127,8 +127,8 @@
       "toLabel": "WorkerThread::find_work",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|rayon-core/src/registry.rs#WorkerThread::find_work|rayon-core/src/job.rs#JobRef::execute|",
@@ -139,8 +139,8 @@
       "toLabel": "JobRef::execute",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "needs|rayon-core/src/registry.rs#WorkerThread::find_work|rayon-core/src/job.rs#JobRef::execute|",
