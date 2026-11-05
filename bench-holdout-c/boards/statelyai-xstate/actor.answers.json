@@ -644,8 +644,8 @@
       "toLabel": "Mailbox<T>",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "it calls its routine start"
     },
     {
       "id": "needs|packages/core/src/createActor.ts#Actor.start|packages/core/src/Mailbox.ts#Mailbox|",
@@ -694,8 +694,8 @@
       "toLabel": "enqueue()",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "needs|packages/core/src/createActor.ts#Actor.send|packages/core/src/Mailbox.ts#Mailbox.enqueue|",
@@ -745,7 +745,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "a value's journey cannot be enumerated"
     },
     {
       "id": "calls|packages/core/src/createActor.ts#Actor._process|packages/core/src/types.ts#ActorLogic|",
@@ -756,8 +756,8 @@
       "toLabel": "transition()",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "it calls its routine transition"
     },
     {
       "id": "needs|packages/core/src/createActor.ts#Actor._process|packages/core/src/types.ts#ActorLogic|",
@@ -869,8 +869,8 @@
       "toLabel": "update(snapshot)",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "accesses|packages/core/src/createActor.ts#Actor.update|packages/core/src/createActor.ts#Actor|_snapshot",
@@ -882,8 +882,8 @@
       "toLabel": "Actor class",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body reads it off that type"
     }
   ]
 }

@@ -28,8 +28,8 @@
       "toLabel": "task_message_handler() [strategy]",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "builds|celery/worker/strategy.py#default|celery/worker/request.py#Request@declared|",
@@ -41,7 +41,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the tool could not place Request here"
     },
     {
       "id": "needs|celery/worker/strategy.py#default|celery/worker/request.py#Request@declared|",
@@ -66,7 +66,7 @@
       "source": "swap",
       "parent": "needs|celery/worker/strategy.py#default|celery/worker/request.py#Request@declared|",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the tool could not say what Request means at one call site"
     },
     {
       "id": "needs|celery/worker/request.py#Request@declared|celery/worker/strategy.py#default|",
@@ -116,7 +116,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "its routine shutdown: it inherits from base, whose routines run as it and are written elsewhere"
     }
   ]
 }

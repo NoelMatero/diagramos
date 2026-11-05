@@ -119,7 +119,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "builds|src/config/config.ts#Config.load|src/config/config.ts#Config|",
@@ -131,7 +131,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "calls|src/main.ts#run|src/help/util.ts#normalizeArgv|",
@@ -207,7 +207,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "a call to another findCommand is here, and dispatch could reach this one"
     },
     {
       "id": "returns|src/config/config.ts#Config.findCommand|src/command.ts#Command|",
@@ -218,8 +218,8 @@
       "toLabel": "Command",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type can be a parameter or a return type"
     },
     {
       "id": "needs|src/config/config.ts#Config.findCommand|src/command.ts#Command|",
@@ -243,8 +243,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "needs|src/config/config.ts#Config.findCommand|src/command.ts#Command|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|src/command.ts#Command|src/config/config.ts#Config.findCommand|",
@@ -281,8 +281,8 @@
       "toLabel": "runCommand()",
       "language": "ts",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|src/config/config.ts#Config.runCommand|src/command.ts#Command.run|",
@@ -294,7 +294,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "needs|src/config/config.ts#Config.runCommand|src/command.ts#Command.run|",

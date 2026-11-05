@@ -17,7 +17,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "an impl of Rocket's own type could not be resolved"
     },
     {
       "id": "calls|core/lib/src/rocket.rs#Rocket|core/lib/src/rocket.rs#Rocket::attach|",
@@ -29,7 +29,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "an impl of Rocket's own type could not be resolved"
     },
     {
       "id": "feeds|core/lib/src/rocket.rs#Rocket::attach|core/lib/src/fairing/mod.rs#Fairings|",
@@ -103,8 +103,8 @@
       "toLabel": "Router<Finalized>",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "nothing in it makes one"
     },
     {
       "id": "needs|core/lib/src/rocket.rs#Rocket::mount|core/lib/src/router/router.rs#Router|",
@@ -128,8 +128,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|core/lib/src/rocket.rs#Rocket::mount|core/lib/src/router/router.rs#Router|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|core/lib/src/router/router.rs#Router|core/lib/src/rocket.rs#Rocket::mount|",
@@ -167,7 +167,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "an impl of Rocket's own type could not be resolved"
     },
     {
       "id": "builds|core/lib/src/rocket.rs#Rocket::ignite|core/lib/src/router/router.rs#Router|",
@@ -179,7 +179,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "it is named here but not plainly constructed"
     },
     {
       "id": "needs|core/lib/src/rocket.rs#Rocket::ignite|core/lib/src/router/router.rs#Router|",
@@ -203,8 +203,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|core/lib/src/rocket.rs#Rocket::ignite|core/lib/src/router/router.rs#Router|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "it calls its routine new"
     },
     {
       "id": "needs|core/lib/src/router/router.rs#Router|core/lib/src/rocket.rs#Rocket::ignite|",
@@ -291,8 +291,8 @@
       "toLabel": "Rocket<Ignite>",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type can be a parameter or a return type"
     },
     {
       "id": "calls|core/lib/src/rocket.rs#Rocket|core/lib/src/rocket.rs#Rocket::launch|",
@@ -304,7 +304,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "an impl of Rocket's own type could not be resolved"
     },
     {
       "id": "returns|core/lib/src/rocket.rs#Rocket::launch|core/lib/src/rocket.rs#Rocket|",
@@ -315,8 +315,8 @@
       "toLabel": "Rocket<Orbit>",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type can be a parameter or a return type"
     }
   ]
 }

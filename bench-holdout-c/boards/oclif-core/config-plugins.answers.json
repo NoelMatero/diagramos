@@ -16,8 +16,8 @@
       "toLabel": "load()",
       "language": "ts",
       "source": "drawn",
-      "truth": "true",
-      "why": "its routine load calls it"
+      "truth": "undecidable",
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "builds|src/config/config.ts#Config|src/config/config.ts#Config#load@declared|",
@@ -28,8 +28,8 @@
       "toLabel": "load()",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "calls|src/config/config.ts#Config#load@declared|src/config/config.ts#Config|",
@@ -42,7 +42,7 @@
       "source": "reverse",
       "parent": "calls|src/config/config.ts#Config|src/config/config.ts#Config#load@declared|",
       "truth": "true",
-      "why": "its routine load calls it"
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|src/config/config.ts#findTopic|src/config/config.ts#Config#load@declared|",
@@ -54,8 +54,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "calls|src/config/config.ts#Config|src/config/config.ts#Config#load@declared|",
-      "truth": "true",
-      "why": "it calls its routine getTopicLookupId"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/config.ts#Config|src/config/config.ts#pluginAdditions|",
@@ -80,8 +80,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "builds|src/config/config.ts#Config|src/config/config.ts#Config#load@declared|",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "undecidable",
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "builds|src/config/config.ts#insertLegacyPlugins|src/config/config.ts#Config#load@declared|",
@@ -94,7 +94,7 @@
       "source": "retarget",
       "parent": "builds|src/config/config.ts#Config|src/config/config.ts#Config#load@declared|",
       "truth": "false",
-      "why": "nothing in it makes one"
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/config.ts#Config|src/config/config.ts#arch|",
@@ -118,8 +118,8 @@
       "toLabel": "PluginLoader",
       "language": "ts",
       "source": "drawn",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "undecidable",
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "needs|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader|",
@@ -142,8 +142,8 @@
       "toLabel": "PluginLoader",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "a field names it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "calls|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader|",
@@ -154,8 +154,8 @@
       "toLabel": "PluginLoader",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "its routine load calls it"
+      "truth": "undecidable",
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "accesses|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader|new",
@@ -182,7 +182,7 @@
       "source": "reverse",
       "parent": "builds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader|",
       "truth": "false",
-      "why": "nothing in it makes one"
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#loadChildren|",
@@ -247,7 +247,7 @@
       "source": "swap",
       "parent": "holds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader|",
       "truth": "false",
-      "why": "the declaration does not name it as a base"
+      "why": "the from end is a routine, and only a type extends or implements"
     },
     {
       "id": "holds|src/config/plugin-loader.ts#PluginLoader|src/config/config.ts#Config#load@declared|",
@@ -259,8 +259,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "holds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader|",
-      "truth": "undecidable",
-      "why": "a type alias (PluginsMap) could stand for it"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type can be the type of a field"
     },
     {
       "id": "holds|src/config/config.ts#load|src/config/plugin-loader.ts#PluginLoader|",
@@ -286,7 +286,7 @@
       "source": "wrong-kind",
       "parent": "holds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader|",
       "truth": "false",
-      "why": "the to end is a routine, and only a type can be the type of a field"
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "calls|src/config/plugin-loader.ts#PluginLoader|src/config/config.ts#Config#load@declared|",
@@ -299,7 +299,7 @@
       "source": "reverse",
       "parent": "calls|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader|",
       "truth": "undecidable",
-      "why": "its routine constructor: it inherits from Config, whose routines run as it and are written elsewhere"
+      "why": "its routine loadRoot: a call to another load is here, and dispatch could reach this one"
     },
     {
       "id": "calls|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#findMatchingDependencies|",
@@ -311,8 +311,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "calls|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader|",
-      "truth": "undecidable",
-      "why": "its routine flags: the tool would not walk this routine's calls"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#error|",
@@ -336,8 +336,8 @@
       "toLabel": "loadRoot()",
       "language": "ts",
       "source": "drawn",
-      "truth": "true",
-      "why": "its routine load calls it"
+      "truth": "undecidable",
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "needs|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
@@ -360,8 +360,8 @@
       "toLabel": "loadRoot()",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "a field names it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "builds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
@@ -372,8 +372,8 @@
       "toLabel": "loadRoot()",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "calls|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|src/config/config.ts#Config#load@declared|",
@@ -386,7 +386,7 @@
       "source": "reverse",
       "parent": "calls|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
       "truth": "undecidable",
-      "why": "its routine constructor: it inherits from Config, whose routines run as it and are written elsewhere"
+      "why": "a call to another load is here, and dispatch could reach this one"
     },
     {
       "id": "calls|src/config/config.ts#buildS3Config|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
@@ -399,7 +399,7 @@
       "source": "retarget",
       "parent": "calls|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
       "truth": "false",
-      "why": "it neither creates one nor calls any of its 10 members"
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#isRoot|",
@@ -451,7 +451,7 @@
       "source": "swap",
       "parent": "holds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
       "truth": "false",
-      "why": "the declaration does not name it as a base"
+      "why": "the from end is a routine, and only a type extends or implements"
     },
     {
       "id": "holds|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|src/config/config.ts#Config#load@declared|",
@@ -463,8 +463,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "holds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
-      "truth": "undecidable",
-      "why": "a type alias (PluginsMap) could stand for it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "holds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#findMatchingDependencies|",
@@ -477,7 +477,7 @@
       "source": "retarget",
       "parent": "holds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
       "truth": "false",
-      "why": "the to end is a routine, and only a type can be the type of a field"
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "builds|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|src/config/config.ts#Config#load@declared|",
@@ -490,7 +490,7 @@
       "source": "reverse",
       "parent": "builds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
       "truth": "false",
-      "why": "nothing in it makes one"
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/config.ts#loadTheme|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
@@ -503,7 +503,7 @@
       "source": "retarget",
       "parent": "builds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
       "truth": "false",
-      "why": "nothing in it makes one"
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/config.ts#Config#load@declared|src/config/plugin-loader.ts#type|",
@@ -552,7 +552,7 @@
       "language": "ts",
       "source": "labelled",
       "truth": "true",
-      "why": "its routine loadRoot calls it"
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "accesses|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|src/config/plugin.ts#Plugin|creates",
@@ -579,7 +579,7 @@
       "source": "reverse",
       "parent": "builds|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|src/config/plugin.ts#Plugin|",
       "truth": "false",
-      "why": "nothing in it makes one"
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|src/config/plugin.ts#aliasPermutations|",
@@ -617,8 +617,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "needs|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|src/config/plugin.ts#Plugin|",
-      "truth": "undecidable",
-      "why": "a type alias (PluginsMap) could stand for it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|src/config/plugin.ts#Plugin|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|",
@@ -670,7 +670,7 @@
       "source": "retarget",
       "parent": "calls|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|src/config/plugin.ts#Plugin|",
       "truth": "false",
-      "why": "every routine of the type was read and none calls it"
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/plugin-loader.ts#PluginLoader#loadRoot@declared|src/config/plugin.ts#filePath|",
@@ -694,8 +694,8 @@
       "toLabel": "load()",
       "language": "ts",
       "source": "drawn",
-      "truth": "true",
-      "why": "its routine findCommand calls it"
+      "truth": "undecidable",
+      "why": "its routine load: the tool would not walk this routine's calls"
     },
     {
       "id": "holds|src/config/plugin.ts#Plugin|src/config/plugin.ts#Plugin#load@declared|",
@@ -706,8 +706,8 @@
       "toLabel": "load()",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "a field names it"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type can be the type of a field"
     },
     {
       "id": "builds|src/config/plugin.ts#Plugin|src/config/plugin.ts#Plugin#load@declared|",
@@ -719,8 +719,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "calls|src/config/plugin.ts#Plugin|src/config/plugin.ts#Plugin#load@declared|",
-      "truth": "undecidable",
-      "why": "it is named here but not plainly constructed"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "calls|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin|",
@@ -733,7 +733,7 @@
       "source": "reverse",
       "parent": "calls|src/config/plugin.ts#Plugin|src/config/plugin.ts#Plugin#load@declared|",
       "truth": "true",
-      "why": "its routine findCommand calls it"
+      "why": "it calls its routine findCommand"
     },
     {
       "id": "calls|src/config/plugin.ts#findCommand|src/config/plugin.ts#Plugin#load@declared|",
@@ -745,8 +745,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "calls|src/config/plugin.ts#Plugin|src/config/plugin.ts#Plugin#load@declared|",
-      "truth": "true",
-      "why": "it calls its routine fetch"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/plugin.ts#Plugin|src/config/plugin.ts#alias|",
@@ -771,8 +771,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "holds|src/config/plugin.ts#Plugin|src/config/plugin.ts#Plugin#load@declared|",
-      "truth": "undecidable",
-      "why": "a type alias (Plugin) could stand for it"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type can be a base"
     },
     {
       "id": "holds|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin|",
@@ -784,8 +784,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "holds|src/config/plugin.ts#Plugin|src/config/plugin.ts#Plugin#load@declared|",
-      "truth": "true",
-      "why": "a field names it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "holds|src/config/plugin.ts#Plugin|src/config/plugin.ts#loadCommandsFromTarget|",
@@ -810,7 +810,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "true",
-      "why": "its routine findCommand calls it"
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "holds|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin#_manifest@declared|",
@@ -821,8 +821,8 @@
       "toLabel": "_manifest()",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "a field names it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "builds|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin#_manifest@declared|",
@@ -834,8 +834,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "calls|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin#_manifest@declared|",
-      "truth": "undecidable",
-      "why": "it is named here but not plainly constructed"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "calls|src/config/plugin.ts#Plugin#_manifest@declared|src/config/plugin.ts#Plugin#load@declared|",
@@ -848,7 +848,7 @@
       "source": "reverse",
       "parent": "calls|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin#_manifest@declared|",
       "truth": "false",
-      "why": "re-judged by hand (#470/#480): load() calls _manifest() (plugin.ts:226) and nothing _manifest() reaches calls load(); findCommand calls loadWithData, a module loader"
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#readManifest|",
@@ -860,8 +860,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "calls|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin#_manifest@declared|",
-      "truth": "true",
-      "why": "its routine _manifest calls it"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#isRespectNoCacheDefault|",
@@ -886,8 +886,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "holds|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin#_manifest@declared|",
-      "truth": "undecidable",
-      "why": "a type alias (Plugin) could stand for it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type extends or implements"
     },
     {
       "id": "holds|src/config/plugin.ts#Plugin#_manifest@declared|src/config/plugin.ts#Plugin#load@declared|",
@@ -899,8 +899,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "holds|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin#_manifest@declared|",
-      "truth": "true",
-      "why": "a field names it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "holds|src/config/plugin.ts#constructor|src/config/plugin.ts#Plugin#_manifest@declared|",
@@ -926,7 +926,7 @@
       "source": "wrong-kind",
       "parent": "holds|src/config/plugin.ts#Plugin#load@declared|src/config/plugin.ts#Plugin#_manifest@declared|",
       "truth": "false",
-      "why": "the to end is a routine, and only a type can be the type of a field"
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "calls|src/config/config.ts#Config#load@declared|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
@@ -937,8 +937,8 @@
       "toLabel": "loadPluginsAndCommands()",
       "language": "ts",
       "source": "drawn",
-      "truth": "true",
-      "why": "its routine load calls it"
+      "truth": "undecidable",
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "builds|src/config/config.ts#Config#load@declared|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
@@ -949,8 +949,8 @@
       "toLabel": "loadPluginsAndCommands()",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "calls|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/config.ts#Config#load@declared|",
@@ -962,8 +962,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "calls|src/config/config.ts#Config#load@declared|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
-      "truth": "true",
-      "why": "its routine load calls it"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/config.ts#getPluginsList|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
@@ -975,8 +975,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "calls|src/config/config.ts#Config#load@declared|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
-      "truth": "undecidable",
-      "why": "it inherits from Config, whose routines run as it and are written elsewhere"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/config.ts#Config#load@declared|src/config/config.ts#force|",
@@ -1001,8 +1001,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "builds|src/config/config.ts#Config#load@declared|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/config.ts#s3Url|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
@@ -1015,7 +1015,7 @@
       "source": "retarget",
       "parent": "builds|src/config/config.ts#Config#load@declared|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
       "truth": "false",
-      "why": "nothing in it makes one"
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/config.ts#Config#load@declared|src/config/config.ts#must|",
@@ -1040,7 +1040,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "true",
-      "why": "its routine load calls it"
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
@@ -1063,8 +1063,8 @@
       "toLabel": "loadChildren()",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "a field names it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "builds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
@@ -1075,8 +1075,8 @@
       "toLabel": "loadChildren()",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "calls|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
@@ -1088,8 +1088,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "calls|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
-      "truth": "undecidable",
-      "why": "its routine constructor: it inherits from Config, whose routines run as it and are written elsewhere"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/config.ts#maybeAdjustDebugSetting|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
@@ -1102,7 +1102,7 @@
       "source": "retarget",
       "parent": "calls|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
       "truth": "false",
-      "why": "it neither creates one nor calls any of its 10 members"
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#topicCount|",
@@ -1154,7 +1154,7 @@
       "source": "swap",
       "parent": "holds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
       "truth": "false",
-      "why": "the declaration does not name it as a base"
+      "why": "the from end is a routine, and only a type extends or implements"
     },
     {
       "id": "holds|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
@@ -1166,8 +1166,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "holds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
-      "truth": "undecidable",
-      "why": "a type alias (PluginsMap) could stand for it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "holds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#loadChildren|",
@@ -1180,7 +1180,7 @@
       "source": "retarget",
       "parent": "holds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
       "truth": "false",
-      "why": "the to end is a routine, and only a type can be the type of a field"
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "builds|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
@@ -1193,7 +1193,7 @@
       "source": "reverse",
       "parent": "builds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
       "truth": "false",
-      "why": "nothing in it makes one"
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/config.ts#runCommand|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
@@ -1206,7 +1206,7 @@
       "source": "retarget",
       "parent": "builds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
       "truth": "false",
-      "why": "nothing in it makes one"
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/plugin-loader.ts#isRoot|",
@@ -1230,8 +1230,8 @@
       "toLabel": "Plugin",
       "language": "ts",
       "source": "drawn",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "false",
+      "why": "nothing in it makes one"
     },
     {
       "id": "needs|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|src/config/plugin.ts#Plugin|",
@@ -1254,8 +1254,8 @@
       "toLabel": "Plugin",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "its routine loadRoot calls it"
+      "truth": "undecidable",
+      "why": "it inherits from Plugin, whose routines run as it and are written elsewhere"
     },
     {
       "id": "builds|src/config/plugin.ts#Plugin|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
@@ -1268,7 +1268,7 @@
       "source": "reverse",
       "parent": "builds|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|src/config/plugin.ts#Plugin|",
       "truth": "false",
-      "why": "nothing in it makes one"
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/plugin-loader.ts#loadUserPlugins|src/config/plugin.ts#Plugin|",
@@ -1306,8 +1306,8 @@
       "language": "ts",
       "source": "swap",
       "parent": "needs|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|src/config/plugin.ts#Plugin|",
-      "truth": "undecidable",
-      "why": "a type alias (PluginsMap) could stand for it"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|src/config/plugin.ts#Plugin|src/config/plugin-loader.ts#PluginLoader#loadChildren@declared|",
@@ -1384,7 +1384,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "true",
-      "why": "its routine load calls it"
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "builds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/config.ts#Config#loadCommands@declared|",
@@ -1395,8 +1395,8 @@
       "toLabel": "loadCommands()",
       "language": "ts",
       "source": "labelled",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "calls|src/config/config.ts#Config#loadCommands@declared|src/config/config.ts#Config#loadPluginsAndCommands@declared|",
@@ -1408,8 +1408,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "calls|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/config.ts#Config#loadCommands@declared|",
-      "truth": "true",
-      "why": "its routine load calls it"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/config.ts#findCommand|src/config/config.ts#Config#loadCommands@declared|",
@@ -1421,8 +1421,8 @@
       "language": "ts",
       "source": "retarget",
       "parent": "calls|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/config.ts#Config#loadCommands@declared|",
-      "truth": "true",
-      "why": "it calls its routine getCmdLookupId"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/config.ts#commandsMarker|",
@@ -1447,8 +1447,8 @@
       "language": "ts",
       "source": "reverse",
       "parent": "builds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/config.ts#Config#loadCommands@declared|",
-      "truth": "true",
-      "why": "the body constructs one here"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/config.ts#Permutations|src/config/config.ts#Config#loadCommands@declared|",
@@ -1461,7 +1461,7 @@
       "source": "retarget",
       "parent": "builds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/config.ts#Config#loadCommands@declared|",
       "truth": "false",
-      "why": "nothing in it makes one"
+      "why": "the to end is a routine, and only a type (or a component) can be made"
     },
     {
       "id": "builds|src/config/config.ts#Config#loadPluginsAndCommands@declared|src/config/config.ts#name|",
@@ -1487,7 +1487,7 @@
       "language": "ts",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "its routine load: the body reads members without naming them (destructuring, spread or a computed key)"
+      "why": "the body reads members without naming them (destructuring, spread or a computed key)"
     }
   ]
 }

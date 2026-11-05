@@ -16,8 +16,8 @@
       "toLabel": "DownloaderMiddlewareManager download_async()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|scrapy/core/downloader/__init__.py#Downloader.fetch|scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager.download_async|",
@@ -66,8 +66,8 @@
       "toLabel": "_process_request()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager._process_request|scrapy/core/downloader/__init__.py#Downloader._enqueue_request|",
@@ -78,8 +78,8 @@
       "toLabel": "_enqueue_request()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "builds|scrapy/core/downloader/__init__.py#Downloader._enqueue_request|scrapy/core/downloader/__init__.py#Slot|",
@@ -90,8 +90,8 @@
       "toLabel": "Slot (concurrency control)",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "nothing in it makes one"
     },
     {
       "id": "calls|scrapy/core/downloader/__init__.py#Downloader._enqueue_request|scrapy/core/downloader/__init__.py#Downloader._wait_for_download|",
@@ -102,8 +102,8 @@
       "toLabel": "_wait_for_download()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "calls|scrapy/core/downloader/__init__.py#Downloader._wait_for_download|scrapy/core/downloader/__init__.py#Downloader._download|",
@@ -114,8 +114,8 @@
       "toLabel": "_download()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|scrapy/core/downloader/__init__.py#Downloader._download|scrapy/core/downloader/handlers/__init__.py#DownloadHandlers.download_request_async|",
@@ -126,8 +126,8 @@
       "toLabel": "DownloadHandlers download_request_async()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|scrapy/core/downloader/__init__.py#Downloader._download|scrapy/core/downloader/handlers/__init__.py#DownloadHandlers.download_request_async|",
@@ -177,8 +177,8 @@
       "toState": "external",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "returns|scrapy/core/downloader/handlers/__init__.py#DownloadHandlerProtocol.download_request|scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager._process_response|",
@@ -190,8 +190,8 @@
       "fromState": "external",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type can be a parameter or a return type"
     },
     {
       "id": "calls|scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager.download_async|scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager._process_response|",
@@ -202,8 +202,8 @@
       "toLabel": "_process_response()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager.download_async|scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager._process_exception|",
@@ -214,8 +214,8 @@
       "toLabel": "_process_exception()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     }
   ]
 }

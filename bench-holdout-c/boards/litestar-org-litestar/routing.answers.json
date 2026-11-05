@@ -103,8 +103,8 @@
       "toLabel": "construct_routing_trie()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "calls|litestar/_asgi/asgi_router.py#ASGIRouter.construct_routing_trie|litestar/_asgi/routing_trie/mapping.py#add_route_to_trie|",
@@ -115,8 +115,8 @@
       "toLabel": "add_route_to_trie()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|litestar/_asgi/asgi_router.py#ASGIRouter.construct_routing_trie|litestar/_asgi/routing_trie/mapping.py#add_route_to_trie|",

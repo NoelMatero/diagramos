@@ -272,8 +272,8 @@
       "toLabel": "_chain",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body constructs one here"
     },
     {
       "id": "builds|celery/canvas.py#Signature.__or__|celery/canvas.py#_chord|",
@@ -284,8 +284,8 @@
       "toLabel": "_chord",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "nothing in it makes one"
     },
     {
       "id": "builds|celery/canvas.py#group.__or__|celery/canvas.py#_chord|",
@@ -296,8 +296,8 @@
       "toLabel": "_chord",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "nothing in it makes one"
     },
     {
       "id": "builds|celery/canvas.py#_chain.__or__|celery/canvas.py#_chain|",
@@ -309,7 +309,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "it is named here but not plainly constructed"
     }
   ]
 }

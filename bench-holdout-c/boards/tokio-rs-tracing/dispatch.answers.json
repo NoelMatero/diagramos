@@ -16,8 +16,8 @@
       "toLabel": "Callsite::register()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "its routine interest calls it"
     },
     {
       "id": "builds|tracing-core/src/callsite.rs#DefaultCallsite::register|tracing-core/src/callsite.rs#Callsites|",
@@ -28,8 +28,8 @@
       "toLabel": "Callsites (Type)",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "nothing in it makes one"
     },
     {
       "id": "calls|tracing-core/src/callsite.rs#DefaultCallsite::register|tracing-core/src/callsite.rs#rebuild_callsite_interest|",
@@ -40,8 +40,8 @@
       "toLabel": "rebuild_callsite_interest()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|tracing-core/src/callsite.rs#rebuild_callsite_interest|tracing-core/src/dispatcher.rs#Dispatch|",
@@ -477,7 +477,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "needs|tracing-core/src/event.rs#Event::dispatch|tracing-core/src/dispatcher.rs#get_default|",
@@ -501,8 +501,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|tracing-core/src/event.rs#Event::dispatch|tracing-core/src/dispatcher.rs#get_default|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|tracing-core/src/dispatcher.rs#get_default|tracing-core/src/event.rs#Event::dispatch|",
@@ -540,7 +540,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the ref could mean more than one declaration, and they differ"
     },
     {
       "id": "needs|tracing-core/src/dispatcher.rs#Dispatch|tracing-core/src/subscriber.rs#Subscriber::event|",
@@ -564,8 +564,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|tracing-core/src/dispatcher.rs#Dispatch|tracing-core/src/subscriber.rs#Subscriber::event|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type can be the type of a field"
     },
     {
       "id": "needs|tracing-core/src/subscriber.rs#Subscriber::event|tracing-core/src/dispatcher.rs#Dispatch|",

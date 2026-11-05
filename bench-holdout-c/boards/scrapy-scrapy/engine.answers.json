@@ -80,7 +80,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "it inherits from BaseScheduler, whose routines run as it and are written elsewhere"
     },
     {
       "id": "calls|scrapy/core/engine.py#ExecutionEngine|scrapy/core/downloader/__init__.py#Downloader|",
@@ -257,8 +257,8 @@
       "toLabel": "fetch(request)",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "feeds|scrapy/core/downloader/__init__.py#Downloader.fetch|scrapy/core/scraper.py#Scraper|",
@@ -269,8 +269,8 @@
       "toLabel": "Scraper",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a type, and only something that runs can be fed"
     },
     {
       "id": "calls|scrapy/core/scraper.py#Scraper|scrapy/core/scraper.py#Scraper.enqueue_scrape|",
@@ -281,8 +281,8 @@
       "toLabel": "enqueue_scrape()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "every routine of the type was read and none calls it"
     },
     {
       "id": "calls|scrapy/core/scraper.py#Scraper|scrapy/core/spidermw.py#SpiderMiddlewareManager|",

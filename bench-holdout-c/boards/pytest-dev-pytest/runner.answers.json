@@ -496,8 +496,8 @@
       "toLabel": "TestReport.from_item_and_call",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "needs|src/_pytest/runner.py#pytest_runtest_makereport|src/_pytest/reports.py#TestReport.from_item_and_call|",
@@ -547,7 +547,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the routine returns one, so something it calls may make it"
     }
   ]
 }

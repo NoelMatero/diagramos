@@ -308,7 +308,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "its routine after_response: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|litestar/response/base.py#ASGIResponse.__call__|litestar/response/base.py#ASGIResponse.start_response|",
@@ -319,8 +319,8 @@
       "toLabel": "Emit ASGI events start + body",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     }
   ]
 }

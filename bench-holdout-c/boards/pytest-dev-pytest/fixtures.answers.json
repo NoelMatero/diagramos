@@ -16,8 +16,8 @@
       "toLabel": "_get_active_fixturedef() find & setup fixture",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef|src/_pytest/fixtures.py#FixtureManager.getfixturedefs|",
@@ -28,8 +28,8 @@
       "toLabel": "FixtureManager.getfixturedefs() lookup visible defs",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|src/_pytest/fixtures.py#FixtureManager.getfixturedefs|src/_pytest/fixtures.py#traverse_fixture_closure|",
@@ -40,8 +40,8 @@
       "toLabel": "traverse_fixture_closure() resolve dependencies",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the routine's calls were read and none is it"
     },
     {
       "id": "builds|src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef|src/_pytest/fixtures.py#SubRequest|",
@@ -52,8 +52,8 @@
       "toLabel": "SubRequest scoped request",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body constructs one here"
     },
     {
       "id": "calls|src/_pytest/fixtures.py#FixtureRequest._get_active_fixturedef|src/_pytest/fixtures.py#FixtureDef.execute|",
@@ -64,8 +64,8 @@
       "toLabel": "FixtureDef.execute() setup & cache",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|src/_pytest/fixtures.py#FixtureDef.execute|src/_pytest/fixtures.py#pytest_fixture_setup|",
@@ -77,7 +77,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the tool could not say what pytest_fixture_setup means at one call site"
     },
     {
       "id": "calls|src/_pytest/fixtures.py#FixtureDef.execute|src/_pytest/fixtures.py#FixtureDef.finish|",
@@ -88,8 +88,8 @@
       "toLabel": "FixtureDef.finish() run finalizers",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     }
   ]
 }
