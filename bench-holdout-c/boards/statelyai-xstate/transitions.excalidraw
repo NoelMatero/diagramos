@@ -1,0 +1,2406 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "statemachine-event-transition-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 448.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1003445657,
+      "version": 1,
+      "versionNonce": 443134435,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "role": "title"
+      },
+      "text": "StateMachine Event Transition Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "StateMachine Event Transition Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 60,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 90632768,
+      "version": 1,
+      "versionNonce": 1242984732,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-node-0-label"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "node": "selectTransitions",
+        "ref": "packages/core/src/stateUtils.ts#selectTransitions"
+      }
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-1",
+      "type": "rectangle",
+      "x": 720,
+      "y": 640,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1838678409,
+      "version": 1,
+      "versionNonce": 1751476243,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-node-1-label"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "node": "getCandidates",
+        "ref": "packages/core/src/stateUtils.ts#getCandidates"
+      }
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-2",
+      "type": "rectangle",
+      "x": 1360,
+      "y": 640,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 174579422,
+      "version": 1,
+      "versionNonce": 1489797378,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-node-2-label"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "node": "evaluateGuard",
+        "ref": "packages/core/src/guards.ts#evaluateGuard"
+      }
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-3",
+      "type": "rectangle",
+      "x": 740,
+      "y": 20,
+      "width": 160,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1714706991,
+      "version": 1,
+      "versionNonce": 2035239817,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-node-3-label"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "node": "microstep",
+        "ref": "packages/core/src/stateUtils.ts#microstep"
+      }
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-4",
+      "type": "rectangle",
+      "x": 1360,
+      "y": 20,
+      "width": 360,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1605818172,
+      "version": 1,
+      "versionNonce": 1616348104,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-node-4-label"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "node": "removeConflictingTransitions",
+        "ref": "packages/core/src/stateUtils.ts#removeConflictingTransitions"
+      }
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-5",
+      "type": "rectangle",
+      "x": 1500,
+      "y": 180,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1212931541,
+      "version": 1,
+      "versionNonce": 1220432607,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-node-5-label"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "node": "exitStates",
+        "ref": "packages/core/src/stateUtils.ts#exitStates"
+      }
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-6",
+      "type": "rectangle",
+      "x": 2180,
+      "y": 20,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 589687546,
+      "version": 1,
+      "versionNonce": 1275659598,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-node-6-label"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "node": "computeExitSet",
+        "ref": "packages/core/src/stateUtils.ts#computeExitSet"
+      }
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-7",
+      "type": "rectangle",
+      "x": 2180,
+      "y": 300,
+      "width": 320,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 279642891,
+      "version": 1,
+      "versionNonce": 1707440773,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-node-7-label"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "node": "resolveActionsAndContext",
+        "ref": "packages/core/src/stateUtils.ts#resolveActionsAndContext"
+      }
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-8",
+      "type": "rectangle",
+      "x": 1480,
+      "y": 460,
+      "width": 180,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 815989832,
+      "version": 1,
+      "versionNonce": 293894820,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-node-8-label"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "node": "enterStates",
+        "ref": "packages/core/src/stateUtils.ts#enterStates"
+      }
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-9",
+      "type": "rectangle",
+      "x": 2180,
+      "y": 520,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1495178097,
+      "version": 1,
+      "versionNonce": 249109243,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-node-9-label"
+        },
+        {
+          "id": "statemachine-event-transition-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "node": "computeEntrySet",
+        "ref": "packages/core/src/stateUtils.ts#computeEntrySet"
+      }
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-0",
+      "type": "arrow",
+      "x": 252,
+      "y": 127.33333333333333,
+      "width": 464.79999999999995,
+      "height": 557.4666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1046623671,
+      "version": 1,
+      "versionNonce": 410324497,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "selectTransitions",
+          "to": "getCandidates",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          479.13333333333327
+        ],
+        [
+          32,
+          557.4666666666666
+        ],
+        [
+          464.29999999999995,
+          557.4666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-0",
+        "focus": 0.3466666666666661,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-1",
+        "focus": -0.11999999999999984,
+        "gap": 3.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-1",
+      "type": "arrow",
+      "x": 916.8,
+      "y": 684.8,
+      "width": 447.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 442941030,
+      "version": 1,
+      "versionNonce": 1096680778,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "getCandidates",
+          "to": "evaluateGuard",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          223.60000000000014,
+          0
+        ],
+        [
+          446.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-1",
+        "focus": 0.11999999999999984,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-2",
+        "focus": -0.11999999999999984,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-2",
+      "type": "arrow",
+      "x": 252,
+      "y": 94,
+      "width": 496.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1917732785,
+      "version": 1,
+      "versionNonce": 238104379,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "selectTransitions",
+          "to": "microstep",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          248.39999999999998,
+          0
+        ],
+        [
+          496.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-0",
+        "focus": -0.32,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-3",
+        "focus": -0.05714285714285703,
+        "gap": 8.799999999999955
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-3",
+      "type": "arrow",
+      "x": 908.8,
+      "y": 52,
+      "width": 455.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 496317064,
+      "version": 1,
+      "versionNonce": 1346901732,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "microstep",
+          "to": "removeConflictingTransitions",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          227.60000000000014,
+          0
+        ],
+        [
+          454.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-3",
+        "focus": -0.542857142857143,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-4",
+        "focus": 0.2,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-4",
+      "type": "arrow",
+      "x": 1724,
+      "y": 52,
+      "width": 456,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1793180403,
+      "version": 1,
+      "versionNonce": 1009713613,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "removeConflictingTransitions",
+          "to": "computeExitSet",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          228,
+          0
+        ],
+        [
+          455.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-4",
+        "focus": -0.2,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-6",
+        "focus": 0.35999999999999927,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-5",
+      "type": "arrow",
+      "x": 908.8,
+      "y": 80,
+      "width": 588.5333333333333,
+      "height": 142,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 697072962,
+      "version": 1,
+      "versionNonce": 1571304374,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "microstep",
+          "to": "exitStates",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          88,
+          0
+        ],
+        [
+          88,
+          142
+        ],
+        [
+          223.26666666666665,
+          142
+        ],
+        [
+          405.89999999999986,
+          142
+        ],
+        [
+          497.21666666666647,
+          142
+        ],
+        [
+          588.0333333333333,
+          142
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-3",
+        "focus": -0.142857142857143,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-5",
+        "focus": 0.15999999999999956,
+        "gap": 2.6666666666667425
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-6",
+      "type": "arrow",
+      "x": 1657.3333333333333,
+      "y": 205.33333333333331,
+      "width": 522.6666666666667,
+      "height": 119.99999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 120390749,
+      "version": 1,
+      "versionNonce": 1155849927,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "exitStates",
+          "to": "computeExitSet",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80.33333333333326,
+          0
+        ],
+        [
+          160.66666666666674,
+          0
+        ],
+        [
+          321.33333333333326,
+          0
+        ],
+        [
+          414.66666666666674,
+          0
+        ],
+        [
+          414.66666666666674,
+          -119.99999999999999
+        ],
+        [
+          522.1666666666667,
+          -119.99999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-5",
+        "focus": -0.4933333333333338,
+        "gap": 2.6666666666667425
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-6",
+        "focus": -0.30666666666666503,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-7",
+      "type": "arrow",
+      "x": 1657.3333333333333,
+      "y": 238.66666666666666,
+      "width": 522.6666666666667,
+      "height": 83.33333333333334,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 937734852,
+      "version": 1,
+      "versionNonce": 64215248,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "exitStates",
+          "to": "resolveActionsAndContext",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          98.66666666666674,
+          0
+        ],
+        [
+          98.66666666666674,
+          23.46666666666667
+        ],
+        [
+          279.5333333333333,
+          23.46666666666667
+        ],
+        [
+          414.66666666666674,
+          23.46666666666667
+        ],
+        [
+          414.66666666666674,
+          83.33333333333334
+        ],
+        [
+          522.1666666666667,
+          83.33333333333334
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-5",
+        "focus": 0.17333333333333234,
+        "gap": 2.6666666666667425
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-7",
+        "focus": 0.6333333333333342,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-8",
+      "type": "arrow",
+      "x": 908.8,
+      "y": 108,
+      "width": 1271.2,
+      "height": 244,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 2095684975,
+      "version": 1,
+      "versionNonce": 1599777481,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "microstep",
+          "to": "resolveActionsAndContext",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          64,
+          0
+        ],
+        [
+          64,
+          244
+        ],
+        [
+          513.5999999999999,
+          244
+        ],
+        [
+          892.3999999999999,
+          244
+        ],
+        [
+          1081.8,
+          244
+        ],
+        [
+          1270.7,
+          244
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-3",
+        "focus": 0.25714285714285706,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-7",
+        "focus": 0.13333333333333416,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-9",
+      "type": "arrow",
+      "x": 908.8,
+      "y": 136,
+      "width": 575.2,
+      "height": 378.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1960710430,
+      "version": 1,
+      "versionNonce": 1137754434,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "microstep",
+          "to": "enterStates",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          40,
+          0
+        ],
+        [
+          40,
+          378.79999999999995
+        ],
+        [
+          98.20000000000005,
+          378.79999999999995
+        ],
+        [
+          217.45000000000005,
+          378.79999999999995
+        ],
+        [
+          336.70000000000005,
+          378.79999999999995
+        ],
+        [
+          574.7,
+          378.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-3",
+        "focus": 0.657142857142857,
+        "gap": 8.799999999999955
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-8",
+        "focus": -0.09600000000000063,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-10",
+      "type": "arrow",
+      "x": 1664,
+      "y": 531.4666666666667,
+      "width": 516,
+      "height": 23.466666666666583,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1211925288,
+      "version": 1,
+      "versionNonce": 73837316,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "enterStates",
+          "to": "computeEntrySet",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          92,
+          0
+        ],
+        [
+          92,
+          23.466666666666583
+        ],
+        [
+          246.26666666666665,
+          23.466666666666583
+        ],
+        [
+          381.1333333333332,
+          23.466666666666583
+        ],
+        [
+          448.5666666666666,
+          23.466666666666583
+        ],
+        [
+          515.5,
+          23.466666666666583
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-8",
+        "focus": 0.4293333333333343,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-9",
+        "focus": 0.1266666666666673,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-11",
+      "type": "arrow",
+      "x": 1664,
+      "y": 498.1333333333333,
+      "width": 516,
+      "height": 116.13333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1464648913,
+      "version": 1,
+      "versionNonce": 1792000987,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "statemachine-event-transition-flow-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow",
+        "edge": {
+          "from": "enterStates",
+          "to": "resolveActionsAndContext",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          79.01666666666665,
+          0
+        ],
+        [
+          158.0333333333333,
+          0
+        ],
+        [
+          316.0666666666666,
+          0
+        ],
+        [
+          408,
+          0
+        ],
+        [
+          408,
+          -116.13333333333333
+        ],
+        [
+          515.5,
+          -116.13333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "statemachine-event-transition-flow-node-8",
+        "focus": -0.2373333333333325,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "statemachine-event-transition-flow-node-7",
+        "focus": -0.36666666666666586,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-0-label",
+      "type": "text",
+      "x": 46.499999999999986,
+      "y": 97.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1017820061,
+      "version": 1,
+      "versionNonce": 29697543,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "selectTransitions",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-node-0",
+      "originalText": "selectTransitions",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-1-label",
+      "type": "text",
+      "x": 748.5,
+      "y": 667.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 618611152,
+      "version": 1,
+      "versionNonce": 713577644,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "getCandidates",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-node-1",
+      "originalText": "getCandidates",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-2-label",
+      "type": "text",
+      "x": 1388.5,
+      "y": 667.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1706658367,
+      "version": 1,
+      "versionNonce": 761031001,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "evaluateGuard",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-node-2",
+      "originalText": "evaluateGuard",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-3-label",
+      "type": "text",
+      "x": 770.5,
+      "y": 77.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1314180986,
+      "version": 1,
+      "versionNonce": 1188739790,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "microstep",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-node-3",
+      "originalText": "microstep",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-4-label",
+      "type": "text",
+      "x": 1386,
+      "y": 47.5,
+      "width": 308,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 251809881,
+      "version": 1,
+      "versionNonce": 1402801315,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "removeConflictingTransitions",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-node-4",
+      "originalText": "removeConflictingTransitions",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-5-label",
+      "type": "text",
+      "x": 1525,
+      "y": 217.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1529185532,
+      "version": 1,
+      "versionNonce": 508382344,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "exitStates",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-node-5",
+      "originalText": "exitStates",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-6-label",
+      "type": "text",
+      "x": 2213,
+      "y": 57.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 792791659,
+      "version": 1,
+      "versionNonce": 737377125,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "computeExitSet",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-node-6",
+      "originalText": "computeExitSet",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-7-label",
+      "type": "text",
+      "x": 2208,
+      "y": 347.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1423469110,
+      "version": 1,
+      "versionNonce": 934383002,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "resolveActionsAndContext",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-node-7",
+      "originalText": "resolveActionsAndContext",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-8-label",
+      "type": "text",
+      "x": 1509.5,
+      "y": 497.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1680149909,
+      "version": 1,
+      "versionNonce": 903913375,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "enterStates",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-node-8",
+      "originalText": "enterStates",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-node-9-label",
+      "type": "text",
+      "x": 2207.5,
+      "y": 547.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 164762568,
+      "version": 1,
+      "versionNonce": 1989796132,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "computeEntrySet",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-node-9",
+      "originalText": "computeEntrySet",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-0-label",
+      "type": "text",
+      "x": 191.6,
+      "y": 596.4666666666666,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 100708018,
+      "version": 1,
+      "versionNonce": 1597928294,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "for each state @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-0",
+      "originalText": "for each state @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-1-label",
+      "type": "text",
+      "x": 1061.2,
+      "y": 674.8,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 637470679,
+      "version": 1,
+      "versionNonce": 2064039089,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "guard check @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-1",
+      "originalText": "guard check @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-2-label",
+      "type": "text",
+      "x": 421.2,
+      "y": 84,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 704748680,
+      "version": 1,
+      "versionNonce": 1592980708,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "transitions @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-2",
+      "originalText": "transitions @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-3-label",
+      "type": "text",
+      "x": 1079.2,
+      "y": 42,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 2095358293,
+      "version": 1,
+      "versionNonce": 356128095,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "filter @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-3",
+      "originalText": "filter @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-4-label",
+      "type": "text",
+      "x": 1864,
+      "y": 42,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 955115726,
+      "version": 1,
+      "versionNonce": 1089887346,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "overlap check @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-4",
+      "originalText": "overlap check @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-5-label",
+      "type": "text",
+      "x": 1048.4666666666667,
+      "y": 212,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 991480611,
+      "version": 1,
+      "versionNonce": 1475301309,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "exit current @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-5",
+      "originalText": "exit current @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-6-label",
+      "type": "text",
+      "x": 1899.4666666666665,
+      "y": 195.33333333333331,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 750960276,
+      "version": 1,
+      "versionNonce": 888622304,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "which nodes @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-6",
+      "originalText": "which nodes @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-7-label",
+      "type": "text",
+      "x": 1853.2666666666667,
+      "y": 252.13333333333333,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 583487697,
+      "version": 1,
+      "versionNonce": 1018832859,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "exit actions @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-7",
+      "originalText": "exit actions @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-8-label",
+      "type": "text",
+      "x": 1312.3999999999999,
+      "y": 342,
+      "width": 220.00000000000003,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1057112378,
+      "version": 1,
+      "versionNonce": 803980430,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "transition actions @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-8",
+      "originalText": "transition actions @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-9-label",
+      "type": "text",
+      "x": 932.2,
+      "y": 504.79999999999995,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1382933503,
+      "version": 1,
+      "versionNonce": 222619929,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "enter next @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-9",
+      "originalText": "enter next @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-10-label",
+      "type": "text",
+      "x": 1831.0666666666666,
+      "y": 544.9333333333333,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1605160437,
+      "version": 1,
+      "versionNonce": 1243247231,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "which nodes @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-10",
+      "originalText": "which nodes @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "statemachine-event-transition-flow-edge-11-label",
+      "type": "text",
+      "x": 1892.0666666666666,
+      "y": 488.1333333333333,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1853274280,
+      "version": 1,
+      "versionNonce": 839443332,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "statemachine-event-transition-flow"
+      },
+      "text": "entry actions @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "statemachine-event-transition-flow-edge-11",
+      "originalText": "entry actions @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

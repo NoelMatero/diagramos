@@ -1,0 +1,119 @@
+{
+  "board": "bench-holdout-c/boards/casey-just/run.excalidraw",
+  "project": "casey-just",
+  "topic": "run",
+  "language": "rust",
+  "scope": "src",
+  "pin": "602ee328c9",
+  "tool": "rust-analyzer 0.0.0 (7cb789d982 2026-02-01)",
+  "claims": [
+    {
+      "id": "builds|src/arguments.rs|src/config.rs#from_arguments|",
+      "word": "builds",
+      "from": "src/arguments.rs",
+      "to": "src/config.rs#from_arguments",
+      "fromLabel": "Arguments from CLI",
+      "toLabel": "Config from arguments",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names a file rather than a declaration"
+    },
+    {
+      "id": "feeds|src/config.rs#from_arguments|src/search.rs#search|",
+      "word": "feeds",
+      "from": "src/config.rs#from_arguments",
+      "to": "src/search.rs#search",
+      "fromLabel": "Config from arguments",
+      "toLabel": "Search find justfile",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "a value's journey cannot be enumerated"
+    },
+    {
+      "id": "feeds|src/search.rs#search|src/loader.rs#load|",
+      "word": "feeds",
+      "from": "src/search.rs#search",
+      "to": "src/loader.rs#load",
+      "fromLabel": "Search find justfile",
+      "toLabel": "Loader read file",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "a value's journey cannot be enumerated"
+    },
+    {
+      "id": "feeds|src/loader.rs#load|src/parser.rs#parse_source|",
+      "word": "feeds",
+      "from": "src/loader.rs#load",
+      "to": "src/parser.rs#parse_source",
+      "fromLabel": "Loader read file",
+      "toLabel": "Parser parse source",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "a value's journey cannot be enumerated"
+    },
+    {
+      "id": "feeds|src/parser.rs#parse_source|src/compiler.rs#compile|",
+      "word": "feeds",
+      "from": "src/parser.rs#parse_source",
+      "to": "src/compiler.rs#compile",
+      "fromLabel": "Parser parse source",
+      "toLabel": "Compiler compile AST",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "a value's journey cannot be enumerated"
+    },
+    {
+      "id": "builds|src/compiler.rs#compile|src/justfile.rs|",
+      "word": "builds",
+      "from": "src/compiler.rs#compile",
+      "to": "src/justfile.rs",
+      "fromLabel": "Compiler compile AST",
+      "toLabel": "Justfile compiled",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names a file rather than a declaration"
+    },
+    {
+      "id": "takes|src/justfile.rs|src/invocation_parser.rs#parse_invocations|",
+      "word": "takes",
+      "from": "src/justfile.rs",
+      "to": "src/invocation_parser.rs#parse_invocations",
+      "fromLabel": "Justfile compiled",
+      "toLabel": "InvocationParser parse recipes",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names a file rather than a declaration"
+    },
+    {
+      "id": "feeds|src/justfile.rs|src/evaluator.rs#new|",
+      "word": "feeds",
+      "from": "src/justfile.rs",
+      "to": "src/evaluator.rs#new",
+      "fromLabel": "Justfile compiled",
+      "toLabel": "Evaluator evaluate vars",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "an end names a file rather than a declaration"
+    },
+    {
+      "id": "feeds|src/evaluator.rs#new|src/executor.rs#command|",
+      "word": "feeds",
+      "from": "src/evaluator.rs#new",
+      "to": "src/executor.rs#command",
+      "fromLabel": "Evaluator evaluate vars",
+      "toLabel": "Executor execute cmd",
+      "language": "rust",
+      "source": "drawn",
+      "truth": "undecidable",
+      "why": "a value's journey cannot be enumerated"
+    }
+  ]
+}

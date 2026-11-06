@@ -1,0 +1,2289 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "scrapy-downloader-request-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 396.00000000000006,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1361303696,
+      "version": 1,
+      "versionNonce": 1611543660,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Scrapy Downloader Request Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Scrapy Downloader Request Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-0",
+      "type": "rectangle",
+      "x": 760,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 697800543,
+      "version": 1,
+      "versionNonce": 1676324345,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-0-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "fetch",
+        "ref": "scrapy/core/downloader/__init__.py#Downloader.fetch"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-1",
+      "type": "rectangle",
+      "x": 660,
+      "y": 400,
+      "width": 360,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 889685070,
+      "version": 1,
+      "versionNonce": 491136754,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-1-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "mw_mgr",
+        "ref": "scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager.download_async"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-2",
+      "type": "rectangle",
+      "x": 340,
+      "y": 800,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 821771961,
+      "version": 1,
+      "versionNonce": 1152912003,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-2-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "process_req",
+        "ref": "scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager._process_request"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-3",
+      "type": "rectangle",
+      "x": 340,
+      "y": 1180,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 147493936,
+      "version": 1,
+      "versionNonce": 834831500,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-3-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "enqueue",
+        "ref": "scrapy/core/downloader/__init__.py#Downloader._enqueue_request"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-4",
+      "type": "rectangle",
+      "x": 380,
+      "y": 1560,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1770987195,
+      "version": 1,
+      "versionNonce": 146569525,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-4-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "wait_dl",
+        "ref": "scrapy/core/downloader/__init__.py#Downloader._wait_for_download"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-5",
+      "type": "rectangle",
+      "x": 420,
+      "y": 1960,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 28472682,
+      "version": 1,
+      "versionNonce": 1490614590,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-5-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "download",
+        "ref": "scrapy/core/downloader/__init__.py#Downloader._download"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-6",
+      "type": "rectangle",
+      "x": 360,
+      "y": 2340,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1184492485,
+      "version": 1,
+      "versionNonce": 1096333519,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-6-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "handlers",
+        "ref": "scrapy/core/downloader/handlers/__init__.py#DownloadHandlers.download_request_async"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-7",
+      "type": "rectangle",
+      "x": 380,
+      "y": 2740,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 620145836,
+      "version": 1,
+      "versionNonce": 1267878392,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-7-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "handler",
+        "ref": "scrapy/core/downloader/handlers/__init__.py#DownloadHandlerProtocol.download_request",
+        "state": "external"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-8",
+      "type": "rectangle",
+      "x": 540,
+      "y": 3140,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1878849191,
+      "version": 1,
+      "versionNonce": 1058671425,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-8-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "process_resp",
+        "ref": "scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager._process_response"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-9",
+      "type": "rectangle",
+      "x": 780,
+      "y": 800,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 543281686,
+      "version": 1,
+      "versionNonce": 1090549754,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-9-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "process_exc",
+        "ref": "scrapy/core/downloader/middleware.py#DownloaderMiddlewareManager._process_exception"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-10",
+      "type": "rectangle",
+      "x": 60,
+      "y": 1560,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1221662400,
+      "version": 1,
+      "versionNonce": 1781393052,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-node-10-label"
+        },
+        {
+          "id": "scrapy-downloader-request-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "node": "slot",
+        "ref": "scrapy/core/downloader/__init__.py#Slot"
+      }
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-0",
+      "type": "arrow",
+      "x": 839.8,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 400131536,
+      "version": 1,
+      "versionNonce": 713121964,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "fetch",
+          "to": "mw_mgr",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-0",
+        "focus": 0.0025000000000004615,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-1",
+        "focus": -0.0011111111111113273,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-1",
+      "type": "arrow",
+      "x": 749.8,
+      "y": 492.8,
+      "width": 281.5333333333333,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1818644185,
+      "version": 1,
+      "versionNonce": 1476833315,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "mw_mgr",
+          "to": "process_req",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          31.999999999999943
+        ],
+        [
+          -259.1666666666667,
+          31.999999999999943
+        ],
+        [
+          -281.5333333333333,
+          31.999999999999943
+        ],
+        [
+          -281.5333333333333,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-1",
+        "focus": 0.5011111111111113,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-2",
+        "focus": -0.013333333333333376,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-2",
+      "type": "arrow",
+      "x": 468.26666666666665,
+      "y": 873.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1461996654,
+      "version": 1,
+      "versionNonce": 72830610,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "process_req",
+          "to": "enqueue",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-2",
+        "focus": 0.013333333333333376,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-3",
+        "focus": -0.013333333333333376,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-3",
+      "type": "arrow",
+      "x": 424.93333333333334,
+      "y": 1254.3999999999999,
+      "width": 253.33333333333331,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1692768767,
+      "version": 1,
+      "versionNonce": 532179737,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "enqueue",
+          "to": "slot",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -245.0666666666666,
+          32
+        ],
+        [
+          -253.33333333333331,
+          32
+        ],
+        [
+          -253.33333333333331,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-3",
+        "focus": 0.3466666666666664,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-10",
+        "focus": -0.06999999999999984,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-4",
+      "type": "arrow",
+      "x": 511.6,
+      "y": 1254.3999999999999,
+      "width": 0,
+      "height": 310.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 872680268,
+      "version": 1,
+      "versionNonce": 1187745560,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "enqueue",
+          "to": "wait_dl",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          155.39999999999986
+        ],
+        [
+          0,
+          310.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-3",
+        "focus": -0.3200000000000001,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-4",
+        "focus": -0.06000000000000001,
+        "gap": 5.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-5",
+      "type": "arrow",
+      "x": 511.6,
+      "y": 1645.1999999999998,
+      "width": 0,
+      "height": 310.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 31873893,
+      "version": 1,
+      "versionNonce": 2099672559,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "wait_dl",
+          "to": "download",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          155.4000000000001
+        ],
+        [
+          0,
+          310.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-4",
+        "focus": 0.06000000000000001,
+        "gap": 5.199999999999818
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-5",
+        "focus": 0.01777777777777751,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-6",
+      "type": "arrow",
+      "x": 511.6,
+      "y": 2035.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 600784266,
+      "version": 1,
+      "versionNonce": 1390181598,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "download",
+          "to": "handlers",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-5",
+        "focus": -0.017777777777778447,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-6",
+        "focus": -0.05249999999999988,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-7",
+      "type": "arrow",
+      "x": 511.6,
+      "y": 2436.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 620272603,
+      "version": 1,
+      "versionNonce": 1917323733,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "handlers",
+          "to": "handler",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-6",
+        "focus": 0.05249999999999988,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-7",
+        "focus": 0.01230769230769282,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-8",
+      "type": "arrow",
+      "x": 511.6,
+      "y": 2837.6000000000004,
+      "width": 113.33333333333326,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 92527768,
+      "version": 1,
+      "versionNonce": 1930001012,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "handler",
+          "to": "process_resp",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.80000000000018
+        ],
+        [
+          14.266666666666538,
+          192.80000000000018
+        ],
+        [
+          113.33333333333326,
+          192.80000000000018
+        ],
+        [
+          113.33333333333326,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-7",
+        "focus": -0.01230769230769282,
+        "gap": 2.399999999999636
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-8",
+        "focus": -0.34666666666666734,
+        "gap": 1.5999999999994543
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-9",
+      "type": "arrow",
+      "x": 839.8,
+      "y": 492.8,
+      "width": 128.19999999999993,
+      "height": 2645.6000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 430654785,
+      "version": 1,
+      "versionNonce": 1739163275,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "mw_mgr",
+          "to": "process_resp",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          55.99999999999994
+        ],
+        [
+          -128.19999999999993,
+          55.99999999999994
+        ],
+        [
+          -128.19999999999993,
+          1258.7000000000003
+        ],
+        [
+          -128.19999999999993,
+          1952.1500000000003
+        ],
+        [
+          -128.19999999999993,
+          2298.875
+        ],
+        [
+          -128.19999999999993,
+          2645.1000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-1",
+        "focus": 0.0011111111111113273,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-8",
+        "focus": 0.32000000000000056,
+        "gap": 1.5999999999994543
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-10",
+      "type": "arrow",
+      "x": 929.8,
+      "y": 492.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 12845029,
+      "version": 1,
+      "versionNonce": 873491311,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "scrapy-downloader-request-flow-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow",
+        "edge": {
+          "from": "mw_mgr",
+          "to": "process_exc",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-1",
+        "focus": -0.4988888888888886,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "scrapy-downloader-request-flow-node-9",
+        "focus": 0.06999999999999962,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-0-label",
+      "type": "text",
+      "x": 801.5,
+      "y": 47.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1626105194,
+      "version": 1,
+      "versionNonce": 1091422526,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "fetch()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-0",
+      "originalText": "fetch()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-1-label",
+      "type": "text",
+      "x": 691.5,
+      "y": 425,
+      "width": 297,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1131079791,
+      "version": 1,
+      "versionNonce": 1558428617,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "DownloaderMiddlewareManager\ndownload_async()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-1",
+      "originalText": "DownloaderMiddlewareManager\ndownload_async()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-2-label",
+      "type": "text",
+      "x": 371,
+      "y": 827.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1192083904,
+      "version": 1,
+      "versionNonce": 598677404,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "_process_request()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-2",
+      "originalText": "_process_request()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-3-label",
+      "type": "text",
+      "x": 371,
+      "y": 1207.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 267732877,
+      "version": 1,
+      "versionNonce": 1367112311,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "_enqueue_request()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-3",
+      "originalText": "_enqueue_request()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-4-label",
+      "type": "text",
+      "x": 410,
+      "y": 1587.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1311106022,
+      "version": 1,
+      "versionNonce": 927337930,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "_wait_for_download()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-4",
+      "originalText": "_wait_for_download()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-5-label",
+      "type": "text",
+      "x": 449.5,
+      "y": 1987.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 340817563,
+      "version": 1,
+      "versionNonce": 593052821,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "_download()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-5",
+      "originalText": "_download()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-6-label",
+      "type": "text",
+      "x": 388,
+      "y": 2365,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1097794732,
+      "version": 1,
+      "versionNonce": 486855160,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "DownloadHandlers\ndownload_request_async()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-6",
+      "originalText": "DownloadHandlers\ndownload_request_async()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-7-label",
+      "type": "text",
+      "x": 405.5,
+      "y": 2765,
+      "width": 209.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 704163529,
+      "version": 1,
+      "versionNonce": 1241756243,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "Download Handler\n(HTTP/FTP/File/etc)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-7",
+      "originalText": "Download Handler\n(HTTP/FTP/File/etc)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-8-label",
+      "type": "text",
+      "x": 565.5,
+      "y": 3167.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 358318754,
+      "version": 1,
+      "versionNonce": 498844310,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "_process_response()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-8",
+      "originalText": "_process_response()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-9-label",
+      "type": "text",
+      "x": 810,
+      "y": 827.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 605004615,
+      "version": 1,
+      "versionNonce": 1391698017,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "_process_exception()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-9",
+      "originalText": "_process_exception()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-node-10-label",
+      "type": "text",
+      "x": 114,
+      "y": 1572.5,
+      "width": 132,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1453306909,
+      "version": 1,
+      "versionNonce": 1584721799,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "Slot\n(concurrency\ncontrol)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-node-10",
+      "originalText": "Slot\n(concurrency control)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-0-label",
+      "type": "text",
+      "x": 778.1999999999999,
+      "y": 222.4,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 185871149,
+      "version": 1,
+      "versionNonce": 52297111,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "download_async\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-0",
+      "originalText": "download_async @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-1-label",
+      "type": "text",
+      "x": 402.63333333333327,
+      "y": 514.8,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1415172960,
+      "version": 1,
+      "versionNonce": 514687676,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "request phase @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-1",
+      "originalText": "request phase @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-2-label",
+      "type": "text",
+      "x": 380.26666666666665,
+      "y": 1013.9999999999999,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 769820687,
+      "version": 1,
+      "versionNonce": 1929035241,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "download_func @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-2",
+      "originalText": "download_func @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-3-label",
+      "type": "text",
+      "x": 105.06666666666672,
+      "y": 1276.3999999999999,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1505801738,
+      "version": 1,
+      "versionNonce": 1040002654,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "queues in @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-3",
+      "originalText": "queues in @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-4-label",
+      "type": "text",
+      "x": 458.8,
+      "y": 1399.7999999999997,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1227646825,
+      "version": 1,
+      "versionNonce": 472899699,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "async @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-4",
+      "originalText": "async @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-5-label",
+      "type": "text",
+      "x": 458.8,
+      "y": 1790.6,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 456246732,
+      "version": 1,
+      "versionNonce": 868755096,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "await @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-5",
+      "originalText": "await @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-6-label",
+      "type": "text",
+      "x": 428,
+      "y": 2166.4,
+      "width": 167.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 139449147,
+      "version": 1,
+      "versionNonce": 1914216117,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "download_request_as\nync @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-6",
+      "originalText": "download_request_async @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-7-label",
+      "type": "text",
+      "x": 432.40000000000003,
+      "y": 2567.2000000000003,
+      "width": 158.4,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 447425414,
+      "version": 1,
+      "versionNonce": 685541354,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "dispatch by scheme\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-7",
+      "originalText": "dispatch by scheme @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-8-label",
+      "type": "text",
+      "x": 451.06666666666655,
+      "y": 3020.4000000000005,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1015598821,
+      "version": 1,
+      "versionNonce": 1256343663,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "Response @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-8",
+      "originalText": "Response @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-9-label",
+      "type": "text",
+      "x": 650,
+      "y": 1731.5000000000002,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1891724824,
+      "version": 1,
+      "versionNonce": 1156941556,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "response phase\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-9",
+      "originalText": "response phase @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "scrapy-downloader-request-flow-edge-10-label",
+      "type": "text",
+      "x": 846.1999999999999,
+      "y": 633.1999999999999,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 2029930060,
+      "version": 1,
+      "versionNonce": 1555460120,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "scrapy-downloader-request-flow"
+      },
+      "text": "on exception @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "scrapy-downloader-request-flow-edge-10",
+      "originalText": "on exception @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
