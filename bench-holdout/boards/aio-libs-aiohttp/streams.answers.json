@@ -183,7 +183,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "its routine get_read_buffer_limits: the tool would not walk this routine's calls"
     },
     {
       "id": "calls|aiohttp/streams.py#StreamReader|aiohttp/streams.py#StreamReader.read|",
@@ -194,8 +194,8 @@
       "toLabel": "read()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "its routine iter_chunked calls it"
     },
     {
       "id": "calls|aiohttp/streams.py#StreamReader|aiohttp/streams.py#StreamReader.readany|",
@@ -206,8 +206,8 @@
       "toLabel": "readany()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "its routine read calls it"
     },
     {
       "id": "calls|aiohttp/streams.py#StreamReader|aiohttp/streams.py#StreamReader.readchunk|",
@@ -219,7 +219,7 @@
       "language": "python",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "its routine get_read_buffer_limits: the tool would not walk this routine's calls"
     },
     {
       "id": "feeds|aiohttp/streams.py#StreamReader.feed_data|aiohttp/streams.py#StreamReader|",
@@ -230,8 +230,8 @@
       "toLabel": "StreamReader",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a type, and only something that runs can be fed"
     },
     {
       "id": "feeds|aiohttp/streams.py#StreamReader.read|aiohttp/streams.py#StreamReader|",
@@ -242,8 +242,8 @@
       "toLabel": "StreamReader",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a type, and only something that runs can be fed"
     },
     {
       "id": "calls|aiohttp/payload.py#Payload|aiohttp/payload.py#Payload.write|",
@@ -254,8 +254,8 @@
       "toLabel": "write()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "its routine write_with_length calls it"
     },
     {
       "id": "conforms|aiohttp/payload.py#BytesPayload|aiohttp/payload.py#Payload|",
@@ -651,8 +651,8 @@
       "toState": "external",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "it neither creates one nor calls any of its 12 members"
     },
     {
       "id": "needs|aiohttp/payload.py#Payload.write|aiohttp/abc.py#AbstractStreamWriter|",

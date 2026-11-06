@@ -80,8 +80,8 @@
       "toLabel": "build_walker()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "its routine scan calls it"
     },
     {
       "id": "calls|src/walk.rs#WorkerState|src/walk.rs#WorkerState::spawn_senders|",
@@ -92,8 +92,8 @@
       "toLabel": "spawn_senders()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "its routine scan calls it"
     },
     {
       "id": "calls|src/walk.rs#ReceiverBuffer|src/output.rs#print_entry|",

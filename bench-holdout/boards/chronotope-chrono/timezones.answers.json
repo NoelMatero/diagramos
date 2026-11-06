@@ -16,8 +16,8 @@
       "toLabel": "offset_from_local_datetime()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "a parameter names it"
     },
     {
       "id": "needs|src/naive/datetime/mod.rs#NaiveDateTime|src/offset/mod.rs#TimeZone::offset_from_local_datetime|",
@@ -41,8 +41,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|src/naive/datetime/mod.rs#NaiveDateTime|src/offset/mod.rs#TimeZone::offset_from_local_datetime|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type can be the type of a field"
     },
     {
       "id": "needs|src/offset/mod.rs#TimeZone::offset_from_local_datetime|src/naive/datetime/mod.rs#NaiveDateTime|",
@@ -80,7 +80,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the routine returns one, so something it calls may make it"
     },
     {
       "id": "conforms|src/offset/fixed.rs#FixedOffset|src/offset/mod.rs#Offset|",
@@ -155,7 +155,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "the routine returns one, so something it calls may make it"
     },
     {
       "id": "needs|src/offset/mod.rs#Offset::fix|src/offset/fixed.rs#FixedOffset|",
@@ -179,8 +179,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|src/offset/mod.rs#Offset::fix|src/offset/fixed.rs#FixedOffset|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|src/offset/fixed.rs#FixedOffset|src/offset/mod.rs#Offset::fix|",
@@ -217,8 +217,8 @@
       "toLabel": "checked_sub_offset()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "a parameter names it"
     },
     {
       "id": "needs|src/offset/fixed.rs#FixedOffset|src/naive/datetime/mod.rs#NaiveDateTime::checked_sub_offset|",
@@ -242,8 +242,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|src/offset/fixed.rs#FixedOffset|src/naive/datetime/mod.rs#NaiveDateTime::checked_sub_offset|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a routine, and only a type can be the type of a field"
     },
     {
       "id": "needs|src/naive/datetime/mod.rs#NaiveDateTime::checked_sub_offset|src/offset/fixed.rs#FixedOffset|",
@@ -281,7 +281,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "a type alias (Offset) could stand for it"
     },
     {
       "id": "takes|src/naive/datetime/mod.rs#NaiveDateTime|src/datetime/mod.rs#DateTime::from_naive_utc_and_offset|",
@@ -292,8 +292,8 @@
       "toLabel": "from_naive_utc_and_offset()",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "a parameter names it"
     },
     {
       "id": "needs|src/naive/datetime/mod.rs#NaiveDateTime|src/datetime/mod.rs#DateTime::from_naive_utc_and_offset|",
@@ -318,7 +318,7 @@
       "source": "swap",
       "parent": "needs|src/naive/datetime/mod.rs#NaiveDateTime|src/datetime/mod.rs#DateTime::from_naive_utc_and_offset|",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "an impl of NaiveDateTime's own type could not be resolved"
     },
     {
       "id": "needs|src/datetime/mod.rs#DateTime::from_naive_utc_and_offset|src/naive/datetime/mod.rs#NaiveDateTime|",
@@ -355,8 +355,8 @@
       "toLabel": "DateTime<Tz>",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the body constructs one here"
     }
   ]
 }

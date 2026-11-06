@@ -142,8 +142,8 @@
       "toLabel": "get_route_handler()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "its routine __init__ calls it"
     },
     {
       "id": "calls|fastapi/routing.py#APIRoute.get_route_handler|fastapi/routing.py#get_request_handler|",
@@ -154,8 +154,8 @@
       "toLabel": "get_request_handler()",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "true",
+      "why": "the tool's call hierarchy lists it"
     },
     {
       "id": "calls|fastapi/routing.py#get_request_handler|fastapi/dependencies/utils.py#solve_dependencies|",
@@ -269,8 +269,8 @@
       "toState": "external",
       "language": "python",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "it neither creates one nor calls any of its 37 members"
     }
   ]
 }

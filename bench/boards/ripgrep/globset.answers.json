@@ -105,7 +105,7 @@
       "language": "rust",
       "source": "drawn",
       "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "why": "an impl of Glob's own type could not be resolved"
     },
     {
       "id": "builds|crates/globset/src/glob.rs#Glob|crates/globset/src/glob.rs#GlobMatcher|",
@@ -679,8 +679,8 @@
       "toLabel": "GlobSetMatchStrategy",
       "language": "rust",
       "source": "drawn",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the to end is a type, and only something that runs can be fed"
     },
     {
       "id": "needs|crates/globset/src/glob.rs#MatchStrategy::new|crates/globset/src/lib.rs#GlobSetMatchStrategy|",
@@ -704,8 +704,8 @@
       "language": "rust",
       "source": "swap",
       "parent": "needs|crates/globset/src/glob.rs#MatchStrategy::new|crates/globset/src/lib.rs#GlobSetMatchStrategy|",
-      "truth": "undecidable",
-      "why": "an end names nothing the tool declares"
+      "truth": "false",
+      "why": "the from end is a routine, and only a type has fields"
     },
     {
       "id": "needs|crates/globset/src/lib.rs#GlobSetMatchStrategy|crates/globset/src/glob.rs#MatchStrategy::new|",

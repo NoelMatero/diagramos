@@ -29,14 +29,30 @@ const ORACLE_FILES = [
   "scripts/lib/bench-shapes.ts",
 ];
 
+/*
+ * The one exception: how a board spells a name (`Parser.parse`,
+ * `Parser::parse`, `Parser#parse`), from the module that reads text and
+ * imports nothing (#465). The key must read a ref the way the board means
+ * it; what the ref's declaration is, and what is true of it, stays the
+ * tool's answer.
+ */
+const SPELLING_ONLY = "../../src/engine/lines";
+
+const importsOf = (source: string) => [...source.matchAll(/from\s+["']([^"']+)["']/g)].map((m) => m[1]!);
+
 describe("the answer key shares no machinery with the checker", () => {
   for (const file of ORACLE_FILES) {
     it(`${file} imports nothing from src/engine`, () => {
       const source = readFileSync(path.join(REPO, file), "utf8");
-      const imports = [...source.matchAll(/from\s+["']([^"']+)["']/g)].map((m) => m[1]!);
-      expect(imports.filter((i) => i.includes("engine"))).toEqual([]);
+      expect(importsOf(source).filter((i) => i.includes("engine") && i !== SPELLING_ONLY)).toEqual([]);
     });
   }
+
+  it("the spelling it shares imports nothing, so it brings no reader with it", () => {
+    const source = readFileSync(path.join(REPO, "src/engine/lines.ts"), "utf8");
+    expect(importsOf(source)).toEqual([]);
+    expect(source).not.toMatch(/\bimport\s*\(|\brequire\s*\(/);
+  });
 });
 
 /** A declaration standing in for one the tool would have reported. */
