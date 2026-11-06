@@ -5957,6 +5957,14 @@ export function checkDrift(
             let verdict: CallsVerdict = callsBetween(
               { ...tail, routine: fromEnd.symbols[0]! },
               { ...head, names: toEnd.symbols },
+              true,
+              /*
+               * From a function the tail hands to a runner (#491): the walk
+               * `reaching` below takes, without the checker and with a cache
+               * of its own -- one filled through the checker places sites a
+               * text-only "never" should not rest on. See `runsWhatItIsGiven`.
+               */
+              (handed) => reachBetween(handed, { ...head, names: toEnd.symbols }),
             );
             if (
               claimed && tail.language === "rust" && !tail.compiled?.()
