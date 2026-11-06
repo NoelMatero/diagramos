@@ -1,0 +1,3 @@
+# marshmallow-code-marshmallow: its dependencies and extras, resolved as of its pinned commit (2026-10-06), the way the main set's unlocked projects were:
+#   uv pip compile --all-extras --python-version 3.14 --exclude-newer 2026-10-06T13:42:32Z pyproject.toml
+# (none: its two dependencies are only for Python older than 3.11)

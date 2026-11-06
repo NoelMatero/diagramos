@@ -1,0 +1,2227 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "nursery-task-spawning-and-cancellation-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 501.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1165484413,
+      "version": 1,
+      "versionNonce": 2093269607,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Nursery Task Spawning and Cancellation",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Nursery Task Spawning and Cancellation",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-0",
+      "type": "rectangle",
+      "x": 420,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f4f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 109380324,
+      "version": 1,
+      "versionNonce": 1132350320,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-node-0-label"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "node": "open_nursery",
+        "ref": "src/trio/_core/_run.py#open_nursery"
+      }
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-1",
+      "type": "rectangle",
+      "x": 420,
+      "y": 400,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f4f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 34366845,
+      "version": 1,
+      "versionNonce": 1519423079,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-node-1-label"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "node": "manager",
+        "ref": "src/trio/_core/_run.py#NurseryManager"
+      }
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-2",
+      "type": "rectangle",
+      "x": 420,
+      "y": 1180,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffe8e8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1230390754,
+      "version": 1,
+      "versionNonce": 1213113046,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-node-2-label"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "node": "cancel_scope",
+        "ref": "src/trio/_core/_run.py#CancelScope"
+      }
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-3",
+      "type": "rectangle",
+      "x": 160,
+      "y": 1560,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff0e8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 498791699,
+      "version": 1,
+      "versionNonce": 672798829,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-node-3-label"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "node": "cancel_status",
+        "ref": "src/trio/_core/_run.py#CancelStatus"
+      }
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-4",
+      "type": "rectangle",
+      "x": 360,
+      "y": 800,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f4f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1773869480,
+      "version": 1,
+      "versionNonce": 1051563652,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-node-4-label"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "node": "nursery",
+        "ref": "src/trio/_core/_run.py#Nursery"
+      }
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-5",
+      "type": "rectangle",
+      "x": 680,
+      "y": 1180,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f4f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 2026593105,
+      "version": 1,
+      "versionNonce": 622243675,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-node-5-label"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "node": "start_soon",
+        "ref": "src/trio/_core/_run.py#Nursery.start_soon"
+      }
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-6",
+      "type": "rectangle",
+      "x": 680,
+      "y": 1560,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f0e8f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1017835526,
+      "version": 1,
+      "versionNonce": 780066154,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-node-6-label"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "node": "spawn_impl",
+        "ref": "src/trio/_core/_run.py#Runner.spawn_impl"
+      }
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-7",
+      "type": "rectangle",
+      "x": 360,
+      "y": 1940,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f8e8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 176692439,
+      "version": 1,
+      "versionNonce": 1054002097,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-node-7-label"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "node": "task",
+        "ref": "src/trio/_core/_run.py#Task"
+      }
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-8",
+      "type": "rectangle",
+      "x": 80,
+      "y": 1180,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffe8e8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 2137336348,
+      "version": 1,
+      "versionNonce": 1606704936,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-node-8-label"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "node": "cancel_method",
+        "ref": "src/trio/_core/_run.py#CancelScope.cancel"
+      }
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-9",
+      "type": "rectangle",
+      "x": 140,
+      "y": 2320,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f8e8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 341097525,
+      "version": 1,
+      "versionNonce": 1894785215,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-node-9-label"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "nursery-task-spawning-and-cancellation-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "node": "activate",
+        "ref": "src/trio/_core/_run.py#Task._activate_cancel_status"
+      }
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-0",
+      "type": "arrow",
+      "x": 522.2666666666667,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 481886395,
+      "version": 1,
+      "versionNonce": 329989941,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "open_nursery",
+          "to": "manager",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-0",
+        "focus": 0.0703030303030305,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-1",
+        "focus": -0.07030303030303035,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-1",
+      "type": "arrow",
+      "x": 558.9333333333334,
+      "y": 492.8,
+      "width": 140,
+      "height": 681.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 886855530,
+      "version": 1,
+      "versionNonce": 1674035006,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "manager",
+          "to": "cancel_scope",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          31.999999999999943
+        ],
+        [
+          126.66666666666663,
+          31.999999999999943
+        ],
+        [
+          126.66666666666663,
+          347.46666666666664
+        ],
+        [
+          126.66666666666663,
+          573.5999999999999
+        ],
+        [
+          -13.333333333333371,
+          573.5999999999999
+        ],
+        [
+          -13.333333333333371,
+          681.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-1",
+        "focus": -0.2630303030303025,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-2",
+        "focus": 0.3955555555555561,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-2",
+      "type": "arrow",
+      "x": 485.6,
+      "y": 492.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2042875333,
+      "version": 1,
+      "versionNonce": 1279753935,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "manager",
+          "to": "nursery",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-1",
+        "focus": 0.40363636363636346,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-4",
+        "focus": 0.046666666666666856,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-3",
+      "type": "arrow",
+      "x": 515.6,
+      "y": 1254.3999999999999,
+      "width": 240,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1478528684,
+      "version": 1,
+      "versionNonce": 1451298808,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "cancel_scope",
+          "to": "cancel_status",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          -77.60000000000002,
+          192.79999999999995
+        ],
+        [
+          -240,
+          192.79999999999995
+        ],
+        [
+          -240,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-2",
+        "focus": -0.06222222222222216,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-3",
+        "focus": 0.28444444444444444,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-4",
+      "type": "arrow",
+      "x": 485.6,
+      "y": 873.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1556183391,
+      "version": 1,
+      "versionNonce": 1859744761,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "nursery",
+          "to": "cancel_scope",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-4",
+        "focus": -0.046666666666666856,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-2",
+        "focus": -0.27111111111111086,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-5",
+      "type": "arrow",
+      "x": 815.6,
+      "y": 1254.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1748067918,
+      "version": 1,
+      "versionNonce": 674557170,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "start_soon",
+          "to": "spawn_impl",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-5",
+        "focus": -0.0430769230769231,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-6",
+        "focus": 0.0430769230769231,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-6",
+      "type": "arrow",
+      "x": 815.6,
+      "y": 1635.1999999999998,
+      "width": 346.06666666666666,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1680154809,
+      "version": 1,
+      "versionNonce": 1336332419,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "spawn_impl",
+          "to": "task",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          -130.63333333333333,
+          192.79999999999995
+        ],
+        [
+          -346.06666666666666,
+          192.79999999999995
+        ],
+        [
+          -346.06666666666666,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-6",
+        "focus": -0.0430769230769231,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-7",
+        "focus": 0.36916666666666453,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-7",
+      "type": "arrow",
+      "x": 442.8666666666667,
+      "y": 2015.9999999999998,
+      "width": 153.93333333333328,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1005876784,
+      "version": 1,
+      "versionNonce": 1018251916,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "task",
+          "to": "activate",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.8000000000004
+        ],
+        [
+          -34.566666666666436,
+          192.8000000000004
+        ],
+        [
+          -153.93333333333328,
+          192.8000000000004
+        ],
+        [
+          -153.93333333333328,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-7",
+        "focus": -0.03583333333333371,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-9",
+        "focus": 0.3539393939393938,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-8",
+      "type": "arrow",
+      "x": 215.60000000000002,
+      "y": 2316.8,
+      "width": 0,
+      "height": 681.6000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 922293411,
+      "version": 3,
+      "versionNonce": 1510147133,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "activate",
+          "to": "cancel_status",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          -0.5
+        ],
+        [
+          0,
+          -340.8000000000002
+        ],
+        [
+          0,
+          -681.1000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-9",
+        "focus": -0.31272727272727213,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-3",
+        "focus": 0.3822222222222213,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": null
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-9",
+      "type": "arrow",
+      "x": 215.60000000000002,
+      "y": 1254.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 540452146,
+      "version": 3,
+      "versionNonce": 573669094,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "cancel_method",
+          "to": "cancel_status",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-8",
+        "focus": -0.0430769230769231,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-3",
+        "focus": -0.3822222222222213,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": null
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-10",
+      "type": "arrow",
+      "x": 275.6,
+      "y": 1635.1999999999998,
+      "width": 140.60000000000002,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1642604596,
+      "version": 3,
+      "versionNonce": 1013040640,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "nursery-task-spawning-and-cancellation-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation",
+        "edge": {
+          "from": "cancel_status",
+          "to": "task",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          140.60000000000002,
+          32
+        ],
+        [
+          140.60000000000002,
+          80.09999999999991
+        ],
+        [
+          140.60000000000002,
+          190.44999999999982
+        ],
+        [
+          140.60000000000002,
+          245.625
+        ],
+        [
+          141.09999999999997,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-3",
+        "focus": -0.28444444444444444,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "nursery-task-spawning-and-cancellation-node-7",
+        "focus": -0.29750000000000054,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": null
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-0-label",
+      "type": "text",
+      "x": 453,
+      "y": 47.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 464949489,
+      "version": 1,
+      "versionNonce": 1678807931,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "open_nursery()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-node-0",
+      "originalText": "open_nursery()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-1-label",
+      "type": "text",
+      "x": 453,
+      "y": 425,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 88194740,
+      "version": 1,
+      "versionNonce": 1651093888,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "NurseryManager\n.__aenter__",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-node-1",
+      "originalText": "NurseryManager\n.__aenter__",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-2-label",
+      "type": "text",
+      "x": 449.5,
+      "y": 1207.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 556112195,
+      "version": 1,
+      "versionNonce": 1620168797,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "CancelScope",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-node-2",
+      "originalText": "CancelScope",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-3-label",
+      "type": "text",
+      "x": 184,
+      "y": 1587.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 483556846,
+      "version": 1,
+      "versionNonce": 898579218,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "CancelStatus",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-node-3",
+      "originalText": "CancelStatus",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-4-label",
+      "type": "text",
+      "x": 430.5,
+      "y": 815,
+      "width": 99.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 260223093,
+      "version": 1,
+      "versionNonce": 399376895,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "Nursery\n.__init__",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-node-4",
+      "originalText": "Nursery\n.__init__",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-5-label",
+      "type": "text",
+      "x": 749.5,
+      "y": 1195,
+      "width": 121.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 508336936,
+      "version": 1,
+      "versionNonce": 2143056644,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "Nursery\n.start_soon",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-node-5",
+      "originalText": "Nursery\n.start_soon",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-6-label",
+      "type": "text",
+      "x": 749.5,
+      "y": 1575,
+      "width": 121.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 14697463,
+      "version": 1,
+      "versionNonce": 1062792529,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "Runner\n.spawn_impl",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-node-6",
+      "originalText": "Runner\n.spawn_impl",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-7-label",
+      "type": "text",
+      "x": 418,
+      "y": 1967.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1498432338,
+      "version": 1,
+      "versionNonce": 21767302,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "Task",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-node-7",
+      "originalText": "Task",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-8-label",
+      "type": "text",
+      "x": 149.5,
+      "y": 1195,
+      "width": 121.00000000000001,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 168919609,
+      "version": 1,
+      "versionNonce": 46419203,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "CancelScope\n.cancel",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-node-8",
+      "originalText": "CancelScope\n.cancel",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-node-9-label",
+      "type": "text",
+      "x": 167.5,
+      "y": 2345,
+      "width": 165,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1887858268,
+      "version": 1,
+      "versionNonce": 925079912,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "Task._activate_\ncancel_status",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-node-9",
+      "originalText": "Task._activate_\ncancel_status",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-0-label",
+      "type": "text",
+      "x": 451.8666666666667,
+      "y": 232.4,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 82884070,
+      "version": 1,
+      "versionNonce": 2022613962,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "returns @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-0",
+      "originalText": "returns @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-1-label",
+      "type": "text",
+      "x": 624,
+      "y": 830.2666666666667,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1260079259,
+      "version": 1,
+      "versionNonce": 1688328853,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "creates @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-1",
+      "originalText": "creates @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-2-label",
+      "type": "text",
+      "x": 419.6,
+      "y": 633.1999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 2017056428,
+      "version": 1,
+      "versionNonce": 1582131192,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "creates @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-2",
+      "originalText": "creates @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-3-label",
+      "type": "text",
+      "x": 367.6,
+      "y": 1437.1999999999998,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1623425225,
+      "version": 1,
+      "versionNonce": 189548627,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "on enter @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-3",
+      "originalText": "on enter @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-4-label",
+      "type": "text",
+      "x": 415.20000000000005,
+      "y": 1013.9999999999999,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 397883242,
+      "version": 1,
+      "versionNonce": 39214910,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "holds ref @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-4",
+      "originalText": "holds ref @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-5-label",
+      "type": "text",
+      "x": 758.4,
+      "y": 1394.7999999999997,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 2050341487,
+      "version": 1,
+      "versionNonce": 506221001,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "spawns @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-5",
+      "originalText": "spawns @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-6-label",
+      "type": "text",
+      "x": 618.9666666666667,
+      "y": 1817.9999999999998,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 2111345600,
+      "version": 1,
+      "versionNonce": 1693953436,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "creates @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-6",
+      "originalText": "creates @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-7-label",
+      "type": "text",
+      "x": 342.30000000000024,
+      "y": 2198.8,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1186994573,
+      "version": 1,
+      "versionNonce": 314904695,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "on spawn @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-7",
+      "originalText": "on spawn @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-8-label",
+      "type": "text",
+      "x": 136.40000000000003,
+      "y": 1966,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 2014825918,
+      "version": 1,
+      "versionNonce": 233808994,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "links to @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-8",
+      "originalText": "links to @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-9-label",
+      "type": "text",
+      "x": 149.60000000000002,
+      "y": 1384.7999999999997,
+      "width": 132,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 994986579,
+      "version": 1,
+      "versionNonce": 274020269,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "marks cancelled\n@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-9",
+      "originalText": "marks cancelled @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "nursery-task-spawning-and-cancellation-edge-10-label",
+      "type": "text",
+      "x": 341.40000000000003,
+      "y": 1705.2999999999997,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 789708545,
+      "version": 1,
+      "versionNonce": 1948768075,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "nursery-task-spawning-and-cancellation"
+      },
+      "text": "propagates @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "nursery-task-spawning-and-cancellation-edge-10",
+      "originalText": "propagates @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

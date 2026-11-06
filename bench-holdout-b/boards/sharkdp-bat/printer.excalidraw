@@ -1,0 +1,2550 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "interactiveprinter-line-highlighting-dec-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 660,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 893710686,
+      "version": 1,
+      "versionNonce": 1389404290,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "role": "title"
+      },
+      "text": "InteractivePrinter Line Highlighting & Decorations",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "InteractivePrinter Line Highlighting & Decorations",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 400,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 533824833,
+      "version": 1,
+      "versionNonce": 367019659,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-0-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "ip",
+        "ref": "src/printer.rs#InteractivePrinter"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-1",
+      "type": "rectangle",
+      "x": 600,
+      "y": 360,
+      "width": 180,
+      "height": 180,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 195697816,
+      "version": 1,
+      "versionNonce": 557857396,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-1-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "print_line",
+        "ref": "src/printer.rs#print_line"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-2",
+      "type": "rectangle",
+      "x": 1120,
+      "y": 720,
+      "width": 360,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1810199367,
+      "version": 1,
+      "versionNonce": 1753878625,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-2-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "highlight",
+        "ref": "src/printer.rs#highlight_regions_for_line"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-3",
+      "type": "rectangle",
+      "x": 1840,
+      "y": 720,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1641316790,
+      "version": 1,
+      "versionNonce": 680168474,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-3-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "highlighter",
+        "ref": "src/printer.rs#HighlighterFromSet"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-4",
+      "type": "rectangle",
+      "x": 1200,
+      "y": 180,
+      "width": 260,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 903984877,
+      "version": 1,
+      "versionNonce": 573950551,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-4-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "deco_trait",
+        "ref": "src/decorations.rs#Decoration"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-5",
+      "type": "rectangle",
+      "x": 1840,
+      "y": 360,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 966648596,
+      "version": 1,
+      "versionNonce": 1911669344,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-5-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "line_num",
+        "ref": "src/decorations.rs#LineNumberDecoration"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-6",
+      "type": "rectangle",
+      "x": 1840,
+      "y": 40,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 419615043,
+      "version": 1,
+      "versionNonce": 298907741,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-6-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "line_changes",
+        "ref": "src/decorations.rs#LineChangesDecoration"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-7",
+      "type": "rectangle",
+      "x": 1840,
+      "y": 200,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 79350482,
+      "version": 1,
+      "versionNonce": 1509913350,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-7-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "grid",
+        "ref": "src/decorations.rs#GridBorderDecoration"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-8",
+      "type": "rectangle",
+      "x": 1160,
+      "y": 560,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1921814233,
+      "version": 1,
+      "versionNonce": 104689699,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-8-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "escape_iter",
+        "ref": "src/vscreen.rs#EscapeSequenceIterator"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-9",
+      "type": "rectangle",
+      "x": 1840,
+      "y": 540,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 503301584,
+      "version": 1,
+      "versionNonce": 1488461996,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-9-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "ansi_style",
+        "ref": "src/vscreen.rs#AnsiStyle"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-10",
+      "type": "rectangle",
+      "x": 1160,
+      "y": 400,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 59833838,
+      "version": 1,
+      "versionNonce": 1936898834,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-10-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "terminal_escape",
+        "ref": "src/terminal.rs#as_terminal_escaped"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-11",
+      "type": "rectangle",
+      "x": 1120,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 290605951,
+      "version": 1,
+      "versionNonce": 248764313,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-node-11-label"
+        },
+        {
+          "id": "interactiveprinter-line-highlighting-dec-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "node": "preprocess",
+        "ref": "src/printer.rs#preprocess"
+      }
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-0",
+      "type": "arrow",
+      "x": 272,
+      "y": 448.79999999999995,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2066779446,
+      "version": 1,
+      "versionNonce": 342927002,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "ip",
+          "to": "print_line",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-0",
+        "focus": 0.21999999999999828,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-1",
+        "focus": 0.013333333333334155,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-1",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 508.79999999999995,
+      "width": 341.60000000000014,
+      "height": 260,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 88178375,
+      "version": 1,
+      "versionNonce": 1416637153,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "print_line",
+          "to": "highlight",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          260
+        ],
+        [
+          40.80000000000007,
+          260
+        ],
+        [
+          191.20000000000005,
+          260
+        ],
+        [
+          266.4000000000001,
+          260
+        ],
+        [
+          341.10000000000014,
+          260
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-1",
+        "focus": 0.6533333333333324,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-2",
+        "focus": -0.21999999999999945,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-2",
+      "type": "arrow",
+      "x": 1486.4,
+      "y": 768.8,
+      "width": 359.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 621160472,
+      "version": 1,
+      "versionNonce": 220615924,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "highlight",
+          "to": "highlighter",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          179.5999999999999,
+          0
+        ],
+        [
+          358.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-2",
+        "focus": 0.21999999999999945,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-3",
+        "focus": -0.21999999999999767,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-3",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 418.79999999999995,
+      "width": 416.60000000000014,
+      "height": 186.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 959287489,
+      "version": 1,
+      "versionNonce": 29778187,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "print_line",
+          "to": "deco_trait",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -186.79999999999995
+        ],
+        [
+          114.90000000000009,
+          -186.79999999999995
+        ],
+        [
+          190.32500000000016,
+          -186.79999999999995
+        ],
+        [
+          265.7500000000002,
+          -186.79999999999995
+        ],
+        [
+          416.10000000000014,
+          -186.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-1",
+        "focus": -0.34666666666666746,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-4",
+        "focus": 0.13333333333333286,
+        "gap": 1.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-4",
+      "type": "arrow",
+      "x": 1461.4,
+      "y": 262,
+      "width": 384.20000000000005,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 504813138,
+      "version": 1,
+      "versionNonce": 1172671878,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "deco_trait",
+          "to": "line_num",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          57,
+          0
+        ],
+        [
+          57,
+          130
+        ],
+        [
+          127.09999999999991,
+          130
+        ],
+        [
+          191.375,
+          130
+        ],
+        [
+          255.6500000000001,
+          130
+        ],
+        [
+          383.70000000000005,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-4",
+        "focus": 0.3666666666666672,
+        "gap": 1.400000000000091
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-5",
+        "focus": 0.2,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-5",
+      "type": "arrow",
+      "x": 1461.4,
+      "y": 202,
+      "width": 384.20000000000005,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 845077699,
+      "version": 1,
+      "versionNonce": 2109149917,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "deco_trait",
+          "to": "line_changes",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          57,
+          0
+        ],
+        [
+          57,
+          -130
+        ],
+        [
+          127.09999999999991,
+          -130
+        ],
+        [
+          191.375,
+          -130
+        ],
+        [
+          255.6500000000001,
+          -130
+        ],
+        [
+          383.70000000000005,
+          -130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-4",
+        "focus": -0.6333333333333329,
+        "gap": 1.400000000000091
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-6",
+        "focus": 0.2,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-6",
+      "type": "arrow",
+      "x": 1461.4,
+      "y": 232,
+      "width": 384.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1392111252,
+      "version": 1,
+      "versionNonce": 1574427872,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "deco_trait",
+          "to": "grid",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          192.0999999999999,
+          0
+        ],
+        [
+          383.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-4",
+        "focus": -0.13333333333333286,
+        "gap": 1.400000000000091
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-7",
+        "focus": 0.2,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-7",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 478.79999999999995,
+      "width": 371.60000000000014,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1329447533,
+      "version": 1,
+      "versionNonce": 236709079,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "print_line",
+          "to": "escape_iter",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          130
+        ],
+        [
+          120.80000000000007,
+          130
+        ],
+        [
+          246.20000000000005,
+          130
+        ],
+        [
+          308.9000000000001,
+          130
+        ],
+        [
+          371.10000000000014,
+          130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-1",
+        "focus": 0.3199999999999991,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-8",
+        "focus": -0.21999999999999995,
+        "gap": 3.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-8",
+      "type": "arrow",
+      "x": 1456.4,
+      "y": 608.8,
+      "width": 389.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1990629358,
+      "version": 1,
+      "versionNonce": 510929170,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "escape_iter",
+          "to": "ansi_style",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          194.5999999999999,
+          0
+        ],
+        [
+          388.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-8",
+        "focus": 0.21999999999999995,
+        "gap": 3.599999999999909
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-9",
+        "focus": -0.375999999999997,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-9",
+      "type": "arrow",
+      "x": 1446.4,
+      "y": 448.79999999999995,
+      "width": 399.20000000000005,
+      "height": 126.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 73917823,
+      "version": 1,
+      "versionNonce": 970278297,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "terminal_escape",
+          "to": "ansi_style",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          65.73333333333335,
+          0
+        ],
+        [
+          131.4666666666667,
+          0
+        ],
+        [
+          262.9333333333334,
+          0
+        ],
+        [
+          291.20000000000005,
+          0
+        ],
+        [
+          291.20000000000005,
+          126.66666666666674
+        ],
+        [
+          398.70000000000005,
+          126.66666666666674
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-10",
+        "focus": 0.2199999999999981,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-9",
+        "focus": 0.2906666666666651,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-10",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 448.79999999999995,
+      "width": 381.60000000000014,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1533248247,
+      "version": 1,
+      "versionNonce": 1005918801,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "print_line",
+          "to": "terminal_escape",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          190.80000000000007,
+          0
+        ],
+        [
+          381.10000000000014,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-1",
+        "focus": -0.013333333333334155,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-10",
+        "focus": -0.2199999999999981,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-11",
+      "type": "arrow",
+      "x": 784.8,
+      "y": 388.79999999999995,
+      "width": 341.60000000000014,
+      "height": 336.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 653269158,
+      "version": 1,
+      "versionNonce": 1074837386,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "interactiveprinter-line-highlighting-dec-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec",
+        "edge": {
+          "from": "print_line",
+          "to": "preprocess",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -307.20000000000005
+        ],
+        [
+          32,
+          -336.79999999999995
+        ],
+        [
+          341.10000000000014,
+          -336.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-1",
+        "focus": -0.6800000000000008,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "interactiveprinter-line-highlighting-dec-node-11",
+        "focus": 0.19999999999999998,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-0-label",
+      "type": "text",
+      "x": 50.999999999999986,
+      "y": 427.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 330673688,
+      "version": 1,
+      "versionNonce": 1266042612,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "InteractivePrinter",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-0",
+      "originalText": "InteractivePrinter",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-1-label",
+      "type": "text",
+      "x": 624,
+      "y": 437.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1602031333,
+      "version": 1,
+      "versionNonce": 1365444719,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "print_line()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-1",
+      "originalText": "print_line()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-2-label",
+      "type": "text",
+      "x": 1146,
+      "y": 747.5,
+      "width": 308,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1327746626,
+      "version": 1,
+      "versionNonce": 182236854,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "highlight_regions_for_line()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-2",
+      "originalText": "highlight_regions_for_line()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-3-label",
+      "type": "text",
+      "x": 1871,
+      "y": 747.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 920349415,
+      "version": 1,
+      "versionNonce": 1979551105,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "HighlighterFromSet",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-3",
+      "originalText": "HighlighterFromSet",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-4-label",
+      "type": "text",
+      "x": 1231,
+      "y": 227.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1574619940,
+      "version": 1,
+      "versionNonce": 1715145136,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "Decoration (trait)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-4",
+      "originalText": "Decoration (trait)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-5-label",
+      "type": "text",
+      "x": 1870,
+      "y": 387.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1918005473,
+      "version": 1,
+      "versionNonce": 1498232747,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "LineNumberDecoration",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-5",
+      "originalText": "LineNumberDecoration",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-6-label",
+      "type": "text",
+      "x": 1864.5,
+      "y": 67.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1127955550,
+      "version": 1,
+      "versionNonce": 1300803970,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "LineChangesDecoration",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-6",
+      "originalText": "LineChangesDecoration",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-7-label",
+      "type": "text",
+      "x": 1870,
+      "y": 227.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1664391283,
+      "version": 1,
+      "versionNonce": 647305805,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "GridBorderDecoration",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-7",
+      "originalText": "GridBorderDecoration",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-8-label",
+      "type": "text",
+      "x": 1189,
+      "y": 587.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 2001605472,
+      "version": 1,
+      "versionNonce": 623788732,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "EscapeSequenceIterator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-8",
+      "originalText": "EscapeSequenceIterator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-9-label",
+      "type": "text",
+      "x": 1870.5,
+      "y": 577.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 772303661,
+      "version": 1,
+      "versionNonce": 161398167,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "AnsiStyle",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-9",
+      "originalText": "AnsiStyle",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-10-label",
+      "type": "text",
+      "x": 1184.5,
+      "y": 427.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 845000079,
+      "version": 1,
+      "versionNonce": 14075497,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "as_terminal_escaped()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-10",
+      "originalText": "as_terminal_escaped()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-node-11-label",
+      "type": "text",
+      "x": 1144,
+      "y": 47.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1580981130,
+      "version": 1,
+      "versionNonce": 1272526558,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "preprocess()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-node-11",
+      "originalText": "preprocess()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-0-label",
+      "type": "text",
+      "x": 412,
+      "y": 438.79999999999995,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 33233511,
+      "version": 1,
+      "versionNonce": 954127361,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-1-label",
+      "type": "text",
+      "x": 799.2,
+      "y": 758.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 440630722,
+      "version": 1,
+      "versionNonce": 1304296758,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-2-label",
+      "type": "text",
+      "x": 1639.6,
+      "y": 758.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 714915429,
+      "version": 1,
+      "versionNonce": 340020975,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-2",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-3-label",
+      "type": "text",
+      "x": 873.3000000000001,
+      "y": 222,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1591041432,
+      "version": 1,
+      "versionNonce": 240618868,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-4-label",
+      "type": "text",
+      "x": 1548.9,
+      "y": 382,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 777275379,
+      "version": 1,
+      "versionNonce": 1769365709,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-4",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-5-label",
+      "type": "text",
+      "x": 1548.9,
+      "y": 62,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 240839646,
+      "version": 1,
+      "versionNonce": 275380226,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-5",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-6-label",
+      "type": "text",
+      "x": 1613.9,
+      "y": 222,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1030889569,
+      "version": 1,
+      "versionNonce": 472809003,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-6",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-7-label",
+      "type": "text",
+      "x": 874.8000000000001,
+      "y": 598.8,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 687504036,
+      "version": 1,
+      "versionNonce": 689721392,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-7",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-8-label",
+      "type": "text",
+      "x": 1624.6,
+      "y": 598.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 469137295,
+      "version": 1,
+      "versionNonce": 1012712553,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-8",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-9-label",
+      "type": "text",
+      "x": 1682.9333333333334,
+      "y": 438.79999999999995,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1205118346,
+      "version": 1,
+      "versionNonce": 123679966,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-9",
+      "originalText": "@takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-10-label",
+      "type": "text",
+      "x": 949.2,
+      "y": 438.79999999999995,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 1203392626,
+      "version": 1,
+      "versionNonce": 100620326,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-10",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "interactiveprinter-line-highlighting-dec-edge-11-label",
+      "type": "text",
+      "x": 790.4,
+      "y": 71.59999999999991,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "am",
+      "roundness": null,
+      "seed": 86391703,
+      "version": 1,
+      "versionNonce": 1925947761,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "interactiveprinter-line-highlighting-dec"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "interactiveprinter-line-highlighting-dec-edge-11",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

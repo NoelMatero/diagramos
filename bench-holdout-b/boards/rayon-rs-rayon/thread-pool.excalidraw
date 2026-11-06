@@ -1,0 +1,1627 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 580.8000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1637119336,
+      "version": 1,
+      "versionNonce": 2065613380,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "role": "title"
+      },
+      "text": "Rayon thread pool: startup and job injection",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Rayon thread pool: startup and job injection",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-0",
+      "type": "rectangle",
+      "x": 1500,
+      "y": 20,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 601662007,
+      "version": 1,
+      "versionNonce": 1479400337,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-node-0-label"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "node": "registry-new",
+        "ref": "rayon-core/src/registry.rs#Registry::new"
+      }
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-1",
+      "type": "rectangle",
+      "x": 2160,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 2145463014,
+      "version": 1,
+      "versionNonce": 18272970,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-node-1-label"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "node": "threadspawn",
+        "ref": "rayon-core/src/registry.rs#ThreadSpawn::spawn"
+      }
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 120,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1472771121,
+      "version": 1,
+      "versionNonce": 1307180219,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-node-2-label"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "node": "main-loop",
+        "ref": "rayon-core/src/registry.rs#main_loop"
+      }
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-3",
+      "type": "rectangle",
+      "x": 680,
+      "y": 120,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 51355400,
+      "version": 1,
+      "versionNonce": 268493924,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-node-3-label"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "node": "worker-thread",
+        "ref": "rayon-core/src/registry.rs#WorkerThread"
+      }
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-4",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1348218739,
+      "version": 1,
+      "versionNonce": 2078789453,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-node-4-label"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "node": "inject-or-push",
+        "ref": "rayon-core/src/registry.rs#Registry::inject_or_push"
+      }
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-5",
+      "type": "rectangle",
+      "x": 780,
+      "y": 20,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 252111298,
+      "version": 1,
+      "versionNonce": 492896566,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-node-5-label"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "node": "inject",
+        "ref": "rayon-core/src/registry.rs#Registry::inject"
+      }
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-6",
+      "type": "rectangle",
+      "x": 1460,
+      "y": 280,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1822912733,
+      "version": 1,
+      "versionNonce": 77442119,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-node-6-label"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "node": "find-work",
+        "ref": "rayon-core/src/registry.rs#WorkerThread::find_work"
+      }
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-7",
+      "type": "rectangle",
+      "x": 2220,
+      "y": 280,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 492773188,
+      "version": 1,
+      "versionNonce": 1133291088,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-node-7-label"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "node": "job-execute",
+        "ref": "rayon-core/src/job.rs#JobRef::execute"
+      }
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-8",
+      "type": "rectangle",
+      "x": 680,
+      "y": 280,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1650723311,
+      "version": 1,
+      "versionNonce": 521369673,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-node-8-label"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "node": "wait-until",
+        "ref": "rayon-core/src/registry.rs#WorkerThread::wait_until"
+      }
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-0",
+      "type": "arrow",
+      "x": 1701.6000000000001,
+      "y": 52,
+      "width": 456.0000000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 2027796200,
+      "version": 1,
+      "versionNonce": 594599620,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "edge": {
+          "from": "registry-new",
+          "to": "threadspawn",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          228.00000000000023,
+          0
+        ],
+        [
+          455.5000000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-0",
+        "focus": -0.20000000000000004,
+        "gap": 1.6000000000001364
+      },
+      "endBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-1",
+        "focus": 0.2,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-1",
+      "type": "arrow",
+      "x": 172,
+      "y": 152,
+      "width": 508.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 557493649,
+      "version": 1,
+      "versionNonce": 206959515,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "edge": {
+          "from": "main-loop",
+          "to": "worker-thread",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          254.39999999999998,
+          0
+        ],
+        [
+          508.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-2",
+        "focus": -0.36,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-3",
+        "focus": 0.19999999999999998,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-2",
+      "type": "arrow",
+      "x": 172,
+      "y": 185.33333333333331,
+      "width": 508.79999999999995,
+      "height": 126.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 487854918,
+      "version": 1,
+      "versionNonce": 406521514,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "edge": {
+          "from": "main-loop",
+          "to": "wait-until",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          126.66666666666669
+        ],
+        [
+          191.06666666666666,
+          126.66666666666669
+        ],
+        [
+          349.9333333333333,
+          126.66666666666669
+        ],
+        [
+          429.36666666666656,
+          126.66666666666669
+        ],
+        [
+          508.29999999999995,
+          126.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-2",
+        "focus": 0.30666666666666603,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-8",
+        "focus": 0.19999999999999998,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-3",
+      "type": "arrow",
+      "x": 332,
+      "y": 52,
+      "width": 447.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 430619159,
+      "version": 1,
+      "versionNonce": 1063175409,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "edge": {
+          "from": "inject-or-push",
+          "to": "inject",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          223.60000000000002,
+          0
+        ],
+        [
+          446.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-4",
+        "focus": -0.19999999999999998,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-5",
+        "focus": 0.2,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-4",
+      "type": "arrow",
+      "x": 1019.2,
+      "y": 52,
+      "width": 482.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 321730340,
+      "version": 1,
+      "versionNonce": 1459293616,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "edge": {
+          "from": "inject",
+          "to": "registry-new",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          241.20000000000005,
+          0
+        ],
+        [
+          481.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-5",
+        "focus": -0.2,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-0",
+        "focus": 0.20000000000000004,
+        "gap": 1.6000000000001364
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-5",
+      "type": "arrow",
+      "x": 1000.8,
+      "y": 312,
+      "width": 464.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 2076327357,
+      "version": 1,
+      "versionNonce": 403444647,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "edge": {
+          "from": "wait-until",
+          "to": "find-work",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          232.39999999999986,
+          0
+        ],
+        [
+          464.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-8",
+        "focus": -0.19999999999999998,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-6",
+        "focus": 0.19999999999999998,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-6",
+      "type": "arrow",
+      "x": 1785.6,
+      "y": 312,
+      "width": 438.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 700306978,
+      "version": 1,
+      "versionNonce": 881145110,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rayon-thread-pool-startup-and-job-inject-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject",
+        "edge": {
+          "from": "find-work",
+          "to": "job-execute",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          219.20000000000005,
+          0
+        ],
+        [
+          437.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-6",
+        "focus": -0.19999999999999998,
+        "gap": 5.599999999999909
+      },
+      "endBinding": {
+        "elementId": "rayon-thread-pool-startup-and-job-inject-node-7",
+        "focus": 0.2,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-0-label",
+      "type": "text",
+      "x": 1528.5,
+      "y": 47.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1598273330,
+      "version": 1,
+      "versionNonce": 1673843942,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "Registry::new",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-node-0",
+      "originalText": "Registry::new",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-1-label",
+      "type": "text",
+      "x": 2191,
+      "y": 47.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2135035991,
+      "version": 1,
+      "versionNonce": 2139954737,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "ThreadSpawn::spawn",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-node-1",
+      "originalText": "ThreadSpawn::spawn",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-2-label",
+      "type": "text",
+      "x": 50.49999999999999,
+      "y": 157.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 54830344,
+      "version": 1,
+      "versionNonce": 1668896356,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "main_loop",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-node-2",
+      "originalText": "main_loop",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-3-label",
+      "type": "text",
+      "x": 704,
+      "y": 147.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1445439957,
+      "version": 1,
+      "versionNonce": 432043743,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "WorkerThread",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-node-3",
+      "originalText": "WorkerThread",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-4-label",
+      "type": "text",
+      "x": 48,
+      "y": 47.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 305197390,
+      "version": 1,
+      "versionNonce": 1165802994,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "Registry::inject_or_push",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-node-4",
+      "originalText": "Registry::inject_or_push",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-5-label",
+      "type": "text",
+      "x": 812,
+      "y": 47.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 341562275,
+      "version": 1,
+      "versionNonce": 1551216957,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "Registry::inject",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-node-5",
+      "originalText": "Registry::inject",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-6-label",
+      "type": "text",
+      "x": 1493.5,
+      "y": 307.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 101041940,
+      "version": 1,
+      "versionNonce": 964537952,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "WorkerThread::find_work",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-node-6",
+      "originalText": "WorkerThread::find_work",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-7-label",
+      "type": "text",
+      "x": 2247.5,
+      "y": 307.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 2081053009,
+      "version": 1,
+      "versionNonce": 1094748507,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "JobRef::execute",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-node-7",
+      "originalText": "JobRef::execute",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-node-8-label",
+      "type": "text",
+      "x": 708,
+      "y": 307.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 407194042,
+      "version": 1,
+      "versionNonce": 879896078,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "WorkerThread::wait_until",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-node-8",
+      "originalText": "WorkerThread::wait_until",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-0-label",
+      "type": "text",
+      "x": 1841.6000000000004,
+      "y": 42,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 587993909,
+      "version": 1,
+      "versionNonce": 462296511,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "spawn handler @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-edge-0",
+      "originalText": "spawn handler @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-1-label",
+      "type": "text",
+      "x": 312,
+      "y": 142,
+      "width": 228.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1900829928,
+      "version": 1,
+      "versionNonce": 966799556,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "from ThreadBuilder @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-edge-1",
+      "originalText": "from ThreadBuilder @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-2-label",
+      "type": "text",
+      "x": 270.66666666666663,
+      "y": 302,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2017772471,
+      "version": 1,
+      "versionNonce": 941266961,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "wait_until_out @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-edge-2",
+      "originalText": "wait_until_out @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-3-label",
+      "type": "text",
+      "x": 472,
+      "y": 42,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 2144179474,
+      "version": 1,
+      "versionNonce": 1020100934,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "if not local @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-edge-3",
+      "originalText": "if not local @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-4-label",
+      "type": "text",
+      "x": 1159.2,
+      "y": 42,
+      "width": 202.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1648167601,
+      "version": 1,
+      "versionNonce": 1125001275,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "to injected_jobs @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-edge-4",
+      "originalText": "to injected_jobs @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-5-label",
+      "type": "text",
+      "x": 1140.7999999999997,
+      "y": 302,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 170578036,
+      "version": 1,
+      "versionNonce": 1607193920,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "find work loop @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-edge-5",
+      "originalText": "find work loop @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rayon-thread-pool-startup-and-job-inject-edge-6-label",
+      "type": "text",
+      "x": 1925.6,
+      "y": 302,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 607179523,
+      "version": 1,
+      "versionNonce": 352426013,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rayon-thread-pool-startup-and-job-inject"
+      },
+      "text": "execute job @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rayon-thread-pool-startup-and-job-inject-edge-6",
+      "originalText": "execute job @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

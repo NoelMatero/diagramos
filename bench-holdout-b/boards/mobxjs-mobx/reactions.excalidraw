@@ -1,0 +1,2140 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 501.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 2102070898,
+      "version": 1,
+      "versionNonce": 1490711078,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "MobX Reaction Tracking and Re-run Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "MobX Reaction Tracking and Re-run Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-0",
+      "type": "rectangle",
+      "x": 100,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e1f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1063670485,
+      "version": 1,
+      "versionNonce": 1197769183,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-0-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "reaction_class",
+        "ref": "packages/mobx/src/core/reaction.ts#Reaction"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-1",
+      "type": "rectangle",
+      "x": 100,
+      "y": 400,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e1f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1456557116,
+      "version": 1,
+      "versionNonce": 1593684680,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-1-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "track_method",
+        "ref": "packages/mobx/src/core/reaction.ts#track"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-2",
+      "type": "rectangle",
+      "x": 40,
+      "y": 780,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 130381835,
+      "version": 1,
+      "versionNonce": 1684777349,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-2-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "trackDerivedFunction",
+        "ref": "packages/mobx/src/core/derivation.ts#trackDerivedFunction"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-3",
+      "type": "rectangle",
+      "x": 20,
+      "y": 1160,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 440426490,
+      "version": 1,
+      "versionNonce": 1252996174,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-3-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "reportObserved",
+        "ref": "packages/mobx/src/core/observable.ts#reportObserved"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-4",
+      "type": "rectangle",
+      "x": 340,
+      "y": 1160,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1689417353,
+      "version": 1,
+      "versionNonce": 1728812819,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-4-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "bindDependencies",
+        "ref": "packages/mobx/src/core/derivation.ts#bindDependencies"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-5",
+      "type": "rectangle",
+      "x": 380,
+      "y": 1540,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3e0",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 2088855360,
+      "version": 1,
+      "versionNonce": 1220321308,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-5-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "atom_class",
+        "ref": "packages/mobx/src/core/atom.ts#Atom"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-6",
+      "type": "rectangle",
+      "x": 360,
+      "y": 1920,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3e0",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1565445935,
+      "version": 1,
+      "versionNonce": 2012576393,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-6-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "reportChanged",
+        "ref": "packages/mobx/src/core/atom.ts#reportChanged"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-7",
+      "type": "rectangle",
+      "x": 340,
+      "y": 2300,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 25318366,
+      "version": 1,
+      "versionNonce": 1467133954,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-7-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "propagateChanged",
+        "ref": "packages/mobx/src/core/observable.ts#propagateChanged"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-8",
+      "type": "rectangle",
+      "x": 340,
+      "y": 2680,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e1f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 756836637,
+      "version": 1,
+      "versionNonce": 80076423,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-8-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "onBecomeStale",
+        "ref": "packages/mobx/src/core/reaction.ts#onBecomeStale_"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-9",
+      "type": "rectangle",
+      "x": 380,
+      "y": 3060,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e1f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 407495812,
+      "version": 1,
+      "versionNonce": 1882064016,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-9-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "schedule",
+        "ref": "packages/mobx/src/core/reaction.ts#schedule_"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-10",
+      "type": "rectangle",
+      "x": 360,
+      "y": 3440,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e1f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 251607322,
+      "version": 1,
+      "versionNonce": 249936622,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-node-10-label"
+        },
+        {
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "node": "runReaction",
+        "ref": "packages/mobx/src/core/reaction.ts#runReaction_"
+      }
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-0",
+      "type": "arrow",
+      "x": 182,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 227876282,
+      "version": 1,
+      "versionNonce": 1629282830,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "edge": {
+          "from": "reaction_class",
+          "to": "track_method"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-0",
+        "focus": -0.025,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-1",
+        "focus": 0.025,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-1",
+      "type": "arrow",
+      "x": 182,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 660265419,
+      "version": 1,
+      "versionNonce": 1511713605,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "edge": {
+          "from": "track_method",
+          "to": "trackDerivedFunction",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-1",
+        "focus": -0.025,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-2",
+        "focus": -0.053333333333333316,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-2",
+      "type": "arrow",
+      "x": 132,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1244006908,
+      "version": 1,
+      "versionNonce": 1545513864,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "edge": {
+          "from": "trackDerivedFunction",
+          "to": "reportObserved"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-2",
+        "focus": 0.3866666666666667,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-3",
+        "focus": -0.06666666666666686,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-3",
+      "type": "arrow",
+      "x": 232,
+      "y": 853.5999999999999,
+      "width": 230,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1168993429,
+      "version": 1,
+      "versionNonce": 1066282143,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "edge": {
+          "from": "trackDerivedFunction",
+          "to": "bindDependencies",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          230,
+          32
+        ],
+        [
+          230,
+          35.39999999999998
+        ],
+        [
+          230,
+          168.0999999999999
+        ],
+        [
+          230,
+          234.44999999999982
+        ],
+        [
+          230,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-2",
+        "focus": -0.2800000000000001,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-4",
+        "focus": -0.06153846153846177,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-4",
+      "type": "arrow",
+      "x": 462,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1918675102,
+      "version": 1,
+      "versionNonce": 1377386434,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "edge": {
+          "from": "bindDependencies",
+          "to": "atom_class"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-4",
+        "focus": 0.06153846153846177,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-5",
+        "focus": 0.025,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-5",
+      "type": "arrow",
+      "x": 462,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 2053649647,
+      "version": 1,
+      "versionNonce": 1839409481,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "edge": {
+          "from": "atom_class",
+          "to": "reportChanged"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-5",
+        "focus": -0.025,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-6",
+        "focus": -0.0727272727272723,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-6",
+      "type": "arrow",
+      "x": 462,
+      "y": 1995.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 429575424,
+      "version": 1,
+      "versionNonce": 1789485020,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "edge": {
+          "from": "reportChanged",
+          "to": "propagateChanged",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-6",
+        "focus": 0.07272727272727297,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-7",
+        "focus": -0.06153846153846177,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-7",
+      "type": "arrow",
+      "x": 462,
+      "y": 2376.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1435290441,
+      "version": 1,
+      "versionNonce": 1680642003,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "edge": {
+          "from": "propagateChanged",
+          "to": "onBecomeStale",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-7",
+        "focus": 0.06153846153846177,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-8",
+        "focus": 0.01666666666666629,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-8",
+      "type": "arrow",
+      "x": 462,
+      "y": 2757.6000000000004,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 655037634,
+      "version": 1,
+      "versionNonce": 1810936374,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "edge": {
+          "from": "onBecomeStale",
+          "to": "schedule",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-8",
+        "focus": -0.01666666666666629,
+        "gap": 2.399999999999636
+      },
+      "endBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-9",
+        "focus": -0.08888888888888931,
+        "gap": 1.5999999999994543
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-9",
+      "type": "arrow",
+      "x": 462,
+      "y": 3138.4000000000005,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1751145075,
+      "version": 1,
+      "versionNonce": 1249345613,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mobx-reaction-tracking-and-re-run-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow",
+        "edge": {
+          "from": "schedule",
+          "to": "runReaction"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-9",
+        "focus": 0.08888888888888931,
+        "gap": 1.5999999999994543
+      },
+      "endBinding": {
+        "elementId": "mobx-reaction-tracking-and-re-run-flow-node-10",
+        "focus": -0.07272727272727297,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-0-label",
+      "type": "text",
+      "x": 136,
+      "y": 47.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 331633148,
+      "version": 1,
+      "versionNonce": 1078592392,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "Reaction",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-0",
+      "originalText": "Reaction",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-1-label",
+      "type": "text",
+      "x": 141.5,
+      "y": 427.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1201741145,
+      "version": 1,
+      "versionNonce": 1973011363,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "track()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-1",
+      "originalText": "track()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-2-label",
+      "type": "text",
+      "x": 68.99999999999999,
+      "y": 807.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 225916726,
+      "version": 1,
+      "versionNonce": 1504593050,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "trackDerivedFunction()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-2",
+      "originalText": "trackDerivedFunction()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-3-label",
+      "type": "text",
+      "x": 52,
+      "y": 1187.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1742722923,
+      "version": 1,
+      "versionNonce": 1307587173,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "reportObserved()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-3",
+      "originalText": "reportObserved()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-4-label",
+      "type": "text",
+      "x": 371,
+      "y": 1187.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1568542416,
+      "version": 1,
+      "versionNonce": 1283787692,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "bindDependencies()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-4",
+      "originalText": "bindDependencies()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-5-label",
+      "type": "text",
+      "x": 438,
+      "y": 1567.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1967751325,
+      "version": 1,
+      "versionNonce": 599907591,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "Atom",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-5",
+      "originalText": "Atom",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-6-label",
+      "type": "text",
+      "x": 387.5,
+      "y": 1947.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 116628602,
+      "version": 1,
+      "versionNonce": 1758949838,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "reportChanged()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-6",
+      "originalText": "reportChanged()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-7-label",
+      "type": "text",
+      "x": 371,
+      "y": 2327.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 509105983,
+      "version": 1,
+      "versionNonce": 1331241049,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "propagateChanged()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-7",
+      "originalText": "propagateChanged()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-8-label",
+      "type": "text",
+      "x": 372,
+      "y": 2707.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 38177748,
+      "version": 1,
+      "versionNonce": 709262880,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "onBecomeStale_()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-8",
+      "originalText": "onBecomeStale_()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-9-label",
+      "type": "text",
+      "x": 409.5,
+      "y": 3087.5,
+      "width": 121.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 230384145,
+      "version": 1,
+      "versionNonce": 1525815579,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "schedule_()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-9",
+      "originalText": "schedule_()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-node-10-label",
+      "type": "text",
+      "x": 393,
+      "y": 3467.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 682766219,
+      "version": 1,
+      "versionNonce": 957384709,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "runReaction_()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-node-10",
+      "originalText": "runReaction_()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-0-label",
+      "type": "text",
+      "x": 151.2,
+      "y": 232.4,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1655092395,
+      "version": 1,
+      "versionNonce": 1426016165,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "defines",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-edge-0",
+      "originalText": "defines",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-1-label",
+      "type": "text",
+      "x": 116,
+      "y": 613.1999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1357713782,
+      "version": 1,
+      "versionNonce": 1703040474,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "line 173 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-edge-1",
+      "originalText": "line 173 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-2-label",
+      "type": "text",
+      "x": 83.6,
+      "y": 993.9999999999999,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 132134809,
+      "version": 1,
+      "versionNonce": 1492180963,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "during exec",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-edge-2",
+      "originalText": "during exec",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-3-label",
+      "type": "text",
+      "x": 396,
+      "y": 878.9999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 6542908,
+      "version": 1,
+      "versionNonce": 1353511112,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "line 192 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-edge-3",
+      "originalText": "line 192 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-4-label",
+      "type": "text",
+      "x": 396,
+      "y": 1374.7999999999997,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1413201791,
+      "version": 1,
+      "versionNonce": 1683321753,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "via addObserver",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-edge-4",
+      "originalText": "via addObserver",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-5-label",
+      "type": "text",
+      "x": 448.8,
+      "y": 1755.6,
+      "width": 26.400000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1087380666,
+      "version": 1,
+      "versionNonce": 117198606,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "has",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-edge-5",
+      "originalText": "has",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-6-label",
+      "type": "text",
+      "x": 400.4,
+      "y": 2136.4,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1424347357,
+      "version": 1,
+      "versionNonce": 516869191,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "line 96 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-edge-6",
+      "originalText": "line 96 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-7-label",
+      "type": "text",
+      "x": 396,
+      "y": 2517.2000000000003,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 215843856,
+      "version": 1,
+      "versionNonce": 1700212460,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "line 240 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-edge-7",
+      "originalText": "line 240 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-8-label",
+      "type": "text",
+      "x": 396,
+      "y": 2898.0000000000005,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1021748899,
+      "version": 1,
+      "versionNonce": 788519485,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "line 114 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-edge-8",
+      "originalText": "line 114 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "mobx-reaction-tracking-and-re-run-flow-edge-9-label",
+      "type": "text",
+      "x": 435.6,
+      "y": 3278.8000000000006,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 985384014,
+      "version": 1,
+      "versionNonce": 403105522,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "mobx-reaction-tracking-and-re-run-flow"
+      },
+      "text": "queues",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mobx-reaction-tracking-and-re-run-flow-edge-9",
+      "originalText": "queues",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

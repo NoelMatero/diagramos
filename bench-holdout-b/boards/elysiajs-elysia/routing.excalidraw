@@ -1,0 +1,1761 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "elysia-route-registration-amp-request-di-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 633.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1790403961,
+      "version": 1,
+      "versionNonce": 296544579,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Elysia Route Registration &amp; Request Dispatch",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Elysia Route Registration &amp; Request Dispatch",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-0",
+      "type": "rectangle",
+      "x": 800,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1685902496,
+      "version": 1,
+      "versionNonce": 428384252,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-node-0-label"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "node": "elysia_class",
+        "ref": "src/index.ts#Elysia"
+      }
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-1",
+      "type": "rectangle",
+      "x": 420,
+      "y": 400,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1246688617,
+      "version": 1,
+      "versionNonce": 1704290931,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-node-1-label"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "node": "add_method",
+        "ref": "src/index.ts#add"
+      }
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-2",
+      "type": "rectangle",
+      "x": 440,
+      "y": 780,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3e0",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 985838654,
+      "version": 1,
+      "versionNonce": 16285666,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-node-2-label"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "node": "router",
+        "ref": "src/index.ts#router"
+      }
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-3",
+      "type": "rectangle",
+      "x": 400,
+      "y": 20,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1162389903,
+      "version": 1,
+      "versionNonce": 1220639337,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-node-3-label"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "node": "group_method",
+        "ref": "src/index.ts#group"
+      }
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-4",
+      "type": "rectangle",
+      "x": 40,
+      "y": 20,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1053604252,
+      "version": 1,
+      "versionNonce": 801850792,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-node-4-label"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "node": "use_method",
+        "ref": "src/index.ts#use"
+      }
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-5",
+      "type": "rectangle",
+      "x": 420,
+      "y": 1540,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1404849077,
+      "version": 1,
+      "versionNonce": 1089931071,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-node-5-label"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "node": "compose_handler",
+        "ref": "src/compose.ts#composeHandler"
+      }
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-6",
+      "type": "rectangle",
+      "x": 400,
+      "y": 1940,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fce4ec",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 463835098,
+      "version": 1,
+      "versionNonce": 1228474286,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-node-6-label"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "node": "lifecycle_hooks",
+        "ref": "src/types.ts#LifeCycleStore"
+      }
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-7",
+      "type": "rectangle",
+      "x": 700,
+      "y": 1940,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3e0",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1874912619,
+      "version": 1,
+      "versionNonce": 892943461,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-node-7-label"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "node": "schema_validator",
+        "ref": "src/types.ts#SchemaValidator"
+      }
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-8",
+      "type": "rectangle",
+      "x": 420,
+      "y": 1160,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#c8e6c9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 690137384,
+      "version": 1,
+      "versionNonce": 246709508,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-node-8-label"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "elysia-route-registration-amp-request-di-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "node": "request_dispatch",
+        "state": "external"
+      }
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-0",
+      "type": "arrow",
+      "x": 919.2,
+      "y": 92,
+      "width": 275,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1027843863,
+      "version": 1,
+      "versionNonce": 1226562545,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "edge": {
+          "from": "elysia_class",
+          "to": "add_method",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.8
+        ],
+        [
+          -95.09999999999991,
+          192.8
+        ],
+        [
+          -275,
+          192.8
+        ],
+        [
+          -275,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-0",
+        "focus": -0.083636363636364,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-1",
+        "focus": 0.4946666666666669,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-1",
+      "type": "arrow",
+      "x": 569.2,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1085079622,
+      "version": 1,
+      "versionNonce": 569908650,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "edge": {
+          "from": "add_method",
+          "to": "router",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-1",
+        "focus": 0.005333333333333011,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-2",
+        "focus": -0.006153846153845955,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-2",
+      "type": "arrow",
+      "x": 569.2,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1154718353,
+      "version": 1,
+      "versionNonce": 370346651,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "edge": {
+          "from": "group_method",
+          "to": "add_method",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-3",
+        "focus": -0.05750000000000026,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-1",
+        "focus": -0.005333333333333011,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-3",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 92,
+      "width": 305,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 477537256,
+      "version": 1,
+      "versionNonce": 757986756,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "edge": {
+          "from": "use_method",
+          "to": "add_method",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.8
+        ],
+        [
+          110.09999999999994,
+          192.8
+        ],
+        [
+          305,
+          192.8
+        ],
+        [
+          305,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-4",
+        "focus": -0.06571428571428602,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-1",
+        "focus": -0.5053333333333333,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-4",
+      "type": "arrow",
+      "x": 569.2,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1774400595,
+      "version": 1,
+      "versionNonce": 845256109,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "edge": {
+          "from": "router",
+          "to": "request_dispatch",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-2",
+        "focus": 0.006153846153845955,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-8",
+        "focus": -0.005333333333333106,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-5",
+      "type": "arrow",
+      "x": 569.2,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1297531682,
+      "version": 1,
+      "versionNonce": 1044532246,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "edge": {
+          "from": "request_dispatch",
+          "to": "compose_handler",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-8",
+        "focus": 0.005333333333333106,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-5",
+        "focus": -0.0053333333333330304,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-6",
+      "type": "arrow",
+      "x": 519.2,
+      "y": 1635.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 526068413,
+      "version": 1,
+      "versionNonce": 566831783,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "edge": {
+          "from": "compose_handler",
+          "to": "lifecycle_hooks"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-5",
+        "focus": 0.3386666666666665,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-6",
+        "focus": 0.08363636363636374,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-7",
+      "type": "arrow",
+      "x": 619.2,
+      "y": 1635.1999999999998,
+      "width": 200,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 918955044,
+      "version": 1,
+      "versionNonce": 1622680752,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "elysia-route-registration-amp-request-di-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di",
+        "edge": {
+          "from": "compose_handler",
+          "to": "schema_validator"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          200,
+          32
+        ],
+        [
+          200,
+          50.40000000000009
+        ],
+        [
+          200,
+          175.5999999999999
+        ],
+        [
+          200,
+          238.19999999999982
+        ],
+        [
+          200,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-5",
+        "focus": -0.3280000000000004,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "elysia-route-registration-amp-request-di-node-7",
+        "focus": 0.08363636363636308,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-0-label",
+      "type": "text",
+      "x": 827.5,
+      "y": 47.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 468265853,
+      "version": 1,
+      "versionNonce": 287064167,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "Elysia Instance",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-node-0",
+      "originalText": "Elysia Instance",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-1-label",
+      "type": "text",
+      "x": 449,
+      "y": 427.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 530656048,
+      "version": 1,
+      "versionNonce": 630339980,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "add() — Register Route",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-node-1",
+      "originalText": "add() — Register Route",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-2-label",
+      "type": "text",
+      "x": 471,
+      "y": 807.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 441777439,
+      "version": 1,
+      "versionNonce": 504435129,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "Router (Memoirist)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-node-2",
+      "originalText": "Router (Memoirist)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-3-label",
+      "type": "text",
+      "x": 433.5,
+      "y": 47.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1878910554,
+      "version": 1,
+      "versionNonce": 273232686,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "group() — Prefix Routes",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-node-3",
+      "originalText": "group() — Prefix Routes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-4-label",
+      "type": "text",
+      "x": 69.99999999999999,
+      "y": 47.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1187026361,
+      "version": 1,
+      "versionNonce": 174063491,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "use() — Load Plugins",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-node-4",
+      "originalText": "use() — Load Plugins",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-5-label",
+      "type": "text",
+      "x": 449,
+      "y": 1565,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 758481372,
+      "version": 1,
+      "versionNonce": 1052724200,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "composeHandler() — JIT\nCompile",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-node-5",
+      "originalText": "composeHandler() — JIT Compile",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-6-label",
+      "type": "text",
+      "x": 427.5,
+      "y": 1967.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 485610443,
+      "version": 1,
+      "versionNonce": 1992718661,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "Lifecycle Hooks",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-node-6",
+      "originalText": "Lifecycle Hooks",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-7-label",
+      "type": "text",
+      "x": 727.5,
+      "y": 1967.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1656854,
+      "version": 1,
+      "versionNonce": 1859074554,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "SchemaValidator",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-node-7",
+      "originalText": "SchemaValidator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-node-8-label",
+      "type": "text",
+      "x": 449,
+      "y": 1187.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1278329845,
+      "version": 1,
+      "versionNonce": 527021183,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "Route Match & Dispatch",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-node-8",
+      "originalText": "Route Match & Dispatch",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-0-label",
+      "type": "text",
+      "x": 758.1000000000001,
+      "y": 274.8,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1563892242,
+      "version": 1,
+      "versionNonce": 1240064070,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "register @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-edge-0",
+      "originalText": "register @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-1-label",
+      "type": "text",
+      "x": 485.6,
+      "y": 613.1999999999999,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1437485239,
+      "version": 1,
+      "versionNonce": 1161230097,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "stores route @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-edge-1",
+      "originalText": "stores route @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-2-label",
+      "type": "text",
+      "x": 490.00000000000006,
+      "y": 232.4,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1320542696,
+      "version": 1,
+      "versionNonce": 1186762692,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "with prefix @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-edge-2",
+      "originalText": "with prefix @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-3-label",
+      "type": "text",
+      "x": 215.69999999999993,
+      "y": 274.8,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 7706677,
+      "version": 1,
+      "versionNonce": 682259647,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "merge routes @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-edge-3",
+      "originalText": "merge routes @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-4-label",
+      "type": "text",
+      "x": 485.6,
+      "y": 993.9999999999999,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 973474222,
+      "version": 1,
+      "versionNonce": 393746642,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "matches path @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-edge-4",
+      "originalText": "matches path @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-5-label",
+      "type": "text",
+      "x": 503.20000000000005,
+      "y": 1364.7999999999997,
+      "width": 132,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 26892291,
+      "version": 1,
+      "versionNonce": 572389149,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "compile handler\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-edge-5",
+      "originalText": "compile handler @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-6-label",
+      "type": "text",
+      "x": 453.20000000000005,
+      "y": 1775.6,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1737774452,
+      "version": 1,
+      "versionNonce": 1827157056,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "uses hooks from",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-edge-6",
+      "originalText": "uses hooks from",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "elysia-route-registration-amp-request-di-edge-7-label",
+      "type": "text",
+      "x": 735.6,
+      "y": 1675.6,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1067880369,
+      "version": 1,
+      "versionNonce": 1344964411,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "elysia-route-registration-amp-request-di"
+      },
+      "text": "uses for validation",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "elysia-route-registration-amp-request-di-edge-7",
+      "originalText": "uses for validation",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
