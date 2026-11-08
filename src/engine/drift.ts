@@ -3192,7 +3192,8 @@ function notDirectSentence(word: "calls" | "needs", route: readonly string[], ar
   const hops = route.length - 1;
   const rule = word === "calls"
     ? `A calls arrow means a direct call. ${start} doesn't call ${end} directly`
-      + (sites === undefined ? "" : ` (all ${sites} of its call${sites === 1 ? "" : "s"} were read)`)
+      + (sites === undefined ? "" : sites === 1 ? " (its one call was read)"
+        : sites === 2 ? " (both its calls were read)" : ` (all ${sites} of its calls were read)`)
     : `A needs arrow means an import written in the file. ${start} doesn't import ${end} directly`;
   return `${rule}; it gets there in ${hops} hop${hops === 1 ? "" : "s"}: ${route.join(" → ")}. `
     + (between.length <= 3
