@@ -70,13 +70,14 @@ not count.
 ## `claim: "calls"`
 
 `from` calls `to`. Both ends are symbols. A class at `to` means `from` creates
-one or calls its methods. Red only when the call is found at the
+one or calls its methods. Red when the call is found at the
 far end and only there. Silent for method calls on untyped values, wildcard
 imports, package names and calls inside Rust macros. If what moves is a value,
 use `feeds`.
 
-A direct call only. When `from` gets to `to` through other routines, draw them,
-or keep the one arrow and name them: `via: ["load", "parse"]`. When `from` picks
+A direct call only: when `from` gets to `to` only through other routines, the
+arrow is red and names them. Draw them, or keep the one arrow and name them:
+`via: ["load", "parse"]`. When `from` picks
 the function from a table or a match, draw one arrow to each choice.
 
 ## `claim: "accesses"`

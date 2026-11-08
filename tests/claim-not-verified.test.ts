@@ -260,13 +260,12 @@ describe("a call chain is not the claim's own check", () => {
     expect(report.claims.callsConfirmed).toBe(0);
     /*
      * Since #329 this arrow is not silent. The closed reading sees `tail`'s
-     * one call land in the far end's file at `mid` rather than at `head`,
-     * which is an accusation -- and the chain walk stops it and leaves the
-     * advisory `calls-refuted` has always left in the same position. Amber,
-     * never red: `calls-one-level-up` is not in `ACCUSING_EDGE_KINDS`.
+     * one call land in the far end's file at `mid` rather than at `head`.
+     * Until 2026-11-08 the chain walk turned that into a note; a plain arrow
+     * means a direct call, so now it is the red, and it names the hops.
      */
-    expect(red?.kind).toBe("calls-one-level-up");
-    expect(red?.detail).toContain("2 steps");
+    expect(red?.kind).toBe("calls-indirect");
+    expect(red?.detail).toContain("2 hops: tail → mid → head");
   });
 
   it.each(LANGUAGES)("@needs inside one file is not verified in %s", async (language) => {

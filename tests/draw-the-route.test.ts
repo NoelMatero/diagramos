@@ -3,8 +3,8 @@
  *
  * `main --calls--> tokenize` when main calls load, load calls parse and parse
  * calls tokenize is a board drawn one level too high. #366 decided it is never
- * red -- people draw summaries on purpose -- so the check says it gets there
- * in three steps and leaves the arrow standing. But an agent draws most
+ * red -- people draw summaries on purpose -- and since 2026-11-08 it is: a
+ * plain arrow means direct, and the red names the route. An agent draws most
  * boards, and an agent can draw exactly what is true, if it is told while it
  * is still drawing. These tests hold the two halves of that:
  *
@@ -67,7 +67,7 @@ const IMPORTS = {
   "c.ts": 'import { b } from "./b";\nexport const c = b;\n',
 };
 
-/** The same chain in Python, where a chained `@needs` is told rather than accused. */
+/** The same chain in Python. */
 const PY_IMPORTS = {
   "pkg/__init__.py": "",
   "pkg/a.py": "A = 1\n",
@@ -75,12 +75,15 @@ const PY_IMPORTS = {
   "pkg/c.py": "from pkg.b import B\nC = B\n",
 };
 
+/** A Python chain that is told rather than accused: c.py writes `A`, which a re-export may hand on. */
+const PY_HANDED_ON = { ...PY_IMPORTS, "pkg/c.py": "from pkg.b import B\nC = B\n# A\n" };
+
 describe("a finding about a longer route carries the route", () => {
   it("names every routine on the way for a calls arrow", async () => {
     const report = checkDrift(await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" }),
       fakeWorkspace(CHAIN), { edges: true });
-    const [advisory] = report.edges.filter((finding) => finding.kind === "calls-one-level-up");
-    expect(advisory?.route).toEqual(["run", "draw", "render"]);
+    const [red] = report.edges.filter((finding) => finding.kind === "calls-indirect");
+    expect(red?.route).toEqual(["run", "draw", "render"]);
   });
 
   it("names every file on the way for a needs arrow that is accused", async () => {
@@ -92,7 +95,7 @@ describe("a finding about a longer route carries the route", () => {
 
   it("names every file on the way for a needs arrow that is only told", async () => {
     const report = checkDrift(await boardOf("pkg/c.py", "pkg/a.py", { claim: "needs" }),
-      fakeWorkspace(PY_IMPORTS), { edges: true });
+      fakeWorkspace(PY_HANDED_ON), { edges: true });
     expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-one-level-up"]);
     expect(report.edges[0]!.route).toEqual(["pkg/c.py", "pkg/b.py", "pkg/a.py"]);
   });
@@ -133,8 +136,8 @@ describe("an arrow that names its route is a summary on purpose", () => {
     const report = checkDrift(
       await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls", via: ["paint"] }),
       fakeWorkspace(CHAIN), { edges: true });
-    const [advisory] = report.edges.filter((finding) => finding.kind === "calls-one-level-up");
-    expect(advisory?.route).toEqual(["run", "draw", "render"]);
+    const [red] = report.edges.filter((finding) => finding.kind === "calls-indirect");
+    expect(red?.route).toEqual(["run", "draw", "render"]);
     expect(report.claims.callsConfirmed).toBe(0);
   });
 

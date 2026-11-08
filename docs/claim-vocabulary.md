@@ -104,8 +104,23 @@ files is somebody reading the architecture, and 26 of the 243 file pairs Haiku
 drew on the planted set are that shape. [Item 44](#forty-two-times-a-measurement-contradicted-the-design)
 has the numbers.
 
+**Since 2026-11-08 a plain arrow means direct, and the route is the red.** The
+user's decision, on the November missed map: an arrow over a longer route is
+wrong, because it claims a call or an import that is not there, and the hops
+are what make the red worth having. So `calls-indirect` and `needs-indirect`
+accuse wherever the direct one is ruled out -- for `@calls`, every call the
+tail makes read and placed and none of them the head; for `@needs`, the
+language's indirect licence, which Python now has behind a guard (a tail that
+writes a name the head defines may be using it through a re-export, and keeps
+the note). Where a direct one stays possible, `calls-one-level-up` and
+`needs-one-level-up` remain notes with the route. The fix the red offers is to
+draw the hops, or to mark the arrow a summary with `via`, below. An
+"indirect" arrow kind that is green when the route exists is for later.
+[Item 53](#forty-two-times-a-measurement-contradicted-the-design) has the
+numbers.
+
 **Since #375 a summary can say it is one.** Every finding with that reading
-(`calls-one-level-up`, `needs-one-level-up`, `needs-indirect`) carries the
+(`calls-one-level-up`, `calls-indirect`, `needs-one-level-up`, `needs-indirect`) carries the
 route it found as `route`, and the draw-time result names it to the agent while
 it is still drawing. The marker for "this arrow is the whole path, on purpose"
 is `via`, which arrows already had for naming their hops: a `calls` or `needs`
