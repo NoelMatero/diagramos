@@ -1,0 +1,34 @@
+diff --git a/scripts/bench-planted.mts b/scripts/bench-planted.mts
+index 1fed020..92d07f8 100644
+--- a/scripts/bench-planted.mts
++++ b/scripts/bench-planted.mts
+@@ -43,6 +43,7 @@
+  * a red on a correct board is the one mistake this tool cannot take back
+  * (AGENTS.md, `licence.ts`).
+  */
++import fs from "node:fs";
+ import path from "node:path";
+ 
+ import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type CheckCache } from "../src/engine/drift";
+@@ -81,7 +82,10 @@ const noWait = argv.includes("--no-wait");
+ const safetyOnly = (outcome: Outcome, truth: string) =>
+   (outcome === "red" && truth === "true") || (outcome === "green" && truth === "false");
+ /** Prints a reason-by-reason line: on the main set only. */
+-const listed = HOLDOUT ? (..._: unknown[]) => undefined : console.log;
++/** STUDY PATCH (never merged): holdout and holdout-b are study sets; holdout-c stays score only. */
++const SCORE_ONLY = HOLDOUT && SET !== "holdout" && SET !== "holdout-b";
++const DUMP = SCORE_ONLY ? undefined : process.env.BENCH_DUMP;
++const listed = SCORE_ONLY ? (..._: unknown[]) => undefined : console.log;
+ 
+ /**
+  * One workspace and one cache per project, for the whole run (#311).
+@@ -430,7 +434,8 @@ for (const key of loaded) {
+           + `\n      checker: ${detail}\n      tooling: ${claim.why}`);
+       }
+     }
+-    const shown = details && (!HOLDOUT || safetyOnly(outcome, claim.truth));
++    const shown = details && (!SCORE_ONLY || safetyOnly(outcome, claim.truth));
++    if (DUMP) fs.appendFileSync(DUMP, JSON.stringify({ set: SET ?? "main", project: key.project, topic: key.topic, cid: claim.id, word: claim.word, from: claim.from, to: claim.to, member: claim.member, truth: claim.truth, source: claim.source, language: claim.language, outcome, reason, detail, why: claim.why, gate: asked.gate, ms: Math.round(asked.ms) }) + "\n");
+     if (shown && key.project !== printedProject) {
+       // Where each project starts, so a saved run can be compared arrow for arrow.
+       console.log(`  == ${key.project}`);
