@@ -2463,12 +2463,19 @@ function handsOnHead(
     }
   }
   let named = false;
+  /*
+   * A class tail's own methods are declared inside what is read (#459), and
+   * a method's declared name is not the method handed anywhere: clap's
+   * `ParsedArg` declares `is_long` and never calls it.
+   */
+  const declaring = new Set((typeTailOf(from.source, from.language, from.routine)?.routines ?? [])
+    .map((one) => (one.childForFieldName("name") ?? one.childForFieldName("key"))?.startIndex));
   for (const routine of ownNodes(from)) {
     const body = routine.childForFieldName("body")
       ?? routine.childForFieldName("value")?.childForFieldName("body");
     if (!body) continue;
     each(body, (node) => {
-      if (named || node.childCount !== 0 || !node.isNamed) return;
+      if (named || node.childCount !== 0 || !node.isNamed || declaring.has(node.startIndex)) return;
       if (names.has(node.text) && !called.has(node.startIndex)) named = true;
     });
   }

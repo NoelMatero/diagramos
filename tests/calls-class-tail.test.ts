@@ -179,6 +179,19 @@ describe("a class whose every routine was read, none calling the far end, goes r
     expect(said(verdict)).toBe("red");
   });
 
+  it("does not take a method's own declared name for the method handed on", () => {
+    // clap's `ParsedArg` declares `is_long` and none of its code calls it:
+    // "ParsedArg calls is_long" is wrong, and the name in `fn is_long` is a
+    // declaration, not a value given to anything.
+    const verdict = ask({
+      "src/a.rs": {
+        source: "pub struct Arg {\n    n: u32,\n}\n\nimpl Arg {\n    pub fn is_long(&self) -> bool {\n        self.n > 1\n    }\n\n    pub fn size(&self) -> u32 {\n        self.n\n    }\n}\n",
+        language: "rust",
+      },
+    }, { file: "src/a.rs", routine: "Arg" }, { file: "src/a.rs", names: ["is_long"] }, { crate: ["src/a.rs"] });
+    expect(said(verdict)).toBe("red");
+  });
+
   it("reads a base declared in the same file as part of the class", () => {
     // requests' `Request(RequestHooksMixin)`: the mixin is written a few
     // lines above, so what the class inherits is read, not guessed.
