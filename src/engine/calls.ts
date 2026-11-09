@@ -393,6 +393,25 @@ export type CallsNotClosed =
    * the program runs.
    */
   | "set-at-run-time"
+  /**
+   * The tail is a class or struct (#459) with code it did not write itself:
+   * a base outside its own file, or outside the repository; a metaclass; in
+   * Rust, a trait of this repository's whose default methods run on it. The
+   * reading of its own routines is not the whole of what it runs.
+   */
+  | "tail-inherits"
+  /**
+   * The tail is a class or struct (#459) that a decorator, a derive or an
+   * attribute macro writes code into, and that code is not in the text.
+   */
+  | "tail-decorated"
+  /**
+   * The tail is a class or struct (#459) with code written outside its own
+   * declaration: an `impl` of it, or a macro naming it, in another file of
+   * the crate; a method set on it from outside (`Dep.go = _go`). Or, in Rust,
+   * no list of the crate's files to rule that out.
+   */
+  | "tail-elsewhere"
   | SiteUnresolved;
 
 /** One end of the question: a file, its text, and what its imports point at. */
@@ -1944,11 +1963,15 @@ function callsTo(
     /** A head an attribute read by name can run (#431): `runsOnRead`. */
     hooked?: boolean;
   },
+  /** The nodes to read instead of the routines of that name: a class or struct tail's own code (#459). */
+  own?: Node[],
 ): { evidence?: CallsEvidence; why?: CallsWithheld } {
   const bindings = bindingsIn(side.source, side.language);
   if (!bindings) return { why: "unreadable" };
 
-  const { routines, declared, unreadable } = routinesNamed(side.source, routine, side.language);
+  const { routines, declared, unreadable } = own
+    ? { routines: own, declared: true, unreadable: false }
+    : routinesNamed(side.source, routine, side.language);
   if (unreadable) return { why: "unreadable" };
   if (routines.length === 0) return { why: declared ? "no-body" : "not-declared" };
   const tree = parseSource(side.source, side.language);
@@ -2042,7 +2065,13 @@ export function callsBetween(
   backwards = true,
 ): CallsVerdict {
   const wanted = new Set(to.names);
-  const forward = callsTo(from, from.routine, { file: to.file, names: wanted, hooked: runsOnRead(to, to.names) });
+  /*
+   * A class or struct at the tail (#459) is read as its own code: the
+   * declaration and, in Rust, every `impl` of it in this file -- generic
+   * ones too, which a name match never found (`impl<'a> Reader<'a>`).
+   */
+  const typeTail = typeTailOf(from.source, from.language, from.routine);
+  const forward = callsTo(from, from.routine, { file: to.file, names: wanted, hooked: runsOnRead(to, to.names) }, typeTail?.nodes);
   if (forward.evidence) return { verdict: "confirmed", evidence: forward.evidence };
   /*
    * A doubt reading forwards was the end of it until #357: the text could not
@@ -2282,7 +2311,7 @@ function runByTheLanguage(
   if (!name) return undefined;
   const values: Array<{ name: string; start: number; end: number }> = [];
   const seen = new Set<number>();
-  for (const routine of routinesNamed(from.source, from.routine, from.language).routines) {
+  for (const routine of ownNodes(from)) {
     const body = routine.childForFieldName("body")
       ?? routine.childForFieldName("value")?.childForFieldName("body");
     if (!body) continue;
@@ -2332,18 +2361,17 @@ function handedOutside(
     .some((routine) => parametersOf(routine) && holders.has(routine.id)));
   if (!name) return undefined;
 
-  const reading = callSitesIn(from, from.routine);
+  const reading = ownBodies(from);
   if (!reading.read) return undefined;
   const outside = new Set<number>();
   for (const body of reading.bodies) {
-    if (body.routine !== from.routine) continue;
     for (const site of body.sites) if (site.file === EXTERNAL_RECEIVER && site.nameAt) outside.add(site.nameAt.start);
   }
   if (outside.size === 0) return undefined;
 
   const values: Array<{ name: string; start: number; end: number }> = [];
   const seen = new Set<number>();
-  for (const routine of routinesNamed(from.source, from.routine, from.language).routines) {
+  for (const routine of ownNodes(from)) {
     const body = routine.childForFieldName("body")
       ?? routine.childForFieldName("value")?.childForFieldName("body");
     if (!body) continue;
@@ -2419,16 +2447,15 @@ function handsOnHead(
     }
   }
 
-  const reading = callSitesIn(from, from.routine);
+  const reading = ownBodies(from);
   const called = new Set<number>();
   if (reading.read) {
     for (const body of reading.bodies) {
-      if (body.routine !== from.routine) continue;
       for (const site of body.sites) if (site.nameAt) called.add(site.nameAt.start);
     }
   }
   let named = false;
-  for (const routine of routinesNamed(from.source, from.routine, from.language).routines) {
+  for (const routine of ownNodes(from)) {
     const body = routine.childForFieldName("body")
       ?? routine.childForFieldName("value")?.childForFieldName("body");
     if (!body) continue;
@@ -2553,11 +2580,10 @@ export function runsWhatItIsGiven(
   /** Told which call it was, for a measurement to quote. */
   noted?: (call: { line: number; wrote: string; at: string }) => void,
 ): "handed-to-a-runner" | "set-at-run-time" | undefined {
-  const reading = callSitesIn(from, from.routine);
+  const reading = ownBodies(from);
   if (!reading.read) return undefined;
   const placed = new Map<number, CallSitePlaced>();
   for (const body of reading.bodies) {
-    if (body.routine !== from.routine) continue;
     for (const site of body.sites) {
       if (site.file === undefined ? site.why === "local-callee" : site.file !== EXTERNAL_RECEIVER) {
         if (site.nameAt) placed.set(site.nameAt.start, site);
@@ -2571,8 +2597,9 @@ export function runsWhatItIsGiven(
   const holders = holdersIn(tree.rootNode);
 
   let found: "handed-to-a-runner" | "set-at-run-time" | undefined;
-  for (const routine of routinesNamed(from.source, from.routine, from.language).routines) {
-    const holder = holders.get(routine.id);
+  // A class tail's own code, whole: its routines' calls and the ones outside them (#459).
+  for (const routine of ownNodes(from)) {
+    const holder = holders.get(routine.id) ?? ownHolder(routine);
     each(routine, (call) => {
       if (found) return;
       const callee = calleeOf(call);
@@ -2848,6 +2875,8 @@ export function compiledBodiesFor(
   heads?: readonly string[],
 ): CompiledTail | undefined {
   if (from.language !== "rust" || !from.compiled) return undefined;
+  // A struct has no body of its own in rustc's list; its methods are read in the text (#459).
+  if (typeTailOf(from.source, from.language, from.routine)) return undefined;
   const crate = from.compiled();
   if (!crate) return undefined;
   const reading = compiledBodiesOf(crate, from.file, from.source, from.routine, heads);
@@ -2898,11 +2927,26 @@ function textClosed(
   from: CallSide & { routine: string },
   to: CallSide & { names: string[] },
 ): { evidence: CallsRefutedEvidence; readMacros?: true } | { reached: CallsWrongRoutineEvidence; readMacros?: true } | { why: CallsNotClosed } {
-  const reading = callSitesIn(from);
+  const typeTail = typeTailOf(from.source, from.language, from.routine);
+  const reading = typeTail ? ownBodies(from) : callSitesIn(from);
   if (!reading.read) return { why: "unreadable" };
-  const bodies = reading.bodies.filter((body) => body.routine === from.routine);
+  const bodies = typeTail ? reading.bodies : reading.bodies.filter((body) => body.routine === from.routine);
   if (bodies.length === 0) return { why: "routine-not-found" };
   const readMacros = bodies.some((body) => body.readMacros) ? { readMacros: true as const } : {};
+
+  /*
+   * A routine stops at its first wall. A class tail (#459) reads every wall
+   * and shows one a compiler can take down ahead of one it cannot: a live
+   * check starts a compiler only for the reason it is shown, and a class has
+   * many more calls than a routine to hit an unanswerable one first (#405).
+   */
+  let wall: CallsNotClosed | undefined;
+  const answerable = (one: CallsNotClosed | undefined) => one === "receiver" || one === "abstract-receiver";
+  const stop = (one: CallsNotClosed): { why: CallsNotClosed } | undefined => {
+    if (!typeTail) return { why: one };
+    if (!wall || (!answerable(wall) && answerable(one))) wall = one;
+    return undefined;
+  };
 
   let sites = 0;
   const reached: Array<{ name: string; line: number }> = [];
@@ -2911,16 +2955,27 @@ function textClosed(
   for (const body of bodies) {
     for (const site of body.sites) {
       // Open: something unplaced, and the site says what stopped it.
-      if (site.file === undefined) return { why: site.why ?? "unplaced" };
-      if (site.byName && (hooked ??= runsOnRead(to, to.names))) return { why: "dynamic" };
+      if (site.file === undefined) {
+        const stopped = stop(site.why ?? "unplaced");
+        if (stopped) return stopped;
+        continue;
+      }
+      if (site.byName && (hooked ??= runsOnRead(to, to.names))) {
+        const stopped = stop("dynamic");
+        if (stopped) return stopped;
+        continue;
+      }
       /*
        * `concrete` is only ever set by a checker's answer, and since #353 an
        * `own` call the class does not declare is put to one too -- a
        * `self.callback()` lands on an attribute, which runs whatever was put
        * there. So the guard is on the answer, not on how the call was spelt.
        */
-      if (site.concrete === false) return { why: "abstract-receiver" };
-      if (site.overridden) return { why: "overridden" };
+      if (site.concrete === false || site.overridden) {
+        const stopped = stop(site.concrete === false ? "abstract-receiver" : "overridden");
+        if (stopped) return stopped;
+        continue;
+      }
       if (site.file === to.file) {
         /*
          * The near miss (#329). Three ways this can go, and only one of them
@@ -2935,8 +2990,11 @@ function textClosed(
          *                                          does this reader
          *   a different routine, named             the thing worth saying
          */
-        if (site.declaredAs === undefined) return { why: "reaches-the-file" };
-        if (to.names.includes(site.declaredAs)) return { why: "reaches-the-file" };
+        if (site.declaredAs === undefined || to.names.includes(site.declaredAs)) {
+          const stopped = stop("reaches-the-file");
+          if (stopped) return stopped;
+          continue;
+        }
         if (cannotBeTheHead(to, site.declaredAs)) {
           elsewhere.push({ name: site.declaredAs, line: site.line });
           sites += 1;
@@ -2959,14 +3017,29 @@ function textClosed(
          * making, so the reader keeps its silence unless it read the
          * declaration it is about to name.
          */
-        if (!isRoutine(to.source, site.declaredAs, to.language)) return { why: "reaches-the-file" };
+        if (!isRoutine(to.source, site.declaredAs, to.language)) {
+          const stopped = stop("reaches-the-file");
+          if (stopped) return stopped;
+          continue;
+        }
         reached.push({ name: site.declaredAs, line: site.line });
       }
       sites += 1;
     }
   }
+  if (wall) return { why: wall };
+  /*
+   * Every call a class tail writes was placed. What it runs without writing
+   * it -- a base, a decorator, an `impl` in another file -- is the last thing
+   * between that and an accusation.
+   */
+  const notWhole = typeTail
+    ? typeTail.notWhole ?? (from.language === "rust" ? crateNotWhole(from, typeTail) : undefined)
+    : undefined;
+  if (notWhole) return { why: notWhole };
+  const line = typeTail ? typeTail.line : bodies[0]!.line;
   if (reached.length === 0) {
-    return { evidence: { routine: from.routine, line: bodies[0]!.line, sites, ...(elsewhere.length > 0 ? { elsewhere } : {}) }, ...readMacros };
+    return { evidence: { routine: from.routine, line, sites, ...(elsewhere.length > 0 ? { elsewhere } : {}) }, ...readMacros };
   }
   /*
    * An arrow drawn at a **type** is a different mistake and not this one
@@ -2978,7 +3051,7 @@ function textClosed(
   if (!to.names.every((name) => isRoutine(to.source, name, to.language))) {
     return { why: "reaches-the-file" };
   }
-  return { reached: { routine: from.routine, line: bodies[0]!.line, sites, reached }, ...readMacros };
+  return { reached: { routine: from.routine, line, sites, reached }, ...readMacros };
 }
 
 /**
@@ -3098,6 +3171,505 @@ function typeSpans(source: string, language: Language, type: string): Array<[num
     if (isType || impl) spans.push([lineOf(source, node.startIndex), lineOf(source, node.startIndex + node.text.length)]);
   });
   return spans;
+}
+
+/* ------------------------------------------- a class or struct as the caller (#459) */
+
+/**
+ * A class or struct at the tail of an arrow: "Controller calls print_input".
+ *
+ * Before #459 the reader took the tail for a routine and nothing else. A
+ * class has no call list of its own, so every arrow drawn from one -- right
+ * or wrong -- came back "not sure": 10 / 23 / 37 wrong arrows on main /
+ * holdout / holdout-b that nothing could catch.
+ *
+ * The meaning is the answer key's since #346: a class calls B when code of
+ * its own does -- a method, the constructor, a field initializer, in Rust
+ * the methods of each `impl` of it. So the tail is read as that code, found
+ * **by position**: the routines written inside the declaration (and, in
+ * Rust, inside each `impl` of the type in this file), never every routine
+ * that shares a method's name. The October prototype read them by name and
+ * confirmed a wrong arrow on fd, whose `walk.rs` has both `WorkerState::scan`
+ * and a free function `scan`.
+ *
+ * What the reading cannot see is in `notWhole`: code the class runs and does
+ * not write. A confirmation never needs it; a red always does.
+ */
+interface TypeTail {
+  /** The declaration, each Rust `impl` of it in this file, then each base this file declares that it inherits from. */
+  nodes: Node[];
+  /** The 1-based line the type is declared on. */
+  line: number;
+  /** Every routine written inside `nodes`, as `callSitesIn` keys its bodies: name and opening line. */
+  owns: Set<string>;
+  routines: Node[];
+  /** The `impl` blocks among `nodes` (Rust). */
+  impls: Node[];
+  /** What the source alone shows the reading is missing. Rust's crate-wide part is `crateNotWhole`'s. */
+  notWhole?: Extract<CallsNotClosed, "tail-inherits" | "tail-decorated" | "tail-elsewhere">;
+}
+
+/** The declarations a tail can be read through: a class, or a Rust struct, enum or union. Never an interface, a trait or an alias -- none of those has code of its own. */
+const TYPE_TAIL = /^(class_declaration|abstract_class_declaration|class_definition|struct_item|enum_item|union_item)$/;
+
+const ownKey = (routine: string, line: number) => `${routine}\u0000${line}`;
+
+const typeTails_ = new WeakMap<Tree, Map<string, TypeTail | null>>();
+
+/**
+ * The type `name` names in this file, read as a caller -- or `undefined`
+ * when the name is not exactly one class or struct here and nothing else:
+ * a routine, a value, an interface merged with a class, two structs of that
+ * name in two modules. Each of those keeps the reading it had before.
+ */
+function typeTailOf(source: string, language: Language, name: string): TypeTail | undefined {
+  const tree = parseSource(source, language);
+  if (!tree) return undefined;
+  const known = typeTails_.get(tree) ?? new Map<string, TypeTail | null>();
+  typeTails_.set(tree, known);
+  if (!known.has(name)) known.set(name, readTypeTail(tree, source, language, name) ?? null);
+  return known.get(name) ?? undefined;
+}
+
+/** The one declaration of `name` in this file, when it is a class or a struct and nothing else is declared under that name. */
+function typeDeclaration(tree: Tree, name: string): Node | undefined {
+  const found: Node[] = [];
+  let other = false;
+  each(tree.rootNode, (node) => {
+    if (node.type === "impl_item" || declarationName(node)?.text !== name) return;
+    if (TYPE_TAIL.test(node.type)) { found.push(node); return; }
+    // Something else declared under the name: a routine, a value, an interface, a variant. Not a use of it (`Reader { n: 0 }`).
+    if (parametersOf(node) || node.childForFieldName("value") || node.childForFieldName("right")
+      || /(declaration|_item|_definition|_signature|^enum_variant)$/.test(node.type)) other = true;
+  });
+  return !other && found.length === 1 ? found[0] : undefined;
+}
+
+function readTypeTail(tree: Tree, source: string, language: Language, name: string): TypeTail | undefined {
+  const declaration = typeDeclaration(tree, name);
+  if (!declaration) return undefined;
+  const nodes = [declaration];
+  const impls: Node[] = [];
+  if (language === "rust") {
+    each(tree.rootNode, (node) => {
+      if (node.type === "impl_item" && implTypeName(node) === name) impls.push(node);
+    });
+    nodes.push(...impls);
+  }
+  let notWhole: TypeTail["notWhole"];
+  const doubt = (why: NonNullable<TypeTail["notWhole"]>) => { notWhole ??= why; };
+
+  const bindings = bindingsIn(source, language);
+  if (!bindings) return undefined;
+  if (language === "rust") {
+    for (const item of [declaration, ...impls]) if (!inertAttributes(item)) doubt("tail-decorated");
+    if (itemMacroNames(tree.rootNode, name)) doubt("tail-decorated");
+  } else {
+    // The class and each base this file declares for it, up the chain.
+    const seen = new Set<string>([name]);
+    for (let at = 0; at < nodes.length && at < 8; at += 1) {
+      const one = nodes[at]!;
+      if (!undecorated(one, language, bindings)) doubt("tail-decorated");
+      for (const base of basesOf(one, language)) {
+        if (base.kind === "plain") continue;
+        if (base.kind === "local" && !seen.has(base.name)) {
+          const declared = typeDeclaration(tree, base.name);
+          if (declared) { seen.add(base.name); nodes.push(declared); continue; }
+        }
+        if (base.kind === "local" && seen.has(base.name)) continue;
+        if (base.kind !== "other" && harmlessBase(base.name, language, bindings)) continue;
+        doubt("tail-inherits");
+      }
+    }
+    if (nodes.length > 8) doubt("tail-inherits");
+    for (const type of seen) if (setFromOutside(tree.rootNode, nodes, type, language)) doubt("tail-elsewhere");
+  }
+
+  const routines: Node[] = [];
+  const owns = new Set<string>();
+  for (const node of nodes) {
+    each(node, (inner) => {
+      // `callSitesIn`'s own test for a body, so the two agree on what a routine is.
+      const named = inner.type === "impl_item"
+        ? inner.childForFieldName("type")
+        : inner.childForFieldName("key") ? declarationName(inner) ?? null : inner.childForFieldName("name") ?? inner.childForFieldName("left");
+      if (!named || named.childCount !== 0) return;
+      const value = inner.childForFieldName("value");
+      if (!(parametersOf(inner) ?? parametersOf(value))) return;
+      if (!(inner.childForFieldName("body") ?? value?.childForFieldName("body"))) return;
+      routines.push(inner);
+      owns.add(ownKey(named.text, lineOf(source, inner.startIndex)));
+    });
+  }
+  return { nodes, line: lineOf(source, declaration.startIndex), owns, routines, impls, ...(notWhole ? { notWhole } : {}) };
+}
+
+type BaseRead = { kind: "plain" } | { kind: "local"; name: string } | { kind: "name"; name: string } | { kind: "other" };
+
+/**
+ * What a class names as its bases, read off the declaration. TypeScript's
+ * `extends` only -- an `implements` list names interfaces, which run
+ * nothing. Python's `metaclass=` (any keyword) is code that runs when the
+ * class is made, so it is `other`. A base that is a call (`Hooks(Plain)`, a
+ * mixin) or a subscript other than a plain generic is `other` too.
+ */
+function basesOf(declaration: Node, language: Language): BaseRead[] {
+  const bases: BaseRead[] = [];
+  const nameOf = (node: Node): BaseRead => {
+    // `Generic[T]`, `Base<T>`: the name before the type arguments.
+    const held = node.type === "subscript" ? node.childForFieldName("value") : node;
+    if (!held) return { kind: "other" };
+    if (held.childCount === 0 && NAME_LEAF.test(held.type)) return { kind: "local", name: held.text };
+    if (held.childForFieldName("attribute") || held.childForFieldName("property")) return { kind: "name", name: held.text };
+    return { kind: "other" };
+  };
+  if (language === "python") {
+    const list = declaration.childForFieldName("superclasses");
+    for (const child of list ? namedKids(list) : []) {
+      if (/comment/.test(child.type)) continue;
+      if (child.childForFieldName("name") && child.childForFieldName("value")) { bases.push({ kind: "other" }); continue; }
+      if (child.text === "object") { bases.push({ kind: "plain" }); continue; }
+      bases.push(nameOf(child));
+    }
+    return bases;
+  }
+  for (const heritage of namedKids(declaration)) {
+    for (const clause of namedKids(heritage)) {
+      if (clause.type !== "extends_clause") continue;
+      const value = clause.childForFieldName("value") ?? firstNamed(clause);
+      bases.push(value ? nameOf(value) : { kind: "other" });
+    }
+  }
+  return bases;
+}
+
+/**
+ * Python modules whose classes are bases that run nothing of the repository's
+ * -- abstract markers, typing's generics, enums -- beyond the class's own
+ * methods, which are read.
+ */
+const HARMLESS_BASE_MODULES = /^(abc|typing|typing_extensions|enum|numbers|collections\.abc)(\.|$)/;
+
+/**
+ * A base that adds no code able to call into the repository: Python's
+ * built-ins (`object`, `Exception`, `dict`), what `abc`, `typing` and
+ * `enum` declare, JavaScript's globals (`Error`). Each can call back only
+ * the class's own methods. A base resolving anywhere else -- a library's,
+ * Django's `View`, a class in another file -- is code the checker did not
+ * read, and a dynamic language's library can reach a repository's code by
+ * name (settings strings, registries).
+ */
+function harmlessBase(written: string, language: Language, bindings: Bindings): boolean {
+  if (language !== "python" && language !== "ts" && language !== "tsx" && language !== "js") return false;
+  const [root, ...rest] = written.split(".");
+  const imported = bindings.imported.get(root!);
+  if (!imported) {
+    return rest.length === 0 && !bindings.local.has(root!) && providedByLanguage(root!, language);
+  }
+  if (language !== "python") return false;
+  const qualified = [imported.specifier, ...rest].join(".");
+  return HARMLESS_BASE_MODULES.test(qualified);
+}
+
+/** Python decorators that write a class's methods from its own fields, and call nothing else of the repository's. */
+const CODE_FROM_FIELDS = new Set([
+  "dataclasses.dataclass", "functools.total_ordering", "typing.final", "typing_extensions.final",
+  "typing.runtime_checkable", "typing_extensions.runtime_checkable", "enum.unique",
+  "attr.s", "attr.attrs", "attr.define", "attr.frozen", "attr.mutable", "attr.dataclass",
+  "attrs.define", "attrs.frozen", "attrs.mutable",
+]);
+
+/**
+ * Whether nothing decorates the class itself, or only the code generators
+ * above. A decorator can hand back another class altogether, whose code is
+ * nowhere here. TypeScript's are all refused: `@Injectable()` and its kind
+ * are a framework's, and a framework may call anything it is told to.
+ */
+function undecorated(declaration: Node, language: Language, bindings: Bindings): boolean {
+  const decorators: Node[] = [];
+  const holders = [declaration, parentOf(declaration)];
+  for (const holder of holders) {
+    if (!holder) continue;
+    if (holder !== declaration && holder.type !== "decorated_definition" && holder.type !== "export_statement") continue;
+    for (const child of namedKids(holder)) if (child.type === "decorator") decorators.push(child);
+  }
+  if (decorators.length === 0) return true;
+  if (language !== "python") return false;
+  return decorators.every((decorator) => {
+    let written = firstNamed(decorator);
+    if (written?.childForFieldName("arguments")) written = written.childForFieldName("function") ?? undefined;
+    if (!written) return false;
+    const [root, ...rest] = written.text.split(".");
+    const imported = bindings.imported.get(root!);
+    return imported !== undefined && CODE_FROM_FIELDS.has([imported.specifier, ...rest].join("."));
+  });
+}
+
+/**
+ * Whether code outside the class sets a member on it: `Dep.go = _go`,
+ * `Dep.prototype.go = ..`, `setattr(Dep, ..)`, `Object.assign(Dep.prototype,
+ * ..)`. That is a method of the class written somewhere its reading never
+ * looks.
+ */
+function setFromOutside(root: Node, inside: Node[], type: string, language: Language): boolean {
+  const within = (node: Node) => inside.some((one) => node.startIndex >= one.startIndex && node.endIndex <= one.endIndex);
+  let set = false;
+  each(root, (node) => {
+    if (set || within(node)) return;
+    if (ASSIGNS.has(node.type)) {
+      const left = node.childForFieldName("left");
+      const object = left?.childForFieldName("object") ?? left?.childForFieldName("value");
+      if (object && (object.text === type || object.text.startsWith(`${type}.`))) set = true;
+      return;
+    }
+    if (language !== "python" && node.childForFieldName("property")?.text === "prototype"
+      && node.childForFieldName("object")?.text === type) {
+      set = true;
+      return;
+    }
+    const callee = node.childForFieldName("arguments") ? node.childForFieldName("function") : null;
+    if (callee?.text === "setattr") {
+      const first = namedKids(node.childForFieldName("arguments")!)[0];
+      if (first?.text === type) set = true;
+    }
+  });
+  return set;
+}
+
+/** The node holding this one, found from the top: tree-sitter's parent pointer is not part of `parse.ts`'s `Node`. */
+function parentOf(node: Node): Node | undefined {
+  let found: Node | undefined;
+  const visit = (at: Node): void => {
+    if (found || at.startIndex > node.startIndex || at.endIndex < node.endIndex) return;
+    for (let index = 0; index < at.childCount; index += 1) {
+      const child = at.child(index);
+      if (!child) continue;
+      if (child.id === node.id) { found = at; return; }
+      visit(child);
+    }
+  };
+  visit(node.tree.rootNode);
+  return found;
+}
+
+/** Rust attributes that write no code: conditions, lints, layout, docs, and std's derives. */
+const INERT_RUST_ATTRIBUTES = /^(cfg|doc|allow|warn|deny|forbid|expect|inline|must_use|repr|non_exhaustive|track_caller|cold|deprecated|automatically_derived|test|rustfmt::skip|clippy::.*|diagnostic::.*)$/;
+const STD_DERIVES = new Set(["Debug", "Clone", "Copy", "PartialEq", "Eq", "PartialOrd", "Ord", "Hash", "Default"]);
+
+/**
+ * Whether every attribute on a Rust item -- written before it, and on
+ * anything inside an `impl` -- writes no code. A derive from outside std
+ * (`Serialize`, clap's `Parser`) writes an `impl` that calls what its field
+ * attributes name; an attribute macro (`#[async_trait]`, `#[instrument]`)
+ * rewrites the item.
+ */
+function inertAttributes(item: Node): boolean {
+  const attributes: Node[] = [];
+  const siblings = namedKids(parentOf(item) ?? item);
+  for (let at = siblings.findIndex((one) => one.id === item.id) - 1; at >= 0; at -= 1) {
+    const before = siblings[at]!;
+    if (before.type === "attribute_item") attributes.push(before);
+    else if (!/comment/.test(before.type)) break;
+  }
+  if (item.type === "impl_item") each(item, (node) => { if (node.type === "attribute_item") attributes.push(node); });
+  return attributes.every((attribute) => {
+    const inner = namedKids(attribute)[0];
+    const path = inner ? firstNamed(inner) : undefined;
+    if (!inner || !path) return false;
+    if (path.text === "derive") {
+      const list = namedKids(inner).find((one) => one.type === "token_tree");
+      const names = list ? namedKids(list).map((one) => one.text.split("::").pop()!) : [];
+      return names.length > 0 && names.every((one) => STD_DERIVES.has(one));
+    }
+    return INERT_RUST_ATTRIBUTES.test(path.text);
+  });
+}
+
+/** Whether a macro written where an item goes (not inside a routine) names the type: it may write an `impl` of it. */
+function itemMacroNames(root: Node, type: string): boolean {
+  const word = wholeName(type);
+  const visit = (node: Node): boolean => {
+    if (parametersOf(node)) return false;
+    if (node.type === "macro_invocation") return word.test(node.text);
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child && visit(child)) return true;
+    }
+    return false;
+  };
+  return visit(root);
+}
+
+/** Rust traits every crate has in scope, unwritten: their default methods are std's. */
+const PRELUDE_TRAITS = new Set([
+  "Clone", "Copy", "Default", "Drop", "Eq", "PartialEq", "Ord", "PartialOrd", "Iterator", "IntoIterator",
+  "DoubleEndedIterator", "ExactSizeIterator", "Extend", "FromIterator", "From", "Into", "TryFrom", "TryInto",
+  "AsRef", "AsMut", "Send", "Sync", "Sized", "Unpin", "Fn", "FnMut", "FnOnce", "ToString", "ToOwned",
+]);
+
+const crateScans_ = new WeakMap<object, Map<string, TypeTail["notWhole"] | null>>();
+
+/**
+ * What a Rust struct's reading misses across its crate: an `impl` of it, or
+ * a macro naming it, in another file; a trait of this crate's with default
+ * methods that it implements. And no answer at all without rustc's list of
+ * the crate's files, because then "every impl" cannot be known.
+ *
+ * Traits from outside the crate are allowed: code outside a crate can reach
+ * the crate's functions only through the type's own trait methods, which
+ * are its `impl`s, which are read. Rust has no reflection to find one by
+ * name. A trait whose origin the text does not settle is refused.
+ */
+function crateNotWhole(from: CallSide & { routine: string }, tail: TypeTail): TypeTail["notWhole"] {
+  const crate = from.compiled?.();
+  // Not built into the crate at all (a module a feature switches off): what rustc read says nothing about it.
+  if (!crate || !from.open || !crate.files.has(from.file)) return "tail-elsewhere";
+  const scanned = crateScans_.get(crate) ?? new Map<string, TypeTail["notWhole"] | null>();
+  crateScans_.set(crate, scanned);
+  const key = `${from.file}\u0000${from.routine}`;
+  if (scanned.has(key)) return scanned.get(key) ?? undefined;
+
+  const word = wholeName(from.routine);
+  const sources = new Map<string, string>([[from.file, from.source]]);
+  for (const file of crate.files) {
+    if (file === from.file) continue;
+    const source = from.open(file)?.source;
+    if (source === undefined) { scanned.set(key, "tail-elsewhere"); return "tail-elsewhere"; }
+    sources.set(file, source);
+  }
+  let verdict: TypeTail["notWhole"];
+  for (const [file, source] of sources) {
+    if (file === from.file || !word.test(source)) continue;
+    const tree = parseSource(source, "rust");
+    if (!tree) { verdict = "tail-elsewhere"; break; }
+    let elsewhere = itemMacroNames(tree.rootNode, from.routine);
+    each(tree.rootNode, (node) => { if (node.type === "impl_item" && implTypeName(node) === from.routine) elsewhere = true; });
+    if (elsewhere) { verdict = "tail-elsewhere"; break; }
+  }
+  if (!verdict) {
+    const bindings = bindingsIn(from.source, "rust");
+    for (const impl of tail.impls) {
+      const written = impl.childForFieldName("trait");
+      if (!written) continue;
+      const trait = (written.childForFieldName("type") ?? written).text.split("::").pop()!.replace(/<.*$/s, "");
+      const declared = traitDefaults(sources, trait);
+      if (declared === "defaults") { verdict = "tail-inherits"; break; }
+      if (declared === "none") continue;
+      const root = (written.childForFieldName("type") ?? written).text.split("::")[0]!.replace(/<.*$/s, "");
+      const imported = bindings?.imported.get(root);
+      if (!imported) {
+        if (root === trait && PRELUDE_TRAITS.has(trait) && !bindings?.local.has(trait)) continue;
+        if (/^(std|core|alloc)$/.test(root)) continue;
+        verdict = "tail-inherits";
+        break;
+      }
+      if (/^(std|core|alloc)::/.test(imported.specifier)) continue;
+      if (filesFor(imported.specifier, from.imports).library) continue;
+      verdict = "tail-inherits";
+      break;
+    }
+  }
+  scanned.set(key, verdict ?? null);
+  return verdict;
+}
+
+/** Whether a trait of that name is declared in the crate, and if so whether any method has a default body. */
+function traitDefaults(sources: Map<string, string>, trait: string): "defaults" | "none" | "not-here" {
+  const word = wholeName(trait);
+  let found = "not-here" as "defaults" | "none" | "not-here";
+  for (const source of sources.values()) {
+    if (!word.test(source)) continue;
+    const tree = parseSource(source, "rust");
+    if (!tree) return "defaults";
+    each(tree.rootNode, (node) => {
+      if (node.type !== "trait_item" || node.childForFieldName("name")?.text !== trait) return;
+      if (found === "not-here") found = "none";
+      each(node, (inner) => { if (parametersOf(inner) && inner.childForFieldName("body")) found = "defaults"; });
+    });
+    if (found === "defaults") return found;
+  }
+  return found;
+}
+
+/**
+ * The calls a class or struct makes outside any routine of its own: a field
+ * initializer (`size = new Map()`, `x = field(default_factory=list)`), a
+ * static block, a decorator on a method (`@retry` runs `retry`), a Rust
+ * associated constant. Placed exactly as a routine's are, and listed as one
+ * more body of the type's, so an unplaced one keeps the reading open.
+ */
+function typeLevelBody(side: CallSide & { routine: string }, tail: TypeTail): BodyCallSites {
+  const body: BodyCallSites = { routine: side.routine, line: tail.line, lines: 0, sites: [] };
+  const bindings = bindingsIn(side.source, side.language);
+  if (!bindings) {
+    body.sites.push({ name: "", line: tail.line, why: "unplaced", receiver: false });
+    return body;
+  }
+  const routines = new Set(tail.routines.map((one) => one.id));
+  const place = (callee: Callee, at: Node, holder: Node) => {
+    const called = valueCalled(callee, side, bindings, at, holder);
+    body.sites.push(siteOf(called, side.source, at, placeOf(called, side, bindings, at, holder)));
+  };
+  for (const holder of tail.nodes) {
+    const visit = (node: Node): void => {
+      if (routines.has(node.id) || node.type === "attribute_item") return;
+      if (node.type === "token_tree") {
+        body.sites.push({ name: "", line: lineOf(side.source, node.startIndex), why: "macro", receiver: false });
+        return;
+      }
+      if (node.type === "decorator") {
+        const written = firstNamed(node);
+        // `@name.setter` is property's own method on a routine of this class.
+        const property = written?.childForFieldName("attribute")?.text;
+        if (written && !written.childForFieldName("arguments") && !/^(setter|getter|deleter)$/.test(property ?? "")) {
+          place(calleeOfNode(written), node, holder);
+        }
+      }
+      const written = calleeOf(node) ?? constructedBy(node) ?? renderedBy(node);
+      if (written) place(written, node, holder);
+      for (let index = 0; index < node.childCount; index += 1) {
+        const child = node.child(index);
+        if (child) visit(child);
+      }
+    };
+    visit(holder);
+  }
+  // A decorator on a method written inside the method's own node (TypeScript) is still not a call `callSitesIn` lists.
+  for (const routine of tail.routines) {
+    for (const child of namedKids(routine)) {
+      if (child.type !== "decorator") continue;
+      const written = firstNamed(child);
+      if (written && !written.childForFieldName("arguments")) place(calleeOfNode(written), child, tail.nodes[0]!);
+    }
+  }
+  return body;
+}
+
+/**
+ * The tail's own bodies, placed: the routine's, or, for a class or struct
+ * tail, every routine written inside it and its code outside them.
+ */
+function ownBodies(from: CallSide & { routine: string }): CallSitesReading {
+  const tail = typeTailOf(from.source, from.language, from.routine);
+  if (!tail) {
+    const reading = callSitesIn(from, from.routine);
+    return reading.read ? { read: true, bodies: reading.bodies.filter((body) => body.routine === from.routine) } : reading;
+  }
+  const reading = callSitesIn(from, (routine, line) => tail.owns.has(ownKey(routine, line)));
+  if (!reading.read) return reading;
+  return {
+    read: true,
+    bodies: [...reading.bodies.filter((body) => tail.owns.has(ownKey(body.routine, body.line))), typeLevelBody(from, tail)],
+  };
+}
+
+/**
+ * The nodes whose text is the tail's: the routines named so, or a class or
+ * struct tail's declaration and `impl`s (and bases it reads), whole.
+ */
+function ownNodes(from: CallSide & { routine: string }): Node[] {
+  return typeTailOf(from.source, from.language, from.routine)?.nodes
+    ?? routinesNamed(from.source, from.routine, from.language).routines;
 }
 
 /**
@@ -4522,7 +5094,11 @@ function siteOf(callee: Callee, source: string, at: Node, where: Placement | { w
  * Nothing consumes this but `scripts/measure-closed-bodies.mts`. It puts no
  * colour on a diagram and no word rests on it.
  */
-export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
+export function callSitesIn(
+  side: CallSide,
+  /** One routine's name, or a test by name and opening line: a class tail's routines, found by position (#459). */
+  only?: string | ((routine: string, line: number) => boolean),
+): CallSitesReading {
   const bindings = bindingsIn(side.source, side.language);
   if (!bindings) return { read: false, why: "unreadable" };
   const tree = parseSource(side.source, side.language);
@@ -4584,7 +5160,7 @@ export function callSitesIn(side: CallSide, only?: string): CallSitesReading {
      * routine as well as file so one body's reading is never handed back for
      * another's.
      */
-    if (only !== undefined && name.text !== only) { bodies.push(body); return; }
+    if (only !== undefined && !(typeof only === "string" ? name.text === only : only(name.text, opened))) { bodies.push(body); return; }
     holders ??= holdersIn(tree.rootNode);
     const holder = holders.get(node.id);
     const quiet = side.language === "python" ? quietReads(node, bindings, side) : undefined;

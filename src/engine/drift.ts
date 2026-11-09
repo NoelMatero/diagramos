@@ -935,6 +935,10 @@ export const NOT_CLOSED_WORDS: Record<CallsNotClosed, string> = {
     + "or a literal may make one, and neither is written under the alias's name",
   "handed-to-a-runner": "the caller hands a function to code that runs it, so it reaches whatever that function reaches",
   "set-at-run-time": "one call is to something the code replaces while it runs, so what it calls is decided then",
+  "tail-inherits": "the class takes code from a base or a trait that was not read, and that code may make the call",
+  "tail-decorated": "a decorator or macro writes code into the class, and that code is not in the text",
+  "tail-elsewhere": "the class has code written outside its own declaration -- in another file, or added later "
+    + "-- that was not read",
 };
 
 export { lackingPhrase };

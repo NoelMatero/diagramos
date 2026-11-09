@@ -12,6 +12,11 @@
  *   ... --one=<project>    one project, in this process (prints raw JSON)
  *   ... --names=plain      Rust: draw a method as `file#new`, not `file#Money::new`
  *                          (#382). TypeScript and Python always draw `Class.method`.
+ *   ... --class-tails      only `@calls` arrows drawn FROM a class or struct (#459):
+ *                          each call the compiler resolves in a method becomes
+ *                          "the method's class calls it", drawn at the class in
+ *                          the method's own file. A class calls what its own
+ *                          code calls, so every one is correct too.
  *
  * **A measurement: it prints and never fails.**
  *
@@ -77,7 +82,8 @@ const only = flag("one");
 const showCases = args.includes("--cases");
 /** How a method's box is drawn: `Type::method` / `Class.method`, or `--names=plain`. */
 const plainNames = flag("names") === "plain";
-const words = flag("words")?.split(",") as TrueWord[] | undefined;
+const classTails = args.includes("--class-tails");
+const words = (flag("words")?.split(",") ?? (classTails ? ["calls"] : undefined)) as TrueWord[] | undefined;
 const WORDS: TrueWord[] = ["holds", "takes", "returns", "conforms", "calls", "accesses"];
 
 /** The pinned clones live in the main checkout; a worktree has none. */
@@ -195,8 +201,32 @@ async function measureOne(project: string): Promise<ProjectResult> {
     pairs = await rustTruePairs(root, plainNames);
   }
   if (words) pairs = pairs.filter((pair) => words.includes(pair.word));
+  if (classTails) pairs = classTailPairs(pairs);
   process.stderr.write(`${project}: ${pairs.length} pairs\n`);
   return askChecker(project, root, pairs);
+}
+
+/**
+ * `--class-tails` (#459): each `@calls` pair drawn from a method, drawn again
+ * from the method's class -- `a.ts#Dep.track -> b.ts#render` becomes
+ * `a.ts#Dep -> b.ts#render`. The class is drawn in the method's file, which
+ * for a Rust `impl` in another file is not where the struct is declared; that
+ * arrow is then one the checker cannot place, which is a "not sure", never a
+ * red. Free functions' pairs are dropped.
+ */
+function classTailPairs(pairs: TruePair[]): TruePair[] {
+  const out: TruePair[] = [];
+  const seen = new Set<string>();
+  for (const pair of pairs) {
+    if (pair.word !== "calls") continue;
+    const method = pair.from.match(/^(.*)#([A-Za-z_$][\w$]*)(?:\.|::)[A-Za-z_$][\w$]*$/);
+    if (!method) continue;
+    const from = `${method[1]}#${method[2]}`;
+    if (from === pair.to || seen.has(`${from} ${pair.to}`)) continue;
+    seen.add(`${from} ${pair.to}`);
+    out.push({ ...pair, from });
+  }
+  return out;
 }
 
 function pythonTruePairs(project: string, dirs: string[]): TruePair[] {
