@@ -2448,9 +2448,59 @@ function callSide(
       ...(askDefinition && closedBodyReferee?.compiledCrateOf
         ? { compiled: () => closedBodyReferee.compiledCrateOf!(target) }
         : {}),
+      ...(language === "rust" ? { packageFiles: () => rustPackageFiles(target, workspace) } : {}),
     };
   };
   return readSide(file);
+}
+
+const packageFiles_ = new WeakMap<Workspace, Map<string, string[] | null>>();
+/** More files than this in one package and the listing gives up: a struct there stays "not sure". */
+const PACKAGE_FILE_LIMIT = 4_000;
+
+/**
+ * Every `.rs` file of the Cargo package a Rust file belongs to (#459): the
+ * directory of the nearest `Cargo.toml` above it, walked whole, leaving out
+ * `target/`, hidden directories and any nested package. A superset of the
+ * crate's own modules -- it also holds the package's tests, examples and
+ * benches -- which is the safe side for a reading that must see every
+ * `impl` of a struct before it may say the struct calls nothing.
+ */
+function rustPackageFiles(file: string, workspace: Workspace): string[] | undefined {
+  const isFile = (relative: string) => {
+    const absolute = workspace.resolve(relative);
+    return absolute !== undefined && workspace.stat(absolute) === "file";
+  };
+  let dir = path.posix.dirname(file);
+  for (;;) {
+    if (isFile(dir === "." ? "Cargo.toml" : `${dir}/Cargo.toml`)) break;
+    if (dir === "." || dir === "") return undefined;
+    dir = path.posix.dirname(dir);
+  }
+  const known = packageFiles_.get(workspace) ?? new Map<string, string[] | null>();
+  packageFiles_.set(workspace, known);
+  if (known.has(dir)) return known.get(dir) ?? undefined;
+  const files: string[] = [];
+  let whole = true;
+  const walk = (relative: string, top: boolean): void => {
+    if (!whole) return;
+    const absolute = workspace.resolve(relative);
+    if (!absolute || workspace.stat(absolute) !== "directory") return;
+    if (!top && isFile(`${relative}/Cargo.toml`)) return;
+    for (const name of workspace.list(absolute)) {
+      if (name.startsWith(".") || (top && name === "target")) continue;
+      const child = relative === "." ? name : `${relative}/${name}`;
+      const childAbsolute = workspace.resolve(child);
+      if (!childAbsolute) continue;
+      const kind = workspace.stat(childAbsolute);
+      if (kind === "directory") walk(child, false);
+      else if (kind === "file" && name.endsWith(".rs")) files.push(child);
+      if (files.length > PACKAGE_FILE_LIMIT) { whole = false; return; }
+    }
+  };
+  walk(dir, true);
+  known.set(dir, whole ? files : null);
+  return whole ? files : undefined;
 }
 
 /**

@@ -40,7 +40,7 @@ function ask(
   files: Record<string, FileSpec>,
   from: { file: string; routine: string },
   to: { file: string; names: string[] },
-  options: { crate?: string[] } = {},
+  options: { crate?: string[]; packageFiles?: string[] } = {},
 ): CallsVerdict {
   const importsOf = (spec: FileSpec): CallSide["imports"] => (spec.imports ?? []).map(([specifier, file, library]) => ({
     specifier,
@@ -59,6 +59,7 @@ function ask(
         return other ? { source: other.source, language: other.language, imports: importsOf(other) } : undefined;
       },
       ...(options.crate ? { compiled: crateOf(options.crate) } : {}),
+      ...(options.packageFiles ? { packageFiles: () => options.packageFiles } : {}),
     };
   };
   return callsBetween({ ...sideOf(from.file), routine: from.routine }, { ...sideOf(to.file), names: to.names });
@@ -164,6 +165,31 @@ describe("a class whose every routine was read, none calling the far end, goes r
     expect(said(verdict)).toBe("red");
   });
 
+  it("Rust, with no rustc build: every `.rs` file of the package was looked in instead", () => {
+    // fd's crate does not build on the bench machine's rustc, and a struct
+    // there was "not sure" for want of a file list. The package's own files
+    // are a superset of the crate's modules.
+    const files: Record<string, FileSpec> = {
+      "src/a.rs": {
+        source: "use crate::b::paint;\n\npub struct Reader {\n    n: u32,\n}\n\nimpl Reader {\n    pub fn go(&self) -> u32 {\n        paint()\n    }\n}\n",
+        language: "rust",
+        imports: [["crate::b", "src/b.rs"]],
+      },
+      "src/b.rs": { source: "pub fn render(n: u32) -> u32 {\n    n\n}\n\npub fn paint() -> u32 {\n    0\n}\n", language: "rust" },
+      "src/c.rs": { source: "use crate::a::Reader;\n\nimpl Reader {\n    pub fn more(&self) -> u32 {\n        crate::b::render(1)\n    }\n}\n", language: "rust" },
+      "src/lib.rs": { source: "mod a;\nmod b;\n", language: "rust" },
+    };
+    const from = { file: "src/a.rs", routine: "Reader" };
+    const to = { file: "src/b.rs", names: ["render"] };
+    expect(said(ask(files, from, to, { packageFiles: ["src/lib.rs", "src/a.rs", "src/b.rs"] }))).toBe("red");
+    const elsewhere = ask(files, from, to, { packageFiles: ["src/lib.rs", "src/a.rs", "src/b.rs", "src/c.rs"] });
+    expect(said(elsewhere)).toBe("not sure");
+    expect(why(elsewhere)).toBe("tail-elsewhere");
+    // A module pasted in from outside the listing is code nobody looked at.
+    const pasted = { ...files, "src/lib.rs": { source: "mod a;\nmod b;\ninclude!(concat!(env!(\"OUT_DIR\"), \"/gen.rs\"));\n", language: "rust" as const } };
+    expect(why(ask(pasted, from, to, { packageFiles: ["src/lib.rs", "src/a.rs", "src/b.rs"] }))).toBe("tail-elsewhere");
+  });
+
   it("reads the routines by where they are written, not by name", () => {
     // fd's `walk.rs` has both `WorkerState::scan` and a free function
     // `scan`. The October prototype read the class by its routines' names
@@ -190,6 +216,23 @@ describe("a class whose every routine was read, none calling the far end, goes r
       },
     }, { file: "src/a.rs", routine: "Arg" }, { file: "src/a.rs", names: ["is_long"] }, { crate: ["src/a.rs"] });
     expect(said(verdict)).toBe("red");
+  });
+
+  it("keeps the plain \"other way round\" answer for a class with no method of its own", () => {
+    // fastapi's `Dependant` is a dataclass with no method, and
+    // `get_dependant` builds one. Nothing of `Dependant`'s calls back.
+    const verdict = ask({
+      "app/models.py": {
+        source: "from dataclasses import dataclass, field\n\n@dataclass\nclass Dependant:\n    names: list = field(default_factory=list)\n",
+        language: "python",
+      },
+      "app/utils.py": {
+        source: "from app.models import Dependant\n\ndef get_dependant():\n    return Dependant()\n",
+        language: "python",
+        imports: [["app.models", "app/models.py"]],
+      },
+    }, { file: "app/models.py", routine: "Dependant" }, { file: "app/utils.py", names: ["get_dependant"] });
+    expect(verdict.verdict).toBe("backwards");
   });
 
   it("reads a base declared in the same file as part of the class", () => {

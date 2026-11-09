@@ -539,6 +539,14 @@ export interface CallSide {
    * builds what it answers from.
    */
   compiled?: () => CompiledCrate | undefined;
+  /**
+   * Every `.rs` file of the Cargo package this file is in (#459), when the
+   * workspace can list them: a superset of the crate's modules. A struct's
+   * code is its `impl` blocks, which may be in any of them, so a reading
+   * that accuses a struct of calling nothing has to have looked in each.
+   * rustc's own list (`compiled`) is preferred where there is one.
+   */
+  packageFiles?: () => string[] | undefined;
 }
 
 /** What `resolveReceiver` may answer with. See `CallSide.resolveReceiver`'s doc. */
@@ -2081,14 +2089,7 @@ export function callsBetween(
    */
   const compiled = forward.why ? compiledBodiesFor(from, to.names) : undefined;
   if (forward.why && !compiled) return { verdict: "withheld", why: forward.why };
-  /*
-   * A class with no routine at all is answered where it always was: the
-   * kind check (#297) says it has no code that runs and to draw the arrow
-   * from a routine, which is the better sentence. A Rust struct is not,
-   * because its code may be in an `impl` anywhere in the crate; reading the
-   * whole crate is what lets it answer here.
-   */
-  if (typeTail && typeTail.routines.length === 0 && from.language !== "rust") return { verdict: "withheld", why: "no-body" };
+
   /*
    * And the compiler's list may show the call the text could only doubt
    * (#434): `ok!(self.parse_long_arg(..))`. Its path has to be the head's
@@ -2132,7 +2133,14 @@ export function callsBetween(
   for (const name of backwards ? to.names : []) {
     const reverse = callsTo(to, name, back);
     if (!reverse.evidence) continue;
-    if (!runsGiven()) return { verdict: "backwards", evidence: reverse.evidence };
+    /*
+     * A class tail's "backwards" is the plain verdict it always had (#459):
+     * before the class was read as its routines, this guard found no body
+     * of that name and never held one back. Reading the class does not
+     * change what the head's code calls, and the first class-tail prototype
+     * lost true reds by letting the new reading replace old answers.
+     */
+    if (typeTail || !runsGiven()) return { verdict: "backwards", evidence: reverse.evidence };
     break;
   }
 
@@ -2147,6 +2155,16 @@ export function callsBetween(
    */
   if (!mayAccuse("calls", from.language, "absence")) {
     return { verdict: "absent", notClosed: "unlicensed" };
+  }
+  /*
+   * A class with no routine at all is answered where it always was: the
+   * kind check (#297) says it has no code that runs and to draw the arrow
+   * from a routine, which is the better sentence. A Rust struct is not,
+   * because its code may be in an `impl` anywhere in the crate; reading the
+   * whole crate is what lets it answer here.
+   */
+  if (typeTail && typeTail.routines.length === 0 && from.language !== "rust") {
+    return { verdict: "absent", notClosed: "routine-not-found" };
   }
   const closed = closedBodyRefutes(from, to, compiled);
   /*
@@ -3536,24 +3554,34 @@ const crateScans_ = new WeakMap<object, Map<string, TypeTail["notWhole"] | null>
  * name. A trait whose origin the text does not settle is refused.
  */
 function crateNotWhole(from: CallSide & { routine: string }, tail: TypeTail): TypeTail["notWhole"] {
+  /*
+   * rustc's list of the crate's modules where it built one; otherwise every
+   * `.rs` file of the package, which holds them all unless a module is
+   * pulled in from outside it (`#[path]`) or pasted in (`include!`) -- and
+   * then nothing is said.
+   */
   const crate = from.compiled?.();
+  const listed = crate ? undefined : from.packageFiles?.();
   // Not built into the crate at all (a module a feature switches off): what rustc read says nothing about it.
-  if (!crate || !from.open || !crate.files.has(from.file)) return "tail-elsewhere";
-  const scanned = crateScans_.get(crate) ?? new Map<string, TypeTail["notWhole"] | null>();
-  crateScans_.set(crate, scanned);
+  if (crate && !crate.files.has(from.file)) return "tail-elsewhere";
+  const files = crate?.files ?? (listed?.includes(from.file) ? listed : undefined);
+  if (!files || !from.open) return "tail-elsewhere";
+  const scanned = crateScans_.get(files) ?? new Map<string, TypeTail["notWhole"] | null>();
+  crateScans_.set(files, scanned);
   const key = `${from.file}\u0000${from.routine}`;
   if (scanned.has(key)) return scanned.get(key) ?? undefined;
 
   const word = wholeName(from.routine);
   const sources = new Map<string, string>([[from.file, from.source]]);
-  for (const file of crate.files) {
+  for (const file of files) {
     if (file === from.file) continue;
     const source = from.open(file)?.source;
     if (source === undefined) { scanned.set(key, "tail-elsewhere"); return "tail-elsewhere"; }
     sources.set(file, source);
   }
   let verdict: TypeTail["notWhole"];
-  for (const [file, source] of sources) {
+  if (!crate && [...sources.values()].some((source) => /#\s*\[\s*path\s*=|\binclude!\s*\(/.test(source))) verdict = "tail-elsewhere";
+  for (const [file, source] of verdict ? [] : sources) {
     if (file === from.file || !word.test(source)) continue;
     const tree = parseSource(source, "rust");
     if (!tree) { verdict = "tail-elsewhere"; break; }
