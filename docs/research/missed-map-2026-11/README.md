@@ -130,9 +130,23 @@ takes-other         3      3   0/0/3                       0/0/3                
 missed per set: main 154, holdout 220, holdout-b 234
 ```
 
-## Still to come: measured prices
+## Measured prices (wall-lift, 2026-11-08/09)
 
-Patterns 2–5 are being priced by switching each wall off in a throwaway worktree and benching main, holdout and holdout-b, never holdout-c. The arms are kind-first with the compiler asked for values, the interface name rule, class tails, all three together, and interface plus the name rule for untyped receivers. Those numbers replace the predictions above when they land. A wall-lift is an upper bound, not the guarded rule.
+Each prototype switched one wall off in a throwaway worktree (`PROTO=` switches) and benched main, holdout and holdout-b against the per-claim dumps above. holdout-c was never run. Every run had the machine to itself. A wall-lift is an upper bound, not the guarded rule.
+
+| prototype | predicted (main / holdout / holdout-b) | measured | new false reds |
+|---|---|---|---|
+| class tails, pattern 4 (#459) | +1–2 / +4–9 / +4–9 | **+5 / +6 / +11** | 0 |
+| interface name rule, pattern 5 (#351) | +2–4 / +5–10 / +3–7 | **+0 / +7 / +3** | 0 |
+| kind first with the compiler asked for values, patterns 2 + 3 (#463) | about +18–40 / +24–49 / +27–55 | **+3 / +11 / +2** | **1** (main) |
+
+No arm lost a catch, and none lost a confirmation except the false red below.
+
+**Patterns 2 and 3 are much smaller than the model said, and riskier.** The one false red is django `BaseHandler.get_response → BaseHandler._middleware_chain`. The prototype read "the end is a field" as "it cannot be called", but `self._middleware_chain` holds a function and is called. A data end can only be called wrong where the compiler says its type cannot be called, and the compiler answers least on exactly those (Python 57%, Rust not asked).
+
+**The new order** after the route decision (pattern 1): class tails, then the interface name rule, then the text half of the kind check (pattern 2) only. Together with pattern 1, about +30–40 on each held-out set: the mid-70s, not 80%.
+
+**Not run:** the combined arm (all three together) was spoiled by the machine sleeping 8 times and was stopped; the interface rule extended to untyped receivers was never started. The fixes are benched together after merging anyway.
 
 ## Files
 
