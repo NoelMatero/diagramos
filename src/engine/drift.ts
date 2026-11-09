@@ -5265,10 +5265,12 @@ export function checkDrift(
              * head defines, which may reach it through a re-export -- the
              * route is a note, and it says which name kept it one.
              */
-            const held = needs.handedOn && needs.handedOn !== "?"
-              ? ` ${fromPath} writes \`${needs.handedOn}\`, which ${toPath} defines and a re-export `
-                + `may hand on, so this is not called wrong.`
-              : "";
+            const held = needs.handedOn === "*"
+              ? ` ${fromPath} has a star import, which may hand on what ${toPath} defines, so this is not called wrong.`
+              : needs.handedOn && needs.handedOn !== "?"
+                ? ` ${fromPath} writes \`${needs.handedOn}\`, which ${toPath} defines and a re-export `
+                  + `may hand on, so this is not called wrong.`
+                : "";
             recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
               from: fromPath,
               to: toPath,

@@ -239,6 +239,23 @@ describe("a Python needs arrow the code reaches only through another file", () =
     expect(report.edges[0]!.detail).toContain("app.py writes `Thing`, which pkg/head.py defines");
   });
 
+  it("stays a note when the tail star-imports and writes no name at all (Django's package files)", async () => {
+    // `from pkg.mid import *` takes whatever mid has, and mid has the head's
+    // two re-exports deep, further than the reader follows a star. Measured:
+    // five true Django imports went red before this guard.
+    const files = {
+      "pkg/__init__.py": "",
+      "pkg/head.py": "def thing():\n    return 1\n",
+      "pkg/inner.py": "from pkg.head import thing\n",
+      "pkg/mid.py": "from pkg.inner import thing\n\n\ndef other():\n    return 2\n",
+      "app.py": "from pkg.mid import *\n",
+    };
+    const report = checkDrift(await boardOf("app.py", "pkg/head.py", "needs"), memory(files), { edges: true });
+    expect(report.edges.filter((finding) => accuses(finding.kind))).toEqual([]);
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-one-level-up"]);
+    expect(report.edges[0]!.detail).toContain("app.py has a star import");
+  });
+
   it("stays a note when the name comes in through a star import", async () => {
     const files = {
       "pkg/__init__.py": "from pkg.mid import *\n",

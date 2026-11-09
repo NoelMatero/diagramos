@@ -367,7 +367,7 @@ export function checkNeeds(
 /**
  * A name the head defines that a Python tail writes, and so may be using,
  * handed on through the files between (2026-11-08). `"?"` when either file
- * cannot be read for it; `undefined` when there is none.
+ * cannot be read for it, `"*"` for a star import; `undefined` when there is none.
  *
  * Python's indirect `@needs` stayed amber because five true imports of 12,693
  * are reached only through another file: a package `__init__.py` hands a
@@ -378,7 +378,10 @@ export function checkNeeds(
  * taking anything from it, through a re-export or otherwise, and the chain is
  * the whole of the connection: the arrow is drawn one level too high.
  *
- * A tail that writes one may be, and keeps the route as a note. A name the
+ * A tail that writes one may be, and keeps the route as a note; so does a
+ * tail with a star import, which takes whatever that module has without
+ * writing a name (Django's package files, measured: five true imports went
+ * red before this). A name the
  * tail defines at its own top level and never imports (`logger =
  * logging.getLogger(...)`) is its own, not the head's. Dunder names
  * (`__all__`, `__version__`) are every module's. Words are read off the
@@ -396,6 +399,8 @@ function mayBeHandedOn(from: string, to: string, workspace: Workspace): string |
   const head = moduleNames(workspace.read(headPath));
   const own = moduleNames(tail);
   if (!head || !own) return "?";
+  // `from x import *` takes whatever x has, and x may have it from the head.
+  if (own.star) return "*";
   const words = new Set(tail.match(/[A-Za-z_]\w*/g) ?? []);
   return [...head.defined].find((name) =>
     !/^__\w+__$/.test(name) && words.has(name) && (!own.defined.has(name) || own.imported.has(name)));
@@ -416,11 +421,12 @@ function named(node: Node): Node[] {
   return out;
 }
 
-function moduleNames(source: string): { defined: Set<string>; imported: Set<string> } | undefined {
+function moduleNames(source: string): { defined: Set<string>; imported: Set<string>; star: boolean } | undefined {
   const tree = parseSource(source, "python");
   if (!tree) return undefined;
   const defined = new Set<string>();
   const imported = new Set<string>();
+  let star = false;
   const targets = (node: Node) => {
     if (node.type === "identifier") defined.add(node.text);
     else if (node.type === "attribute" || node.type === "subscript") return;
@@ -472,9 +478,10 @@ function moduleNames(source: string): { defined: Set<string>; imported: Set<stri
   // An import anywhere binds a name, and that name may be the head's.
   each(tree.rootNode, (node) => {
     if (node.type !== "import_statement" && node.type !== "import_from_statement") return;
+    if (node.type === "import_from_statement" && named(node).some((child) => child.type === "wildcard_import")) star = true;
     for (const word of node.text.match(/[A-Za-z_]\w*/g) ?? []) imported.add(word);
   });
-  return { defined, imported };
+  return { defined, imported, star };
 }
 
 /**
