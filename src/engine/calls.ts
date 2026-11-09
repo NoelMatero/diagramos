@@ -2082,6 +2082,14 @@ export function callsBetween(
   const compiled = forward.why ? compiledBodiesFor(from, to.names) : undefined;
   if (forward.why && !compiled) return { verdict: "withheld", why: forward.why };
   /*
+   * A class with no routine at all is answered where it always was: the
+   * kind check (#297) says it has no code that runs and to draw the arrow
+   * from a routine, which is the better sentence. A Rust struct is not,
+   * because its code may be in an `impl` anywhere in the crate; reading the
+   * whole crate is what lets it answer here.
+   */
+  if (typeTail && typeTail.routines.length === 0 && from.language !== "rust") return { verdict: "withheld", why: "no-body" };
+  /*
    * And the compiler's list may show the call the text could only doubt
    * (#434): `ok!(self.parse_long_arg(..))`. Its path has to be the head's
    * own, not just its name -- see `ownCallIn`.
