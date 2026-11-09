@@ -64,9 +64,10 @@ import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
   callImports, type CallSide, type CallSitePlaced, type CallsNotClosed, type CallsRefutedEvidence, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER,
   type ReceiverResolution, bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
+  spelledLikeARunner,
 } from "./calls";
 import type { CompiledCrate } from "./compiled-calls";
-import { newReachCache, reachBetween, type ReachCache } from "./reach";
+import { newReachCache, reachBetween, type ReachCache, type ReachHop } from "./reach";
 import { constructions, routineNamesIn, type ConstructsNames, type ConstructsWithheld } from "./constructs";
 import {
   type AccessesWithheld, type NotReadEvidence, declaresMember, memberAccesses, memberNamed, membersReadAt,
@@ -6231,13 +6232,35 @@ export function checkDrift(
              * way set aside. Not for a class or an alias at the far end: the
              * readings that make those red are not this one.
              */
-            const forwardClosed = (): { rests: RedRests; sites: number } | undefined => {
+            const forwardClosed = (hops: ReachHop[]) => {
               if (toEnd.symbols.some((name) => isTypeName(head.source, name, head.language)
                 || onlyATypeAlias(head.source, name, head.language))) return undefined;
               const forward = callsBetween({ ...tail, routine: fromEnd.symbols[0]! }, { ...head, names: toEnd.symbols }, false);
-              if (forward.verdict === "wrong-routine") return { rests: WRITTEN, sites: forward.evidence.sites };
-              if (forward.verdict === "refuted") return { rests: refutedRests(forward.evidence), sites: forward.evidence.sites };
+              if (forward.verdict === "wrong-routine") return { rests: WRITTEN, sites: forward.evidence.sites, hops };
+              if (forward.verdict === "refuted") return { rests: refutedRests(forward.evidence), sites: forward.evidence.sites, hops };
               return undefined;
+            };
+            /**
+             * Whether the route's first step is a call the tail writes and the
+             * closed reading placed at that routine: the same line, the same
+             * name, the same file. A route that leaves the tail any other way
+             * -- a routine handed to a library that runs it (`pipe(xs,
+             * helper)`), a `.call` on a field whose value the walk placed by
+             * name while the closed reading placed it outside -- is a route two
+             * readers disagree about, and the far end may be what runs. So is
+             * one whose first call is spelled like something that runs by name
+             * or runs its receiver (`getattr`, `.call`): #470's refusals, and
+             * on a live TypeScript check `this.derivation.call(..)` on a field
+             * holding a function is placed at the repository's `call` method.
+             */
+            const leavesByAWrittenCall = (hops: ReadonlyArray<{ file: string; routine: string; line: number }>): boolean => {
+              const first = hops[0];
+              if (!first) return false;
+              const reading = callSitesIn(tail);
+              if (!reading.read) return false;
+              if (spelledLikeARunner(first.routine, tail.language)) return false;
+              return reading.bodies.some((body) => body.sites.some((site) =>
+                site.line === first.line && site.file === first.file && site.name === first.routine));
             };
             /**
              * What an arrow over a longer route gets -- unless the arrow
@@ -6256,7 +6279,7 @@ export function checkDrift(
             const oneLevelUp = (
               via: string[],
               hops: number,
-              settled?: { rests: RedRests; sites: number },
+              settled?: { rests: RedRests; sites: number; hops: ReadonlyArray<{ file: string; routine: string; line: number }> },
             ): EdgeOutcome => {
               if (viaNamesRoute(edge.via, via)) {
                 if (claimed) claims.callsConfirmed += 1;
@@ -6264,7 +6287,7 @@ export function checkDrift(
               }
               // A route of one step is the far end reached straight from the
               // tail -- handed on by name, say -- which is no proof of "not directly".
-              if (settled && via.length > 2) {
+              if (settled && via.length > 2 && leavesByAWrittenCall(settled.hops)) {
                 return {
                   kind: "finding",
                   finding: {
@@ -6346,7 +6369,7 @@ export function checkDrift(
               if (alsoForward.verdict === "reached") {
                 edgesChecked += 1;
                 recordEdge(edge, fromNode, toNode,
-                  oneLevelUp(alsoForward.via, alsoForward.hops.length, forwardClosed()));
+                  oneLevelUp(alsoForward.via, alsoForward.hops.length, forwardClosed(alsoForward.hops)));
                 continue;
               }
               edgesChecked += 1;
@@ -6385,7 +6408,7 @@ export function checkDrift(
               if (throughAChain.verdict === "reached") {
                 edgesChecked += 1;
                 recordEdge(edge, fromNode, toNode, oneLevelUp(throughAChain.via, throughAChain.hops.length,
-                  { rests: WRITTEN, sites: verdict.evidence.sites }));
+                  { rests: WRITTEN, sites: verdict.evidence.sites, hops: throughAChain.hops }));
                 continue;
               }
               edgesChecked += 1;
@@ -6434,7 +6457,7 @@ export function checkDrift(
               if (throughAChain.verdict === "reached") {
                 edgesChecked += 1;
                 recordEdge(edge, fromNode, toNode, oneLevelUp(throughAChain.via, throughAChain.hops.length,
-                  { rests: refutedRests(verdict.evidence), sites: verdict.evidence.sites }));
+                  { rests: refutedRests(verdict.evidence), sites: verdict.evidence.sites, hops: throughAChain.hops }));
                 continue;
               }
               const wasClaimed = baselineGraph?.edges.some(

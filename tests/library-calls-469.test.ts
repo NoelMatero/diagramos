@@ -135,13 +135,20 @@ describe("refusals: the library is handed something of the repository's it can r
       ].join("\n\n\n"),
     },
     right: [
-      ["asyncio.Task is handed a coroutine made from a function that calls the head", "work.py#start_named", "target.py#b"],
       ["a library function is handed a function that calls the head", "work.py#through_pipe", "target.py#b"],
       ["a library class is handed a function as a keyword", "work.py#through_thread", "target.py#b"],
       ["functools.partial wraps a function that calls the head", "work.py#through_partial", "target.py#b"],
       ["a library is handed a bound method that calls the head", "work.py#Runner.go", "target.py#b"],
     ],
-    wrong: [],
+    /*
+     * `coro = work()` is a call written here, and `work` calls the head:
+     * `start_named` reaches `b` only through `work`, so since 2026-11-08 the
+     * arrow is red with that route. The ones above leave the tail by a
+     * routine handed to a library, not by a call, and keep the note.
+     */
+    wrong: [
+      ["asyncio.Task is handed a coroutine made from a function that calls the head", "work.py#start_named", "target.py#b", "calls-indirect"],
+    ],
   });
 
   shapes("TypeScript", {
@@ -225,9 +232,16 @@ describe("refusals: an import that only looks like a package is this repository'
     },
     right: [
       ["the call is to the nickname's own function", "app/load.ts#load", "lib/common/utils/shared.ts#isNil"],
-      ["the nickname's function may be what reaches the head", "app/load.ts#load", "lib/common/other.ts#unrelated"],
     ],
-    wrong: [],
+    /*
+     * Read as this repository's, the nickname's function is a step: `load`
+     * reaches `unrelated` through `isNil`. Until 2026-11-08 that was a note;
+     * a plain arrow means a direct call, so it is the red that names the
+     * route -- which is the proof the import was read as the repository's.
+     */
+    wrong: [
+      ["the nickname's function is what reaches the head", "app/load.ts#load", "lib/common/other.ts#unrelated", "calls-indirect"],
+    ],
   });
 
   shapes("a Python module the import roots do not reach", {
@@ -251,10 +265,11 @@ describe("refusals: an import that only looks like a package is this repository'
       "core/Cargo.toml": "[package]\nname = \"acme-core\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[dependencies]\nacme-common = { path = \"../common\" }\n",
       "core/src/lib.rs": "use acme_common::is_nil;\n\npub fn load(x: Option<i32>) -> i32 {\n    if is_nil(x) { 0 } else { 1 }\n}\n",
     },
-    right: [
-      ["the sibling crate's function may be what reaches the head", "core/src/lib.rs#load", "common/src/other.rs#unrelated"],
+    right: [],
+    // The same as the nickname above: the sibling crate's function is a step, and the route is the red.
+    wrong: [
+      ["the sibling crate's function is what reaches the head", "core/src/lib.rs#load", "common/src/other.rs#unrelated", "calls-indirect"],
     ],
-    wrong: [],
   });
 });
 
