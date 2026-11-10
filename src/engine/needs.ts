@@ -49,7 +49,7 @@
 import { mayHideAnImport, readDependencies, readerCanPlace, type FileDependency } from "./deps";
 import { vouchedFor, type Ledger } from "./ledger";
 import { licenceFor, mayAccuse } from "./licence";
-import { languageOf } from "./parse";
+import { each, languageOf, parseSource, type Node } from "./parse";
 import { declaredNames } from "./parts";
 import type { ConfigCache } from "./resolve";
 import type { Workspace } from "./workspace";
@@ -110,7 +110,11 @@ export type NeedsVerdict =
    * a reading of the architecture, and 26 of the 243 file pairs Haiku drew on
    * `bench:planted` are that shape. `via` is the files between, in order.
    */
-  | { verdict: "indirect"; via: string[]; evidence: NeedsEvidence; mayAccuse: boolean; unplaced: boolean }
+  | {
+    verdict: "indirect"; via: string[]; evidence: NeedsEvidence; mayAccuse: boolean; unplaced: boolean;
+    /** A name the head defines that the tail writes, which keeps a Python chain from being accused. */
+    handedOn?: string;
+  }
   /**
    * The tail does not import the head and nothing it imports leads there,
    * followed to the end through files that could all be read (#323). The
@@ -336,24 +340,148 @@ export function checkNeeds(
   });
   const walk = walkImports(from, to, workspace, cache, ledger, place);
   if (walk.reached) {
+    const handedOn = mayBeHandedOn(from, to, workspace);
     /*
      * Whether an `@needs` arrow over this chain may be called wrong, which is
      * a per-language measurement and not a rule (#323). Rust and TypeScript
-     * leave no true import reachable only through another file; Python leaves
-     * six, so there the chain is reported and never accused. `@depends` never
-     * reads this: the chain is what that word claims.
+     * leave no true import reachable only through another file. Python leaves
+     * five, every one a name handed on by re-exports, so there the chain is
+     * accused only where the tail writes no name the head defines
+     * (`mayBeHandedOn`). `@depends` never reads this: the chain is what that
+     * word claims.
      */
     return {
       verdict: "indirect",
       via: walk.reached.via,
       evidence: walk.reached.first,
-      mayAccuse: licensed("indirect"),
+      ...(handedOn ? { handedOn } : {}),
+      mayAccuse: licensed("indirect") && handedOn === undefined,
       unplaced: tail.unplaced > 0,
     };
   }
   const bothLicensed = licensed("absence");
   if (walk.blind || !bothLicensed) return { verdict: "absent" };
   return { verdict: "refuted", unplaced: walk.unplaced };
+}
+
+/**
+ * A name the head defines that a Python tail writes, and so may be using,
+ * handed on through the files between (2026-11-08). `"?"` when either file
+ * cannot be read for it, `"*"` for a star import; `undefined` when there is none.
+ *
+ * Python's indirect `@needs` stayed amber because five true imports of 12,693
+ * are reached only through another file: a package `__init__.py` hands a
+ * class on two or three re-exports deep, further than `reexported` follows.
+ * In each of them the tail writes that class's name -- `from pkg import
+ * Model`, `pkg.Model` -- because using a name is the only way to need it. So
+ * a tail that never writes a name the head defines at module level cannot be
+ * taking anything from it, through a re-export or otherwise, and the chain is
+ * the whole of the connection: the arrow is drawn one level too high.
+ *
+ * A tail that writes one may be, and keeps the route as a note; so does a
+ * tail with a star import, which takes whatever that module has without
+ * writing a name (Django's package files, measured: five true imports went
+ * red before this). A name the
+ * tail defines at its own top level and never imports (`logger =
+ * logging.getLogger(...)`) is its own, not the head's. Dunder names
+ * (`__all__`, `__version__`) are every module's. Words are read off the
+ * whole text, strings and comments too: reading too many only keeps a note.
+ *
+ * Only Python: TypeScript and Rust were measured with no true import behind a
+ * chain, because a barrel and a `pub use` are followed to the end.
+ */
+function mayBeHandedOn(from: string, to: string, workspace: Workspace): string | undefined {
+  if (languageOf(from) !== "python" || languageOf(to) !== "python") return undefined;
+  const tailPath = workspace.resolve(from);
+  const headPath = workspace.resolve(to);
+  if (!tailPath || !headPath) return "?";
+  const tail = workspace.read(tailPath);
+  const head = moduleNames(workspace.read(headPath));
+  const own = moduleNames(tail);
+  if (!head || !own) return "?";
+  // `from x import *` takes whatever x has, and x may have it from the head.
+  if (own.star) return "*";
+  const words = new Set(tail.match(/[A-Za-z_]\w*/g) ?? []);
+  return [...head.defined].find((name) =>
+    !/^__\w+__$/.test(name) && words.has(name) && (!own.defined.has(name) || own.imported.has(name)));
+}
+
+/**
+ * What a Python module defines at its top level, and every word its imports
+ * write. Top level includes the blocks of an `if`, `try` or `with` there
+ * (`try: from ssl import SSLContext / except ImportError: SSLContext = None`),
+ * never a function's or a class's body. `undefined` when it does not parse.
+ */
+function named(node: Node): Node[] {
+  const out: Node[] = [];
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (child?.isNamed) out.push(child);
+  }
+  return out;
+}
+
+function moduleNames(source: string): { defined: Set<string>; imported: Set<string>; star: boolean } | undefined {
+  const tree = parseSource(source, "python");
+  if (!tree) return undefined;
+  const defined = new Set<string>();
+  const imported = new Set<string>();
+  let star = false;
+  const targets = (node: Node) => {
+    if (node.type === "identifier") defined.add(node.text);
+    else if (node.type === "attribute" || node.type === "subscript") return;
+    else for (const child of named(node)) targets(child);
+  };
+  const statements = (block: Node) => {
+    for (const node of named(block)) {
+      switch (node.type) {
+        case "function_definition":
+        case "class_definition": {
+          const name = node.childForFieldName("name");
+          if (name) defined.add(name.text);
+          break;
+        }
+        case "decorated_definition": {
+          const name = node.childForFieldName("definition")?.childForFieldName("name");
+          if (name) defined.add(name.text);
+          break;
+        }
+        case "type_alias_statement": {
+          const name = node.childForFieldName("left");
+          if (name) targets(name);
+          break;
+        }
+        case "expression_statement":
+          for (const child of named(node)) {
+            if (child.type !== "assignment" && child.type !== "augmented_assignment") continue;
+            const left = child.childForFieldName("left");
+            if (left) targets(left);
+          }
+          break;
+        case "if_statement":
+        case "elif_clause":
+        case "else_clause":
+        case "try_statement":
+        case "except_clause":
+        case "except_group_clause":
+        case "finally_clause":
+        case "with_statement":
+        case "block":
+          statements(node);
+          break;
+        default:
+          break;
+      }
+    }
+  };
+  statements(tree.rootNode);
+  // An import anywhere binds a name, and that name may be the head's.
+  each(tree.rootNode, (node) => {
+    if (node.type !== "import_statement" && node.type !== "import_from_statement") return;
+    if (node.type === "import_from_statement" && named(node).some((child) => child.type === "wildcard_import")) star = true;
+    for (const word of node.text.match(/[A-Za-z_]\w*/g) ?? []) imported.add(word);
+  });
+  return { defined, imported, star };
 }
 
 /**

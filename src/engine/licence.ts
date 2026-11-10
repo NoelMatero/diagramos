@@ -1728,17 +1728,16 @@ export const LICENCES: readonly Licence[] = [
           "36 true imports come back as reached through another file rather " +
             "than direct -- Django `__init__.py` files naming a module the " +
             "compiler follows through a re-export -- which is amber, never red."),
-        indirect: {
-          unmeasured:
-            "Measured and not licensed. Five true Python imports of 12,693 are " +
-            "reached only through another file: a package `__init__.py` names a " +
-            "class the compiler follows two or three re-exports deep, and this " +
-            "reader follows a star import one named step and no further. Calling " +
-            "those wrong is five accusations against correct boards, so an " +
-            "indirect `@needs` in Python stays amber with the route named. " +
-            "`npm run measure:recall -- .corpus/* --words=needs` reproduces it " +
-            "(#323).",
-        },
+        indirect: NEEDS_INDIRECT(12693, 0,
+          "Licensed behind a guard (2026-11-08). Five true Python imports are " +
+            "reached only through another file -- a package `__init__.py` " +
+            "handing a class on further than this reader follows -- and in each " +
+            "the tail either writes a name the head defines or star-imports. " +
+            "needs.ts `mayBeHandedOn` keeps both a note, so 0 of 12,693 true " +
+            "imports are called wrong; the five read `said:indirect`, the " +
+            "accused ones `said:indirect-accused`. The same run over the nine " +
+            "Python projects of holdout and holdout-b: 0 of 7,146. Before the " +
+            "star half of the guard, Django's package files gave 5 false reds."),
       },
       depends: {
         presence: {

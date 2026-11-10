@@ -650,12 +650,12 @@ describe("the licence's second axis (#231)", () => {
 
   it("licenses an indirect @needs where no true import hides behind a chain (#323)", () => {
     // ts/tsx/js 0 of 12,824 and rust 0 of 2,539 true imports are reached only
-    // through another file; python has five, all package re-exports, so it is
-    // the one square that stays amber.
-    for (const language of ["ts", "tsx", "js", "rust"] as const) {
+    // through another file. Python has five, all package re-exports, and is
+    // licensed only behind needs.ts's guard: a tail that writes a name the
+    // head defines is never accused (2026-11-08).
+    for (const language of ["ts", "tsx", "js", "rust", "python"] as const) {
       expect(mayAccuse("needs", language, "indirect"), language).toBe(true);
     }
-    expect(mayAccuse("needs", "python", "indirect")).toBe(false);
   });
 
   it("gives @needs an absence licence in every language its corpus measured", () => {

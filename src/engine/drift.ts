@@ -62,11 +62,12 @@ import { languageOf, parametersOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
-  callImports, type CallSide, type CallSitePlaced, type CallsNotClosed, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER,
+  callImports, type CallSide, type CallSitePlaced, type CallsNotClosed, type CallsRefutedEvidence, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER,
   type ReceiverResolution, bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
+  spelledLikeARunner,
 } from "./calls";
 import type { CompiledCrate } from "./compiled-calls";
-import { newReachCache, reachBetween, type ReachCache } from "./reach";
+import { newReachCache, reachBetween, type ReachCache, type ReachHop } from "./reach";
 import { constructions, routineNamesIn, type ConstructsNames, type ConstructsWithheld } from "./constructs";
 import {
   type AccessesWithheld, type NotReadEvidence, declaresMember, memberAccesses, memberNamed, membersReadAt,
@@ -410,6 +411,19 @@ export type EdgeFindingKind =
    */
   | "needs-indirect"
   /**
+   * A `@calls` arrow whose tail never calls the head itself and reaches it
+   * through other routines (2026-11-08): `calls-one-level-up`'s reading, made
+   * an accusation. A plain arrow means a direct call, and an arrow drawn one
+   * level too high claims one that does not exist.
+   *
+   * Only where the direct call is ruled out: every call the tail makes was
+   * read and placed, and none is the head (`refuted`, `wrong-routine`, or
+   * the same closed reading asked after a call the other way). An open body
+   * keeps `calls-one-level-up`, a note. The red names the hops, because
+   * they are the fix: draw them, or mark the arrow a summary with `via`.
+   */
+  | "calls-indirect"
+  /**
    * An arrow whose end is the wrong kind of thing for its claim (#297):
    * `@feeds` from a struct, `@holds` from a function, `@takes` into a class.
    *
@@ -468,6 +482,7 @@ export const EDGE_FINDING_KINDS = [
   "accesses-not-read",
   "conforms-absent",
   "calls-one-level-up",
+  "calls-indirect",
   "end-lacks-part",
   "needs-absent",
   "needs-one-level-up",
@@ -511,6 +526,7 @@ export const ACCUSING_EDGE_KINDS = [
   "end-lacks-part",
   "needs-absent",
   "needs-indirect",
+  "calls-indirect",
 ] as const satisfies readonly EdgeFindingKind[];
 
 /** The rest: an observation about an arrow, never an accusation about one. */
@@ -3162,6 +3178,33 @@ function oneLine(label: string): string {
 }
 
 /**
+ * The red for an arrow the code reaches only through other steps
+ * (2026-11-08): the rule, what was found, the hops, and both ways out as the
+ * literal edit. Rule first and the edit spelled out, because the agent
+ * reading it is often a small model, and #375's Haiku runs acted on a hint
+ * only when it named the exact call.
+ *
+ * `route` is the whole way, both ends included: routines for `calls`, files
+ * for `needs`. `sites` is how many calls the tail makes, all of them read.
+ */
+function notDirectSentence(word: "calls" | "needs", route: readonly string[], arrow: string, sites?: number): string {
+  const [start, end] = [route[0]!, route[route.length - 1]!];
+  const between = route.slice(1, -1);
+  const hops = route.length - 1;
+  const rule = word === "calls"
+    ? `A calls arrow means a direct call. ${start} doesn't call ${end} directly`
+      + (sites === undefined ? "" : sites === 1 ? " (its one call was read)"
+        : sites === 2 ? " (both its calls were read)" : ` (all ${sites} of its calls were read)`)
+    : `A needs arrow means an import written in the file. ${start} doesn't import ${end} directly`;
+  return `${rule}; it gets there in ${hops} hop${hops === 1 ? "" : "s"}: ${route.join(" → ")}. `
+    + (between.length <= 3
+      ? `Draw ${list(between)} as ${between.length === 1 ? "a box" : "boxes"} between them`
+      : `Draw the ${between.length} steps as boxes between them`)
+    + `, or, if this arrow `
+    + `is a summary on purpose, mark it: edit_diagram updates ${JSON.stringify([{ id: arrow, via: between }])}.`;
+}
+
+/**
  * Where a refuted routine's calls went, said of the head's file: none of them
  * there, or the ones that were landed on something the head cannot be (#430).
  */
@@ -5215,6 +5258,19 @@ export function checkDrift(
             }
             const hops = needs.via.length + 1;
             const through = `it gets there in ${hops} steps, through ${needs.via.join(" -> ")}`;
+            /*
+             * Where the language may accuse, the hops are the red (2026-11-08:
+             * a plain arrow means direct), with the literal edit for each way
+             * out. Where it may not -- a Python tail that writes a name the
+             * head defines, which may reach it through a re-export -- the
+             * route is a note, and it says which name kept it one.
+             */
+            const held = needs.handedOn === "*"
+              ? ` ${fromPath} has a star import, which may hand on what ${toPath} defines, so this is not called wrong.`
+              : needs.handedOn && needs.handedOn !== "?"
+                ? ` ${fromPath} writes \`${needs.handedOn}\`, which ${toPath} defines and a re-export `
+                  + `may hand on, so this is not called wrong.`
+                : "";
             recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
               from: fromPath,
               to: toPath,
@@ -5223,14 +5279,11 @@ export function checkDrift(
               fromRef,
               toRef,
               kind: needs.mayAccuse ? "needs-indirect" : "needs-one-level-up",
-              detail:
-                `this arrow says ${oneLine(fromNode.label) || fromPath} needs `
-                + `${oneLine(toNode.label) || toPath}, and ${fromPath} does not import it -- `
-                + `${through}. `
-                + (needs.mayAccuse
-                  ? `@needs means the import written in ${fromPath}. Draw the hop, or say `
-                    + `\`claim: "depends"\`, which is this chain and is true.`
-                  : `Draw the hop, or leave the arrow where it is and read it as "depends on".`),
+              detail: needs.mayAccuse
+                ? notDirectSentence("needs", route, `${edge.from} -> ${edge.to}`)
+                : `this arrow says ${oneLine(fromNode.label) || fromPath} needs `
+                  + `${oneLine(toNode.label) || toPath}, and ${fromPath} does not import it -- `
+                  + `${through}.${held} Draw the hop, or leave the arrow where it is and read it as "depends on".`,
               route,
             }, rests: needsRests(needs.unplaced) });
             continue;
@@ -6155,15 +6208,103 @@ export function checkDrift(
               { cache: reachCache, ...declarationAsked },
             );
             /**
-             * The advisory a ruled-out accusation turns into -- unless the
-             * arrow already says it is this route (#375). `via` naming the
-             * routines the walk went through is a summary drawn on purpose,
-             * and the walk is that route checked, every hop a placed call.
+             * What a `calls-refuted` rests on (#393): every call written was
+             * read, and a call the language or outside code makes without it
+             * being written is the one thing a compiler is asked about.
              */
-            const oneLevelUp = (via: string[], hops: number): EdgeOutcome => {
+            const refutedRests = (evidence: CallsRefutedEvidence): RedRests => ({
+              written: !evidence.implicit,
+              unwritten: evidence.implicit?.outside
+                ? `a call code outside the repository may make on a value handed to it (\`${evidence.implicit.name}\`)`
+                : `a call the language makes without it being written (\`${evidence.implicit?.name}\`)`,
+              ...(evidence.implicit ? {
+                ask: (referee: ClosedBodyReferee) => askMember(
+                  referee,
+                  evidence.implicit!.values.map((one) => ({ file: fromPath, name: one.name, at: one })),
+                  evidence.implicit!.name,
+                  declaredIn(workspace.read(toFile), languageOf(toFile) ?? "python", toPath, evidence.implicit!.name),
+                ),
+              } : {}),
+            });
+            /**
+             * Whether the tail's own body rules out a direct call, asked when
+             * the far end was found calling back (`backwards`), which is read
+             * before the tail's calls are closed. The same closed reading
+             * `refuted` and `wrong-routine` stand on, with the call the other
+             * way set aside. Not for a class or an alias at the far end: the
+             * readings that make those red are not this one.
+             */
+            const forwardClosed = (hops: ReachHop[]) => {
+              if (toEnd.symbols.some((name) => isTypeName(head.source, name, head.language)
+                || onlyATypeAlias(head.source, name, head.language))) return undefined;
+              const forward = callsBetween({ ...tail, routine: fromEnd.symbols[0]! }, { ...head, names: toEnd.symbols }, false);
+              if (forward.verdict === "wrong-routine") return { rests: WRITTEN, sites: forward.evidence.sites, hops };
+              if (forward.verdict === "refuted") return { rests: refutedRests(forward.evidence), sites: forward.evidence.sites, hops };
+              return undefined;
+            };
+            /**
+             * Whether the route's first step is a call the tail writes and the
+             * closed reading placed at that routine: the same line, the same
+             * name, the same file. A route that leaves the tail any other way
+             * -- a routine handed to a library that runs it (`pipe(xs,
+             * helper)`), a `.call` on a field whose value the walk placed by
+             * name while the closed reading placed it outside -- is a route two
+             * readers disagree about, and the far end may be what runs. So is
+             * one whose first call is spelled like something that runs by name
+             * or runs its receiver (`getattr`, `.call`): #470's refusals, and
+             * on a live TypeScript check `this.derivation.call(..)` on a field
+             * holding a function is placed at the repository's `call` method.
+             */
+            const leavesByAWrittenCall = (hops: ReadonlyArray<{ file: string; routine: string; line: number }>): boolean => {
+              const first = hops[0];
+              if (!first) return false;
+              const reading = callSitesIn(tail);
+              if (!reading.read) return false;
+              if (spelledLikeARunner(first.routine, tail.language)) return false;
+              return reading.bodies.some((body) => body.sites.some((site) =>
+                site.line === first.line && site.file === first.file && site.name === first.routine));
+            };
+            /**
+             * What an arrow over a longer route gets -- unless the arrow
+             * already says it is this route (#375). `via` naming the routines
+             * the walk went through is a summary drawn on purpose, and the
+             * walk is that route checked, every hop a placed call.
+             *
+             * `settled` is the closed reading that ruled the direct call out:
+             * every call the tail makes was read and placed, and none is the
+             * far end. With it the arrow is wrong (2026-11-08: a plain arrow
+             * means direct), and the red shows the hops it found, because the
+             * route is the fix. Without it -- a backwards verdict whose
+             * forward body did not close -- a direct call is still possible,
+             * so the route is a note and the arrow is not sure.
+             */
+            const oneLevelUp = (
+              via: string[],
+              hops: number,
+              settled?: { rests: RedRests; sites: number; hops: ReadonlyArray<{ file: string; routine: string; line: number }> },
+            ): EdgeOutcome => {
               if (viaNamesRoute(edge.via, via)) {
                 if (claimed) claims.callsConfirmed += 1;
                 return { kind: "confirmed" };
+              }
+              // A route of one step is the far end reached straight from the
+              // tail -- handed on by name, say -- which is no proof of "not directly".
+              if (settled && via.length > 2 && leavesByAWrittenCall(settled.hops)) {
+                return {
+                  kind: "finding",
+                  finding: {
+                    from: fromPath,
+                    to: toPath,
+                    fromLabel: fromNode.label,
+                    toLabel: toNode.label,
+                    fromRef,
+                    toRef,
+                    kind: "calls-indirect",
+                    detail: notDirectSentence("calls", via, `${edge.from} -> ${edge.to}`, settled.sites),
+                    route: via,
+                  },
+                  rests: settled.rests,
+                };
               }
               return {
                 kind: "finding",
@@ -6230,7 +6371,7 @@ export function checkDrift(
               if (alsoForward.verdict === "reached") {
                 edgesChecked += 1;
                 recordEdge(edge, fromNode, toNode,
-                  oneLevelUp(alsoForward.via, alsoForward.hops.length));
+                  oneLevelUp(alsoForward.via, alsoForward.hops.length, forwardClosed(alsoForward.hops)));
                 continue;
               }
               edgesChecked += 1;
@@ -6268,8 +6409,8 @@ export function checkDrift(
               const throughAChain = reaching();
               if (throughAChain.verdict === "reached") {
                 edgesChecked += 1;
-                recordEdge(edge, fromNode, toNode,
-                  oneLevelUp(throughAChain.via, throughAChain.hops.length));
+                recordEdge(edge, fromNode, toNode, oneLevelUp(throughAChain.via, throughAChain.hops.length,
+                  { rests: WRITTEN, sites: verdict.evidence.sites, hops: throughAChain.hops }));
                 continue;
               }
               edgesChecked += 1;
@@ -6317,8 +6458,8 @@ export function checkDrift(
               const throughAChain = reaching();
               if (throughAChain.verdict === "reached") {
                 edgesChecked += 1;
-                recordEdge(edge, fromNode, toNode,
-                  oneLevelUp(throughAChain.via, throughAChain.hops.length));
+                recordEdge(edge, fromNode, toNode, oneLevelUp(throughAChain.via, throughAChain.hops.length,
+                  { rests: refutedRests(verdict.evidence), sites: verdict.evidence.sites, hops: throughAChain.hops }));
                 continue;
               }
               const wasClaimed = baselineGraph?.edges.some(
@@ -6340,20 +6481,7 @@ export function checkDrift(
                   + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
                   + `them, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `
                   + `${fromPath} line ${verdict.evidence.line} is where ${verdict.evidence.routine} is declared.`,
-              }, rests: {
-                written: !verdict.evidence.implicit,
-                unwritten: verdict.evidence.implicit?.outside
-                  ? `a call code outside the repository may make on a value handed to it (\`${verdict.evidence.implicit.name}\`)`
-                  : `a call the language makes without it being written (\`${verdict.evidence.implicit?.name}\`)`,
-                ...(verdict.evidence.implicit ? {
-                  ask: (referee: ClosedBodyReferee) => askMember(
-                    referee,
-                    verdict.evidence.implicit!.values.map((one) => ({ file: fromPath, name: one.name, at: one })),
-                    verdict.evidence.implicit!.name,
-                    declaredIn(workspace.read(toFile), languageOf(toFile) ?? "python", toPath, verdict.evidence.implicit!.name),
-                  ),
-                } : {}),
-              } }); };
+              }, rests: refutedRests(verdict.evidence) }); };
               if (verdict.evidence.elsewhere) besideTheHead = refute;
               else { refute(); continue; }
             }

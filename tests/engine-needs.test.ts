@@ -442,14 +442,26 @@ describe("an import that is not there (#323)", () => {
       .toMatchObject({ verdict: "indirect", via: ["service.ts"], mayAccuse: true });
   });
 
-  it("leaves a Python chain unaccused, because six true imports hide behind one", () => {
+  it("calls a Python chain wrong when the tail writes nothing the head defines", () => {
     const layered = {
       "app.py": "from .service import run\n",
       "service.py": "from .database import db\n\ndef run():\n    return db\n",
       "database.py": "db = 1\n",
     };
     expect(checkNeeds("app.py", "database.py", fakeWorkspace(layered)))
-      .toMatchObject({ verdict: "indirect", via: ["service.py"], mayAccuse: false });
+      .toMatchObject({ verdict: "indirect", via: ["service.py"], mayAccuse: true });
+  });
+
+  it("leaves a Python chain unaccused when the tail writes a name the head defines", () => {
+    // Five true imports of 12,693 hide behind a chain, every one a name a
+    // package hands on further than the reader follows: the tail writes it.
+    const layered = {
+      "app.py": "from .service import run\n\nx = run() or db\n",
+      "service.py": "from .database import db\n\ndef run():\n    return db\n",
+      "database.py": "db = 1\n",
+    };
+    expect(checkNeeds("app.py", "database.py", fakeWorkspace(layered)))
+      .toMatchObject({ verdict: "indirect", via: ["service.py"], mayAccuse: false, handedOn: "db" });
   });
 
   it("follows a star re-export chain and confirms, rather than reporting a route", () => {
@@ -620,8 +632,8 @@ describe("what the board does with it", () => {
     const layered = { ...files, "c.ts": 'import { b } from "./b";\nexport const c = b;\n' };
     const report = await verdicts(await boardOf("c.ts", "a.ts", { claim: "needs" }), layered);
     expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-indirect"]);
-    expect(report.edges[0]!.detail).toContain("through b.ts");
-    expect(report.edges[0]!.detail).toContain('claim: "depends"');
+    expect(report.edges[0]!.detail).toContain("c.ts → b.ts → a.ts");
+    expect(report.edges[0]!.detail).toContain('"via":["b.ts"]');
     expect(accuses(report.edges[0]!.kind)).toBe(true);
   });
 

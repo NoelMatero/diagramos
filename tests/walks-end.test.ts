@@ -91,9 +91,9 @@ describe("an arrow from a routine to itself, reached through another one", () =>
     it(`ends, and says it gets there one level up (${language})`, () => {
       const [files, ref] = THROUGH_ONE[language];
       const answer = board(files, ref);
-      // The note, not a red and not silence.
-      expect(answer.edges.map(([kind]) => kind)).toEqual(["calls-one-level-up"]);
-      expect(answer.edges[0]![1]).toContain("in 2 steps, through a -> b -> a.");
+      // A red naming the hops (a plain arrow means direct), and not a hang.
+      expect(answer.edges.map(([kind]) => kind)).toEqual(["calls-indirect"]);
+      expect(answer.edges[0]![1]).toContain("in 2 hops: a → b → a.");
       expect(answer.confirmed).toBe(0);
     }, LIMIT_MS + 10_000);
   }
@@ -104,8 +104,8 @@ describe("an arrow from a routine to itself, reached through two others", () => 
     it(`ends, and names the whole circle (${language})`, () => {
       const [files, ref] = THROUGH_TWO[language];
       const answer = board(files, ref);
-      expect(answer.edges.map(([kind]) => kind)).toEqual(["calls-one-level-up"]);
-      expect(answer.edges[0]![1]).toContain("in 3 steps, through a -> b -> c -> a.");
+      expect(answer.edges.map(([kind]) => kind)).toEqual(["calls-indirect"]);
+      expect(answer.edges[0]![1]).toContain("in 3 hops: a → b → c → a.");
     }, LIMIT_MS + 10_000);
   }
 });

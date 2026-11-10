@@ -106,22 +106,23 @@ describe("absent is not a finding, and this is the test that keeps it true", () 
   });
 });
 
-describe("an arrow one level too high is not an arrow that is wrong", () => {
+describe("an arrow one level too high is wrong, and says the route", () => {
   /*
    * `measure:reach` put 545 genuinely-reaching pairs from two repositories in
-   * front of `@calls`: 58 came back `refuted` and one `backwards`, so 59 red
-   * accusations landed on arrows whose code really does reach. Every one is
+   * front of `@calls`: 58 came back `refuted` and one `backwards`. Every one is
    * the shape below -- the routine calls a helper, and the helper calls the
    * far end.
    *
-   * The accusation is not wrong about the *call*; it is wrong about what the
-   * person holding the board will do with it, which is delete an arrow that
-   * was right. So it becomes an advisory that names the route.
+   * Until 2026-11-08 that was an advisory, so the person holding the board
+   * would not delete an arrow that reaches. A plain arrow means a direct call,
+   * though, and the arrow claims one that is not there: now it is red, and the
+   * red names the route, so the fix is to draw the helper or mark the arrow a
+   * summary -- not to delete it.
    */
   const HELPER = 'import { render } from "./b";\n'
     + "export function draw(n: number) { return render(n); }\n";
 
-  it("says reached rather than refuted when a helper gets there", async () => {
+  it("says reached, red, rather than refuted when a helper gets there", async () => {
     const caller = 'import { draw } from "./helper";\n'
       + "export function run() { return draw(1); }\n";
     const board = await boardOf("src/a.ts#run", "src/b.ts#render", { claim: "calls" });
@@ -130,9 +131,9 @@ describe("an arrow one level too high is not an arrow that is wrong", () => {
     }), { edges: true });
 
     expect(report.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
-    const advisory = report.edges.filter((finding) => finding.kind === "calls-one-level-up");
-    expect(advisory).toHaveLength(1);
-    expect(advisory[0]!.detail).toContain("run -> draw -> render");
+    const red = report.edges.filter((finding) => finding.kind === "calls-indirect");
+    expect(red).toHaveLength(1);
+    expect(red[0]!.detail).toContain("run → draw → render");
   });
 
   it("keeps the accusation when nothing on the way gets there either", async () => {
@@ -147,7 +148,7 @@ describe("an arrow one level too high is not an arrow that is wrong", () => {
       "src/a.ts": caller, "src/helper.ts": elsewhere, "src/b.ts": CALLEE,
     }), { edges: true });
 
-    expect(report.edges.filter((finding) => finding.kind === "calls-one-level-up")).toEqual([]);
+    expect(report.edges.filter((finding) => finding.kind === "calls-indirect")).toEqual([]);
     expect(report.edges.filter((finding) => finding.kind === "calls-refuted")).toHaveLength(1);
   });
 
@@ -156,6 +157,8 @@ describe("an arrow one level too high is not an arrow that is wrong", () => {
      * The `backwards` half of the same guard. `render` calls `run` directly,
      * and `run` reaches `render` through the helper, so both calls are real --
      * "turn the arrow round" would be advice to break a board that is right.
+     * Every call `run` makes was read, so forwards is not direct either: red,
+     * with the route, not "turn it round".
      */
     const caller = 'import { draw } from "./helper";\n'
       + "export function run() { return draw(1); }\n";
@@ -167,7 +170,7 @@ describe("an arrow one level too high is not an arrow that is wrong", () => {
     }), { edges: true });
 
     expect(report.edges.filter((finding) => finding.kind === "calls-backwards")).toEqual([]);
-    expect(report.edges.filter((finding) => finding.kind === "calls-one-level-up")).toHaveLength(1);
+    expect(report.edges.filter((finding) => finding.kind === "calls-indirect")).toHaveLength(1);
   });
 });
 

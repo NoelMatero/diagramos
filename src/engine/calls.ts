@@ -1436,6 +1436,18 @@ const RUNS_A_VALUE = new Set(["call", "apply"]);
 const JAVASCRIPT = new Set<Language>(["ts", "tsx", "js"]);
 
 /**
+ * Whether a call spelled this way may run something other than a routine of
+ * that name: a built-in that calls by name (`getattr`, `eval`) or JavaScript's
+ * `.call` / `.apply`, which run their receiver. Asked of the first step of a
+ * route before an arrow over it is called wrong (`calls-indirect`): a
+ * repository's own `getattr` or an object's own `call` method is placed
+ * there, and the readers that place them are the ones #470 found unsure.
+ */
+export function spelledLikeARunner(name: string, language: Language): boolean {
+  return REACHES_ANYTHING_IN[language].has(name) || (JAVASCRIPT.has(language) && RUNS_A_VALUE.has(name));
+}
+
+/**
  * What JavaScript's `x.call(thisArg, ...)` and `x.apply(thisArg, xs)` run
  * (#470): `x`, when `x` is a function -- `render.call(null, 1)` is a call of
  * `render`, `Object.prototype.hasOwnProperty.call(o, k)` a library's. When

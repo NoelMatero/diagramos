@@ -104,8 +104,23 @@ files is somebody reading the architecture, and 26 of the 243 file pairs Haiku
 drew on the planted set are that shape. [Item 44](#forty-two-times-a-measurement-contradicted-the-design)
 has the numbers.
 
+**Since 2026-11-08 a plain arrow means direct, and the route is the red.** The
+user's decision, on the November missed map: an arrow over a longer route is
+wrong, because it claims a call or an import that is not there, and the hops
+are what make the red worth having. So `calls-indirect` and `needs-indirect`
+accuse wherever the direct one is ruled out -- for `@calls`, every call the
+tail makes read and placed and none of them the head; for `@needs`, the
+language's indirect licence, which Python now has behind a guard (a tail that
+writes a name the head defines may be using it through a re-export, and keeps
+the note). Where a direct one stays possible, `calls-one-level-up` and
+`needs-one-level-up` remain notes with the route. The fix the red offers is to
+draw the hops, or to mark the arrow a summary with `via`, below. An
+"indirect" arrow kind that is green when the route exists is for later.
+[Item 53](#forty-two-times-a-measurement-contradicted-the-design) has the
+numbers.
+
 **Since #375 a summary can say it is one.** Every finding with that reading
-(`calls-one-level-up`, `needs-one-level-up`, `needs-indirect`) carries the
+(`calls-one-level-up`, `calls-indirect`, `needs-one-level-up`, `needs-indirect`) carries the
 route it found as `route`, and the draw-time result names it to the agent while
 it is still drawing. The marker for "this arrow is the whole path, on purpose"
 is `via`, which arrows already had for naming their hops: a `calls` or `needs`
@@ -4954,6 +4969,40 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     interface). `@accesses` from a class needed nothing: #297 already reads
     a class tail through its methods, and `tests/accesses-from-a-class.test.ts`
     holds that as a guard.
+
+53. **A plain arrow means direct: the route the checker already found became
+    the red (2026-11-08).**
+
+    The checker worked out "it gets there in 2 steps, through X" and then
+    answered "not sure", so the wrong arrow was never flagged: 29 / 28 / 19
+    wrong arrows on main / holdout / holdout-b, never a correct one. Now
+    `calls-indirect` and `needs-indirect` accuse with the hops, and the fix
+    they offer is to draw the hops or mark the arrow a summary with `via`.
+
+    **Two refusals the bench could not have found.** CI did, in #469's and
+    #470's design-record tests, which were quiet on main only because the
+    chain turned their reds into notes. A route that leaves the tail through
+    a routine handed to a library (`pipe(xs, helper)`, `Thread(target=..)`)
+    is not one the tail takes by calling; and a first call spelled like a
+    runner (`getattr`, `.call`, `.apply`) may run the head itself -- a live
+    TypeScript check places `this.derivation.call(..)` on a field holding a
+    function at the repository's own `call` method. Both keep the note.
+    `measure:recall` found the third: Django's package files star-import and
+    write no name, and five true imports went red until a star import kept
+    the note too.
+
+    | measured on the branch | true pairs | called wrong |
+    |---|---:|---:|
+    | `measure:recall --words=needs`, Python, .corpus | 12,693 | 0 |
+    | the same, holdout and holdout-b Python projects | 7,146 | 0 |
+    | `measure:compiler-true --words=calls`, TypeScript | 5,575 | 0 |
+    | the same, Python | 2,551 | 0 |
+    | the same, Rust | 4,290 | 1, the same `calls-refuted` main gives |
+
+    A live trace of the 74 arrows blocked by this alone: 68 meet the bar. The
+    six that do not are two whose tail's own calls stay open, two Python
+    tails that write a name the head defines, one end marked external, and
+    one red a compiler could not back.
 
 ## Open, in the order worth doing
 
