@@ -1191,6 +1191,18 @@ function renderedBy(node: Node): Callee | undefined {
   return calleeOfNode(name);
 }
 
+/**
+ * Where the name a node calls is written -- `foo` in `foo()`, `x.foo()`,
+ * `Type::foo()`, `new Foo()`, `<Foo />` -- or `undefined` when the node is no
+ * call or calls nothing by name. `stored.ts` reads a name written anywhere
+ * else as a name used as a value.
+ */
+export function calledNameAt(node: Node): number | undefined {
+  const callee = calleeOf(node) ?? constructedBy(node) ?? renderedBy(node);
+  if (!callee || callee.kind === "computed") return undefined;
+  return callee.kind === "through" ? callee.memberAt.start : callee.nameAt.start;
+}
+
 function calleeOfNode(written: Node): Callee {
   const callee = unwrapped(written);
   if (callee.childCount === 0) {
