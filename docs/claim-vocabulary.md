@@ -4970,6 +4970,40 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     a class tail through its methods, and `tests/accesses-from-a-class.test.ts`
     holds that as a guard.
 
+53. **A plain arrow means direct: the route the checker already found became
+    the red (2026-11-08).**
+
+    The checker worked out "it gets there in 2 steps, through X" and then
+    answered "not sure", so the wrong arrow was never flagged: 29 / 28 / 19
+    wrong arrows on main / holdout / holdout-b, never a correct one. Now
+    `calls-indirect` and `needs-indirect` accuse with the hops, and the fix
+    they offer is to draw the hops or mark the arrow a summary with `via`.
+
+    **Two refusals the bench could not have found.** CI did, in #469's and
+    #470's design-record tests, which were quiet on main only because the
+    chain turned their reds into notes. A route that leaves the tail through
+    a routine handed to a library (`pipe(xs, helper)`, `Thread(target=..)`)
+    is not one the tail takes by calling; and a first call spelled like a
+    runner (`getattr`, `.call`, `.apply`) may run the head itself -- a live
+    TypeScript check places `this.derivation.call(..)` on a field holding a
+    function at the repository's own `call` method. Both keep the note.
+    `measure:recall` found the third: Django's package files star-import and
+    write no name, and five true imports went red until a star import kept
+    the note too.
+
+    | measured on the branch | true pairs | called wrong |
+    |---|---:|---:|
+    | `measure:recall --words=needs`, Python, .corpus | 12,693 | 0 |
+    | the same, holdout and holdout-b Python projects | 7,146 | 0 |
+    | `measure:compiler-true --words=calls`, TypeScript | 5,575 | 0 |
+    | the same, Python | 2,551 | 0 |
+    | the same, Rust | 4,290 | 1, the same `calls-refuted` main gives |
+
+    A live trace of the 74 arrows blocked by this alone: 68 meet the bar. The
+    six that do not are two whose tail's own calls stay open, two Python
+    tails that write a name the head defines, one end marked external, and
+    one red a compiler could not back.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is
