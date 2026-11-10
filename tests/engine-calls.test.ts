@@ -387,23 +387,18 @@ describe("an absent verdict says which wall the reading hit (#324)", () => {
     expect(mayAccuse("calls", "js")).toBe(false);
   });
 
-  it("says routine-not-found when the arrow starts at a class rather than a routine", () => {
+  it("says routine-not-found when the tail names a class merged with an interface", () => {
     /*
-     * The tail names something that is declared and has no call list of its
-     * own. The forward read finds no call and raises no doubt -- there is
-     * nothing wrong with the name -- and then the closed reading has no body
-     * to enumerate, so the two readers disagree about whether the thing
-     * exists at all.
-     *
-     * All 12 of these on the planted boards are exactly this: `Dep`,
-     * `ShapeCache`, `RoutesResolver`, `PydanticDataclass`. The same
-     * board-side mistake behind the 18 arrows the checker outright agrees
-     * with -- an arrow drawn from a type, where only something that runs can
-     * call. Named here so the two can be counted together later.
+     * Until #459 every class tail ended here: `Dep`, `ShapeCache`,
+     * `RoutesResolver`, `PydanticDataclass`, all 12 on the planted boards
+     * of the day. A class is read through its own code now (see
+     * calls-class-tail.test.ts). What is left is a name declared as a class
+     * *and* something else -- here an interface merged into it -- where
+     * which declaration the box means is not in the text.
      */
     const verdict = ask({
       "src/a.ts": {
-        source: "export class Dep {\n  track() { return 1; }\n}\n",
+        source: "export interface Dep {\n  size: number;\n}\nexport class Dep {\n  track() { return 1; }\n}\n",
         language: "ts",
       },
       "src/b.ts": { source: "export function render() { return 2; }\n", language: "ts" },

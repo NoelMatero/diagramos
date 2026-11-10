@@ -276,12 +276,35 @@ describe("an unverified @calls arrow says what stopped the check (#324)", () => 
    */
   it("names the wall, and still does not accuse", async () => {
     /*
-     * The arrow starts at a class. There is no call list to close, because
-     * there is no body -- and "nothing in the calling file declares that
-     * routine" is a sentence somebody can act on, where the old one was not.
+     * The arrow starts at a class with a base the checker does not read.
+     * Since #459 a class tail is read through its own methods, and this one
+     * calls nothing -- but `Base`'s methods run on it too, and they are in a
+     * file nobody opened. "the class takes code from a base" is a sentence
+     * somebody can act on, where "could not answer" was not.
      *
      * Still silence: `report.edges` is empty. A named reason for not knowing
      * is not an accusation, and must never become one.
+     */
+    const board = await boardOf("src/a.ts#Dep", "src/b.ts#render", { claim: "calls" });
+    const report = checkDrift(board, fakeWorkspace({
+      "src/a.ts": 'import { Base } from "./base";\nexport class Dep extends Base {\n  track() { return 1; }\n}\n',
+      "src/base.ts": "export class Base {}\n",
+      "src/b.ts": CALLEE,
+    }), { edges: true });
+
+    expect(report.edges).toEqual([]);
+    expect(report.claims.callsNotClosed["tail-inherits"]).toBe(1);
+    expect(report.unconfirmedEdges[0]?.detail)
+      .toContain("the class takes code from a base or a trait that was not read");
+  });
+
+  it("calls an arrow from a class wrong when none of its own code calls the far end (#459)", async () => {
+    /*
+     * Before #459 this was the shape above, and silent: the checker took the
+     * tail for a routine, found none called `Dep`, and said "nothing in the
+     * calling file declares that routine". Every arrow drawn from a class
+     * stayed "not sure", right or wrong. `Dep`'s one method is read, it
+     * calls nothing, and nothing else of the class's runs.
      */
     const board = await boardOf("src/a.ts#Dep", "src/b.ts#render", { claim: "calls" });
     const report = checkDrift(board, fakeWorkspace({
@@ -289,10 +312,9 @@ describe("an unverified @calls arrow says what stopped the check (#324)", () => 
       "src/b.ts": CALLEE,
     }), { edges: true });
 
-    expect(report.edges).toEqual([]);
-    expect(report.claims.callsNotClosed["routine-not-found"]).toBe(1);
-    expect(report.unconfirmedEdges[0]?.detail)
-      .toContain("nothing in the calling file declares that routine");
+    expect(report.edges.map((one) => one.kind)).toEqual(["calls-refuted"]);
+    expect(report.edges[0]!.detail).toContain("every call Dep makes was checked");
+    expect(report.edges[0]!.detail).toContain("src/a.ts line 1 is where Dep is declared");
   });
 
   it("calls the arrow wrong, and says which routine it actually reaches (#329)", async () => {
