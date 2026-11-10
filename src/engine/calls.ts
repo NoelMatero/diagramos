@@ -206,6 +206,11 @@ export interface CallsRefutedEvidence {
    */
   elsewhere?: Array<{ name: string; line: number }>;
   /**
+   * How many of `sites` call through an interface, a trait or an override
+   * (#351), each read as running a routine of the name it calls.
+   */
+  dispatched?: number;
+  /**
    * The head is a method the language runs without it being written (#384):
    * a Python `__dunder__` an operator or builtin calls, or TypeScript's
    * `toString`, `valueOf`, `toJSON`, `then`. No written call is then no
@@ -525,6 +530,20 @@ export interface CallSide {
    * existed. `drift.ts` hands it to every side it builds.
    */
   overridden?: (holder: string, member: string) => boolean;
+  /**
+   * Whether the repository anywhere writes a routine named `name` so that it
+   * can run under another name (#351, `stored.ts`): named as a value, read by
+   * a name in a string, renamed by an import, or called from a function with
+   * no name of its own. `member`: the routine is a method, which a bare name
+   * does not reach.
+   *
+   * Asked of a call through an interface, a trait or an override, which runs
+   * a routine of the name it calls: when this says no for every name the head
+   * has, that call is not the head. Absent, nobody asked, and such a call
+   * keeps the arrow a doubt as it always did. `drift.ts` hands it to `@calls`'
+   * tail.
+   */
+  runsUnderAnotherName?: (name: string, member: boolean) => boolean;
   /**
    * The crate the Rust compiler built this file into, when it has (#357) --
    * every body after macro expansion, with every call it makes.
@@ -2979,6 +2998,57 @@ function listedCall(
   return { name, inside: from.routine, line: first ? lineOf(from.source, first.startIndex) : 1, wrote: `${name}(..), in rustc's call list` };
 }
 
+/**
+ * Names whose call runs whatever the value holds, under any name: a
+ * function's own `call`/`apply`/`bind`, Rust's `Fn` traits, Python's
+ * `__call__`.
+ */
+const RUNS_WHAT_IT_HOLDS = new Set(["call", "apply", "bind", "call_mut", "call_once", "__call__"]);
+
+/**
+ * Whether a call through an interface, a trait or an override (#351) is
+ * certainly not the head: it runs a routine of the name it calls, the head
+ * has none of that name, and nothing in the repository stores the head
+ * where a call of another name would find it (`stored.ts`).
+ *
+ * The head has to be routines and nothing else -- a class runs its methods
+ * under their own names -- and none of them one the language runs by a name
+ * nobody writes: a constructor runs when its class is made, and a Python
+ * `__dunder__` when an operator or a builtin wants it.
+ */
+function runsItsOwnName(
+  site: CallSitePlaced,
+  from: CallSide,
+  to: CallSide & { names: string[] },
+): boolean {
+  if (!from.runsUnderAnotherName || !site.name) return false;
+  const plain = (name: string) => name.replace(/^(#|r#)/, "");
+  const called = plain(site.name);
+  if (RUNS_WHAT_IT_HOLDS.has(called)) return false;
+  const runsAs = [called, ...(site.declaredAs ? [plain(site.declaredAs)] : [])];
+  if (to.names.length === 0) return false;
+  for (const name of to.names) {
+    const head = plain(name);
+    if (runsAs.includes(head) || head === "constructor" || /^__\w+__$/.test(head)) return false;
+    if (!isRoutine(to.source, name, to.language)) return false;
+    if (from.runsUnderAnotherName(head, onlyAMethod(to.source, to.language, name))) return false;
+  }
+  return true;
+}
+
+/** Whether every routine of this name in the file is a method of a class, an `impl` or a trait. */
+function onlyAMethod(source: string, language: Language, name: string): boolean {
+  const tree = parseSource(source, language);
+  if (!tree) return false;
+  const holders = holdersIn(tree.rootNode);
+  const routines = routinesNamed(source, name, language).routines
+    .filter((node) => parametersOf(node) ?? parametersOf(node.childForFieldName("value")));
+  return routines.length > 0 && routines.every((node) => {
+    const holder = holders.get(node.id);
+    return holder !== undefined && /class|impl_item|trait_item/.test(holder.type);
+  });
+}
+
 /** `closedBodyRefutes` as it was before #357: the text reading alone. */
 function textClosed(
   from: CallSide & { routine: string },
@@ -3006,6 +3076,7 @@ function textClosed(
   };
 
   let sites = 0;
+  let dispatched = 0;
   const reached: Array<{ name: string; line: number }> = [];
   let hooked: boolean | undefined;
   const elsewhere: Array<{ name: string; line: number }> = [];
@@ -3029,6 +3100,16 @@ function textClosed(
        * there. So the guard is on the answer, not on how the call was spelt.
        */
       if (site.concrete === false || site.overridden) {
+        /*
+         * A call through an interface, a trait or an override runs a
+         * routine of the name it calls (#351). Where the head has other
+         * names and nothing stores it under one, that call is read.
+         */
+        if (runsItsOwnName(site, from, to)) {
+          dispatched += 1;
+          sites += 1;
+          continue;
+        }
         const stopped = stop(site.concrete === false ? "abstract-receiver" : "overridden");
         if (stopped) return stopped;
         continue;
@@ -3096,7 +3177,11 @@ function textClosed(
   if (notWhole) return { why: notWhole };
   const line = typeTail ? typeTail.line : bodies[0]!.line;
   if (reached.length === 0) {
-    return { evidence: { routine: from.routine, line, sites, ...(elsewhere.length > 0 ? { elsewhere } : {}) }, ...readMacros };
+    return { evidence: {
+      routine: from.routine, line, sites,
+      ...(elsewhere.length > 0 ? { elsewhere } : {}),
+      ...(dispatched > 0 ? { dispatched } : {}),
+    }, ...readMacros };
   }
   /*
    * An arrow drawn at a **type** is a different mistake and not this one

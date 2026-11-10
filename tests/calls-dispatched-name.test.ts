@@ -18,14 +18,25 @@
  * definition" landing the call on an interface's method the way a compiler
  * answers, says whether the arrow is refuted.
  */
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { emptyBoard, type BoardFile } from "../src/engine/board-file";
+import { createDiagram } from "../src/engine/diagram";
+import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace } from "../src/engine/drift";
 import { callsBetween, type CallSide, type CallsVerdict } from "../src/engine/calls";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
 import { storedIn } from "../src/engine/stored";
+import { installExcalifontMeasurer } from "./helpers/excalifont";
+
+installExcalifontMeasurer();
 
 beforeAll(async () => { await initEngine(); }, 60_000);
 
+const ACCUSING = new Set<string>(ACCUSING_EDGE_KINDS);
 
 /** How each finding was written, for `name` read as a method (`member`) or as a free function. */
 function found(files: Record<string, string>, name: string, member: boolean): string[] {
@@ -222,4 +233,72 @@ describe("a name that only looks like the head's is not counted", () => {
     const keeps = worker.replace("{ return await fn(); }", "{ this.kept = fn; return await fn(); }");
     expect(found({ ...TS, "worker.ts": keeps }, "handleCompleted", true)).toContain("wrapped");
   });
+});
+
+describe("a wrong arrow through a dispatched call is called wrong", () => {
+  it("in TypeScript, for a free function and for a method", () => {
+    for (const arrow of [TS_FREE, TS_METHOD]) {
+      const one = verdict(TS, arrow.from, arrow.to, TS_IFACE);
+      expect(one.verdict).toBe("refuted");
+      if (one.verdict === "refuted") expect(one.evidence.dispatched).toBe(1);
+    }
+  });
+
+  it("in Python, for a free function and for a method", () => {
+    for (const arrow of [PY_FREE, PY_METHOD]) expect(verdict(PY, arrow.from, arrow.to, PY_IFACE).verdict).toBe("refuted");
+  });
+
+  it("in Rust, for a free function and for a method", () => {
+    for (const arrow of [RS_FREE, RS_METHOD]) expect(verdict(RS, arrow.from, arrow.to, RS_IFACE).verdict).toBe("refuted");
+  });
+
+  it("when the head is only called by name, from a named routine or directly", () => {
+    const files = {
+      ...TS,
+      "wire.ts": "import { handleFailed } from \"./worker\";\nexport class Impl {\n  onError(e: Error) { return handleFailed(e); }\n}\n",
+    };
+    expect(verdict(files, TS_FREE.from, TS_FREE.to, TS_IFACE).verdict).toBe("refuted");
+  });
+});
+
+describe("through the whole check, with no compiler", () => {
+  /*
+   * A base class calling its own method that a subclass replaces is marked
+   * from the text alone (#353), so `checkDrift` with no referee reads the
+   * same rule a live check does.
+   */
+  const FILES = {
+    "base.py":
+      "class Transport:\n    def handle(self, r):\n        raise NotImplementedError\n\n"
+      + "    def send(self, r):\n        return self.handle(r)\n",
+    "http.py":
+      "from base import Transport\n\n\nclass HTTPTransport(Transport):\n    def handle(self, r):\n        return r\n",
+    "render.py": "def render(n):\n    return n\n",
+  };
+
+  async function reds(files: Record<string, string>): Promise<Array<{ kind: string; detail: string }>> {
+    const repo = mkdtempSync(path.join(tmpdir(), "calls-dispatched-"));
+    try {
+      for (const [file, source] of Object.entries(files)) writeFileSync(path.join(repo, file), source);
+      const { board } = await createDiagram(emptyBoard(), {
+        name: "arch",
+        nodes: [{ id: "a", label: "send", ref: "base.py#send" }, { id: "b", label: "render", ref: "render.py#render" }],
+        edges: [{ from: "a", to: "b", claim: "calls" }],
+      });
+      const report = checkDrift(board as BoardFile, createWorkspace(repo), { edges: true });
+      return report.edges.filter((one) => ACCUSING.has(one.kind));
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  }
+
+  it("calls the arrow wrong, and says the override was read", async () => {
+    const found = await reds(FILES);
+    expect(found.map((one) => one.kind)).toEqual(["calls-refuted"]);
+    expect(found[0]!.detail).toContain("one through an interface or an override, which runs a method of the name it calls");
+  }, 60_000);
+
+  it("leaves it alone when the head is stored somewhere", async () => {
+    expect(await reds({ ...FILES, "wire.py": "from render import render\n\nHOOKS = [render]\n" })).toEqual([]);
+  }, 60_000);
 });
