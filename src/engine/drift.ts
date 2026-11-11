@@ -1007,6 +1007,37 @@ export function lackingSentence(
     + `${LACKING_FIX[lacking.part]}, or drop the claim.`;
 }
 
+/** How a red about a claim written this turn opens, kept when another red takes its place (#463). */
+const FRESH = "a claim written this turn is already wrong: ";
+
+/**
+ * Which end each word's own reader reads, for the kind check asked behind a
+ * red the gate withdrew (#463).
+ *
+ * A withdrawn red said "what I read here does not name the other end", and
+ * the compiler could not settle it. Whether the *other* end is even the right
+ * kind of thing is a question that reader never asked, and the text answers
+ * it: `processSchema @takes ToJSONSchemaContext` is drawn from a function,
+ * and `SmartRouter @conforms match` into a method.
+ *
+ * The end the reader read is left alone. The signature words read their
+ * head's signature, and on a class they read its constructor; telling that
+ * end it has no parameters would contradict the reader that just read them,
+ * and "Config @takes Service" for a constructor that takes a Config is how
+ * people draw it. So the question goes to the other end only.
+ *
+ * Only these four words. `@builds` reds are written and never withdrawn, and
+ * whether a data end of `@calls`, `@feeds` or `@accesses` can run is a
+ * compiler's question: a field holding a function is called all day long
+ * (django's `self._middleware_chain`).
+ */
+const KIND_BEHIND_A_WITHDRAWN_RED: Partial<Record<ArrowClaim, "from" | "to">> = {
+  takes: "from",
+  returns: "from",
+  holds: "to",
+  conforms: "to",
+};
+
 /**
  * An arrow that was read and could not be corroborated.
  *
@@ -3797,6 +3828,12 @@ export function checkDrift(
   /** Every name a `calls` arrow from each node points at, to say which choices are drawn. */
   const callsDrawn = new Map<string, Set<string>>();
   const gated: GatedRed[] = [];
+  /**
+   * The arrow being checked's own kind question, for `recordEdge` to ask when
+   * the gate withdraws a red (#463). Set per arrow once both ends are named,
+   * cleared at the top of every arrow; see `KIND_BEHIND_A_WITHDRAWN_RED`.
+   */
+  let kindAfterWithdrawal: (() => LackingEnd | undefined) | undefined;
   /** Arrows read through a box marked external that is code here, and the sentence saying so (#366). */
   const markedWrongly = new Map<string, string>();
   /** Of those, the arrows read through a box marked external at a whole file, which may confirm and never accuse (#435). */
@@ -3967,7 +4004,27 @@ export function checkDrift(
         referee: referee !== undefined,
         ...(verdict.said ? { said: verdict.said } : {}),
       });
-      if (!verdict.stands) {
+      /*
+       * Withdrawn, and not because the compiler said the code does it: before
+       * settling on "not sure", is an end plainly the wrong kind of thing for
+       * the word (#463)? That answer rests on what the code writes, and it
+       * takes the withdrawn red's place. The gate's entry above is kept, so a
+       * first pass with no compiler still starts one, and a compiler's "it
+       * does" withdraws the red without this being asked.
+       */
+      const lacking = !verdict.stands && verdict.why !== "compiler-says-it-does" && edge.claim
+        ? kindAfterWithdrawal?.()
+        : undefined;
+      if (lacking && edge.claim && outcome.kind === "finding") {
+        const { from, to, fromLabel, toLabel, fromRef, toRef } = outcome.finding;
+        outcome = { kind: "finding", finding: {
+          from, to, fromLabel, toLabel, fromRef, toRef,
+          kind: "end-lacks-part",
+          detail: (outcome.finding.detail.startsWith(FRESH) ? FRESH : "") + lackingSentence(
+            edge.claim, lacking, { label: oneLine(fromLabel) || from }, { label: oneLine(toLabel) || to },
+          ),
+        }, rests: WRITTEN };
+      } else if (!verdict.stands) {
         const answer = verdict.why === "compiler-says-it-does"
           ? `the compiler says it does${verdict.said ? `: ${verdict.said}` : ""}.`
           : verdict.why === "compiler-could-not-say"
@@ -4656,6 +4713,8 @@ export function checkDrift(
       // exit below name the arrow by its box labels instead of its raw ids.
       const fromNode = nodeById.get(edge.from);
       const toNode = nodeById.get(edge.to);
+      // The last arrow's kind question must never answer for this one (#463).
+      kindAfterWithdrawal = undefined;
 
       /*
        * An arrow carrying a claim is a question somebody asked on purpose, and
@@ -5343,6 +5402,21 @@ export function checkDrift(
       const fromEnd = { file: fromFile, path: fromPath, symbols: symbolsOf(fromNode, fromFile, workspace) };
       const toEnd = { file: toFile, path: toPath, symbols: symbolsOf(toNode, toFile, workspace) };
       const bothNamed = fromEnd.symbols.length > 0 && toEnd.symbols.length > 0;
+      /*
+       * Asked by `recordEdge` only if this claim's own red is withdrawn
+       * (#463), and only about the end its reader did not read. From the text
+       * alone: no compiler's answer about a value is taken here.
+       */
+      const askedEnd = edge.claim ? KIND_BEHIND_A_WITHDRAWN_RED[edge.claim] : undefined;
+      if (claimed && edge.claim && bothNamed && askedEnd) {
+        const claim = edge.claim;
+        const end = (side: "from" | "to") => side === askedEnd
+          ? { source: workspace.read(side === "from" ? fromFile : toFile),
+            language: languageOf(side === "from" ? fromFile : toFile),
+            symbols: (side === "from" ? fromEnd : toEnd).symbols }
+          : { source: "", language: undefined, symbols: [] };
+        kindAfterWithdrawal = () => lackingEnd(claim, end("from"), end("to"));
+      }
 
       /*
        * What this claim's own reader is about to count as "not sure", and what
