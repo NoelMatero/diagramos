@@ -51,7 +51,7 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[]): TruePair[] {
+export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[], options?: { dispatched?: boolean }): TruePair[] {
   const files = dirs.flatMap((dir) => walk(path.join(root, dir)));
   const reading = new Set(files);
   // The project's own settings: whether one type fits another depends on
@@ -219,6 +219,8 @@ export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[])
     }
   }
 
+  if (options?.dispatched) return dispatchedPairs(ts, checker, sources, routines, refOfDeclaration, rel);
+
   for (const routine of routines) {
     const { node } = routine;
     // takes: each parameter, by the type the compiler gives it.
@@ -339,5 +341,132 @@ export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[])
       add({ word: "conforms", from: `${rel(shape.node)}#${shape.name}`, to: `${rel(target.node)}#${target.name}`, how: "structural" });
     }
   }
+  return pairs;
+}
+
+/**
+ * `--dispatched` (#351): the calls the compiler resolves to an interface's
+ * method or an abstract one -- calls that run whatever the value holds -- each
+ * drawn to every routine the files read store under that method:
+ *
+ *   - `dispatched-impl`: a class that names the interface in `implements`
+ *     (or the abstract class in `extends`) and declares the method itself;
+ *   - `dispatched-stored`: an object literal the compiler types as the
+ *     interface, whose property of that name is a routine named as a value
+ *     (`{ onError: handleFailed }`, `{ onError: this.fail }`, `{ handleFailed }`);
+ *   - `dispatched-wrapped`: the same property holding a function with no
+ *     name, and each routine that function calls.
+ *
+ * Each is a place the call can run, so an arrow from the caller to it is one
+ * a careful reader may draw and the check must never call wrong. That is the
+ * population #351's rule puts at risk; the plain `calls` pairs never hold it,
+ * because the compiler's own answer for such a call is the interface.
+ */
+function dispatchedPairs(
+  ts: typeof TS,
+  checker: TS.TypeChecker,
+  sources: readonly TS.SourceFile[],
+  routines: ReadonlyArray<{ ref: string; node: TS.SignatureDeclaration & { body?: TS.Node } }>,
+  refOfDeclaration: Map<TS.Node, string>,
+  rel: (node: TS.Node) => string,
+): TruePair[] {
+  const pairs: TruePair[] = [];
+  const seen = new Set<string>();
+  const add = (pair: TruePair) => {
+    const key = `${pair.from} ${pair.to}`;
+    if (pair.from === pair.to || seen.has(key)) return;
+    seen.add(key);
+    pairs.push(pair);
+  };
+  const abstract = (node: TS.Node) => ts.canHaveModifiers(node) && (ts.getModifiers(node) ?? []).some((one) => one.kind === ts.SyntaxKind.AbstractKeyword);
+  const dispatchedMember = (node: TS.Node) => ts.isMethodSignature(node) || ts.isPropertySignature(node) || abstract(node);
+  /** The routine a value names, following an import to its declaration. */
+  const routineNamed = (value: TS.Node): string | undefined => {
+    let symbol = checker.getSymbolAtLocation(ts.isPropertyAccessExpression(value) ? value.name : value);
+    if (symbol && symbol.flags & ts.SymbolFlags.Alias) symbol = checker.getAliasedSymbol(symbol);
+    for (const declaration of symbol?.declarations ?? []) {
+      const ref = refOfDeclaration.get(declaration)
+        ?? (ts.isVariableDeclaration(declaration) && declaration.initializer ? refOfDeclaration.get(declaration.initializer) : undefined);
+      if (ref) return ref;
+    }
+    return undefined;
+  };
+  /** Each routine a function with no name calls, by the compiler's own resolution. */
+  const calledInside = (body: TS.Node): string[] => {
+    const found: string[] = [];
+    const visit = (node: TS.Node): void => {
+      if (ts.isCallExpression(node)) {
+        const declaration = checker.getResolvedSignature(node)?.declaration;
+        const ref = declaration ? refOfDeclaration.get(declaration as TS.Node) : undefined;
+        if (ref) found.push(ref);
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(body);
+    return found;
+  };
+
+  // What each interface or abstract member has stored under it: by the member's declaration node.
+  const stored = new Map<TS.Node, Array<{ ref: string; how: string }>>();
+  const keep = (member: TS.Node, ref: string, how: string) => {
+    const list = stored.get(member) ?? [];
+    list.push({ ref, how });
+    stored.set(member, list);
+  };
+  for (const source of sources) {
+    const visit = (node: TS.Node): void => {
+      if (ts.isObjectLiteralExpression(node)) {
+        const type = checker.getContextualType(node);
+        for (const property of node.properties) {
+          if (!property.name || !ts.isIdentifier(property.name)) continue;
+          const member = type?.getProperty(property.name.text);
+          for (const declaration of member?.declarations ?? []) {
+            if (!dispatchedMember(declaration)) continue;
+            const value = ts.isPropertyAssignment(property) ? property.initializer
+              : ts.isShorthandPropertyAssignment(property) ? property.name : undefined;
+            if (!value) continue;
+            if (ts.isArrowFunction(value) || ts.isFunctionExpression(value)) {
+              for (const ref of calledInside(value.body)) keep(declaration, ref, "dispatched-wrapped");
+            } else {
+              const ref = routineNamed(value);
+              if (ref) keep(declaration, ref, "dispatched-stored");
+            }
+          }
+        }
+      }
+      if (ts.isClassDeclaration(node) && node.name) {
+        for (const clause of node.heritageClauses ?? []) {
+          for (const written of clause.types) {
+            const base = checker.getTypeAtLocation(written);
+            for (const member of node.members) {
+              if (!ts.isMethodDeclaration(member) || !member.body || !ts.isIdentifier(member.name)) continue;
+              const ref = refOfDeclaration.get(member);
+              if (!ref) continue;
+              for (const declaration of base.getProperty(member.name.text)?.declarations ?? []) {
+                if (dispatchedMember(declaration)) keep(declaration, ref, "dispatched-impl");
+              }
+            }
+          }
+        }
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+  }
+
+  for (const routine of routines) {
+    if (!routine.node.body) continue;
+    const visit = (node: TS.Node): void => {
+      if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+        const symbol = checker.getSymbolAtLocation(node.expression.name);
+        for (const declaration of symbol?.declarations ?? []) {
+          for (const target of stored.get(declaration) ?? []) add({ word: "calls", from: routine.ref, to: target.ref, how: target.how });
+        }
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(routine.node.body);
+  }
+  void rel;
   return pairs;
 }

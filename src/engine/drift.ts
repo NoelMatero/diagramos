@@ -78,6 +78,7 @@ import { onlyATypeAlias, partsMayBe, standsFor } from "./alias";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { conformedTypes, declaredBases, type ConformsWithheld } from "./conforms";
 import { overridesIn, type Overrides } from "./overrides";
+import { storedIn, type Stored, type StoredSource } from "./stored";
 import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import { boardIsNewer, newerBuildClaimError } from "./version";
@@ -2437,6 +2438,11 @@ function callSide(
    * a closed-body accusation rests on. See `CallSide.overridden`.
    */
   overrides?: Overrides,
+  /**
+   * Where the repository stores a routine under another name (#351), for the
+   * same side. See `CallSide.runsUnderAnotherName`.
+   */
+  stored?: Stored,
 ): CallSide | undefined {
   const declarationAt = askDefinition ? closedBodyReferee?.declarationAt?.bind(closedBodyReferee) : undefined;
   const readSide = (target: string): CallSide | undefined => {
@@ -2461,6 +2467,7 @@ function callSide(
       ...(closedBodyReferee ? { resolveReceiver: (at) => closedBodyReferee.resolveReceiver(target, at) } : {}),
       ...(declarationAt ? { declarationAt: (at) => declarationAt(target, at) } : {}),
       ...(overrides ? { overridden: (holder, member) => overrides.below(holder, member) } : {}),
+      ...(stored ? { runsUnderAnotherName: (name, member) => stored.findings(name, member).length > 0 } : {}),
       ...(askDefinition && closedBodyReferee?.compiledCrateOf
         ? { compiled: () => closedBodyReferee.compiledCrateOf!(target) }
         : {}),
@@ -3208,6 +3215,18 @@ function notDirectSentence(word: "calls" | "needs", route: readonly string[], ar
  * Where a refuted routine's calls went, said of the head's file: none of them
  * there, or the ones that were landed on something the head cannot be (#430).
  */
+/**
+ * The calls through an interface, a trait or an override a red counted as
+ * read (#351), said so: each runs a routine of the name it calls, and that is
+ * the whole of why it is not the head.
+ */
+function throughDispatch(dispatched: number | undefined): string {
+  if (!dispatched) return "";
+  return dispatched === 1
+    ? " (one through an interface or an override, which runs a method of the name it calls)"
+    : ` (${dispatched} through an interface or an override, each running a method of the name it calls)`;
+}
+
 function landedBeside(elsewhere: ReadonlyArray<{ name: string; line: number }> | undefined, toPath: string, head: readonly string[]): string {
   if (!elsewhere || elsewhere.length === 0) return `none reaching ${toPath}`;
   const names = [...new Set(elsewhere.map((one) => one.name))];
@@ -3694,6 +3713,8 @@ export interface CheckCache {
    * a run of one arrow per board would otherwise walk the tree once an arrow.
    */
   readonly overrides?: Overrides;
+  /** Where a routine is stored under another name (#351), read from the text alone like `overrides`. */
+  readonly stored?: Stored;
 }
 
 export const newCheckCache = (workspace: Workspace): CheckCache => ({
@@ -3701,6 +3722,7 @@ export const newCheckCache = (workspace: Workspace): CheckCache => ({
   read: { imports: new Map(), configs: new Map() },
   reach: newReachCache(),
   overrides: overridesOf(workspace),
+  stored: storedOf(workspace),
 });
 
 /**
@@ -3726,6 +3748,31 @@ function overridesOf(workspace: Workspace): Overrides {
       // A file that would not read could hold the subclass: that is "cannot
       // tell", which answers yes, not a file skipped.
       try { sources.push({ source: workspace.read(absolute), language }); } catch { return undefined; }
+    }
+    return sources;
+  });
+}
+
+/**
+ * Where a routine is written so that it can run under another name (#351),
+ * for `@calls`' closed reading of a call through an interface, a trait or an
+ * override. The third walk of the whole tree, bounded and lazy like
+ * `overridesOf`, and this one reads Rust too: a function handed on as
+ * `Self::handle` or wrapped in a closure is as much a Rust shape as any.
+ */
+function storedOf(workspace: Workspace): Stored {
+  return storedIn(() => {
+    const rootAbsolute = workspace.resolve(".");
+    const walked = rootAbsolute ? sourceFilesUnder(rootAbsolute, workspace, OVERRIDE_WALK_CAP) : undefined;
+    if (!rootAbsolute || !walked) return undefined;
+    const sources: StoredSource[] = [];
+    for (const absolute of walked) {
+      const language = languageOf(absolute);
+      if (!language) continue;
+      // A file that would not read could store anything: "cannot tell".
+      try {
+        sources.push({ file: path.relative(rootAbsolute, absolute).split(path.sep).join("/"), source: workspace.read(absolute), language });
+      } catch { return undefined; }
     }
     return sources;
   });
@@ -3885,6 +3932,8 @@ export function checkDrift(
 
   /** Which methods some subclass declares again (#353). See `overridesOf`. */
   const overrides = options?.cache?.overrides ?? overridesOf(workspace);
+  /** Where a routine is stored under another name (#351). See `storedOf`. */
+  const stored = options?.cache?.stored ?? storedOf(workspace);
 
   /**
    * Files the wiring behind a `@feeds` arrow could be in.
@@ -6056,7 +6105,7 @@ export function checkDrift(
            * against the repo-relative file a dependency resolved to, so an
            * absolute one would never match even if it could be read.
            */
-          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true, overrides);
+          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true, overrides, stored);
           const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
           if (!tail || !head) {
             noteCalled("unreadable");
@@ -6479,7 +6528,7 @@ export function checkDrift(
                   + `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
                   + `${oneLine(toNode.label) || toPath}, and every call `
                   + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
-                  + `them, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `
+                  + `them${throughDispatch(verdict.evidence.dispatched)}, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `
                   + `${fromPath} line ${verdict.evidence.line} is where ${verdict.evidence.routine} is declared.`,
               }, rests: refutedRests(verdict.evidence) }); };
               if (verdict.evidence.elsewhere) besideTheHead = refute;
