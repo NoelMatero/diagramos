@@ -1,0 +1,2453 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "observable-object-administration-value-s-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 778.8000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 867444797,
+      "version": 1,
+      "versionNonce": 702561063,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Observable Object Administration: Value Storage & Reporting",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Observable Object Administration: Value Storage & Reporting",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-0",
+      "type": "rectangle",
+      "x": 760,
+      "y": 400,
+      "width": 380,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 653554084,
+      "version": 1,
+      "versionNonce": 2040276272,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-0-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "adm",
+        "ref": "packages/mobx/src/types/observableobject.ts#ObservableObjectAdministration"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-node-1",
+      "type": "rectangle",
+      "x": 400,
+      "y": 780,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 260667453,
+      "version": 1,
+      "versionNonce": 984427303,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-1-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "target",
+        "ref": "packages/mobx/src/types/observableobject.ts#ObservableObjectAdministration"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-node-2",
+      "type": "rectangle",
+      "x": 1200,
+      "y": 780,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1032130722,
+      "version": 1,
+      "versionNonce": 1462127766,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-2-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "values",
+        "ref": "packages/mobx/src/types/observableobject.ts#ObservableObjectAdministration"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-node-3",
+      "type": "rectangle",
+      "x": 1340,
+      "y": 1180,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1508999635,
+      "version": 1,
+      "versionNonce": 1262851629,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-3-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "obsvalue",
+        "ref": "packages/mobx/src/types/observablevalue.ts#ObservableValue"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-node-4",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 1560,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 212136296,
+      "version": 1,
+      "versionNonce": 1175582276,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-4-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "atom",
+        "ref": "packages/mobx/src/core/atom.ts#Atom"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-node-5",
+      "type": "rectangle",
+      "x": 800,
+      "y": 780,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 889317393,
+      "version": 1,
+      "versionNonce": 787942171,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-5-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "keysatom",
+        "ref": "packages/mobx/src/types/observableobject.ts#ObservableObjectAdministration"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-node-6",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 20,
+      "width": 420,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 819678662,
+      "version": 1,
+      "versionNonce": 987504170,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-6-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "descriptor",
+        "ref": "packages/mobx/src/types/observableobject.ts#getCachedObservablePropDescriptor"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-node-7",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 400,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 762442903,
+      "version": 1,
+      "versionNonce": 1644158065,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-7-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "getobsval",
+        "ref": "packages/mobx/src/types/observableobject.ts#ObservableObjectAdministration"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-node-8",
+      "type": "rectangle",
+      "x": 20,
+      "y": 400,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 257626844,
+      "version": 1,
+      "versionNonce": 1071812328,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-8-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "setobsval",
+        "ref": "packages/mobx/src/types/observableobject.ts#ObservableObjectAdministration"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-node-9",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 1940,
+      "width": 320,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 926847989,
+      "version": 1,
+      "versionNonce": 613753983,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-9-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "observers",
+        "ref": "packages/mobx/src/core/atom.ts#Atom"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-node-10",
+      "type": "rectangle",
+      "x": 40,
+      "y": 780,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1500235153,
+      "version": 1,
+      "versionNonce": 27179931,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-node-10-label"
+        },
+        {
+          "id": "observable-object-administration-value-s-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "node": "listeners",
+        "ref": "packages/mobx/src/types/observableobject.ts#ObservableObjectAdministration"
+      }
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-0",
+      "type": "arrow",
+      "x": 856.9999999999999,
+      "y": 472.8,
+      "width": 305,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1320590203,
+      "version": 1,
+      "versionNonce": 416874741,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "adm",
+          "to": "target",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -270.9,
+          32
+        ],
+        [
+          -305,
+          32
+        ],
+        [
+          -305,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-0",
+        "focus": 0.48947368421052684,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-1",
+        "focus": -0.05000000000000067,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-1",
+      "type": "arrow",
+      "x": 1047,
+      "y": 472.8,
+      "width": 225,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 558771242,
+      "version": 1,
+      "versionNonce": 1101905406,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "adm",
+          "to": "values",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          120.39999999999986,
+          32
+        ],
+        [
+          120.39999999999986,
+          142.50000000000017
+        ],
+        [
+          120.39999999999986,
+          192.7999999999999
+        ],
+        [
+          225,
+          192.7999999999999
+        ],
+        [
+          225,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-0",
+        "focus": -0.5105263157894736,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-2",
+        "focus": -0.4,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-2",
+      "type": "arrow",
+      "x": 951.9999999999999,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 775569029,
+      "version": 1,
+      "versionNonce": 624204943,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "adm",
+          "to": "keysatom",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-0",
+        "focus": -0.010526315789473122,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-5",
+        "focus": -0.0500000000000013,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-3",
+      "type": "arrow",
+      "x": 1312,
+      "y": 873.5999999999999,
+      "width": 113.33333333333326,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 169748844,
+      "version": 1,
+      "versionNonce": 795852984,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "values",
+          "to": "obsvalue",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          14.266666666666652,
+          192.79999999999995
+        ],
+        [
+          113.33333333333326,
+          192.79999999999995
+        ],
+        [
+          113.33333333333326,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-2",
+        "focus": 0.06666666666666679,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-3",
+        "focus": -0.3435897435897459,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-4",
+      "type": "arrow",
+      "x": 1425.3333333333333,
+      "y": 1254.3999999999999,
+      "width": 73.33333333333326,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 288980255,
+      "version": 1,
+      "versionNonce": 1204195769,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "obsvalue",
+          "to": "atom",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -73.33333333333326,
+          32
+        ],
+        [
+          -73.33333333333326,
+          113.73333333333335
+        ],
+        [
+          -73.33333333333326,
+          160.5
+        ],
+        [
+          -73.33333333333326,
+          207.26666666666665
+        ],
+        [
+          -73.33333333333326,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-3",
+        "focus": 0.3435897435897459,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-4",
+        "focus": -0.1,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-5",
+      "type": "arrow",
+      "x": 1458.6666666666665,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1419983630,
+      "version": 1,
+      "versionNonce": 1890461362,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "descriptor",
+          "to": "getobsval",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-6",
+        "focus": -0.32698412698412627,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-7",
+        "focus": -0.008333333333334195,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-6",
+      "type": "arrow",
+      "x": 1318.6666666666665,
+      "y": 92,
+      "width": 1146.6666666666665,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1776527993,
+      "version": 1,
+      "versionNonce": 1146980419,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "descriptor",
+          "to": "setobsval",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -691.7333333333332,
+          32
+        ],
+        [
+          -1146.6666666666665,
+          32
+        ],
+        [
+          -1146.6666666666665,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-6",
+        "focus": 0.3396825396825405,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-8",
+        "focus": -0.049999999999999996,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-7",
+      "type": "arrow",
+      "x": 1405.3333333333333,
+      "y": 472.8,
+      "width": 53.33333333333326,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1886157296,
+      "version": 1,
+      "versionNonce": 321126220,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "getobsval",
+          "to": "values",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -53.33333333333326,
+          32
+        ],
+        [
+          -53.33333333333326,
+          123.73333333333329
+        ],
+        [
+          -53.33333333333326,
+          167.99999999999994
+        ],
+        [
+          -53.33333333333326,
+          212.2666666666666
+        ],
+        [
+          -53.33333333333326,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-7",
+        "focus": 0.34166666666666845,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-2",
+        "focus": 0.2666666666666668,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-8",
+      "type": "arrow",
+      "x": 1511.9999999999998,
+      "y": 472.8,
+      "width": 0,
+      "height": 701.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1018666595,
+      "version": 1,
+      "versionNonce": 620041213,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "getobsval",
+          "to": "obsvalue"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          350.7999999999999
+        ],
+        [
+          0,
+          701.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-7",
+        "focus": -0.32499999999999857,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-3",
+        "focus": 0.32307692307692143,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-9",
+      "type": "arrow",
+      "x": 1511.9999999999998,
+      "y": 1254.3999999999999,
+      "width": 0,
+      "height": 681.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 996172018,
+      "version": 1,
+      "versionNonce": 342577574,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "obsvalue",
+          "to": "observers",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          340.79999999999995
+        ],
+        [
+          0,
+          681.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-3",
+        "focus": -0.32307692307692143,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-9",
+        "focus": 0.3249999999999988,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-10",
+      "type": "arrow",
+      "x": 172,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 750594676,
+      "version": 1,
+      "versionNonce": 1278182208,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "setobsval",
+          "to": "listeners"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-8",
+        "focus": 0.049999999999999996,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-10",
+        "focus": -0.05714285714285722,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-11",
+      "type": "arrow",
+      "x": 1352,
+      "y": 1635.1999999999998,
+      "width": 53.33333333333326,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 2091076813,
+      "version": 1,
+      "versionNonce": 343747511,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "observable-object-administration-value-s-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s",
+        "edge": {
+          "from": "atom",
+          "to": "observers",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          44.26666666666665
+        ],
+        [
+          0,
+          88.5333333333333
+        ],
+        [
+          0,
+          177.0666666666666
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          53.33333333333326,
+          192.79999999999995
+        ],
+        [
+          53.33333333333326,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "observable-object-administration-value-s-node-4",
+        "focus": 0.1,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "observable-object-administration-value-s-node-9",
+        "focus": -0.3416666666666672,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "observable-object-administration-value-s-node-0-label",
+      "type": "text",
+      "x": 785,
+      "y": 427.5,
+      "width": 330,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1157001521,
+      "version": 1,
+      "versionNonce": 753566651,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "ObservableObjectAdministration",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-0",
+      "originalText": "ObservableObjectAdministration",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-1-label",
+      "type": "text",
+      "x": 477.5,
+      "y": 795,
+      "width": 165,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1826895604,
+      "version": 1,
+      "versionNonce": 1235759296,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "target_\n(actual object)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-1",
+      "originalText": "target_\n(actual object)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-2-label",
+      "type": "text",
+      "x": 1210,
+      "y": 805,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 116013443,
+      "version": 1,
+      "versionNonce": 2128475037,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "values_\nMap<key, Observable>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-2",
+      "originalText": "values_\nMap<key, Observable>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-3-label",
+      "type": "text",
+      "x": 1371,
+      "y": 1207.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1062595374,
+      "version": 1,
+      "versionNonce": 1949832530,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "ObservableValue<T>",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-3",
+      "originalText": "ObservableValue<T>",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-4-label",
+      "type": "text",
+      "x": 1338,
+      "y": 1587.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 96827829,
+      "version": 1,
+      "versionNonce": 90861887,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "Atom",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-4",
+      "originalText": "Atom",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-5-label",
+      "type": "text",
+      "x": 877.5,
+      "y": 805,
+      "width": 165,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1409663848,
+      "version": 1,
+      "versionNonce": 595364932,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "keysAtom_: Atom\n(tracks keys)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-5",
+      "originalText": "keysAtom_: Atom\n(tracks keys)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-6-label",
+      "type": "text",
+      "x": 1208.5,
+      "y": 47.5,
+      "width": 363.00000000000006,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1526606391,
+      "version": 1,
+      "versionNonce": 569832337,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "getCachedObservablePropDescriptor",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-6",
+      "originalText": "getCachedObservablePropDescriptor",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-7-label",
+      "type": "text",
+      "x": 1333.5,
+      "y": 427.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1653013394,
+      "version": 1,
+      "versionNonce": 648666310,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "getObservablePropValue_",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-7",
+      "originalText": "getObservablePropValue_",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-8-label",
+      "type": "text",
+      "x": 53.499999999999986,
+      "y": 427.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 207094905,
+      "version": 1,
+      "versionNonce": 25638467,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "setObservablePropValue_",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-8",
+      "originalText": "setObservablePropValue_",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-9-label",
+      "type": "text",
+      "x": 1306,
+      "y": 1975,
+      "width": 308,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1528579996,
+      "version": 1,
+      "versionNonce": 1091030952,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "observers_: Set<IDerivation>\n(reads tracked here)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-9",
+      "originalText": "observers_: Set<IDerivation>\n(reads tracked here)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-node-10-label",
+      "type": "text",
+      "x": 69.99999999999999,
+      "y": 805,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1865725160,
+      "version": 1,
+      "versionNonce": 1851963588,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "changeListeners_\n(notified on change)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-node-10",
+      "originalText": "changeListeners_\n(notified on change)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-0-label",
+      "type": "text",
+      "x": 533.3,
+      "y": 494.8,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 764596006,
+      "version": 1,
+      "versionNonce": 842400522,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "wraps @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-0",
+      "originalText": "wraps @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-1-label",
+      "type": "text",
+      "x": 1110.1999999999998,
+      "y": 605.3000000000002,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 2061156315,
+      "version": 1,
+      "versionNonce": 625391061,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "stores @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-1",
+      "originalText": "stores @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-2-label",
+      "type": "text",
+      "x": 894.7999999999998,
+      "y": 613.1999999999999,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1473851628,
+      "version": 1,
+      "versionNonce": 215781176,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "tracks @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-2",
+      "originalText": "tracks @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-3-label",
+      "type": "text",
+      "x": 1260.2666666666667,
+      "y": 1056.3999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 484211209,
+      "version": 1,
+      "versionNonce": 1362041235,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "contains @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-3",
+      "originalText": "contains @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-4-label",
+      "type": "text",
+      "x": 1277.2,
+      "y": 1358.1333333333332,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1550700714,
+      "version": 1,
+      "versionNonce": 1417524094,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "extends @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-4",
+      "originalText": "extends @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-5-label",
+      "type": "text",
+      "x": 1401.4666666666665,
+      "y": 232.4,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1600953775,
+      "version": 1,
+      "versionNonce": 1289850377,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "getter @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-5",
+      "originalText": "getter @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-6-label",
+      "type": "text",
+      "x": 569.7333333333332,
+      "y": 114,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1568037632,
+      "version": 1,
+      "versionNonce": 1028254172,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "setter @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-6",
+      "originalText": "setter @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-7-label",
+      "type": "text",
+      "x": 1277.2,
+      "y": 586.5333333333333,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 423027917,
+      "version": 1,
+      "versionNonce": 282424247,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "values_ @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-7",
+      "originalText": "values_ @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-8-label",
+      "type": "text",
+      "x": 1441.5999999999997,
+      "y": 813.5999999999999,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1161560574,
+      "version": 1,
+      "versionNonce": 997372578,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "reads observable",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-8",
+      "originalText": "reads observable",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-9-label",
+      "type": "text",
+      "x": 1454.7999999999997,
+      "y": 1585.1999999999998,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 505495187,
+      "version": 1,
+      "versionNonce": 1226820845,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "tracks @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-9",
+      "originalText": "tracks @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-10-label",
+      "type": "text",
+      "x": 106,
+      "y": 613.1999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 305081537,
+      "version": 1,
+      "versionNonce": 525268235,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "notifies change",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-10",
+      "originalText": "notifies change",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "observable-object-administration-value-s-edge-11-label",
+      "type": "text",
+      "x": 1299.2,
+      "y": 1802.2666666666664,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1785691140,
+      "version": 1,
+      "versionNonce": 1096516368,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "observable-object-administration-value-s"
+      },
+      "text": "holds @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "observable-object-administration-value-s-edge-11",
+      "originalText": "holds @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

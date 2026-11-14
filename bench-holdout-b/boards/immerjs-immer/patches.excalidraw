@@ -1,0 +1,2335 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "patches-plugin-recording-and-applying-pa-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 607.2,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 141672410,
+      "version": 1,
+      "versionNonce": 245929902,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "role": "title"
+      },
+      "text": "Patches Plugin: Recording and Applying Patches",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Patches Plugin: Recording and Applying Patches",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 620,
+      "width": 240,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 806334589,
+      "version": 1,
+      "versionNonce": 1237294951,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-node-0-label"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "node": "gen_patches",
+        "ref": "src/plugins/patches.ts#generatePatches_",
+        "claim": {
+          "handles": true,
+          "cases": [
+            "Object",
+            "Map",
+            "Array",
+            "Set"
+          ],
+          "of": "state.type_"
+        }
+      }
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-1",
+      "type": "rectangle",
+      "x": 740,
+      "y": 20,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 881348068,
+      "version": 1,
+      "versionNonce": 850222192,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-node-1-label"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "node": "gen_array",
+        "ref": "src/plugins/patches.ts#generateArrayPatches"
+      }
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-2",
+      "type": "rectangle",
+      "x": 680,
+      "y": 680,
+      "width": 360,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1270759443,
+      "version": 1,
+      "versionNonce": 390670701,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-node-2-label"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "node": "gen_obj_map",
+        "ref": "src/plugins/patches.ts#generatePatchesFromAssigned"
+      }
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-3",
+      "type": "rectangle",
+      "x": 740,
+      "y": 520,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 2002358498,
+      "version": 1,
+      "versionNonce": 930984918,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-node-3-label"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "node": "gen_set",
+        "ref": "src/plugins/patches.ts#generateSetPatches"
+      }
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-4",
+      "type": "rectangle",
+      "x": 680,
+      "y": 200,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 651077201,
+      "version": 1,
+      "versionNonce": 340115547,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-node-4-label"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "node": "get_path",
+        "ref": "src/plugins/patches.ts#getPath"
+      }
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-5",
+      "type": "diamond",
+      "x": 1440,
+      "y": 460,
+      "width": 280,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 398353576,
+      "version": 1,
+      "versionNonce": 769435524,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-node-5-label"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "node": "immer_scope",
+        "ref": "src/plugins/patches.ts#ImmerScope"
+      }
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-6",
+      "type": "rectangle",
+      "x": 2120,
+      "y": 500,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 948660183,
+      "version": 1,
+      "versionNonce": 771873969,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-node-6-label"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "node": "apply_patches",
+        "ref": "src/plugins/patches.ts#applyPatches_",
+        "claim": {
+          "handles": true,
+          "cases": [
+            "REPLACE",
+            "ADD",
+            "REMOVE"
+          ],
+          "of": "op"
+        }
+      }
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-7",
+      "type": "rectangle",
+      "x": 2720,
+      "y": 480,
+      "width": 260,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1789803270,
+      "version": 1,
+      "versionNonce": 497938026,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-node-7-label"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "node": "deep_clone",
+        "ref": "src/plugins/patches.ts#deepClonePatchValue"
+      }
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-8",
+      "type": "rectangle",
+      "x": 680,
+      "y": 360,
+      "width": 360,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1113065269,
+      "version": 1,
+      "versionNonce": 1612657087,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-node-8-label"
+        },
+        {
+          "id": "patches-plugin-recording-and-applying-pa-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "node": "gen_replacement",
+        "ref": "src/plugins/patches.ts#generateReplacementPatches_"
+      }
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-0",
+      "type": "arrow",
+      "x": 252,
+      "y": 638,
+      "width": 482.9333333333334,
+      "height": 576,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 388237250,
+      "version": 1,
+      "versionNonce": 1664564022,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "gen_patches",
+          "to": "gen_array",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -497.4666666666667
+        ],
+        [
+          32,
+          -576
+        ],
+        [
+          482.4333333333334,
+          -576
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-0",
+        "focus": -0.7428571428571428,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-1",
+        "focus": 0.15999999999999986,
+        "gap": 5.066666666666606
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-1",
+      "type": "arrow",
+      "x": 252,
+      "y": 722,
+      "width": 429.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1484344691,
+      "version": 1,
+      "versionNonce": 1102973261,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "gen_patches",
+          "to": "gen_obj_map",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          214.8,
+          0
+        ],
+        [
+          429.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-0",
+        "focus": 0.4571428571428572,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-2",
+        "focus": 0.16000000000000034,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-2",
+      "type": "arrow",
+      "x": 252,
+      "y": 694,
+      "width": 479.6,
+      "height": 142,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 628899140,
+      "version": 1,
+      "versionNonce": 157474896,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "gen_patches",
+          "to": "gen_set",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          -142
+        ],
+        [
+          168.8,
+          -142
+        ],
+        [
+          246.5,
+          -142
+        ],
+        [
+          324.20000000000005,
+          -142
+        ],
+        [
+          479.1,
+          -142
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-0",
+        "focus": 0.05714285714285716,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-3",
+        "focus": 0.2,
+        "gap": 8.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-3",
+      "type": "arrow",
+      "x": 252,
+      "y": 666,
+      "width": 429.6,
+      "height": 434,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1959038685,
+      "version": 1,
+      "versionNonce": 1249109575,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "gen_patches",
+          "to": "get_path",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -375.8
+        ],
+        [
+          56,
+          -434
+        ],
+        [
+          429.1,
+          -434
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-0",
+        "focus": -0.3428571428571428,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-4",
+        "focus": 0.2,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-4",
+      "type": "arrow",
+      "x": 1014.9333333333334,
+      "y": 78.66666666666666,
+      "width": 429.86666666666656,
+      "height": 417.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 134105318,
+      "version": 1,
+      "versionNonce": 1189940426,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "gen_array",
+          "to": "immer_scope",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          345.86666666666656,
+          -2.842170943040401e-14
+        ],
+        [
+          345.86666666666656,
+          77.73333333333338
+        ],
+        [
+          345.86666666666656,
+          417.33333333333337
+        ],
+        [
+          429.36666666666656,
+          417.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-1",
+        "focus": 0.17333333333333323,
+        "gap": 5.066666666666606
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-5",
+        "focus": 0.4857142857142857,
+        "gap": 14
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-5",
+      "type": "arrow",
+      "x": 1041.6,
+      "y": 705.3333333333334,
+      "width": 403.20000000000005,
+      "height": 125.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 737787959,
+      "version": 1,
+      "versionNonce": 503584145,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "gen_obj_map",
+          "to": "immer_scope",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -39.4666666666667
+        ],
+        [
+          224.79999999999995,
+          -39.4666666666667
+        ],
+        [
+          295.20000000000005,
+          -39.4666666666667
+        ],
+        [
+          295.20000000000005,
+          -125.33333333333337
+        ],
+        [
+          402.70000000000005,
+          -125.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-2",
+        "focus": -0.49333333333333307,
+        "gap": 1.599999999999909
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-5",
+        "focus": -0.7142857142857143,
+        "gap": 14
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-6",
+      "type": "arrow",
+      "x": 991.6,
+      "y": 552,
+      "width": 453.19999999999993,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 187481352,
+      "version": 1,
+      "versionNonce": 1440161380,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "gen_set",
+          "to": "immer_scope",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          226.60000000000002,
+          0
+        ],
+        [
+          452.69999999999993,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-3",
+        "focus": -0.2,
+        "gap": 8.399999999999977
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-5",
+        "focus": -0.3142857142857143,
+        "gap": 16.75269741589538
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-7",
+      "type": "arrow",
+      "x": 1041.6,
+      "y": 392,
+      "width": 403.20000000000005,
+      "height": 132,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1608897073,
+      "version": 1,
+      "versionNonce": 331364027,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "gen_replacement",
+          "to": "immer_scope",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          66.90000000000009,
+          0
+        ],
+        [
+          133.79999999999995,
+          0
+        ],
+        [
+          267.5999999999999,
+          0
+        ],
+        [
+          295.20000000000005,
+          0
+        ],
+        [
+          295.20000000000005,
+          132
+        ],
+        [
+          402.70000000000005,
+          132
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-8",
+        "focus": -0.2,
+        "gap": 1.599999999999909
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-5",
+        "focus": 0.08571428571428572,
+        "gap": 4.0933182129485575
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-8",
+      "type": "arrow",
+      "x": 1724.8,
+      "y": 538,
+      "width": 403.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2108559546,
+      "version": 1,
+      "versionNonce": 1482910478,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "immer_scope",
+          "to": "apply_patches",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          201.60000000000014,
+          0
+        ],
+        [
+          402.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-5",
+        "focus": 0.11428571428571428,
+        "gap": 8.487638069569153
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-6",
+        "focus": 0.05000000000000001,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-9",
+      "type": "arrow",
+      "x": 2328,
+      "y": 538,
+      "width": 385.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 393465035,
+      "version": 1,
+      "versionNonce": 1365341253,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "apply_patches",
+          "to": "deep_clone",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          192.80000000000018,
+          0
+        ],
+        [
+          385.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-6",
+        "focus": -0.05000000000000001,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-7",
+        "focus": 0.0333333333333343,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-10",
+      "type": "arrow",
+      "x": 1014.9333333333334,
+      "y": 45.33333333333333,
+      "width": 1698.6666666666665,
+      "height": 470.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1645391035,
+      "version": 2,
+      "versionNonce": 1070924597,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "gen_array",
+          "to": "deep_clone",
+          "claim": "calls"
+        },
+        "via": [
+          "clonePatchValueIfNeeded"
+        ]
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          58.666666666666515,
+          4.263256414560601e-14
+        ],
+        [
+          58.666666666666515,
+          -7.6666666666667
+        ],
+        [
+          1080.6666666666665,
+          -7.6666666666667
+        ],
+        [
+          1590.6666666666665,
+          -7.6666666666667
+        ],
+        [
+          1590.6666666666665,
+          462.6666666666667
+        ],
+        [
+          1698.1666666666665,
+          462.6666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-1",
+        "focus": -0.4933333333333347,
+        "gap": 5.066666666666606
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-7",
+        "focus": 0.5333333333333343,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-11",
+      "type": "arrow",
+      "x": 1041.6,
+      "y": 738.6666666666666,
+      "width": 1672,
+      "height": 170.66666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 2050360170,
+      "version": 2,
+      "versionNonce": 267486014,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "patches-plugin-recording-and-applying-pa-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa",
+        "edge": {
+          "from": "gen_obj_map",
+          "to": "deep_clone",
+          "claim": "calls"
+        },
+        "via": [
+          "clonePatchValueIfNeeded"
+        ]
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          230.33333333333348,
+          0
+        ],
+        [
+          460.66666666666674,
+          0
+        ],
+        [
+          921.3333333333335,
+          0
+        ],
+        [
+          1564,
+          0
+        ],
+        [
+          1564,
+          -170.66666666666663
+        ],
+        [
+          1671.5,
+          -170.66666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-2",
+        "focus": 0.1733333333333335,
+        "gap": 1.599999999999909
+      },
+      "endBinding": {
+        "elementId": "patches-plugin-recording-and-applying-pa-node-7",
+        "focus": -0.4666666666666658,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-0-label",
+      "type": "text",
+      "x": 52,
+      "y": 677.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1523757492,
+      "version": 1,
+      "versionNonce": 362297984,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "generatePatches_",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-node-0",
+      "originalText": "generatePatches_",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-1-label",
+      "type": "text",
+      "x": 770,
+      "y": 57.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1900512241,
+      "version": 1,
+      "versionNonce": 390012027,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "generateArrayPatches",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-node-1",
+      "originalText": "generateArrayPatches",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-2-label",
+      "type": "text",
+      "x": 711.5,
+      "y": 717.5,
+      "width": 297,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1919119598,
+      "version": 1,
+      "versionNonce": 1757266962,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "generatePatchesFromAssigned",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-node-2",
+      "originalText": "generatePatchesFromAssigned",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-3-label",
+      "type": "text",
+      "x": 771,
+      "y": 547.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1991674947,
+      "version": 1,
+      "versionNonce": 331372893,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "generateSetPatches",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-node-3",
+      "originalText": "generateSetPatches",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-4-label",
+      "type": "text",
+      "x": 721.5,
+      "y": 227.5,
+      "width": 77,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1943899688,
+      "version": 1,
+      "versionNonce": 854260740,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "getPath",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-node-4",
+      "originalText": "getPath",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-5-label",
+      "type": "text",
+      "x": 1525,
+      "y": 517.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1695785845,
+      "version": 1,
+      "versionNonce": 1258064639,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "ImmerScope",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-node-5",
+      "originalText": "ImmerScope",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-6-label",
+      "type": "text",
+      "x": 2148.5,
+      "y": 527.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 786511442,
+      "version": 1,
+      "versionNonce": 880455046,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "applyPatches_",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-node-6",
+      "originalText": "applyPatches_",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-7-label",
+      "type": "text",
+      "x": 2745.5,
+      "y": 527.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1450260215,
+      "version": 1,
+      "versionNonce": 1921480273,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "deepClonePatchValue",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-node-7",
+      "originalText": "deepClonePatchValue",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-node-8-label",
+      "type": "text",
+      "x": 711.5,
+      "y": 387.5,
+      "width": 297,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1175937372,
+      "version": 1,
+      "versionNonce": 1783767656,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "generateReplacementPatches_",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-node-8",
+      "originalText": "generateReplacementPatches_",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-0-label",
+      "type": "text",
+      "x": 209.2,
+      "y": 130.5333333333333,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 111149475,
+      "version": 1,
+      "versionNonce": 1036655421,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "Array case @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-0",
+      "originalText": "Array case @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-1-label",
+      "type": "text",
+      "x": 392,
+      "y": 712,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 74784590,
+      "version": 1,
+      "versionNonce": 651241458,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "Object/Map @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-1",
+      "originalText": "Object/Map @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-2-label",
+      "type": "text",
+      "x": 354.8,
+      "y": 542,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1850640209,
+      "version": 1,
+      "versionNonce": 580186971,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "Set case @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-2",
+      "originalText": "Set case @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-3-label",
+      "type": "text",
+      "x": 281.6,
+      "y": 280.2,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 2018112788,
+      "version": 1,
+      "versionNonce": 449976416,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-4-label",
+      "type": "text",
+      "x": 1299.2,
+      "y": 146.40000000000003,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1904623191,
+      "version": 1,
+      "versionNonce": 1625393201,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "patches @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-4",
+      "originalText": "patches @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-5-label",
+      "type": "text",
+      "x": 1204.8,
+      "y": 655.8666666666667,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1367860530,
+      "version": 1,
+      "versionNonce": 1159282406,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "patches @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-5",
+      "originalText": "patches @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-6-label",
+      "type": "text",
+      "x": 1156.6000000000001,
+      "y": 542,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1215027157,
+      "version": 1,
+      "versionNonce": 2064965855,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "patches @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-6",
+      "originalText": "patches @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-7-label",
+      "type": "text",
+      "x": 1247.6,
+      "y": 382,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1971901192,
+      "version": 1,
+      "versionNonce": 1154334820,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "patches @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-7",
+      "originalText": "patches @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-8-label",
+      "type": "text",
+      "x": 1864.8000000000002,
+      "y": 528,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 744492971,
+      "version": 1,
+      "versionNonce": 1674152101,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "patches @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-8",
+      "originalText": "patches @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-9-label",
+      "type": "text",
+      "x": 2468,
+      "y": 528,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 447114358,
+      "version": 1,
+      "versionNonce": 1951176410,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "clone @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-9",
+      "originalText": "clone @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-10-label",
+      "type": "text",
+      "x": 2034,
+      "y": 27.66666666666663,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 438108646,
+      "version": 1,
+      "versionNonce": 1296713674,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "protect @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-10",
+      "originalText": "protect @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "patches-plugin-recording-and-applying-pa-edge-11-label",
+      "type": "text",
+      "x": 1901.3333333333335,
+      "y": 728.6666666666666,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1615303835,
+      "version": 1,
+      "versionNonce": 962428565,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "patches-plugin-recording-and-applying-pa"
+      },
+      "text": "protect @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "patches-plugin-recording-and-applying-pa-edge-11",
+      "originalText": "protect @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

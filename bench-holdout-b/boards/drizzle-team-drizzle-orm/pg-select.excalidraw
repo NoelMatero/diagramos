@@ -1,0 +1,2554 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "postgresql-select-query-builder-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 475.20000000000005,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 298922954,
+      "version": 1,
+      "versionNonce": 1497304862,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "role": "title"
+      },
+      "text": "PostgreSQL Select Query Builder Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "PostgreSQL Select Query Builder Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 140,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 827322029,
+      "version": 1,
+      "versionNonce": 858963991,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-node-0-label"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "node": "builder_factory",
+        "ref": "drizzle-orm/src/pg-core/query-builders/select.ts#PgSelectBuilder"
+      }
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-1",
+      "type": "rectangle",
+      "x": 640,
+      "y": 120,
+      "width": 180,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1912361172,
+      "version": 1,
+      "versionNonce": 90938656,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-node-1-label"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "node": "select_base",
+        "ref": "drizzle-orm/src/pg-core/query-builders/select.ts#PgSelectBase"
+      }
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-2",
+      "type": "rectangle",
+      "x": 1240,
+      "y": 640,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 343055363,
+      "version": 1,
+      "versionNonce": 1284571933,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-node-2-label"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "node": "query_builder_base",
+        "ref": "drizzle-orm/src/pg-core/query-builders/select.ts#PgSelectQueryBuilderBase"
+      }
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-3",
+      "type": "rectangle",
+      "x": 1960,
+      "y": 140,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1725816978,
+      "version": 1,
+      "versionNonce": 2071223238,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-node-3-label"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "node": "select_config",
+        "ref": "drizzle-orm/src/pg-core/query-builders/select.types.ts#PgSelectConfig"
+      }
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-4",
+      "type": "rectangle",
+      "x": 1240,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1903891713,
+      "version": 1,
+      "versionNonce": 2140502347,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-node-4-label"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "node": "pg_dialect",
+        "ref": "drizzle-orm/src/pg-core/dialect.ts#PgDialect"
+      }
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-5",
+      "type": "rectangle",
+      "x": 1300,
+      "y": 380,
+      "width": 260,
+      "height": 180,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1099833688,
+      "version": 1,
+      "versionNonce": 460152884,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-node-5-label"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "node": "build_select_query",
+        "ref": "drizzle-orm/src/pg-core/dialect.ts#buildSelectQuery"
+      }
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-6",
+      "type": "rectangle",
+      "x": 1960,
+      "y": 600,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1775113223,
+      "version": 1,
+      "versionNonce": 592162337,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-node-6-label"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "node": "build_selection",
+        "ref": "drizzle-orm/src/pg-core/dialect.ts#buildSelection"
+      }
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-7",
+      "type": "rectangle",
+      "x": 1960,
+      "y": 760,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 439545718,
+      "version": 1,
+      "versionNonce": 1048498138,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-node-7-label"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "node": "build_from_table",
+        "ref": "drizzle-orm/src/pg-core/dialect.ts#buildFromTable"
+      }
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-8",
+      "type": "rectangle",
+      "x": 1980,
+      "y": 320,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1080756517,
+      "version": 1,
+      "versionNonce": 629824431,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-node-8-label"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "node": "build_joins",
+        "ref": "drizzle-orm/src/pg-core/dialect.ts#buildJoins"
+      }
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-9",
+      "type": "rectangle",
+      "x": 2580,
+      "y": 340,
+      "width": 160,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 940867340,
+      "version": 1,
+      "versionNonce": 801369304,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-node-9-label"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "postgresql-select-query-builder-flow-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "node": "sql_class",
+        "ref": "drizzle-orm/src/sql/sql.ts#SQL"
+      }
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-0",
+      "type": "arrow",
+      "x": 232,
+      "y": 186,
+      "width": 403.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1512034546,
+      "version": 1,
+      "versionNonce": 2076746150,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "builder_factory",
+          "to": "select_base",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          201.60000000000002,
+          0
+        ],
+        [
+          402.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-0",
+        "focus": 0.15,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-1",
+        "focus": 0.05714285714285692,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-1",
+      "type": "arrow",
+      "x": 815.2,
+      "y": 228,
+      "width": 429.60000000000014,
+      "height": 460.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1534529123,
+      "version": 1,
+      "versionNonce": 206726141,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "select_base",
+          "to": "query_builder_base",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          413.13333333333344
+        ],
+        [
+          32,
+          460.66666666666674
+        ],
+        [
+          429.10000000000014,
+          460.66666666666674
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-1",
+        "focus": 0.542857142857143,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-2",
+        "focus": -0.21666666666666853,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-2",
+      "type": "arrow",
+      "x": 815.2,
+      "y": 172,
+      "width": 1144.0000000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1657105204,
+      "version": 1,
+      "versionNonce": 414334720,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "select_base",
+          "to": "select_config",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          572.0000000000002,
+          0
+        ],
+        [
+          1143.5000000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-1",
+        "focus": -0.25714285714285695,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-3",
+        "focus": 0.35999999999999927,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-3",
+      "type": "arrow",
+      "x": 815.2,
+      "y": 144,
+      "width": 429.60000000000014,
+      "height": 92,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1274561165,
+      "version": 1,
+      "versionNonce": 1244502903,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "select_base",
+          "to": "pg_dialect",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -92
+        ],
+        [
+          168.80000000000007,
+          -92
+        ],
+        [
+          299.20000000000005,
+          -92
+        ],
+        [
+          364.4000000000001,
+          -92
+        ],
+        [
+          429.10000000000014,
+          -92
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-1",
+        "focus": -0.657142857142857,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-4",
+        "focus": 0.2,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-4",
+      "type": "arrow",
+      "x": 815.2,
+      "y": 200,
+      "width": 479.60000000000014,
+      "height": 278.6666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 225763286,
+      "version": 1,
+      "versionNonce": 1371894202,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "select_base",
+          "to": "build_select_query",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          278.6666666666667
+        ],
+        [
+          100.4666666666667,
+          278.6666666666667
+        ],
+        [
+          195.2500000000001,
+          278.6666666666667
+        ],
+        [
+          290.03333333333353,
+          278.6666666666667
+        ],
+        [
+          479.10000000000014,
+          278.6666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-1",
+        "focus": 0.14285714285714307,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-5",
+        "focus": -0.09629629629629614,
+        "gap": 5.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-5",
+      "type": "arrow",
+      "x": 1554.8000000000002,
+      "y": 418.6666666666667,
+      "width": 404.4000000000001,
+      "height": 213.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 777526631,
+      "version": 3,
+      "versionNonce": 256544001,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "build_select_query",
+          "to": "select_config",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          42,
+          0
+        ],
+        [
+          42,
+          -205.66666666666669
+        ],
+        [
+          103.20000000000005,
+          -205.66666666666669
+        ],
+        [
+          296.4000000000001,
+          -205.66666666666669
+        ],
+        [
+          296.4000000000001,
+          -213.33333333333337
+        ],
+        [
+          403.9000000000001,
+          -213.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-5",
+        "focus": -0.5703703703703695,
+        "gap": 5.199999999999818
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-3",
+        "focus": -0.30666666666666503,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": "takes"
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-6",
+      "type": "arrow",
+      "x": 1554.8000000000002,
+      "y": 508.6666666666667,
+      "width": 404.4000000000001,
+      "height": 122.80000000000001,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 141919800,
+      "version": 1,
+      "versionNonce": 1504706196,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "build_select_query",
+          "to": "build_selection",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          66,
+          0
+        ],
+        [
+          66,
+          122.80000000000001
+        ],
+        [
+          140.79999999999995,
+          122.80000000000001
+        ],
+        [
+          272.5999999999999,
+          122.80000000000001
+        ],
+        [
+          338.5,
+          122.80000000000001
+        ],
+        [
+          403.9000000000001,
+          122.80000000000001
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-5",
+        "focus": 0.42962962962963025,
+        "gap": 5.199999999999818
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-6",
+        "focus": 0.2133333333333326,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-7",
+      "type": "arrow",
+      "x": 1554.8000000000002,
+      "y": 538.6666666666667,
+      "width": 404.4000000000001,
+      "height": 252.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 904401121,
+      "version": 1,
+      "versionNonce": 1037572011,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "build_select_query",
+          "to": "build_from_table",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          42,
+          0
+        ],
+        [
+          42,
+          252.79999999999995
+        ],
+        [
+          75.80000000000018,
+          252.79999999999995
+        ],
+        [
+          157.95000000000027,
+          252.79999999999995
+        ],
+        [
+          240.10000000000014,
+          252.79999999999995
+        ],
+        [
+          403.9000000000001,
+          252.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-5",
+        "focus": 0.762962962962963,
+        "gap": 5.199999999999818
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-7",
+        "focus": 0.2133333333333326,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-8",
+      "type": "arrow",
+      "x": 1554.8000000000002,
+      "y": 448.6666666666667,
+      "width": 434.4000000000001,
+      "height": 90,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1074633770,
+      "version": 1,
+      "versionNonce": 688590334,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "build_select_query",
+          "to": "build_joins",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          66,
+          0
+        ],
+        [
+          66,
+          -90
+        ],
+        [
+          172.20000000000005,
+          -90
+        ],
+        [
+          237.75,
+          -90
+        ],
+        [
+          303.3000000000002,
+          -90
+        ],
+        [
+          433.9000000000001,
+          -90
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-5",
+        "focus": -0.23703703703703657,
+        "gap": 5.199999999999818
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-8",
+        "focus": 0.03333333333333326,
+        "gap": 9.200000000000273
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-9",
+      "type": "arrow",
+      "x": 1554.8000000000002,
+      "y": 478.6666666666667,
+      "width": 1030,
+      "height": 92,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1836452731,
+      "version": 2,
+      "versionNonce": 3559669,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "build_select_query",
+          "to": "sql_class",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          140.25,
+          0
+        ],
+        [
+          280.5,
+          0
+        ],
+        [
+          561,
+          0
+        ],
+        [
+          922,
+          0
+        ],
+        [
+          922,
+          -92
+        ],
+        [
+          1029.5,
+          -92
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-5",
+        "focus": 0.09629629629629614,
+        "gap": 5.199999999999818
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-9",
+        "focus": 0.3333333333333318,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": "builds"
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-10",
+      "type": "arrow",
+      "x": 2199.2000000000003,
+      "y": 631.4666666666667,
+      "width": 385.5999999999999,
+      "height": 216.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 81965419,
+      "version": 2,
+      "versionNonce": 2037211237,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "build_selection",
+          "to": "sql_class",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          75.29999999999973,
+          0
+        ],
+        [
+          150.5999999999999,
+          0
+        ],
+        [
+          301.1999999999998,
+          0
+        ],
+        [
+          301.5999999999999,
+          0
+        ],
+        [
+          301.5999999999999,
+          -216.8
+        ],
+        [
+          385.0999999999999,
+          -216.8
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-6",
+        "focus": -0.2133333333333326,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-9",
+        "focus": -0.0666666666666682,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": "builds"
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-11",
+      "type": "arrow",
+      "x": 2199.2000000000003,
+      "y": 791.4666666666667,
+      "width": 385.5999999999999,
+      "height": 348.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 818371546,
+      "version": 2,
+      "versionNonce": 225258414,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "build_from_table",
+          "to": "sql_class",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          325.5999999999999,
+          0
+        ],
+        [
+          325.5999999999999,
+          -41.60000000000002
+        ],
+        [
+          325.5999999999999,
+          -348.8
+        ],
+        [
+          385.0999999999999,
+          -348.8
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-7",
+        "focus": -0.2133333333333326,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-9",
+        "focus": -0.4666666666666682,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": "builds"
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-12",
+      "type": "arrow",
+      "x": 2169.2000000000003,
+      "y": 358.6666666666667,
+      "width": 415.5999999999999,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1759385525,
+      "version": 2,
+      "versionNonce": 86715199,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "postgresql-select-query-builder-flow-edge-12-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow",
+        "edge": {
+          "from": "build_joins",
+          "to": "sql_class",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          207.79999999999973,
+          0
+        ],
+        [
+          415.0999999999999,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-8",
+        "focus": -0.03333333333333326,
+        "gap": 9.200000000000273
+      },
+      "endBinding": {
+        "elementId": "postgresql-select-query-builder-flow-node-9",
+        "focus": 0.7333333333333318,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "claim": "builds"
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-0-label",
+      "type": "text",
+      "x": 47.5,
+      "y": 167.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1637479780,
+      "version": 1,
+      "versionNonce": 628624112,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "PgSelectBuilder",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-node-0",
+      "originalText": "PgSelectBuilder",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-1-label",
+      "type": "text",
+      "x": 664,
+      "y": 177.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1464728609,
+      "version": 1,
+      "versionNonce": 1653652715,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "PgSelectBase",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-node-1",
+      "originalText": "PgSelectBase",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-2-label",
+      "type": "text",
+      "x": 1268,
+      "y": 667.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1149238686,
+      "version": 1,
+      "versionNonce": 532156098,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "PgSelectQueryBuilderBase",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-node-2",
+      "originalText": "PgSelectQueryBuilderBase",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-3-label",
+      "type": "text",
+      "x": 1993,
+      "y": 177.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1196541619,
+      "version": 1,
+      "versionNonce": 2114668941,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "PgSelectConfig",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-node-3",
+      "originalText": "PgSelectConfig",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-4-label",
+      "type": "text",
+      "x": 1270.5,
+      "y": 47.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1489686872,
+      "version": 1,
+      "versionNonce": 804679732,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "PgDialect",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-node-4",
+      "originalText": "PgDialect",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-5-label",
+      "type": "text",
+      "x": 1331,
+      "y": 457.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1370464293,
+      "version": 1,
+      "versionNonce": 1417941167,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "buildSelectQuery()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-node-5",
+      "originalText": "buildSelectQuery()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-6-label",
+      "type": "text",
+      "x": 1992,
+      "y": 627.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 541920642,
+      "version": 1,
+      "versionNonce": 2012857846,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "buildSelection()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-node-6",
+      "originalText": "buildSelection()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-7-label",
+      "type": "text",
+      "x": 1992,
+      "y": 787.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1503830055,
+      "version": 1,
+      "versionNonce": 249814977,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "buildFromTable()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-node-7",
+      "originalText": "buildFromTable()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-8-label",
+      "type": "text",
+      "x": 2004,
+      "y": 347.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1464040972,
+      "version": 1,
+      "versionNonce": 1186945496,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "buildJoins()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-node-8",
+      "originalText": "buildJoins()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-node-9-label",
+      "type": "text",
+      "x": 2643.5,
+      "y": 397.5,
+      "width": 33,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 2095356073,
+      "version": 1,
+      "versionNonce": 212989875,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "SQL",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-node-9",
+      "originalText": "SQL",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-0-label",
+      "type": "text",
+      "x": 372,
+      "y": 176,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1801793171,
+      "version": 1,
+      "versionNonce": 1796381933,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "from() @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-0",
+      "originalText": "from() @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-1-label",
+      "type": "text",
+      "x": 772.4000000000001,
+      "y": 631.1333333333334,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 310374910,
+      "version": 1,
+      "versionNonce": 1566933666,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "extends @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-1",
+      "originalText": "extends @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-2-label",
+      "type": "text",
+      "x": 1330.0000000000002,
+      "y": 162,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1089284609,
+      "version": 1,
+      "versionNonce": 271353931,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "config @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-2",
+      "originalText": "config @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-3-label",
+      "type": "text",
+      "x": 922.4000000000001,
+      "y": 42,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1536184132,
+      "version": 1,
+      "versionNonce": 721106512,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "dialect @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-3",
+      "originalText": "dialect @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-4-label",
+      "type": "text",
+      "x": 854.0666666666667,
+      "y": 468.6666666666667,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 886676103,
+      "version": 1,
+      "versionNonce": 1181772193,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "toSQL() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-4",
+      "originalText": "toSQL() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-5-label",
+      "type": "text",
+      "x": 1600.8000000000002,
+      "y": 203,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1730770658,
+      "version": 1,
+      "versionNonce": 1002751446,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "config @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-5",
+      "originalText": "config @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-6-label",
+      "type": "text",
+      "x": 1638.4,
+      "y": 621.4666666666667,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 331850629,
+      "version": 1,
+      "versionNonce": 46832527,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "SELECT @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-6",
+      "originalText": "SELECT @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-7-label",
+      "type": "text",
+      "x": 1582.2000000000003,
+      "y": 781.4666666666667,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 2015367224,
+      "version": 1,
+      "versionNonce": 589773972,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "FROM @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-7",
+      "originalText": "FROM @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-8-label",
+      "type": "text",
+      "x": 1678.6000000000001,
+      "y": 348.6666666666667,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1209970651,
+      "version": 1,
+      "versionNonce": 1194952149,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "JOIN @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-8",
+      "originalText": "JOIN @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-9-label",
+      "type": "text",
+      "x": 2063,
+      "y": 468.6666666666667,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 2060893990,
+      "version": 1,
+      "versionNonce": 1411961610,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "SQL @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-9",
+      "originalText": "SQL @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-10-label",
+      "type": "text",
+      "x": 2447.6,
+      "y": 621.4666666666667,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1707914262,
+      "version": 1,
+      "versionNonce": 138558970,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "SQL @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-10",
+      "originalText": "SQL @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-11-label",
+      "type": "text",
+      "x": 2472,
+      "y": 739.8666666666667,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 44384203,
+      "version": 1,
+      "versionNonce": 272203077,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "SQL @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-11",
+      "originalText": "SQL @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "postgresql-select-query-builder-flow-edge-12-label",
+      "type": "text",
+      "x": 2324.2,
+      "y": 348.6666666666667,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 317255132,
+      "version": 1,
+      "versionNonce": 1479692264,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "postgresql-select-query-builder-flow"
+      },
+      "text": "SQL @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "postgresql-select-query-builder-flow-edge-12",
+      "originalText": "SQL @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

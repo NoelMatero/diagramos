@@ -1,0 +1,2352 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "processpromise-template-tag-to-processou-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 620.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1220036829,
+      "version": 1,
+      "versionNonce": 1931588679,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "ProcessPromise: $ Template Tag to ProcessOutput",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "ProcessPromise: $ Template Tag to ProcessOutput",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-0",
+      "type": "rectangle",
+      "x": 980,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 835185092,
+      "version": 2,
+      "versionNonce": 1686334928,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-node-0-label"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "node": "shell_tag",
+        "ref": "src/core.ts"
+      }
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-1",
+      "type": "rectangle",
+      "x": 700,
+      "y": 400,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 17840989,
+      "version": 1,
+      "versionNonce": 630485959,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-node-1-label"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "node": "promise_callback",
+        "ref": "src/core.ts#PromiseCallback"
+      }
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-2",
+      "type": "rectangle",
+      "x": 400,
+      "y": 400,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 594523202,
+      "version": 1,
+      "versionNonce": 1045940406,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-node-2-label"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "node": "process_promise_ctor",
+        "ref": "src/core.ts#ProcessPromise"
+      }
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-3",
+      "type": "rectangle",
+      "x": 460,
+      "y": 1180,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1690630643,
+      "version": 1,
+      "versionNonce": 484349645,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-node-3-label"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "node": "snapshot",
+        "ref": "src/core.ts#Snapshot"
+      }
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-4",
+      "type": "rectangle",
+      "x": 20,
+      "y": 800,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 393767304,
+      "version": 1,
+      "versionNonce": 821537764,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-node-4-label"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "node": "build",
+        "ref": "src/core.ts#ProcessPromise.build"
+      }
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-5",
+      "type": "rectangle",
+      "x": 1000,
+      "y": 400,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1815183025,
+      "version": 1,
+      "versionNonce": 1860224059,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-node-5-label"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "node": "run",
+        "ref": "src/core.ts#ProcessPromise.run"
+      }
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-6",
+      "type": "rectangle",
+      "x": 1100,
+      "y": 800,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 340391270,
+      "version": 1,
+      "versionNonce": 571316810,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-node-6-label"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "node": "exec_func",
+        "ref": "src/vendor-core.ts#exec",
+        "state": "external"
+      }
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-7",
+      "type": "rectangle",
+      "x": 1060,
+      "y": 1180,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 944073911,
+      "version": 1,
+      "versionNonce": 2032444177,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-node-7-label"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "node": "event_handler",
+        "ref": "src/core.ts#ProcessPromise.run"
+      }
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-8",
+      "type": "rectangle",
+      "x": 1080,
+      "y": 1560,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1183492476,
+      "version": 1,
+      "versionNonce": 780517896,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-node-8-label"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "node": "process_output",
+        "ref": "src/core.ts#ProcessOutput"
+      }
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-9",
+      "type": "rectangle",
+      "x": 1080,
+      "y": 1940,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1108478997,
+      "version": 2,
+      "versionNonce": 301286175,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-node-9-label"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "processpromise-template-tag-to-processou-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "node": "finalize",
+        "ref": "src/core.ts#ProcessPromise.finalize"
+      }
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-0",
+      "type": "arrow",
+      "x": 1081.1333333333332,
+      "y": 92,
+      "width": 275,
+      "height": 310.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1494583579,
+      "version": 1,
+      "versionNonce": 1704289301,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "shell_tag",
+          "to": "promise_callback",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          -236.89999999999998,
+          56
+        ],
+        [
+          -275,
+          56
+        ],
+        [
+          -275,
+          310.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-0",
+        "focus": 0.0806060606060599,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-1",
+        "focus": -0.035151515151515295,
+        "gap": 2.8000000000000114
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-1",
+      "type": "arrow",
+      "x": 1026.1333333333332,
+      "y": 92,
+      "width": 520,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 732764618,
+      "version": 1,
+      "versionNonce": 241836318,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "shell_tag",
+          "to": "process_promise_ctor",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -378.4,
+          32
+        ],
+        [
+          -520,
+          32
+        ],
+        [
+          -520,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-0",
+        "focus": 0.5806060606060598,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-2",
+        "focus": -0.03515151515151604,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-2",
+      "type": "arrow",
+      "x": 806.1333333333332,
+      "y": 482.8,
+      "width": 223.33333333333326,
+      "height": 691.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1886880421,
+      "version": 1,
+      "versionNonce": 1227726895,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "promise_callback",
+          "to": "snapshot",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          228.7333333333333
+        ],
+        [
+          0,
+          343.09999999999997
+        ],
+        [
+          0,
+          457.46666666666664
+        ],
+        [
+          0,
+          583.5999999999999
+        ],
+        [
+          -223.33333333333326,
+          583.5999999999999
+        ],
+        [
+          -223.33333333333326,
+          691.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-1",
+        "focus": 0.03515151515151621,
+        "gap": 2.8000000000000114
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-3",
+        "focus": 0.5349999999999999,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-3",
+      "type": "arrow",
+      "x": 542.8,
+      "y": 492.8,
+      "width": 0,
+      "height": 681.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1746991244,
+      "version": 1,
+      "versionNonce": 1399271768,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "process_promise_ctor",
+          "to": "snapshot",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          340.7999999999999
+        ],
+        [
+          0,
+          681.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-2",
+        "focus": -0.2981818181818169,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-3",
+        "focus": 0.035,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-4",
+      "type": "arrow",
+      "x": 469.4666666666666,
+      "y": 492.8,
+      "width": 307.4666666666666,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1824645951,
+      "version": 1,
+      "versionNonce": 1065387097,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "process_promise_ctor",
+          "to": "build",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          31.999999999999943
+        ],
+        [
+          -272.13333333333327,
+          31.999999999999943
+        ],
+        [
+          -307.4666666666666,
+          31.999999999999943
+        ],
+        [
+          -307.4666666666666,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-2",
+        "focus": 0.36848484848484914,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-4",
+        "focus": -0.053333333333333316,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-5",
+      "type": "arrow",
+      "x": 162,
+      "y": 873.5999999999999,
+      "width": 340.79999999999995,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 147247278,
+      "version": 1,
+      "versionNonce": 284253650,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "build",
+          "to": "snapshot",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.79999999999995
+        ],
+        [
+          128,
+          192.79999999999995
+        ],
+        [
+          340.79999999999995,
+          192.79999999999995
+        ],
+        [
+          340.79999999999995,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-4",
+        "focus": 0.053333333333333316,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-3",
+        "focus": -0.46499999999999936,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-6",
+      "type": "arrow",
+      "x": 1136.1333333333332,
+      "y": 92,
+      "width": 0,
+      "height": 314.1333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 545368345,
+      "version": 1,
+      "versionNonce": 521571427,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "shell_tag",
+          "to": "run",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          157.06666666666666
+        ],
+        [
+          0,
+          313.6333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-0",
+        "focus": -0.4193939393939401,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-5",
+        "focus": -0.027619047619048438,
+        "gap": 6.133333333333326
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-7",
+      "type": "arrow",
+      "x": 1182.8,
+      "y": 486.1333333333333,
+      "width": 0,
+      "height": 307.4666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1274339344,
+      "version": 1,
+      "versionNonce": 924648172,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "run",
+          "to": "exec_func",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          153.73333333333323
+        ],
+        [
+          0,
+          306.9666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-5",
+        "focus": -0.30571428571428544,
+        "gap": 6.133333333333326
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-6",
+        "focus": -0.08000000000000061,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-8",
+      "type": "arrow",
+      "x": 1182.8,
+      "y": 873.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1149179267,
+      "version": 1,
+      "versionNonce": 1882474397,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "exec_func",
+          "to": "event_handler",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-6",
+        "focus": 0.08000000000000061,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-7",
+        "focus": 0.023333333333333144,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-9",
+      "type": "arrow",
+      "x": 1182.8,
+      "y": 1254.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 384457234,
+      "version": 1,
+      "versionNonce": 521642054,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "event_handler",
+          "to": "process_output",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-7",
+        "focus": -0.023333333333333144,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-8",
+        "focus": 0.027999999999999234,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-10",
+      "type": "arrow",
+      "x": 1182.8,
+      "y": 1635.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1293774612,
+      "version": 1,
+      "versionNonce": 599467616,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "process_output",
+          "to": "finalize",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-8",
+        "focus": -0.027999999999999234,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-9",
+        "focus": 0.28499999999999887,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-11",
+      "type": "arrow",
+      "x": 1129.4666666666665,
+      "y": 1935.9999999999998,
+      "width": 208.8666666666668,
+      "height": 1449.8666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1231110893,
+      "version": 3,
+      "versionNonce": 1409232471,
+      "isDeleted": true,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "processpromise-template-tag-to-processou-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou",
+        "edge": {
+          "from": "finalize",
+          "to": "run",
+          "claim": "returns"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          -0.5
+        ],
+        [
+          2.2737367544323206e-13,
+          -108
+        ],
+        [
+          -208.86666666666656,
+          -108
+        ],
+        [
+          -208.86666666666656,
+          -704.9333333333332
+        ],
+        [
+          -208.86666666666656,
+          -1411.1999999999998
+        ],
+        [
+          -39.99999999999977,
+          -1411.1999999999998
+        ],
+        [
+          -39.5,
+          -1449.3666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-9",
+        "focus": -0.38166666666666965,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "processpromise-template-tag-to-processou-node-5",
+        "focus": 0.36095238095238247,
+        "gap": 6.133333333333439
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-0-label",
+      "type": "text",
+      "x": 1013,
+      "y": 47.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 769183697,
+      "version": 1,
+      "versionNonce": 692393179,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "$ template tag",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-node-0",
+      "originalText": "$ template tag",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-1-label",
+      "type": "text",
+      "x": 727.5,
+      "y": 427.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 936656276,
+      "version": 1,
+      "versionNonce": 562182624,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "PromiseCallback",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-node-1",
+      "originalText": "PromiseCallback",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-2-label",
+      "type": "text",
+      "x": 433,
+      "y": 425,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1177176611,
+      "version": 1,
+      "versionNonce": 1148861629,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "ProcessPromise\nconstructor",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-node-2",
+      "originalText": "ProcessPromise constructor",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-3-label",
+      "type": "text",
+      "x": 496,
+      "y": 1207.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1140811726,
+      "version": 1,
+      "versionNonce": 763447666,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "Snapshot",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-node-3",
+      "originalText": "Snapshot",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-4-label",
+      "type": "text",
+      "x": 48.999999999999986,
+      "y": 827.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 133570645,
+      "version": 1,
+      "versionNonce": 29688415,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "ProcessPromise.build()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-node-4",
+      "originalText": "ProcessPromise.build()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-5-label",
+      "type": "text",
+      "x": 1030,
+      "y": 427.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 890444680,
+      "version": 1,
+      "versionNonce": 1266541028,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "ProcessPromise.run()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-node-5",
+      "originalText": "ProcessPromise.run()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-6-label",
+      "type": "text",
+      "x": 1124,
+      "y": 827.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 823166679,
+      "version": 1,
+      "versionNonce": 1737599409,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "exec() spawn",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-node-6",
+      "originalText": "exec() spawn",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-7-label",
+      "type": "text",
+      "x": 1086.5,
+      "y": 1207.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 286404018,
+      "version": 1,
+      "versionNonce": 1271488614,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "end event handler",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-node-7",
+      "originalText": "end event handler",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-8-label",
+      "type": "text",
+      "x": 1108.5,
+      "y": 1587.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 287562521,
+      "version": 1,
+      "versionNonce": 1852523107,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "ProcessOutput",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-node-8",
+      "originalText": "ProcessOutput",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-node-9-label",
+      "type": "text",
+      "x": 1105,
+      "y": 1967.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 161970620,
+      "version": 1,
+      "versionNonce": 1713853256,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "finalize()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-node-9",
+      "originalText": "finalize()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-0-label",
+      "type": "text",
+      "x": 773.8333333333333,
+      "y": 128,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1436248390,
+      "version": 1,
+      "versionNonce": 357001386,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "creates callback\n@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-0",
+      "originalText": "creates callback @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-1-label",
+      "type": "text",
+      "x": 533.3333333333333,
+      "y": 114,
+      "width": 228.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1046943995,
+      "version": 1,
+      "versionNonce": 1806602613,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "new ProcessPromise @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-1",
+      "originalText": "new ProcessPromise @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-2-label",
+      "type": "text",
+      "x": 731.3333333333333,
+      "y": 920.2666666666667,
+      "width": 149.60000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1948265356,
+      "version": 1,
+      "versionNonce": 908360280,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "captures snapshot\n@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-2",
+      "originalText": "captures snapshot @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-3-label",
+      "type": "text",
+      "x": 472.4,
+      "y": 823.5999999999999,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 432096809,
+      "version": 1,
+      "versionNonce": 2081888307,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "stores @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-3",
+      "originalText": "stores @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-4-label",
+      "type": "text",
+      "x": 170.9333333333333,
+      "y": 514.8,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 2054022346,
+      "version": 1,
+      "versionNonce": 132755998,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-5-label",
+      "type": "text",
+      "x": 232.8,
+      "y": 1056.3999999999999,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 35617487,
+      "version": 1,
+      "versionNonce": 1282622121,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "cmd @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-5",
+      "originalText": "cmd @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-6-label",
+      "type": "text",
+      "x": 1070.1333333333332,
+      "y": 239.06666666666666,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1354387744,
+      "version": 1,
+      "versionNonce": 2119409020,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "pp.run() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-6",
+      "originalText": "pp.run() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-7-label",
+      "type": "text",
+      "x": 1099.2,
+      "y": 629.8666666666666,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1086343405,
+      "version": 1,
+      "versionNonce": 1049993303,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "spawns child @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-7",
+      "originalText": "spawns child @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-8-label",
+      "type": "text",
+      "x": 1108,
+      "y": 1003.9999999999999,
+      "width": 149.60000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1633463070,
+      "version": 1,
+      "versionNonce": 253570882,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "stdout/stderr/end\n@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-8",
+      "originalText": "stdout/stderr/end @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-9-label",
+      "type": "text",
+      "x": 1108,
+      "y": 1384.7999999999997,
+      "width": 149.60000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1680766003,
+      "version": 1,
+      "versionNonce": 1836083725,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "new ProcessOutput\n@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-9",
+      "originalText": "new ProcessOutput @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-10-label",
+      "type": "text",
+      "x": 1156.3999999999999,
+      "y": 1775.6,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1970642145,
+      "version": 1,
+      "versionNonce": 1235975083,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-10",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "processpromise-template-tag-to-processou-edge-11-label",
+      "type": "text",
+      "x": 845.8,
+      "y": 1221.0666666666666,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1627256612,
+      "version": 2,
+      "versionNonce": 1452887472,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "processpromise-template-tag-to-processou"
+      },
+      "text": "resolves @returns",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "processpromise-template-tag-to-processou-edge-11",
+      "originalText": "resolves @returns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

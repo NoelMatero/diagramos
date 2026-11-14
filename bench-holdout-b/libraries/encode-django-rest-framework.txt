@@ -1,0 +1,5 @@
+# encode-django-rest-framework: its dependencies and extras, resolved as of its pinned commit (2026-10-05), the way the main set's unlocked projects were:
+#   uv pip compile --all-extras --python-version 3.14 --exclude-newer 2026-10-05T05:21:15Z pyproject.toml
+asgiref==3.12.1
+django==6.1.1
+sqlparse==0.6.0
