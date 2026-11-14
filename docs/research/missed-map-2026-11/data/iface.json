@@ -1,0 +1,1750 @@
+[
+{
+"set": "main",
+"id": 16,
+"lang": "ts",
+"head": "failureReason",
+"names": [
+"batch",
+"canStart",
+"clearGcTimeout",
+"continue",
+"mutationFn",
+"onError",
+"onMutate",
+"onSettled",
+"onSuccess",
+"scheduleGc",
+"start",
+"updateGcTime"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "packages/query-core/src/mutation.ts#execute",
+"to": "packages/query-core/src/mutation.ts#failureReason",
+"source": "wrong-kind"
+},
+{
+"set": "main",
+"id": 63,
+"lang": "ts",
+"head": "QueryClientProvider",
+"names": [
+"batchCalls",
+"getCurrentResult",
+"getOptimisticResult",
+"setOptions",
+"subscribe"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter"
+],
+"from": "packages/react-query/src/useBaseQuery.ts#useBaseQuery",
+"to": "packages/react-query/src/QueryClientProvider.tsx#QueryClientProvider",
+"source": "retarget"
+},
+{
+"set": "main",
+"id": 64,
+"lang": "ts",
+"head": "QueryClientContext",
+"names": [
+"batchCalls",
+"getCurrentResult",
+"getOptimisticResult",
+"setOptions",
+"subscribe"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter"
+],
+"from": "packages/react-query/src/useBaseQuery.ts#useBaseQuery",
+"to": "packages/react-query/src/QueryClientProvider.tsx#QueryClientContext",
+"source": "wrong-kind"
+},
+{
+"set": "main",
+"id": 527,
+"lang": "rust",
+"head": "Write",
+"names": [
+"begin_array",
+"begin_array_value",
+"begin_object",
+"begin_object_key",
+"begin_object_value",
+"begin_string",
+"end_array",
+"end_array_value",
+"end_object",
+"end_object_key",
+"end_object_value",
+"end_string",
+"write_bool",
+"write_byte_array",
+"write_char_escape",
+"write_f32",
+"write_f64",
+"write_i128",
+"write_i16",
+"write_i32",
+"write_i64",
+"write_i8",
+"write_null",
+"write_string_fragment",
+"write_u128",
+"write_u16",
+"write_u32",
+"write_u64",
+"write_u8"
+],
+"same": false,
+"alone": false,
+"rest": [
+"drawn from a class or struct"
+],
+"from": "src/ser.rs#Formatter",
+"to": "src/io/core.rs#Write",
+"source": "drawn"
+},
+{
+"set": "main",
+"id": 558,
+"lang": "ts",
+"head": "loadInstance",
+"names": [
+"resolveComponentHost",
+"resolveComponentWrapper"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter",
+"library import not placed",
+"reaches it in steps (route note)",
+"untyped value, compiler never asked"
+],
+"from": "packages/core/injector/injector.ts#resolveConstructorParams",
+"to": "packages/core/injector/injector.ts#loadInstance",
+"source": "reverse"
+},
+{
+"set": "main",
+"id": 935,
+"lang": "python",
+"head": "_propagate",
+"names": [
+"_search_for_cached",
+"get_package_from_pool"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/poetry/mixology/version_solver.py#search_for",
+"to": "src/poetry/mixology/version_solver.py#_propagate",
+"source": "retarget"
+},
+{
+"set": "main",
+"id": 994,
+"lang": "rust",
+"head": "new",
+"names": [
+"create_cache",
+"group_info",
+"is_accelerated",
+"is_match",
+"memory_usage",
+"reset_cache",
+"search",
+"search_half",
+"search_slots",
+"which_overlapping_matches",
+"with_pattern_ids"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "regex-automata/src/meta/regex.rs#search_with",
+"to": "regex-automata/src/meta/strategy.rs#new",
+"source": "drawn"
+},
+{
+"set": "main",
+"id": 1166,
+"lang": "ts",
+"head": "TransformOptionsInternal",
+"names": [
+"abort",
+"isOptimizedDepFile",
+"warn"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "packages/vite/src/node/server/transformRequest.ts#transformRequest",
+"to": "packages/vite/src/node/server/transformRequest.ts#TransformOptionsInternal",
+"source": "retarget"
+},
+{
+"set": "main",
+"id": 1168,
+"lang": "ts",
+"head": "PluginContainer",
+"names": [
+"abort",
+"isOptimizedDepFile",
+"warn"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "packages/vite/src/node/server/transformRequest.ts#doTransform",
+"to": "packages/vite/src/node/server/pluginContainer.ts#PluginContainer",
+"source": "drawn"
+},
+{
+"set": "main",
+"id": 1174,
+"lang": "ts",
+"head": "doTransform",
+"names": [
+"abort",
+"isOptimizedDepFile",
+"warn"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "packages/vite/src/node/server/transformRequest.ts#doTransform",
+"to": "packages/vite/src/node/server/transformRequest.ts#doTransform",
+"source": "retarget"
+},
+{
+"set": "main",
+"id": 1175,
+"lang": "ts",
+"head": "e",
+"names": [
+"abort",
+"isOptimizedDepFile",
+"warn"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "packages/vite/src/node/server/transformRequest.ts#doTransform",
+"to": "packages/vite/src/node/server/transformRequest.ts#e",
+"source": "wrong-kind"
+},
+{
+"set": "main",
+"id": 1180,
+"lang": "ts",
+"head": "hires",
+"names": [
+"error",
+"isOptimizedDepFile",
+"isOptimizedDepUrl",
+"warn"
+],
+"same": false,
+"alone": false,
+"rest": [
+"a function value made outside the routine",
+"callback parameter"
+],
+"from": "packages/vite/src/node/server/middlewares/transform.ts#transformMiddleware",
+"to": "packages/vite/src/node/server/send.ts#hires",
+"source": "wrong-kind"
+},
+{
+"set": "main",
+"id": 1186,
+"lang": "ts",
+"head": "import",
+"names": [
+"directRequest"
+],
+"same": false,
+"alone": false,
+"rest": [
+"function stored in a field",
+"untyped value, compiler never asked"
+],
+"from": "packages/vite/src/module-runner/runner.ts#cachedRequest",
+"to": "packages/vite/src/module-runner/runner.ts#import",
+"source": "reverse"
+},
+{
+"set": "main",
+"id": 1192,
+"lang": "ts",
+"head": "createImportMeta",
+"names": [
+"directRequest"
+],
+"same": false,
+"alone": false,
+"rest": [
+"function stored in a field",
+"untyped value, compiler never asked"
+],
+"from": "packages/vite/src/module-runner/runner.ts#cachedRequest",
+"to": "packages/vite/src/module-runner/runner.ts#createImportMeta",
+"source": "wrong-kind"
+},
+{
+"set": "main",
+"id": 1225,
+"lang": "ts",
+"head": "pushRefVForMarker",
+"names": [
+"helper",
+"helperString",
+"isBuiltInComponent",
+"onError"
+],
+"same": false,
+"alone": false,
+"rest": [
+"reaches it in steps (route note)"
+],
+"from": "packages/compiler-core/src/transforms/transformElement.ts#transformElement",
+"to": "packages/compiler-core/src/transforms/transformElement.ts#pushRefVForMarker",
+"source": "retarget"
+},
+{
+"set": "main",
+"id": 1226,
+"lang": "ts",
+"head": "source",
+"names": [
+"helper",
+"helperString",
+"isBuiltInComponent",
+"onError"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "packages/compiler-core/src/transforms/transformElement.ts#transformElement",
+"to": "packages/compiler-core/src/transforms/transformElement.ts#source",
+"source": "wrong-kind"
+},
+{
+"set": "main",
+"id": 1233,
+"lang": "ts",
+"head": "VNODE_CALL",
+"names": [
+"helper",
+"helperString",
+"isBuiltInComponent",
+"onError"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "packages/compiler-core/src/transforms/transformElement.ts#transformElement",
+"to": "packages/compiler-core/src/ast.ts#VNODE_CALL",
+"source": "wrong-kind"
+},
+{
+"set": "main",
+"id": 1234,
+"lang": "ts",
+"head": "transformExpression",
+"names": [
+"helper",
+"onError",
+"removeNode",
+"replaceNode"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter",
+"local holding a function"
+],
+"from": "packages/compiler-core/src/transforms/vIf.ts#processIf",
+"to": "packages/compiler-core/src/transforms/transformExpression.ts#transformExpression",
+"source": "drawn"
+},
+{
+"set": "main",
+"id": 1245,
+"lang": "ts",
+"head": "transformExpression",
+"names": [
+"helper",
+"helperString",
+"isBuiltInComponent",
+"onError"
+],
+"same": false,
+"alone": false,
+"rest": [
+"a function value made outside the routine",
+"local holding a function"
+],
+"from": "packages/compiler-core/src/transforms/transformElement.ts#buildProps",
+"to": "packages/compiler-core/src/transforms/transformExpression.ts#transformExpression",
+"source": "drawn"
+},
+{
+"set": "holdout",
+"id": 5,
+"lang": "python",
+"head": "print",
+"names": [
+"__rich_console__",
+"_log_render",
+"get",
+"get_datetime",
+"process_renderables"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "rich/console.py#render",
+"to": "rich/console.py#print",
+"source": "reverse"
+},
+{
+"set": "holdout",
+"id": 107,
+"lang": "python",
+"head": "real_url",
+"names": [
+"_request_class",
+"_send",
+"_ws_response_class",
+"close",
+"start",
+"update_cookies_from_headers"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter",
+"library import not placed",
+"local holding a function"
+],
+"from": "aiohttp/client.py#_request",
+"to": "aiohttp/client_reqrep.py#real_url",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 109,
+"lang": "python",
+"head": "connect",
+"names": [
+"_request_class",
+"_send",
+"_ws_response_class",
+"close",
+"start",
+"update_cookies_from_headers"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter",
+"library import not placed",
+"local holding a function"
+],
+"from": "aiohttp/client.py#_request",
+"to": "aiohttp/connector.py#connect",
+"source": "drawn"
+},
+{
+"set": "holdout",
+"id": 120,
+"lang": "python",
+"head": "expired",
+"names": [
+"__init__",
+"_close_immediately",
+"_create_connection",
+"_factory",
+"_resolve_host",
+"_send",
+"close",
+"connection_made",
+"resolve",
+"send_dns_cache_hit",
+"send_dns_cache_miss",
+"send_dns_resolvehost_end",
+"send_dns_resolvehost_start",
+"start"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "aiohttp/connector.py#connect",
+"to": "aiohttp/connector.py#expired",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 122,
+"lang": "python",
+"head": "_send",
+"names": [
+"_request_class",
+"_send",
+"_ws_response_class",
+"close",
+"start",
+"update_cookies_from_headers"
+],
+"same": true,
+"alone": false,
+"rest": [
+"callback parameter",
+"library import not placed",
+"local holding a function"
+],
+"from": "aiohttp/client.py#_request",
+"to": "aiohttp/client_reqrep.py#_send",
+"source": "drawn"
+},
+{
+"set": "holdout",
+"id": 128,
+"lang": "python",
+"head": "Connection",
+"names": [
+"__init__",
+"_create_response",
+"_create_writer",
+"_hashfunc",
+"_should_write",
+"_write_bytes",
+"close",
+"drain",
+"exception",
+"on_eof",
+"read",
+"release",
+"send_headers",
+"write_eof",
+"write_with_length"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "aiohttp/client_reqrep.py#_send",
+"to": "aiohttp/connector.py#Connection",
+"source": "swap"
+},
+{
+"set": "holdout",
+"id": 136,
+"lang": "python",
+"head": "POST_METHODS",
+"names": [
+"_request_class",
+"_send",
+"_ws_response_class",
+"close",
+"start",
+"update_cookies_from_headers"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter",
+"library import not placed",
+"local holding a function"
+],
+"from": "aiohttp/client.py#_request",
+"to": "aiohttp/client_reqrep.py#POST_METHODS",
+"source": "wrong-kind"
+},
+{
+"set": "holdout",
+"id": 172,
+"lang": "python",
+"head": "AbstractStreamWriter",
+"names": [
+"__init__",
+"_close",
+"decode",
+"write",
+"write_with_length"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "aiohttp/payload.py#Payload.write",
+"to": "aiohttp/abc.py#AbstractStreamWriter",
+"source": "drawn"
+},
+{
+"set": "holdout",
+"id": 290,
+"lang": "ts",
+"head": "ParsePayload",
+"names": [
+"run"
+],
+"same": false,
+"alone": false,
+"rest": [
+"new on an expression"
+],
+"from": "packages/zod/src/v4/core/parse.ts#_parse",
+"to": "packages/zod/src/v4/core/schemas.ts#ParsePayload",
+"source": "swap"
+},
+{
+"set": "holdout",
+"id": 320,
+"lang": "ts",
+"head": "$ZodIssue",
+"names": [
+"constr",
+"customError",
+"error",
+"localeError"
+],
+"same": false,
+"alone": false,
+"rest": [
+"local holding a function"
+],
+"from": "packages/zod/src/v4/core/util.ts#finalizeIssue",
+"to": "packages/zod/src/v4/core/errors.ts#$ZodIssue",
+"source": "swap"
+},
+{
+"set": "holdout",
+"id": 338,
+"lang": "ts",
+"head": "JSONSchema",
+"names": [
+"getter",
+"override",
+"processJSONSchema",
+"toJSONSchema",
+"unrepresentable",
+"uri"
+],
+"same": false,
+"alone": false,
+"rest": [
+"local holding a function"
+],
+"from": "packages/zod/src/v4/core/to-json-schema.ts#finalize",
+"to": "packages/zod/src/v4/core/json-schema.ts#JSONSchema",
+"source": "swap"
+},
+{
+"set": "holdout",
+"id": 533,
+"lang": "ts",
+"head": "validator",
+"names": [
+"header",
+"param",
+"queries"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter"
+],
+"from": "src/validator/validator.ts#validator",
+"to": "src/validator/validator.ts#validator",
+"source": "drawn"
+},
+{
+"set": "holdout",
+"id": 537,
+"lang": "ts",
+"head": "equal",
+"names": [
+"header",
+"param",
+"queries"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter"
+],
+"from": "src/validator/validator.ts#validator",
+"to": "src/utils/buffer.ts#equal",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 623,
+"lang": "python",
+"head": "get_requirements",
+"names": [
+"check_build_deps",
+"config_settings",
+"get_installation_order",
+"ignore_requires_python",
+"no_build_isolation",
+"no_deps",
+"no_require_hashes",
+"only_deps",
+"override_externally_managed",
+"pip_version_check",
+"progress_bar",
+"require_hashes",
+"resolve",
+"root_user_action",
+"src",
+"use_pep517"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/pip/_internal/commands/install.py#pip_version_check",
+"to": "src/pip/_internal/cli/req_command.py#get_requirements",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 643,
+"lang": "python",
+"head": "_get_cache_dir",
+"names": [
+"check_build_deps",
+"config_settings",
+"get_installation_order",
+"ignore_requires_python",
+"no_build_isolation",
+"no_deps",
+"no_require_hashes",
+"only_deps",
+"override_externally_managed",
+"pip_version_check",
+"progress_bar",
+"require_hashes",
+"resolve",
+"root_user_action",
+"src",
+"use_pep517"
+],
+"same": false,
+"alone": false,
+"rest": [
+"reaches it in steps (route note)"
+],
+"from": "src/pip/_internal/commands/install.py#run",
+"to": "src/pip/_internal/wheel_builder.py#_get_cache_dir",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 650,
+"lang": "python",
+"head": "install_given_reqs",
+"names": [
+"check_build_deps",
+"config_settings",
+"get_installation_order",
+"ignore_requires_python",
+"no_build_isolation",
+"no_deps",
+"no_require_hashes",
+"only_deps",
+"override_externally_managed",
+"pip_version_check",
+"progress_bar",
+"require_hashes",
+"resolve",
+"root_user_action",
+"src",
+"use_pep517"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/pip/_internal/commands/install.py#add_options",
+"to": "src/pip/_internal/req/__init__.py#install_given_reqs",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 663,
+"lang": "python",
+"head": "index_urls",
+"names": [
+"file_links",
+"filter",
+"page_candidates"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/pip/_internal/index/package_finder.py#find_all_candidates",
+"to": "src/pip/_internal/index/collector.py#index_urls",
+"source": "wrong-kind"
+},
+{
+"set": "holdout",
+"id": 683,
+"lang": "python",
+"head": "find_matches",
+"names": [
+"get_install_requirement"
+],
+"same": false,
+"alone": false,
+"rest": [
+"reaches the head's file"
+],
+"from": "src/pip/_internal/resolution/resolvelib/resolver.py#Resolver.resolve",
+"to": "src/pip/_internal/resolution/resolvelib/provider.py#PipProvider.find_matches",
+"source": "swap"
+},
+{
+"set": "holdout",
+"id": 709,
+"lang": "ts",
+"head": "fetchUpgradedPackument",
+"names": [
+"fetchUpgradedPackumentMemo",
+"findNpmConfig",
+"mockFetchUpgradedPackument"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/package-managers/npm.ts#fetchVersions",
+"to": "src/package-managers/npm.ts#fetchUpgradedPackument",
+"source": "drawn"
+},
+{
+"set": "holdout",
+"id": 768,
+"lang": "ts",
+"head": "getPackageVersionProtected",
+"names": [
+"filterResults"
+],
+"same": false,
+"alone": false,
+"rest": [
+"reaches it in steps (route note)"
+],
+"from": "src/lib/upgradePackageDefinitions.ts#upgradePackageDefinitions",
+"to": "src/lib/queryVersions.ts#getPackageVersionProtected",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 769,
+"lang": "ts",
+"head": "error",
+"names": [
+"filterResults"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/lib/upgradePackageDefinitions.ts#upgradePackageDefinitions",
+"to": "src/lib/queryVersions.ts#error",
+"source": "wrong-kind"
+},
+{
+"set": "holdout",
+"id": 795,
+"lang": "ts",
+"head": "isCircularPeer",
+"names": [
+"filterResults"
+],
+"same": false,
+"alone": false,
+"rest": [
+"reaches it in steps (route note)"
+],
+"from": "src/lib/upgradePackageDefinitions.ts#upgradePackageDefinitions",
+"to": "src/lib/getPeerDependenciesFromRegistry.ts#isCircularPeer",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 873,
+"lang": "ts",
+"head": "constructor",
+"names": [
+"addFlow",
+"close",
+"disconnect",
+"forQueue",
+"on",
+"parseNodeKey",
+"setAttributes",
+"toKey",
+"waitUntilReady"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/classes/flow-producer.ts#add",
+"to": "src/classes/flow-producer.ts#constructor",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 900,
+"lang": "ts",
+"head": "token",
+"names": [
+"cleanJobsByState",
+"close",
+"deleteDeduplicationKey",
+"drain",
+"emit",
+"getQueueMetaField",
+"hasQueueMetaField",
+"isMaxed",
+"obliterate",
+"pause",
+"promoteJobs",
+"remove",
+"removeDeprecatedPriorityKey",
+"removeOrphanedJobs",
+"removeQueueMetaFields",
+"removeRateLimitKey",
+"retryFinishedJobs",
+"setAttributes",
+"setQueueMeta",
+"setRateLimit",
+"trimEvents",
+"updateProgress",
+"waitUntilReady"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/classes/queue.ts#add",
+"to": "src/classes/queue.ts#token",
+"source": "wrong-kind"
+},
+{
+"set": "holdout",
+"id": 933,
+"lang": "ts",
+"head": "moveToActive",
+"names": [
+"addEvent",
+"backendFactory",
+"close",
+"disconnectBlocking",
+"emit",
+"extendLocks",
+"moveStalledJobsToWait",
+"moveToActive",
+"reconnectBlocking",
+"recordException",
+"setAttributes",
+"setRateLimit",
+"waitForJob",
+"waitUntilReady"
+],
+"same": true,
+"alone": true,
+"rest": [],
+"from": "src/classes/worker.ts#waitForJob",
+"to": "src/classes/worker.ts#moveToActive",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 941,
+"lang": "ts",
+"head": "delay",
+"names": [
+"addEvent",
+"backendFactory",
+"close",
+"disconnectBlocking",
+"emit",
+"extendLocks",
+"moveStalledJobsToWait",
+"moveToActive",
+"reconnectBlocking",
+"recordException",
+"setAttributes",
+"setRateLimit",
+"waitForJob",
+"waitUntilReady"
+],
+"same": false,
+"alone": false,
+"rest": [
+"reaches it in steps (route note)"
+],
+"from": "src/classes/worker.ts#processJob",
+"to": "src/classes/worker.ts#delay",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 945,
+"lang": "ts",
+"head": "handleCompleted",
+"names": [
+"addEvent",
+"backendFactory",
+"close",
+"disconnectBlocking",
+"emit",
+"extendLocks",
+"moveStalledJobsToWait",
+"moveToActive",
+"reconnectBlocking",
+"recordException",
+"setAttributes",
+"setRateLimit",
+"waitForJob",
+"waitUntilReady"
+],
+"same": false,
+"alone": false,
+"rest": [
+"reaches it in steps (route note)"
+],
+"from": "src/classes/worker.ts#constructor",
+"to": "src/classes/worker.ts#handleCompleted",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 953,
+"lang": "ts",
+"head": "handleCompleted",
+"names": [
+"add",
+"addJob",
+"addJobs",
+"addLog",
+"changeDelay",
+"changePriority",
+"clearLogs",
+"createCounter",
+"createHistogram",
+"emit",
+"extendLock",
+"getDependencies",
+"getDependencyCounts",
+"getIgnoredChildrenFailures",
+"getJobData",
+"getProcessedChildrenValues",
+"getState",
+"isFinished",
+"isJobInState",
+"moveJobFromActiveToWait",
+"moveToCompleted",
+"moveToDelayed",
+"moveToFailed",
+"moveToWaitingChildren",
+"on",
+"promote",
+"record",
+"remove",
+"removeChildDependency",
+"removeDeduplicationKey",
+"removeListener",
+"removeUnprocessedChildren",
+"retryFinishedJob",
+"retryJob",
+"setAttributes",
+"trace",
+"updateData",
+"updateProgress",
+"waitUntilReady"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/classes/job.ts#moveToCompleted",
+"to": "src/classes/worker.ts#handleCompleted",
+"source": "reverse"
+},
+{
+"set": "holdout",
+"id": 954,
+"lang": "ts",
+"head": "moveToCompleted",
+"names": [
+"addEvent",
+"backendFactory",
+"close",
+"disconnectBlocking",
+"emit",
+"extendLocks",
+"moveStalledJobsToWait",
+"moveToActive",
+"reconnectBlocking",
+"recordException",
+"setAttributes",
+"setRateLimit",
+"waitForJob",
+"waitUntilReady"
+],
+"same": false,
+"alone": false,
+"rest": [
+"reaches it in steps (route note)"
+],
+"from": "src/classes/worker.ts#constructor",
+"to": "src/classes/job.ts#moveToCompleted",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 955,
+"lang": "ts",
+"head": "result",
+"names": [
+"addEvent",
+"backendFactory",
+"close",
+"disconnectBlocking",
+"emit",
+"extendLocks",
+"moveStalledJobsToWait",
+"moveToActive",
+"reconnectBlocking",
+"recordException",
+"setAttributes",
+"setRateLimit",
+"waitForJob",
+"waitUntilReady"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter"
+],
+"from": "src/classes/worker.ts#handleCompleted",
+"to": "src/classes/job.ts#result",
+"source": "wrong-kind"
+},
+{
+"set": "holdout",
+"id": 960,
+"lang": "ts",
+"head": "handleFailed",
+"names": [
+"add",
+"addJob",
+"addJobs",
+"addLog",
+"changeDelay",
+"changePriority",
+"clearLogs",
+"createCounter",
+"createHistogram",
+"emit",
+"extendLock",
+"getDependencies",
+"getDependencyCounts",
+"getIgnoredChildrenFailures",
+"getJobData",
+"getProcessedChildrenValues",
+"getState",
+"isFinished",
+"isJobInState",
+"moveJobFromActiveToWait",
+"moveToCompleted",
+"moveToDelayed",
+"moveToFailed",
+"moveToWaitingChildren",
+"on",
+"promote",
+"record",
+"remove",
+"removeChildDependency",
+"removeDeduplicationKey",
+"removeListener",
+"removeUnprocessedChildren",
+"retryFinishedJob",
+"retryJob",
+"setAttributes",
+"trace",
+"updateData",
+"updateProgress",
+"waitUntilReady"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/classes/job.ts#moveToFailed",
+"to": "src/classes/worker.ts#handleFailed",
+"source": "reverse"
+},
+{
+"set": "holdout",
+"id": 983,
+"lang": "ts",
+"head": "TRPCUntypedClient",
+"names": [
+"subscribe"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "packages/client/src/links/internals/createChain.ts#createChain",
+"to": "packages/client/src/internals/TRPCUntypedClient.ts#TRPCUntypedClient",
+"source": "reverse"
+},
+{
+"set": "holdout",
+"id": 989,
+"lang": "ts",
+"head": "TRPCLink",
+"names": [
+"subscribe"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "packages/client/src/links/internals/createChain.ts#createChain",
+"to": "packages/client/src/links/types.ts#TRPCLink",
+"source": "swap"
+},
+{
+"set": "holdout",
+"id": 995,
+"lang": "ts",
+"head": "parse",
+"names": [
+"create",
+"createContext",
+"onError",
+"result",
+"serialize",
+"value",
+"valueOrUndefined"
+],
+"same": false,
+"alone": false,
+"rest": [
+"local holding a function"
+],
+"from": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#resolveResponse",
+"to": "packages/server/src/unstable-core-do-not-import/http/contentType.ts#parse",
+"source": "retarget"
+},
+{
+"set": "holdout",
+"id": 996,
+"lang": "ts",
+"head": "batchIndex",
+"names": [
+"create",
+"createContext",
+"onError",
+"result",
+"serialize",
+"value",
+"valueOrUndefined"
+],
+"same": false,
+"alone": false,
+"rest": [
+"local holding a function"
+],
+"from": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#resolveResponse",
+"to": "packages/server/src/unstable-core-do-not-import/http/contentType.ts#batchIndex",
+"source": "wrong-kind"
+},
+{
+"set": "holdout",
+"id": 1006,
+"lang": "ts",
+"head": "formatError",
+"names": [
+"create",
+"createContext",
+"onError",
+"result",
+"serialize",
+"value",
+"valueOrUndefined"
+],
+"same": false,
+"alone": false,
+"rest": [
+"local holding a function"
+],
+"from": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#resolveResponse",
+"to": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#formatError",
+"source": "retarget"
+},
+{
+"set": "holdout-b",
+"id": 12,
+"lang": "rust",
+"head": "AppInit",
+"names": [
+"check",
+"create",
+"register"
+],
+"same": false,
+"alone": false,
+"rest": [
+"drawn from a class or struct"
+],
+"from": "actix-web/src/app_service.rs#AppInitService",
+"to": "actix-web/src/app_service.rs#AppInit",
+"source": "reverse"
+},
+{
+"set": "holdout-b",
+"id": 14,
+"lang": "rust",
+"head": "AppRouting",
+"names": [
+"check",
+"create",
+"register"
+],
+"same": false,
+"alone": false,
+"rest": [
+"drawn from a class or struct"
+],
+"from": "actix-web/src/app_service.rs#AppInitService",
+"to": "actix-web/src/app_service.rs#AppRouting",
+"source": "drawn"
+},
+{
+"set": "holdout-b",
+"id": 15,
+"lang": "rust",
+"head": "ResourceService",
+"names": [
+"check",
+"create",
+"register"
+],
+"same": false,
+"alone": false,
+"rest": [
+"drawn from a class or struct"
+],
+"from": "actix-web/src/app_service.rs#AppRouting",
+"to": "actix-web/src/resource.rs#ResourceService",
+"source": "drawn"
+},
+{
+"set": "holdout-b",
+"id": 19,
+"lang": "rust",
+"head": "ResourceService",
+"names": [
+"check"
+],
+"same": false,
+"alone": false,
+"rest": [
+"drawn from a class or struct"
+],
+"from": "actix-web/src/route.rs#RouteService",
+"to": "actix-web/src/resource.rs#ResourceService",
+"source": "reverse"
+},
+{
+"set": "holdout-b",
+"id": 55,
+"lang": "rust",
+"head": "prefix",
+"names": [
+"patterns",
+"resource_path"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "actix-router/src/resource.rs#construct",
+"to": "actix-router/src/resource.rs#prefix",
+"source": "reverse"
+},
+{
+"set": "holdout-b",
+"id": 68,
+"lang": "rust",
+"head": "recognize_fn",
+"names": [
+"patterns",
+"resource_path"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter",
+"inside a Rust macro"
+],
+"from": "actix-router/src/resource.rs#capture_match_info_fn",
+"to": "actix-router/src/router.rs#recognize_fn",
+"source": "reverse"
+},
+{
+"set": "holdout-b",
+"id": 74,
+"lang": "rust",
+"head": "build_path_tail",
+"names": [
+"patterns",
+"resource_path"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter",
+"inside a Rust macro"
+],
+"from": "actix-router/src/resource.rs#capture_match_info_fn",
+"to": "actix-router/src/resource.rs#build_path_tail",
+"source": "retarget"
+},
+{
+"set": "holdout-b",
+"id": 148,
+"lang": "ts",
+"head": "buildJoins",
+"names": [
+"all",
+"as",
+"buildUpdateSet",
+"defaultFn",
+"execute",
+"extras",
+"getSQL",
+"mapFromDriverValue",
+"onUpdateFn",
+"orderBy",
+"shouldDisableInsert",
+"transaction",
+"where"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "drizzle-orm/src/pg-core/dialect.ts#buildUpdateSet",
+"to": "drizzle-orm/src/pg-core/dialect.ts#buildJoins",
+"source": "retarget"
+},
+{
+"set": "holdout-b",
+"id": 379,
+"lang": "ts",
+"head": "readPropFromProto",
+"names": [
+"fixSetContents",
+"generatePatches_",
+"generateReplacementPatches_",
+"proxyMap_",
+"proxySet_"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/core/immerClass.ts#createProxy",
+"to": "src/core/proxy.ts#readPropFromProto",
+"source": "retarget"
+},
+{
+"set": "holdout-b",
+"id": 380,
+"lang": "ts",
+"head": "copy_",
+"names": [
+"fixSetContents",
+"generatePatches_",
+"generateReplacementPatches_",
+"proxyMap_",
+"proxySet_"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/core/immerClass.ts#createProxy",
+"to": "src/core/proxy.ts#copy_",
+"source": "wrong-kind"
+},
+{
+"set": "holdout-b",
+"id": 391,
+"lang": "python",
+"head": "_serialize",
+"names": [
+"OPTIONS_CLASS",
+"_bind_to_schema",
+"dict_class",
+"handle_error",
+"on_bind_field",
+"set_class"
+],
+"same": false,
+"alone": false,
+"rest": [
+"untyped value: method the repo never declares"
+],
+"from": "src/marshmallow/schema.py#__apply_nested_option",
+"to": "src/marshmallow/schema.py#_serialize",
+"source": "retarget"
+},
+{
+"set": "holdout-b",
+"id": 410,
+"lang": "python",
+"head": "kwargs",
+"names": [
+"OPTIONS_CLASS",
+"_bind_to_schema",
+"dict_class",
+"handle_error",
+"on_bind_field",
+"set_class"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/marshmallow/schema.py#_do_load",
+"to": "src/marshmallow/schema.py#kwargs",
+"source": "wrong-kind"
+},
+{
+"set": "holdout-b",
+"id": 413,
+"lang": "python",
+"head": "resolve_hooks",
+"names": [
+"OPTIONS_CLASS",
+"_bind_to_schema",
+"dict_class",
+"handle_error",
+"on_bind_field",
+"set_class"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/marshmallow/schema.py#_do_load",
+"to": "src/marshmallow/schema.py#resolve_hooks",
+"source": "retarget"
+},
+{
+"set": "holdout-b",
+"id": 414,
+"lang": "python",
+"head": "dump_fields",
+"names": [
+"OPTIONS_CLASS",
+"_bind_to_schema",
+"dict_class",
+"handle_error",
+"on_bind_field",
+"set_class"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/marshmallow/schema.py#_do_load",
+"to": "src/marshmallow/schema.py#dump_fields",
+"source": "wrong-kind"
+},
+{
+"set": "holdout-b",
+"id": 431,
+"lang": "python",
+"head": "item",
+"names": [
+"OPTIONS_CLASS",
+"_bind_to_schema",
+"dict_class",
+"handle_error",
+"on_bind_field",
+"set_class"
+],
+"same": false,
+"alone": false,
+"rest": [
+"callback parameter",
+"drawn from a class or struct",
+"getattr / setattr",
+"untyped value: method the repo never declares"
+],
+"from": "src/marshmallow/schema.py#SchemaMeta",
+"to": "src/marshmallow/schema.py#item",
+"source": "wrong-kind"
+},
+{
+"set": "holdout-b",
+"id": 582,
+"lang": "python",
+"head": "internal_stmt",
+"names": [
+"leaves",
+"visit_default"
+],
+"same": false,
+"alone": false,
+"rest": [
+"drawn from a class or struct"
+],
+"from": "src/black/linegen.py#LineGenerator",
+"to": "src/black/linegen.py#internal_stmt",
+"source": "wrong-kind"
+},
+{
+"set": "holdout-b",
+"id": 762,
+"lang": "python",
+"head": "deadline",
+"names": [
+"current_time",
+"deadline_to_sleep_time",
+"start_clock"
+],
+"same": false,
+"alone": false,
+"rest": [
+"built-in hidden by a wildcard import",
+"untyped value: method the repo never declares"
+],
+"from": "src/trio/_core/_run.py#unrolled_run",
+"to": "src/trio/_core/_run.py#deadline",
+"source": "retarget"
+},
+{
+"set": "holdout-b",
+"id": 763,
+"lang": "python",
+"head": "binding",
+"names": [
+"current_time",
+"deadline_to_sleep_time",
+"start_clock"
+],
+"same": false,
+"alone": false,
+"rest": [
+"built-in hidden by a wildcard import",
+"untyped value: method the repo never declares"
+],
+"from": "src/trio/_core/_run.py#unrolled_run",
+"to": "src/trio/_core/_run.py#binding",
+"source": "wrong-kind"
+},
+{
+"set": "holdout-b",
+"id": 798,
+"lang": "rust",
+"head": "Splitter",
+"names": [
+"complete",
+"consume",
+"consume_iter",
+"fold_with",
+"full",
+"into_folder",
+"into_iter",
+"len",
+"max_len",
+"min_len",
+"reduce",
+"split",
+"split_at",
+"split_off_left",
+"to_reducer",
+"with_producer"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/iter/plumbing/mod.rs#helper",
+"to": "src/iter/plumbing/mod.rs#Splitter",
+"source": "retarget"
+},
+{
+"set": "holdout-b",
+"id": 822,
+"lang": "rust",
+"head": "WorkerThread",
+"names": [
+"set"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "rayon-core/src/latch.rs#set",
+"to": "rayon-core/src/registry.rs#WorkerThread",
+"source": "retarget"
+},
+{
+"set": "holdout-b",
+"id": 840,
+"lang": "rust",
+"head": "find_work",
+"names": [
+"as_core_latch",
+"spawn"
+],
+"same": false,
+"alone": false,
+"rest": [
+"reaches it in steps (route note)"
+],
+"from": "rayon-core/src/registry.rs#WorkerThread::wait_until",
+"to": "rayon-core/src/registry.rs#WorkerThread::find_work",
+"source": "drawn"
+},
+{
+"set": "holdout-b",
+"id": 954,
+"lang": "rust",
+"head": "description",
+"names": [
+"print_footer",
+"print_header",
+"print_line",
+"print_snip"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/controller.rs#print_file_ranges",
+"to": "src/input.rs#description",
+"source": "retarget"
+},
+{
+"set": "holdout-b",
+"id": 967,
+"lang": "rust",
+"head": "OutputHandle",
+"names": [
+"print_footer",
+"print_header",
+"print_line",
+"print_snip"
+],
+"same": false,
+"alone": true,
+"rest": [],
+"from": "src/controller.rs#print_file",
+"to": "src/output.rs#OutputHandle",
+"source": "retarget"
+}
+]

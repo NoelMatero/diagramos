@@ -1,0 +1,87 @@
+#296 · PLANTED MISTAKES, AND WHAT THE CHECKER SAID
+  libraries: installed from pins 19d5e2b0d0 (8 projects, /Users/noelmatero/.board-ai-holdout-c/.corpus-libs)
+  machine: no other measurement ran during this one
+  set: holdout-c -- projects nobody tunes on. Read the score, never the arrows: only safety failures are listed.
+  40 boards, 1149 claims scored, 386 left out as undecidable, in 978s
+
+  FALSE CLAIMS -- planted mistakes and the ones Haiku drew
+    caught = red. A green here is the checker agreeing with something false.
+                  claims     red  not sure   green  silent   caught
+    calls            302     140       160       2       0      46%
+    needs            134      97        30       7       0      72%
+    builds           120      86        32       2       0      72%
+    conforms          65      56         9       0       0      86%
+    holds             64      61         3       0       0      95%
+    takes             22      17         4       1       0      77%
+    accesses          14       7         7       0       0      50%
+    feeds             12       9         3       0       0      75%
+    returns           10       6         4       0       0      60%
+    ALL              743     479       252      12       0      64%
+
+  FALSE CLAIMS, by language
+    same claims, grouped the other way
+                  claims     red  not sure   green  silent   caught
+    ts               312     224        86       2       0      72%
+    python           235     131        98       6       0      56%
+    rust             196     124        68       4       0      63%
+    ALL              743     479       252      12       0      64%
+
+  FALSE CLAIMS, by how the mistake was made
+    each plant is one of #296's four, or a claim Haiku drew wrong
+                  claims     red  not sure   green  silent   caught
+    retarget         200     109        86       5       0      55%
+    reverse          183     141        40       2       0      77%
+    wrong-kind       175     128        47       0       0      73%
+    not planted      109      54        51       4       0      50%
+    swap              76      47        28       1       0      62%
+    ALL              743     479       252      12       0      64%
+
+  TRUE CLAIMS -- what the checker says about a correct board
+    caught = green. Every red in this table is a false accusation.
+                  claims     red  not sure   green  silent   caught
+    needs            185       2         1     182       0      98%
+    calls            157       0        42     115       0      73%
+    builds            23       0         3      20       0      87%
+    holds             21       0         0      21       0     100%
+    conforms          15       0         0      15       0     100%
+    accesses           3       0         1       2       0      67%
+    takes              2       0         0       2       0     100%
+    ALL              406       2        47     357       0      88%
+
+  TRUE CLAIMS, by language
+    the red column is the number that matters
+                  claims     red  not sure   green  silent   caught
+    ts               161       0         9     152       0      94%
+    rust             125       2        29      94       0      75%
+    python           120       0         9     111       0      93%
+    ALL              406       2        47     357       0      88%
+
+  FALSE REDS -- 2 true claims the checker called wrong   [arrows withheld: holdout-c is score only]
+
+  GREEN ON A FALSE CLAIM -- 12   [arrows withheld: holdout-c is score only]
+
+  LEFT OUT -- claims the tooling could not decide, by reason
+       50  a value's journey cannot be enumerated
+       35  an end names a file rather than a declaration
+       35  it is named here but not plainly constructed
+       32  the ref could mean more than one declaration, and they differ
+       20  both ends are the same file
+       19  a glob import could bring it in
+       10  an end names nothing the tool declares
+        7  the tool would not walk this routine's calls
+        7  it implements Parser, whose default routines run as it and are written elsewhere
+        6  an end's file could not be read
+        6  fields can come from a base or an index signature
+        6  T resolves to something undeclared here (a generic or a local)
+        5  an import (crate::lib::std::mem::size_of) did not resolve
+        5  F resolves to something undeclared here (a generic or a local)
+        5  r resolves to something undeclared here (a generic or a local)
+
+  THE SCORE, AND WHAT IT COULD REACH
+    decided correctly = a wrong claim went red, a true claim went green (#320)
+    today                            836 / 1149  73%
+    + every 'now' claim decided      873 / 1149  76%
+    + every 'work' claim decided     998 / 1149  87%   <- the ceiling
+    out of reach: 137 undecidable (108 wrong, 29 true), and 12 wrong claims that came back green.
+    Held fixed while that rises: reds on true claims, and greens on wrong claims.
+

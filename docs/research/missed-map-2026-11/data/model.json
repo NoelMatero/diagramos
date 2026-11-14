@@ -1,0 +1,8722 @@
+[
+{
+"set": "main",
+"id": 16,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "wrong-kind",
+"from": "packages/query-core/src/mutation.ts#execute",
+"to": "packages/query-core/src/mutation.ts#failureReason",
+"project": "TanStack-query",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 17,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "packages/query-core/src/mutation.ts#execute",
+"to": "packages/query-core/src/retryer.ts#Retryer",
+"project": "TanStack-query",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "main",
+"id": 45,
+"lang": "ts",
+"word": "holds",
+"reason": "declined: not-declared",
+"source": "retarget",
+"from": "packages/query-core/src/queryObserver.ts#shouldNotifyListeners",
+"to": "packages/query-core/src/query.ts#Query",
+"project": "TanStack-query",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 46,
+"lang": "ts",
+"word": "holds",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "wrong-kind",
+"from": "packages/query-core/src/queryObserver.ts#QueryObserver",
+"to": "packages/query-core/src/query.ts#createQueryFnContext",
+"project": "TanStack-query",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "main",
+"id": 55,
+"lang": "ts",
+"word": "takes",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "drawn",
+"from": "packages/query-core/src/query.ts#Query",
+"to": "packages/query-core/src/query.ts#Query",
+"project": "TanStack-query",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "main",
+"id": 63,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "packages/react-query/src/useBaseQuery.ts#useBaseQuery",
+"to": "packages/react-query/src/QueryClientProvider.tsx#QueryClientProvider",
+"project": "TanStack-query",
+"groups": [
+"dispatch",
+"funcval"
+]
+},
+{
+"set": "main",
+"id": 64,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "packages/react-query/src/useBaseQuery.ts#useBaseQuery",
+"to": "packages/react-query/src/QueryClientProvider.tsx#QueryClientContext",
+"project": "TanStack-query",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 65,
+"lang": "ts",
+"word": "accesses",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "packages/react-query/src/QueryClientProvider.tsx#useQueryClient",
+"to": "packages/react-query/src/QueryClientProvider.tsx#QueryClientContext",
+"project": "TanStack-query",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 74,
+"lang": "rust",
+"word": "returns",
+"reason": "unconfirmed: signature-other-half",
+"source": "swap",
+"from": "src/error.rs#ErrorImpl",
+"to": "src/fmt.rs#display",
+"project": "anyhow",
+"groups": [
+"returns-other"
+]
+},
+{
+"set": "main",
+"id": 79,
+"lang": "rust",
+"word": "returns",
+"reason": "unconfirmed: signature-other-half",
+"source": "swap",
+"from": "src/error.rs#ErrorImpl",
+"to": "src/fmt.rs#debug",
+"project": "anyhow",
+"groups": [
+"returns-other"
+]
+},
+{
+"set": "main",
+"id": 103,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "reverse",
+"from": "src/wrapper.rs#MessageError",
+"to": "src/error.rs#construct_from_adhoc",
+"project": "anyhow",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 150,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed macro",
+"source": "retarget",
+"from": "clap_builder/src/parser/parser.rs#get_matches_with",
+"to": "clap_builder/src/parser/parser.rs#parse_short_arg",
+"project": "clap",
+"groups": [
+"route",
+"rust",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 151,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed macro",
+"source": "wrong-kind",
+"from": "clap_builder/src/parser/parser.rs#get_matches_with",
+"to": "clap_builder/src/parser/parser.rs#NoArg",
+"project": "clap",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 154,
+"lang": "rust",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "clap_builder/src/parser/parser.rs#parse",
+"to": "clap_builder/src/parser/parser.rs#start_custom_arg",
+"project": "clap",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 158,
+"lang": "rust",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "clap_builder/src/parser/parser.rs#parse",
+"to": "clap_builder/src/parser/parser.rs#verify_num_args",
+"project": "clap",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 160,
+"lang": "rust",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "clap_builder/src/parser/parser.rs#parse_long_arg",
+"to": "clap_builder/src/parser/arg_matcher.rs#ArgMatcher",
+"project": "clap",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 165,
+"lang": "rust",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "clap_builder/src/parser/parser.rs#parse_short_arg",
+"to": "clap_builder/src/parser/arg_matcher.rs#ArgMatcher",
+"project": "clap",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 185,
+"lang": "rust",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "clap_builder/src/builder/command.rs#_build_recursive",
+"to": "clap_builder/src/builder/command.rs#get_name",
+"project": "clap",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 190,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed macro",
+"source": "retarget",
+"from": "clap_builder/src/builder/command.rs#_build_self",
+"to": "clap_builder/src/builder/arg.rs#is_hide_long_help_set",
+"project": "clap",
+"groups": [
+"names",
+"nevernamed",
+"route",
+"rust",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 197,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: receiver",
+"source": "retarget",
+"from": "clap_builder/src/builder/command.rs#_build_self",
+"to": "clap_builder/src/mkeymap.rs#push",
+"project": "clap",
+"groups": [
+"names",
+"route",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 198,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed macro",
+"source": "wrong-kind",
+"from": "clap_builder/src/builder/command.rs#_build_self",
+"to": "clap_builder/src/mkeymap.rs#args",
+"project": "clap",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 205,
+"lang": "rust",
+"word": "accesses",
+"reason": "garbled claim",
+"source": "wrong-kind",
+"from": "clap_builder/src/mkeymap.rs#_build",
+"to": "clap_builder/src/mkeymap.rs#index",
+"project": "clap",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 209,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed macro",
+"source": "retarget",
+"from": "clap_builder/src/builder/command.rs#_build_self",
+"to": "clap_builder/src/builder/debug_asserts.rs#find_duplicates",
+"project": "clap",
+"groups": [
+"names",
+"nevernamed",
+"route",
+"rust",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 210,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: macro",
+"source": "wrong-kind",
+"from": "clap_builder/src/builder/command.rs#_build_self",
+"to": "clap_builder/src/builder/debug_asserts.rs#Command",
+"project": "clap",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 223,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "drawn",
+"from": "clap_lex/src/lib.rs#ParsedArg",
+"to": "clap_lex/src/lib.rs#is_long",
+"project": "clap",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 225,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "drawn",
+"from": "clap_lex/src/lib.rs#ParsedArg",
+"to": "clap_lex/src/lib.rs#is_short",
+"project": "clap",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 229,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "drawn",
+"from": "clap_lex/src/lib.rs#ParsedArg",
+"to": "clap_lex/src/lib.rs#to_value_os",
+"project": "clap",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 241,
+"lang": "python",
+"word": "calls",
+"reason": "declined: computed",
+"source": "drawn",
+"from": "django/core/handlers/exception.py#convert_exception_to_response",
+"to": "django/core/handlers/base.py#BaseHandler._get_response",
+"project": "django-django",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "main",
+"id": 244,
+"lang": "python",
+"word": "accesses",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "django/dispatch/dispatcher.py#Signal.connect",
+"to": "django/dispatch/dispatcher.py#Signal.receivers",
+"project": "django-django",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 245,
+"lang": "python",
+"word": "accesses",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "django/dispatch/dispatcher.py#Signal.disconnect",
+"to": "django/dispatch/dispatcher.py#Signal.receivers",
+"project": "django-django",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 249,
+"lang": "python",
+"word": "accesses",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "django/dispatch/dispatcher.py#Signal._live_receivers",
+"to": "django/dispatch/dispatcher.py#Signal.receivers",
+"project": "django-django",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 256,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "django/urls/resolvers.py#get_resolver",
+"to": "django/urls/base.py#resolve",
+"project": "django-django",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "main",
+"id": 257,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "retarget",
+"from": "django/urls/exceptions.py",
+"to": "django/urls/resolvers.py#get_resolver",
+"project": "django-django",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "main",
+"id": 259,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "django/urls/resolvers.py#resolve@declared+used",
+"to": "django/urls/base.py#resolve",
+"project": "django-django",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "main",
+"id": 260,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "django/urls/base.py#resolve",
+"to": "django/urls/converters.py",
+"project": "django-django",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 267,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "django/urls/resolvers.py#_reverse_with_prefix",
+"to": "django/urls/resolvers.py#ResolverMatch",
+"project": "django-django",
+"groups": [
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 268,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "wrong-kind",
+"from": "django/urls/resolvers.py#resolve",
+"to": "django/urls/resolvers.py#regex",
+"project": "django-django",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 271,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "django/urls/exceptions.py",
+"to": "django/urls/resolvers.py#resolve@declared+used",
+"project": "django-django",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "main",
+"id": 272,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "retarget",
+"from": "django/urls/resolvers.py#resolve@declared+used",
+"to": "django/urls/base.py",
+"project": "django-django",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "main",
+"id": 275,
+"lang": "python",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "swap",
+"from": "django/urls/conf.py#path",
+"to": "django/urls/resolvers.py#resolve",
+"project": "django-django",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 276,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "django/urls/resolvers.py#resolve",
+"to": "django/urls/conf.py#path",
+"project": "django-django",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "main",
+"id": 277,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "retarget",
+"from": "django/urls/conf.py#path",
+"to": "django/urls/base.py",
+"project": "django-django",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "main",
+"id": 280,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed reaches-the-file",
+"source": "swap",
+"from": "httpx/_client.py#send",
+"to": "httpx/_models.py#Request",
+"project": "encode-httpx",
+"groups": [
+"route",
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 282,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "httpx/_client.py#send",
+"to": "httpx/_multipart.py",
+"project": "encode-httpx",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 312,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "httpx/_client.py#_send_handling_redirects",
+"to": "httpx/_client.py#files",
+"project": "encode-httpx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 320,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "httpx/_client.py#_build_redirect_request",
+"to": "httpx/_multipart.py",
+"project": "encode-httpx",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 347,
+"lang": "python",
+"word": "builds",
+"reason": "unread: endpoint-external",
+"source": "retarget",
+"from": "httpx/_models.py#Request",
+"to": "httpx/_content.py#__iter__",
+"project": "encode-httpx",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "main",
+"id": 351,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "httpx/_models.py#charset_encoding",
+"to": "httpx/_models.py#Headers",
+"project": "encode-httpx",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "main",
+"id": 364,
+"lang": "python",
+"word": "takes",
+"reason": "declined: no-signature",
+"source": "drawn",
+"from": "httpx/_models.py#Headers",
+"to": "httpx/_types.py#HeaderTypes",
+"project": "encode-httpx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 371,
+"lang": "python",
+"word": "builds",
+"reason": "unread: endpoint-external",
+"source": "drawn",
+"from": "httpx/_transports/default.py#HTTPTransport",
+"to": "httpx/_transports/default.py#HTTPTransport.handle_request",
+"project": "encode-httpx",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "main",
+"id": 372,
+"lang": "python",
+"word": "feeds",
+"reason": "unread: endpoint-external",
+"source": "drawn",
+"from": "httpx/_transports/default.py#HTTPTransport.handle_request",
+"to": "httpx/_transports/default.py#HTTPTransport",
+"project": "encode-httpx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 373,
+"lang": "python",
+"word": "feeds",
+"reason": "unread: endpoint-external",
+"source": "drawn",
+"from": "httpx/_transports/default.py#HTTPTransport",
+"to": "httpx/_transports/default.py#HTTPTransport.handle_request",
+"project": "encode-httpx",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "main",
+"id": 374,
+"lang": "python",
+"word": "feeds",
+"reason": "unread: endpoint-external",
+"source": "drawn",
+"from": "httpx/_transports/default.py#HTTPTransport.handle_request",
+"to": "httpx/_transports/default.py#ResponseStream",
+"project": "encode-httpx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 378,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "httpx/_transports/default.py#ResponseStream",
+"to": "httpx/_content.py",
+"project": "encode-httpx",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 430,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed type-alias",
+"source": "swap",
+"from": "packages/element/src/newElement.ts#_newElementBase",
+"to": "packages/element/src/types.ts#ExcalidrawElement",
+"project": "excalidraw-excalidraw",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 435,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed type-alias",
+"source": "swap",
+"from": "packages/element/src/mutateElement.ts#mutateElement",
+"to": "packages/element/src/types.ts#ExcalidrawElement",
+"project": "excalidraw-excalidraw",
+"groups": [
+"typehead",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 441,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "packages/element/src/mutateElement.ts#mutateElement",
+"to": "packages/element/src/elbowArrow.ts#getBindableElementForId",
+"project": "excalidraw-excalidraw",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 452,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "drawn",
+"from": "packages/element/src/shape.ts#ShapeCache",
+"to": "packages/element/src/shape.ts#generateRoughOptions",
+"project": "excalidraw-excalidraw",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 458,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed type-alias",
+"source": "swap",
+"from": "packages/math/src/point.ts#pointFrom",
+"to": "packages/math/src/types.ts#GlobalPoint",
+"project": "excalidraw-excalidraw",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 463,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed type-alias",
+"source": "swap",
+"from": "packages/math/src/vector.ts#vectorFromPoint",
+"to": "packages/math/src/types.ts#Vector",
+"project": "excalidraw-excalidraw",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 468,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed type-alias",
+"source": "swap",
+"from": "packages/math/src/vector.ts#vectorFromPoint",
+"to": "packages/math/src/types.ts#GlobalPoint",
+"project": "excalidraw-excalidraw",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 473,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed type-alias",
+"source": "swap",
+"from": "packages/math/src/vector.ts#vectorCross",
+"to": "packages/math/src/types.ts#Vector",
+"project": "excalidraw-excalidraw",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 478,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed type-alias",
+"source": "swap",
+"from": "packages/math/src/line.ts#linesIntersectAt",
+"to": "packages/math/src/types.ts#Line",
+"project": "excalidraw-excalidraw",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 483,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed type-alias",
+"source": "swap",
+"from": "packages/math/src/line.ts#linesIntersectAt",
+"to": "packages/math/src/types.ts#GlobalPoint",
+"project": "excalidraw-excalidraw",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 488,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed type-alias",
+"source": "swap",
+"from": "packages/math/src/segment.ts#segmentsIntersectAt",
+"to": "packages/math/src/types.ts#LineSegment",
+"project": "excalidraw-excalidraw",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 493,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed type-alias",
+"source": "swap",
+"from": "packages/math/src/segment.ts#segmentsIntersectAt",
+"to": "packages/math/src/types.ts#GlobalPoint",
+"project": "excalidraw-excalidraw",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 527,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed overridden",
+"source": "drawn",
+"from": "src/ser.rs#Formatter",
+"to": "src/io/core.rs#Write",
+"project": "json",
+"groups": [
+"class",
+"dispatch"
+]
+},
+{
+"set": "main",
+"id": 547,
+"lang": "rust",
+"word": "holds",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "src/value/mod.rs#Number",
+"to": "src/value/mod.rs#Value",
+"project": "json",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 554,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "reverse",
+"from": "packages/core/injector/injector.ts#loadInstance",
+"to": "packages/core/injector/injector.ts#loadProvider",
+"project": "nestjs-nest",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 555,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "retarget",
+"from": "packages/core/injector/injector.ts#loadProvider",
+"to": "packages/core/injector/injector.ts#PropertyDependency",
+"project": "nestjs-nest",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 558,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "reverse",
+"from": "packages/core/injector/injector.ts#resolveConstructorParams",
+"to": "packages/core/injector/injector.ts#loadInstance",
+"project": "nestjs-nest",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 559,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed unplaced",
+"source": "retarget",
+"from": "packages/core/injector/injector.ts#getTokenName",
+"to": "packages/core/injector/injector.ts#resolveConstructorParams",
+"project": "nestjs-nest",
+"groups": [
+"names",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 560,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed unplaced",
+"source": "wrong-kind",
+"from": "packages/core/injector/injector.ts#loadInstance",
+"to": "packages/core/injector/injector.ts#instanceWrapper",
+"project": "nestjs-nest",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 567,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "packages/core/injector/injector.ts#instantiateClass",
+"to": "packages/core/injector/injector.ts#lookupComponent",
+"project": "nestjs-nest",
+"groups": [
+"funcval",
+"names",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 575,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "swap",
+"from": "packages/core/injector/injector.ts#lookupComponent",
+"to": "packages/core/injector/instance-wrapper.ts#InstanceWrapper",
+"project": "nestjs-nest",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 577,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed unplaced",
+"source": "drawn",
+"from": "packages/core/injector/injector.ts#loadInstance",
+"to": "packages/core/injector/injector.ts#resolveComponentHost",
+"project": "nestjs-nest",
+"groups": [
+"names",
+"route"
+]
+},
+{
+"set": "main",
+"id": 579,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "reverse",
+"from": "packages/core/injector/injector.ts#loadProvider",
+"to": "packages/core/injector/injector.ts#resolveComponentHost",
+"project": "nestjs-nest",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 580,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "packages/core/injector/injector.ts#resolveComponentHost",
+"to": "packages/core/injector/injector.ts#lookupComponent",
+"project": "nestjs-nest",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 583,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "packages/core/injector/injector.ts#instantiateClass",
+"to": "packages/core/injector/injector.ts#loadInstance",
+"project": "nestjs-nest",
+"groups": [
+"funcval",
+"names",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 585,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed unplaced",
+"source": "wrong-kind",
+"from": "packages/core/injector/injector.ts#loadInstance",
+"to": "packages/core/injector/injector.ts#name",
+"project": "nestjs-nest",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 610,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "packages/common/pipes/validation.pipe.ts#ValidationPipe",
+"to": "packages/common/pipes/parse-array.pipe.ts#ParseArrayPipe",
+"project": "nestjs-nest",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "main",
+"id": 621,
+"lang": "ts",
+"word": "holds",
+"reason": "declined: not-declared",
+"source": "retarget",
+"from": "packages/common/pipes/parse-array.pipe.ts#toClassInstance",
+"to": "packages/common/pipes/parse-array.pipe.ts#ParseArrayPipeOptions",
+"project": "nestjs-nest",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 626,
+"lang": "ts",
+"word": "takes",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "drawn",
+"from": "packages/common/interfaces/features/pipe-transform.interface.ts#ArgumentMetadata",
+"to": "packages/common/pipes/default-value.pipe.ts#DefaultValuePipe",
+"project": "nestjs-nest",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "main",
+"id": 663,
+"lang": "ts",
+"word": "needs",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "retarget",
+"from": "packages/core/router/router-explorer.ts#RouterExplorer",
+"to": "packages/core/router/route-specificity-sorter.ts",
+"project": "nestjs-nest",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "main",
+"id": 681,
+"lang": "python",
+"word": "calls",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "src/flask/app.py#wsgi_app",
+"to": "src/flask/app.py#__call__",
+"project": "pallets-flask",
+"groups": [
+"dispatch",
+"funcval",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 682,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/flask/app.py#__call__",
+"to": "src/flask/app.py#preprocess_request",
+"project": "pallets-flask",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 693,
+"lang": "python",
+"word": "calls",
+"reason": "unconfirmed: compiler-says-it-does",
+"source": "reverse",
+"from": "src/flask/ctx.py#push",
+"to": "src/flask/app.py#wsgi_app",
+"project": "pallets-flask",
+"groups": [
+"nevernamed",
+"other",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 694,
+"lang": "python",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "src/flask/app.py#wsgi_app",
+"to": "src/flask/ctx.py#__setattr__",
+"project": "pallets-flask",
+"groups": [
+"dispatch",
+"funcval",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 695,
+"lang": "python",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "src/flask/app.py#wsgi_app",
+"to": "src/flask/ctx.py#default",
+"project": "pallets-flask",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 704,
+"lang": "python",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "src/flask/app.py#wsgi_app",
+"to": "src/flask/app.py#test_client",
+"project": "pallets-flask",
+"groups": [
+"dispatch",
+"funcval",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 707,
+"lang": "python",
+"word": "calls",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "src/flask/app.py#dispatch_request",
+"to": "src/flask/app.py#full_dispatch_request",
+"project": "pallets-flask",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "main",
+"id": 712,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/flask/app.py#full_dispatch_request",
+"to": "src/flask/app.py#handle_http_exception",
+"project": "pallets-flask",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 763,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "labelled",
+"from": "src/flask/sansio/app.py#App",
+"to": "src/flask/sansio/app.py#App",
+"project": "pallets-flask",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "main",
+"id": 788,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "wrong-kind",
+"from": "pydantic/_internal/_dataclasses.py#complete_dataclass",
+"to": "pydantic/_internal/_generate_schema.py#BaseModel",
+"project": "pydantic-pydantic",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 791,
+"lang": "python",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "pydantic/_internal/_generate_schema.py#GenerateSchema",
+"to": "pydantic/_internal/_dataclasses.py#complete_dataclass",
+"project": "pydantic-pydantic",
+"groups": [
+"class",
+"dynamic",
+"funcval",
+"names",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 792,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "pydantic/_internal/_dataclasses.py#PydanticDataclass",
+"to": "pydantic/_internal/_generate_schema.py#GenerateSchema",
+"project": "pydantic-pydantic",
+"groups": [
+"class"
+]
+},
+{
+"set": "main",
+"id": 797,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unplaced",
+"source": "retarget",
+"from": "pydantic/_internal/_dataclasses.py#complete_dataclass",
+"to": "pydantic/plugin/_schema_validator.py#build_wrapper",
+"project": "pydantic-pydantic",
+"groups": [
+"names"
+]
+},
+{
+"set": "main",
+"id": 798,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unplaced",
+"source": "wrong-kind",
+"from": "pydantic/_internal/_dataclasses.py#complete_dataclass",
+"to": "pydantic/plugin/_schema_validator.py#s",
+"project": "pydantic-pydantic",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 800,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "pydantic/_internal/_dataclasses.py#complete_dataclass",
+"to": "pydantic/plugin/__init__.py",
+"project": "pydantic-pydantic",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 804,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "pydantic/_internal/_model_construction.py#ModelMetaclass",
+"to": "pydantic/_internal/_docs_extraction.py",
+"project": "pydantic-pydantic",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 813,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "drawn",
+"from": "pydantic/_internal/_model_construction.py#ModelMetaclass",
+"to": "pydantic/_internal/_generate_schema.py#GenerateSchema",
+"project": "pydantic-pydantic",
+"groups": [
+"class",
+"dynamic",
+"funcval",
+"names",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 817,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "pydantic/_internal/_model_construction.py#ModelMetaclass",
+"to": "pydantic/_internal/_type_refs.py",
+"project": "pydantic-pydantic",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 834,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "reverse",
+"from": "src/poetry/installation/executor.py#Executor",
+"to": "src/poetry/installation/installer.py#Installer",
+"project": "python-poetry-poetry",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "main",
+"id": 839,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/poetry/puzzle/solver.py",
+"to": "src/poetry/installation/operations/operation.py#Operation",
+"project": "python-poetry-poetry",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 842,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/poetry/installation/__init__.py",
+"to": "src/poetry/installation/operations/operation.py#Operation",
+"project": "python-poetry-poetry",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 847,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/poetry/installation/__init__.py",
+"to": "src/poetry/installation/wheel_installer.py#WheelInstaller",
+"project": "python-poetry-poetry",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 855,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/poetry/installation/executor.py#Executor",
+"to": "src/poetry/installation/__init__.py",
+"project": "python-poetry-poetry",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 883,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/poetry/repositories/cached_repository.py",
+"to": "src/poetry/repositories/abstract_repository.py#AbstractRepository",
+"project": "python-poetry-poetry",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 890,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/poetry/repositories/http_repository.py",
+"to": "src/poetry/repositories/repository.py#Repository",
+"project": "python-poetry-poetry",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 901,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/poetry/repositories/pypi_repository.py#PyPiRepository",
+"to": "src/poetry/repositories/repository_pool.py",
+"project": "python-poetry-poetry",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 907,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/poetry/repositories/repository_pool.py#RepositoryPool",
+"to": "src/poetry/repositories/installed_repository.py",
+"project": "python-poetry-poetry",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 913,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "reverse",
+"from": "src/poetry/repositories/repository.py#Repository",
+"to": "src/poetry/repositories/repository_pool.py#RepositoryPool",
+"project": "python-poetry-poetry",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "main",
+"id": 918,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/poetry/repositories/repository_pool.py",
+"to": "src/poetry/repositories/link_sources/base.py#LinkSource",
+"project": "python-poetry-poetry",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 935,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/poetry/mixology/version_solver.py#search_for",
+"to": "src/poetry/mixology/version_solver.py#_propagate",
+"project": "python-poetry-poetry",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "main",
+"id": 939,
+"lang": "python",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "src/poetry/mixology/version_solver.py#__init__",
+"to": "src/poetry/mixology/version_solver.py#_choose_package_version",
+"project": "python-poetry-poetry",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "main",
+"id": 947,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/poetry/mixology/version_solver.py#_propagate",
+"to": "src/poetry/mixology/version_solver.py#_effective_marker",
+"project": "python-poetry-poetry",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 966,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "swap",
+"from": "src/poetry/mixology/version_solver.py#_choose_package_version",
+"to": "src/poetry/mixology/partial_solution.py#PartialSolution",
+"project": "python-poetry-poetry",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "main",
+"id": 994,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "drawn",
+"from": "regex-automata/src/meta/regex.rs#search_with",
+"to": "regex-automata/src/meta/strategy.rs#new",
+"project": "regex",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "main",
+"id": 1006,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "swap",
+"from": "regex-automata/src/meta/strategy.rs#search_nofail",
+"to": "regex-automata/src/util/search.rs#Match",
+"project": "regex",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "main",
+"id": 1018,
+"lang": "rust",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "regex-syntax/src/ast/parse.rs#parse_set_class",
+"to": "regex-syntax/src/ast/mod.rs#Concat",
+"project": "regex",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1020,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed reaches-the-file",
+"source": "swap",
+"from": "regex-syntax/src/ast/parse.rs#parse_set_class",
+"to": "regex-syntax/src/ast/mod.rs#Concat",
+"project": "regex",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1023,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "swap",
+"from": "regex-syntax/src/ast/parse.rs#Primitive",
+"to": "regex-syntax/src/ast/mod.rs#Concat",
+"project": "regex",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1030,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "swap",
+"from": "regex-syntax/src/ast/parse.rs#parse_uncounted_repetition",
+"to": "regex-syntax/src/ast/mod.rs#Concat",
+"project": "regex",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1035,
+"lang": "rust",
+"word": "holds",
+"reason": "garbled claim",
+"source": "wrong-kind",
+"from": "crates/globset/src/glob.rs#Parser",
+"to": "crates/globset/src/glob.rs#required_ext",
+"project": "ripgrep",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1074,
+"lang": "rust",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "crates/globset/src/glob.rs#MatchStrategy::new",
+"to": "crates/globset/src/lib.rs#GlobSetMatchStrategy",
+"project": "ripgrep",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1101,
+"lang": "rust",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "crates/ignore/src/dir.rs#stops_at_git_dir",
+"to": "crates/ignore/src/dir.rs#matched_ignore",
+"project": "ripgrep",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 1113,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed macro",
+"source": "swap",
+"from": "crates/ignore/src/walk.rs#should_skip_entry",
+"to": "crates/ignore/src/dir.rs#IgnoreMatch",
+"project": "ripgrep",
+"groups": [
+"route",
+"rust"
+]
+},
+{
+"set": "main",
+"id": 1117,
+"lang": "rust",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "crates/searcher/src/searcher/mod.rs#search_path",
+"to": "crates/searcher/src/searcher/mod.rs#Searcher",
+"project": "ripgrep",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1128,
+"lang": "rust",
+"word": "feeds",
+"reason": "unread: endpoint-external",
+"source": "drawn",
+"from": "crates/searcher/src/lines.rs#LineIter",
+"to": "crates/searcher/src/searcher/mod.rs#search_reader",
+"project": "ripgrep",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "main",
+"id": 1129,
+"lang": "rust",
+"word": "feeds",
+"reason": "unread: endpoint-external",
+"source": "drawn",
+"from": "crates/searcher/src/searcher/mod.rs#search_reader",
+"to": "crates/searcher/src/searcher/core.rs#Core",
+"project": "ripgrep",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1150,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "swap",
+"from": "packages/vite/src/node/server/middlewares/transform.ts#transformMiddleware",
+"to": "packages/vite/src/node/server/environment.ts#DevEnvironment",
+"project": "vitejs-vite",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "main",
+"id": 1160,
+"lang": "ts",
+"word": "returns",
+"reason": "unconfirmed: signature-other-half",
+"source": "swap",
+"from": "packages/vite/src/node/server/environment.ts#DevEnvironment",
+"to": "packages/vite/src/node/server/transformRequest.ts#transformRequest",
+"project": "vitejs-vite",
+"groups": [
+"returns-other"
+]
+},
+{
+"set": "main",
+"id": 1166,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "packages/vite/src/node/server/transformRequest.ts#transformRequest",
+"to": "packages/vite/src/node/server/transformRequest.ts#TransformOptionsInternal",
+"project": "vitejs-vite",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "main",
+"id": 1168,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "drawn",
+"from": "packages/vite/src/node/server/transformRequest.ts#doTransform",
+"to": "packages/vite/src/node/server/pluginContainer.ts#PluginContainer",
+"project": "vitejs-vite",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "main",
+"id": 1174,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "packages/vite/src/node/server/transformRequest.ts#doTransform",
+"to": "packages/vite/src/node/server/transformRequest.ts#doTransform",
+"project": "vitejs-vite",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "main",
+"id": 1175,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "wrong-kind",
+"from": "packages/vite/src/node/server/transformRequest.ts#doTransform",
+"to": "packages/vite/src/node/server/transformRequest.ts#e",
+"project": "vitejs-vite",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1180,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "packages/vite/src/node/server/middlewares/transform.ts#transformMiddleware",
+"to": "packages/vite/src/node/server/send.ts#hires",
+"project": "vitejs-vite",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1186,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "packages/vite/src/module-runner/runner.ts#cachedRequest",
+"to": "packages/vite/src/module-runner/runner.ts#import",
+"project": "vitejs-vite",
+"groups": [
+"dispatch",
+"funcval",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 1187,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "packages/vite/src/module-runner/runner.ts#import",
+"to": "packages/vite/src/module-runner/runner.ts#processImport",
+"project": "vitejs-vite",
+"groups": [
+"route"
+]
+},
+{
+"set": "main",
+"id": 1192,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "packages/vite/src/module-runner/runner.ts#cachedRequest",
+"to": "packages/vite/src/module-runner/runner.ts#createImportMeta",
+"project": "vitejs-vite",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1199,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "packages/vite/src/module-runner/esmEvaluator.ts#runInlinedModule",
+"to": "packages/vite/src/module-runner/runner.ts#directRequest",
+"project": "vitejs-vite",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "main",
+"id": 1202,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "swap",
+"from": "packages/vite/src/module-runner/esmEvaluator.ts#runInlinedModule",
+"to": "packages/vite/src/module-runner/types.ts#ModuleRunnerContext",
+"project": "vitejs-vite",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "main",
+"id": 1203,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "packages/vite/src/module-runner/types.ts#ModuleRunnerContext",
+"to": "packages/vite/src/module-runner/esmEvaluator.ts#runInlinedModule",
+"project": "vitejs-vite",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "main",
+"id": 1204,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "retarget",
+"from": "packages/vite/src/module-runner/esmEvaluator.ts#runInlinedModule",
+"to": "packages/vite/src/module-runner/utils.ts",
+"project": "vitejs-vite",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "main",
+"id": 1210,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "packages/vite/src/node/ssr/ssrTransform.ts#Visitors",
+"to": "packages/vite/src/node/ssr/ssrTransform.ts#ssrTransformScript",
+"project": "vitejs-vite",
+"groups": [
+"class"
+]
+},
+{
+"set": "main",
+"id": 1225,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "packages/compiler-core/src/transforms/transformElement.ts#transformElement",
+"to": "packages/compiler-core/src/transforms/transformElement.ts#pushRefVForMarker",
+"project": "vuejs-core",
+"groups": [
+"dispatch",
+"route"
+]
+},
+{
+"set": "main",
+"id": 1226,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "wrong-kind",
+"from": "packages/compiler-core/src/transforms/transformElement.ts#transformElement",
+"to": "packages/compiler-core/src/transforms/transformElement.ts#source",
+"project": "vuejs-core",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1233,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "wrong-kind",
+"from": "packages/compiler-core/src/transforms/transformElement.ts#transformElement",
+"to": "packages/compiler-core/src/ast.ts#VNODE_CALL",
+"project": "vuejs-core",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1234,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "drawn",
+"from": "packages/compiler-core/src/transforms/vIf.ts#processIf",
+"to": "packages/compiler-core/src/transforms/transformExpression.ts#transformExpression",
+"project": "vuejs-core",
+"groups": [
+"dispatch",
+"funcval"
+]
+},
+{
+"set": "main",
+"id": 1245,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "drawn",
+"from": "packages/compiler-core/src/transforms/transformElement.ts#buildProps",
+"to": "packages/compiler-core/src/transforms/transformExpression.ts#transformExpression",
+"project": "vuejs-core",
+"groups": [
+"dispatch",
+"funcval"
+]
+},
+{
+"set": "main",
+"id": 1296,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "packages/runtime-core/src/renderer.ts#setupRenderEffect",
+"to": "packages/runtime-core/src/scheduler.ts#nextTick",
+"project": "vuejs-core",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "main",
+"id": 1304,
+"lang": "ts",
+"word": "accesses",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "packages/runtime-core/src/scheduler.ts#queueJob",
+"to": "packages/runtime-core/src/scheduler.ts#queue",
+"project": "vuejs-core",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1309,
+"lang": "ts",
+"word": "accesses",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "packages/runtime-core/src/scheduler.ts#flushJobs",
+"to": "packages/runtime-core/src/scheduler.ts#queue",
+"project": "vuejs-core",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "main",
+"id": 1315,
+"lang": "ts",
+"word": "returns",
+"reason": "unconfirmed: signature-other-half",
+"source": "swap",
+"from": "packages/runtime-core/src/scheduler.ts#SchedulerJob",
+"to": "packages/runtime-core/src/scheduler.ts#queueJob",
+"project": "vuejs-core",
+"groups": [
+"returns-other"
+]
+},
+{
+"set": "holdout",
+"id": 5,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "reverse",
+"from": "rich/console.py#render",
+"to": "rich/console.py#print",
+"project": "Textualize-rich",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 13,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "wrong-kind",
+"from": "rich/console.py#_collect_renderables",
+"to": "rich/text.py#_Span",
+"project": "Textualize-rich",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 16,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "rich/console.py#_collect_renderables",
+"to": "rich/text.py#__bool__",
+"project": "Textualize-rich",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 17,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "rich/console.py#_collect_renderables",
+"to": "rich/text.py#line_start",
+"project": "Textualize-rich",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 21,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed inherits",
+"source": "swap",
+"from": "rich/text.py#__rich_console__",
+"to": "rich/segment.py#Segment",
+"project": "Textualize-rich",
+"groups": [
+"class",
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 27,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "rich/console.py#_render_buffer",
+"to": "rich/style.py#on",
+"project": "Textualize-rich",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 28,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "rich/console.py#_render_buffer",
+"to": "rich/style.py#frame",
+"project": "Textualize-rich",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 33,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "rich/markup.py#render",
+"to": "rich/markup.py#escape",
+"project": "Textualize-rich",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 34,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "rich/markup.py#render",
+"to": "rich/markup.py#backslashes",
+"project": "Textualize-rich",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 35,
+"lang": "python",
+"word": "accesses",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "rich/markup.py#_parse",
+"to": "rich/markup.py#RE_TAGS",
+"project": "Textualize-rich",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 41,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "wrong-kind",
+"from": "rich/markup.py#render",
+"to": "rich/text.py#step",
+"project": "Textualize-rich",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 43,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "rich/markup.py#render",
+"to": "rich/_windows.py",
+"project": "Textualize-rich",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 45,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed reaches-the-file",
+"source": "retarget",
+"from": "rich/markup.py#render",
+"to": "rich/text.py#set_length",
+"project": "Textualize-rich",
+"groups": [
+"funcval",
+"typehead",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 46,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "rich/markup.py#render",
+"to": "rich/text.py#span_end",
+"project": "Textualize-rich",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 56,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "rich/measure.py",
+"to": "rich/style.py#Style",
+"project": "Textualize-rich",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 64,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "rich/markup.py#render",
+"to": "rich/_emoji_codes.py",
+"project": "Textualize-rich",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 83,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "rich/progress.py#Progress",
+"to": "rich/live.py#ipy_widget",
+"project": "Textualize-rich",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 85,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "rich/progress.py#Progress",
+"to": "rich/_emoji_codes.py",
+"project": "Textualize-rich",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 88,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "wrong-kind",
+"from": "rich/progress.py#Progress",
+"to": "rich/live.py#_nested",
+"project": "Textualize-rich",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 93,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "rich/progress.py#ProgressColumn",
+"to": "rich/_windows.py",
+"project": "Textualize-rich",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 97,
+"lang": "python",
+"word": "needs",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "rich/table.py#Table",
+"to": "rich/prompt.py",
+"project": "Textualize-rich",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 98,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "swap",
+"from": "rich/table.py#Table",
+"to": "rich/console.py#Console",
+"project": "Textualize-rich",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 100,
+"lang": "python",
+"word": "accesses",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "rich/table.py#__rich_measure__",
+"to": "rich/console.py#Console",
+"project": "Textualize-rich",
+"groups": [
+"accesses-other"
+]
+},
+{
+"set": "holdout",
+"id": 102,
+"lang": "python",
+"word": "accesses",
+"reason": "declined: inherited",
+"source": "drawn",
+"from": "rich/progress.py#Task",
+"to": "rich/progress.py#ProgressSample",
+"project": "Textualize-rich",
+"groups": [
+"accesses-other"
+]
+},
+{
+"set": "holdout",
+"id": 107,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unplaced",
+"source": "retarget",
+"from": "aiohttp/client.py#_request",
+"to": "aiohttp/client_reqrep.py#real_url",
+"project": "aio-libs-aiohttp",
+"groups": [
+"dispatch",
+"funcval",
+"names"
+]
+},
+{
+"set": "holdout",
+"id": 109,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unplaced",
+"source": "drawn",
+"from": "aiohttp/client.py#_request",
+"to": "aiohttp/connector.py#connect",
+"project": "aio-libs-aiohttp",
+"groups": [
+"dispatch",
+"funcval",
+"names"
+]
+},
+{
+"set": "holdout",
+"id": 112,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "aiohttp/client.py#_request",
+"to": "aiohttp/web_runner.py",
+"project": "aio-libs-aiohttp",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 120,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed overridden",
+"source": "retarget",
+"from": "aiohttp/connector.py#connect",
+"to": "aiohttp/connector.py#expired",
+"project": "aio-libs-aiohttp",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 122,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unplaced",
+"source": "drawn",
+"from": "aiohttp/client.py#_request",
+"to": "aiohttp/client_reqrep.py#_send",
+"project": "aio-libs-aiohttp",
+"groups": [
+"dispatch",
+"funcval",
+"names"
+]
+},
+{
+"set": "holdout",
+"id": 128,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed overridden",
+"source": "swap",
+"from": "aiohttp/client_reqrep.py#_send",
+"to": "aiohttp/connector.py#Connection",
+"project": "aio-libs-aiohttp",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 130,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "aiohttp/web_request.py",
+"to": "aiohttp/connector.py#Connection",
+"project": "aio-libs-aiohttp",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 135,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "aiohttp/client.py#_request",
+"to": "aiohttp/tcp_helpers.py",
+"project": "aio-libs-aiohttp",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 136,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unplaced",
+"source": "wrong-kind",
+"from": "aiohttp/client.py#_request",
+"to": "aiohttp/client_reqrep.py#POST_METHODS",
+"project": "aio-libs-aiohttp",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 149,
+"lang": "python",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "aiohttp/streams.py#StreamReader.feed_data",
+"to": "aiohttp/streams.py#StreamReader",
+"project": "aio-libs-aiohttp",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 150,
+"lang": "python",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "aiohttp/streams.py#StreamReader.read",
+"to": "aiohttp/streams.py#StreamReader",
+"project": "aio-libs-aiohttp",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 162,
+"lang": "python",
+"word": "conforms",
+"reason": "garbled claim",
+"source": "retarget",
+"from": "aiohttp/payload.py#size",
+"to": "aiohttp/payload.py#Payload",
+"project": "aio-libs-aiohttp",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 172,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "drawn",
+"from": "aiohttp/payload.py#Payload.write",
+"to": "aiohttp/abc.py#AbstractStreamWriter",
+"project": "aio-libs-aiohttp",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 175,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "aiohttp/payload.py#Payload.write",
+"to": "aiohttp/web_log.py",
+"project": "aio-libs-aiohttp",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 183,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed inherits",
+"source": "retarget",
+"from": "aiohttp/web_urldispatcher.py#__len__",
+"to": "aiohttp/web_urldispatcher.py#AbstractRoute",
+"project": "aio-libs-aiohttp",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout",
+"id": 188,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "aiohttp/web_fileresponse.py",
+"to": "aiohttp/web_app.py#Application._handle",
+"project": "aio-libs-aiohttp",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 209,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/format/parsed.rs#Parsed",
+"to": "src/format/parse.rs#parse_internal",
+"project": "chronotope-chrono",
+"groups": [
+"class",
+"dispatch",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 210,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed computed",
+"source": "wrong-kind",
+"from": "src/format/parse.rs#parse_internal",
+"to": "src/format/parsed.rs#week_from_sun",
+"project": "chronotope-chrono",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 261,
+"lang": "rust",
+"word": "calls",
+"reason": "unread: endpoint-external",
+"source": "wrong-kind",
+"from": "src/naive/date/mod.rs#NaiveDate",
+"to": "src/time_delta.rs#MICROS_PER_SEC",
+"project": "chronotope-chrono",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 283,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: incomplete",
+"source": "reverse",
+"from": "packages/zod/src/v4/core/index.ts",
+"to": "packages/zod/src/v4/classic/schemas.ts#ZodType",
+"project": "colinhacks-zod",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 287,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: incomplete",
+"source": "reverse",
+"from": "packages/zod/src/v4/classic/checks.ts",
+"to": "packages/zod/src/v4/classic/schemas.ts#refine",
+"project": "colinhacks-zod",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 290,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "swap",
+"from": "packages/zod/src/v4/core/parse.ts#_parse",
+"to": "packages/zod/src/v4/core/schemas.ts#ParsePayload",
+"project": "colinhacks-zod",
+"groups": [
+"dispatch",
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 295,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: computed",
+"source": "swap",
+"from": "packages/zod/src/v4/core/parse.ts#_parse",
+"to": "packages/zod/src/v4/core/schemas.ts#_$ZodTypeInternals",
+"project": "colinhacks-zod",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 296,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "packages/zod/src/v4/core/schemas.ts#_$ZodTypeInternals",
+"to": "packages/zod/src/v4/core/parse.ts#_parse",
+"project": "colinhacks-zod",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout",
+"id": 297,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "packages/zod/src/v4/core/parse.ts#_safeDecodeAsync",
+"to": "packages/zod/src/v4/core/schemas.ts#_$ZodTypeInternals",
+"project": "colinhacks-zod",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 301,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "drawn",
+"from": "packages/zod/src/v4/core/schemas.ts#_$ZodTypeInternals",
+"to": "packages/zod/src/v4/core/checks.ts#$ZodCheckInternals",
+"project": "colinhacks-zod",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout",
+"id": 305,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "packages/zod/src/v4/core/checks.ts#$ZodCheckInternals",
+"to": "packages/zod/src/v4/core/errors.ts#$ZodRawIssue",
+"project": "colinhacks-zod",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 312,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: incomplete",
+"source": "retarget",
+"from": "packages/zod/src/v4/core/doc.ts",
+"to": "packages/zod/src/v4/core/schemas.ts#ParsePayload",
+"project": "colinhacks-zod",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 315,
+"lang": "ts",
+"word": "conforms",
+"reason": "declined: incomplete",
+"source": "swap",
+"from": "packages/zod/src/v4/core/schemas.ts#ParsePayload",
+"to": "packages/zod/src/v4/core/errors.ts#$ZodRawIssue",
+"project": "colinhacks-zod",
+"groups": [
+"conforms-other"
+]
+},
+{
+"set": "holdout",
+"id": 320,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "swap",
+"from": "packages/zod/src/v4/core/util.ts#finalizeIssue",
+"to": "packages/zod/src/v4/core/errors.ts#$ZodIssue",
+"project": "colinhacks-zod",
+"groups": [
+"dispatch",
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 325,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "swap",
+"from": "packages/zod/src/v4/core/errors.ts#$ZodRawIssue",
+"to": "packages/zod/src/v4/core/util.ts#finalizeIssue",
+"project": "colinhacks-zod",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 328,
+"lang": "ts",
+"word": "takes",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "retarget",
+"from": "packages/zod/src/v4/core/errors.ts#set",
+"to": "packages/zod/src/v4/core/util.ts#finalizeIssue",
+"project": "colinhacks-zod",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 330,
+"lang": "ts",
+"word": "accesses",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "packages/zod/src/v4/core/to-json-schema.ts#processSchema",
+"to": "packages/zod/src/v4/core/json-schema-processors.ts#allProcessors",
+"project": "colinhacks-zod",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 331,
+"lang": "ts",
+"word": "takes",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "drawn",
+"from": "packages/zod/src/v4/core/to-json-schema.ts#processSchema",
+"to": "packages/zod/src/v4/core/to-json-schema.ts#ToJSONSchemaContext",
+"project": "colinhacks-zod",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 332,
+"lang": "ts",
+"word": "takes",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "drawn",
+"from": "packages/zod/src/v4/core/to-json-schema.ts#extractDefs",
+"to": "packages/zod/src/v4/core/to-json-schema.ts#ToJSONSchemaContext",
+"project": "colinhacks-zod",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 333,
+"lang": "ts",
+"word": "takes",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "drawn",
+"from": "packages/zod/src/v4/core/to-json-schema.ts#finalize",
+"to": "packages/zod/src/v4/core/to-json-schema.ts#ToJSONSchemaContext",
+"project": "colinhacks-zod",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 335,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "packages/zod/src/v4/core/to-json-schema.ts#ToJSONSchemaContext",
+"to": "packages/zod/src/v4/core/to-json-schema.ts#finalize",
+"project": "colinhacks-zod",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout",
+"id": 338,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "swap",
+"from": "packages/zod/src/v4/core/to-json-schema.ts#finalize",
+"to": "packages/zod/src/v4/core/json-schema.ts#JSONSchema",
+"project": "colinhacks-zod",
+"groups": [
+"dispatch",
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 340,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "drawn",
+"from": "fastapi/dependencies/utils.py#get_dependant",
+"to": "fastapi/dependencies/utils.py#_get_signature",
+"project": "fastapi-fastapi",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 351,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "wrong-kind",
+"from": "fastapi/dependencies/utils.py#get_dependant",
+"to": "fastapi/dependencies/models.py#call",
+"project": "fastapi-fastapi",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 353,
+"lang": "python",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "reverse",
+"from": "fastapi/dependencies/models.py#Dependant",
+"to": "fastapi/dependencies/utils.py#get_dependant",
+"project": "fastapi-fastapi",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout",
+"id": 365,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "fastapi/dependencies/utils.py#_get_body_field",
+"to": "fastapi/dependencies/utils.py#request_body_to_args",
+"project": "fastapi-fastapi",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 368,
+"lang": "python",
+"word": "calls",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "fastapi/dependencies/utils.py#_solve_generator",
+"to": "fastapi/dependencies/utils.py#solve_dependencies",
+"project": "fastapi-fastapi",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 372,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "fastapi/dependencies/utils.py#solve_dependencies",
+"to": "fastapi/dependencies/utils.py#get_typed_return_annotation",
+"project": "fastapi-fastapi",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 373,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "fastapi/dependencies/utils.py#solve_dependencies",
+"to": "fastapi/dependencies/utils.py#va",
+"project": "fastapi-fastapi",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 380,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "fastapi/openapi/utils.py#get_openapi",
+"to": "fastapi/openapi/utils.py#_get_openapi_operation_parameters",
+"project": "fastapi-fastapi",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 384,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "fastapi/openapi/utils.py#get_openapi_path",
+"to": "fastapi/openapi/utils.py#get_fields_from_routes",
+"project": "fastapi-fastapi",
+"groups": [
+"nevernamed",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 388,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "fastapi/openapi/utils.py#get_openapi_path",
+"to": "fastapi/openapi/utils.py#generate_operation_id",
+"project": "fastapi-fastapi",
+"groups": [
+"nevernamed",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 389,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "wrong-kind",
+"from": "fastapi/openapi/utils.py#get_openapi_path",
+"to": "fastapi/openapi/utils.py#license_info",
+"project": "fastapi-fastapi",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 415,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "fastapi/routing.py#_iter_routes_with_context",
+"to": "fastapi/dependencies/utils.py#solve_dependencies",
+"project": "fastapi-fastapi",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 416,
+"lang": "python",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "fastapi/routing.py#get_request_handler",
+"to": "fastapi/dependencies/utils.py#body_fields",
+"project": "fastapi-fastapi",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 419,
+"lang": "python",
+"word": "calls",
+"reason": "unread: endpoint-external",
+"source": "drawn",
+"from": "fastapi/dependencies/utils.py#solve_dependencies",
+"to": "fastapi/routing.py#APIRoute@used",
+"project": "fastapi-fastapi",
+"groups": [
+"other"
+]
+},
+{
+"set": "holdout",
+"id": 421,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "src/hono-base.ts#dispatch",
+"to": "src/hono-base.ts#fetch",
+"project": "honojs-hono",
+"groups": [
+"funcval",
+"names",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 427,
+"lang": "ts",
+"word": "accesses",
+"reason": "declined: incomplete",
+"source": "swap",
+"from": "src/hono-base.ts#dispatch",
+"to": "src/context.ts#Context",
+"project": "honojs-hono",
+"groups": [
+"accesses-other"
+]
+},
+{
+"set": "holdout",
+"id": 429,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/hono-base.ts#dispatch",
+"to": "src/context.ts#Set",
+"project": "honojs-hono",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 433,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/context.ts#Context",
+"to": "src/hono-base.ts#dispatch",
+"project": "honojs-hono",
+"groups": [
+"class",
+"names",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 434,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "src/hono-base.ts#dispatch",
+"to": "src/context.ts#executionCtx",
+"project": "honojs-hono",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 435,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "src/hono-base.ts#dispatch",
+"to": "src/context.ts#notFoundHandler",
+"project": "honojs-hono",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 439,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "src/hono-base.ts#dispatch",
+"to": "src/compose.ts#dispatch",
+"project": "honojs-hono",
+"groups": [
+"funcval",
+"names",
+"route",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 442,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "src/compose.ts#compose",
+"to": "src/compose.ts#dispatch",
+"project": "honojs-hono",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 445,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "src/compose.ts#compose",
+"to": "src/compose.ts#compose",
+"project": "honojs-hono",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 447,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "drawn",
+"from": "src/compose.ts#dispatch",
+"to": "src/types.ts#H",
+"project": "honojs-hono",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 449,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: incomplete",
+"source": "reverse",
+"from": "src/types.ts#H",
+"to": "src/compose.ts#dispatch",
+"project": "honojs-hono",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 455,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "src/context.ts#Context",
+"to": "src/context.ts#Context",
+"project": "honojs-hono",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 457,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "src/context.ts#Context",
+"to": "src/context.ts#notFound",
+"project": "honojs-hono",
+"groups": [
+"class",
+"names"
+]
+},
+{
+"set": "holdout",
+"id": 458,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/context.ts#Context",
+"to": "src/context.ts#Layout",
+"project": "honojs-hono",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 465,
+"lang": "ts",
+"word": "conforms",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "wrong-kind",
+"from": "src/router/smart-router/router.ts#SmartRouter",
+"to": "src/router.ts#match",
+"project": "honojs-hono",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 468,
+"lang": "ts",
+"word": "holds",
+"reason": "declined: quoted",
+"source": "reverse",
+"from": "src/router.ts#Router",
+"to": "src/router/smart-router/router.ts#SmartRouter",
+"project": "honojs-hono",
+"groups": [
+"holds-other"
+]
+},
+{
+"set": "holdout",
+"id": 470,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "retarget",
+"from": "src/router/smart-router/router.ts#add",
+"to": "src/router.ts#Router",
+"project": "honojs-hono",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout",
+"id": 476,
+"lang": "ts",
+"word": "conforms",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "wrong-kind",
+"from": "src/router/trie-router/router.ts#TrieRouter",
+"to": "src/router.ts#match",
+"project": "honojs-hono",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 483,
+"lang": "ts",
+"word": "conforms",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "retarget",
+"from": "src/router/reg-exp-router/router.ts#RegExpRouter",
+"to": "src/router.ts#add",
+"project": "honojs-hono",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 486,
+"lang": "ts",
+"word": "holds",
+"reason": "declined: quoted",
+"source": "reverse",
+"from": "src/router.ts#Router",
+"to": "src/router/reg-exp-router/router.ts#RegExpRouter",
+"project": "honojs-hono",
+"groups": [
+"holds-other"
+]
+},
+{
+"set": "holdout",
+"id": 488,
+"lang": "ts",
+"word": "holds",
+"reason": "confirmed",
+"source": "wrong-kind",
+"from": "src/router/reg-exp-router/router.ts#RegExpRouter",
+"to": "src/router.ts#match",
+"project": "honojs-hono",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 493,
+"lang": "ts",
+"word": "conforms",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "wrong-kind",
+"from": "src/router/pattern-router/router.ts#PatternRouter",
+"to": "src/router.ts#match",
+"project": "honojs-hono",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 499,
+"lang": "ts",
+"word": "conforms",
+"reason": "garbled claim",
+"source": "retarget",
+"from": "src/router/linear-router/router.ts#match",
+"to": "src/router.ts#Router",
+"project": "honojs-hono",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 500,
+"lang": "ts",
+"word": "conforms",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "wrong-kind",
+"from": "src/router/linear-router/router.ts#LinearRouter",
+"to": "src/router.ts#match",
+"project": "honojs-hono",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 507,
+"lang": "ts",
+"word": "accesses",
+"reason": "declined: open",
+"source": "swap",
+"from": "src/router/trie-router/router.ts#TrieRouter",
+"to": "src/router/trie-router/node.ts#Node",
+"project": "honojs-hono",
+"groups": [
+"accesses-other"
+]
+},
+{
+"set": "holdout",
+"id": 508,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "reverse",
+"from": "src/router/trie-router/node.ts#Node",
+"to": "src/router/trie-router/router.ts#TrieRouter",
+"project": "honojs-hono",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 532,
+"lang": "ts",
+"word": "builds",
+"reason": "confirmed",
+"source": "drawn",
+"from": "src/router/reg-exp-router/trie.ts#Trie",
+"to": "src/router/trie-router/node.ts#Node",
+"project": "honojs-hono",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 533,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "drawn",
+"from": "src/validator/validator.ts#validator",
+"to": "src/validator/validator.ts#validator",
+"project": "honojs-hono",
+"groups": [
+"dispatch",
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 537,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/validator/validator.ts#validator",
+"to": "src/utils/buffer.ts#equal",
+"project": "honojs-hono",
+"groups": [
+"dispatch",
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 540,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/validator/validator.ts#validator",
+"to": "src/utils/ipaddr.ts",
+"project": "honojs-hono",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 544,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/validator/utils.test.ts",
+"to": "src/helper/cookie/index.ts#getCookie",
+"project": "honojs-hono",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 547,
+"lang": "ts",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "src/validator/validator.ts#validator",
+"to": "src/validator/validator.ts#ValidationFunction",
+"project": "honojs-hono",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 548,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: macro",
+"source": "drawn",
+"from": "src/client/dispatch.rs#channel",
+"to": "src/client/conn/http1.rs#SendRequest",
+"project": "hyperium-hyper",
+"groups": [
+"rust"
+]
+},
+{
+"set": "holdout",
+"id": 551,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: macro",
+"source": "drawn",
+"from": "src/proto/h1/conn.rs#encode_head",
+"to": "src/proto/h1/encode.rs#Encoder",
+"project": "hyperium-hyper",
+"groups": [
+"rust"
+]
+},
+{
+"set": "holdout",
+"id": 555,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/requests/models.py#prepare_body",
+"to": "src/requests/models.py#PreparedRequest",
+"project": "psf-requests",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 557,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/requests/models.py#Request",
+"to": "src/requests/models.py#field",
+"project": "psf-requests",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 563,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/requests/models.py#close",
+"to": "src/requests/models.py#RequestHooksMixin",
+"project": "psf-requests",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 564,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/requests/models.py#Request",
+"to": "src/requests/models.py#files",
+"project": "psf-requests",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 570,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/requests/models.py#close",
+"to": "src/requests/models.py#RequestEncodingMixin",
+"project": "psf-requests",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 571,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/requests/models.py#PreparedRequest",
+"to": "src/requests/models.py#name",
+"project": "psf-requests",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 577,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/requests/models.py#PreparedRequest",
+"to": "src/requests/models.py#k",
+"project": "psf-requests",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 595,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/requests/models.py#PreparedRequest",
+"to": "src/requests/structures.py#name",
+"project": "psf-requests",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 606,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/requests/sessions.py#Session.prepare_request",
+"to": "src/requests/__version__.py",
+"project": "psf-requests",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 613,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/requests/hooks.py",
+"to": "src/requests/adapters.py#BaseAdapter.send",
+"project": "psf-requests",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 618,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "retarget",
+"from": "src/requests/packages.py",
+"to": "src/requests/models.py#Response",
+"project": "psf-requests",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout",
+"id": 622,
+"lang": "python",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "src/pip/_internal/cli/req_command.py#get_requirements",
+"to": "src/pip/_internal/commands/install.py#run",
+"project": "pypa-pip",
+"groups": [
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 623,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed overridden",
+"source": "retarget",
+"from": "src/pip/_internal/commands/install.py#pip_version_check",
+"to": "src/pip/_internal/cli/req_command.py#get_requirements",
+"project": "pypa-pip",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 625,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "src/pip/_internal/cli/req_command.py#get_requirements",
+"to": "src/pip/_internal/commands/install.py#run",
+"project": "pypa-pip",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout",
+"id": 627,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "src/pip/_internal/commands/install.py#run",
+"to": "src/pip/_internal/index/package_finder.py#PackageFinder",
+"project": "pypa-pip",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 628,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "src/pip/_internal/commands/install.py#run",
+"to": "src/pip/_internal/operations/prepare.py#RequirementPreparer",
+"project": "pypa-pip",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 630,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/pip/_internal/operations/prepare.py#RequirementPreparer",
+"to": "src/pip/_internal/commands/install.py#run",
+"project": "pypa-pip",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 631,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/pip/_internal/commands/install.py#_handle_target_dir",
+"to": "src/pip/_internal/operations/prepare.py#RequirementPreparer",
+"project": "pypa-pip",
+"groups": [
+"nevernamed"
+]
+},
+{
+"set": "holdout",
+"id": 633,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "src/pip/_internal/commands/install.py#run",
+"to": "src/pip/_internal/resolution/resolvelib/resolver.py#Resolver",
+"project": "pypa-pip",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 636,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/pip/_internal/resolution/resolvelib/candidates.py",
+"to": "src/pip/_internal/index/package_finder.py#PackageFinder",
+"project": "pypa-pip",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 639,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/pip/_internal/resolution/resolvelib/candidates.py",
+"to": "src/pip/_internal/operations/prepare.py#RequirementPreparer",
+"project": "pypa-pip",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 643,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed overridden",
+"source": "retarget",
+"from": "src/pip/_internal/commands/install.py#run",
+"to": "src/pip/_internal/wheel_builder.py#_get_cache_dir",
+"project": "pypa-pip",
+"groups": [
+"dispatch",
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 645,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "src/pip/_internal/wheel_builder.py#build",
+"to": "src/pip/_internal/commands/install.py#run",
+"project": "pypa-pip",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout",
+"id": 646,
+"lang": "python",
+"word": "needs",
+"reason": "confirmed",
+"source": "retarget",
+"from": "src/pip/_internal/commands/install.py#run",
+"to": "src/pip/_internal/__init__.py",
+"project": "pypa-pip",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 650,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/pip/_internal/commands/install.py#add_options",
+"to": "src/pip/_internal/req/__init__.py#install_given_reqs",
+"project": "pypa-pip",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 652,
+"lang": "python",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "src/pip/_internal/req/__init__.py#install_given_reqs",
+"to": "src/pip/_internal/commands/install.py#run",
+"project": "pypa-pip",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout",
+"id": 653,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/pip/_internal/commands/download.py",
+"to": "src/pip/_internal/req/__init__.py#install_given_reqs",
+"project": "pypa-pip",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 654,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "drawn",
+"from": "src/pip/_internal/req/__init__.py#install_given_reqs",
+"to": "src/pip/_internal/operations/install/wheel.py#install_wheel",
+"project": "pypa-pip",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 657,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/pip/_internal/index/package_finder.py#find_best_candidate",
+"to": "src/pip/_internal/index/package_finder.py#evaluate_link",
+"project": "pypa-pip",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 661,
+"lang": "python",
+"word": "calls",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "reverse",
+"from": "src/pip/_internal/index/collector.py#collect_sources",
+"to": "src/pip/_internal/index/package_finder.py#find_all_candidates",
+"project": "pypa-pip",
+"groups": [
+"nevernamed",
+"other",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 663,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed overridden",
+"source": "wrong-kind",
+"from": "src/pip/_internal/index/package_finder.py#find_all_candidates",
+"to": "src/pip/_internal/index/collector.py#index_urls",
+"project": "pypa-pip",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 667,
+"lang": "python",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "src/pip/_internal/index/collector.py#parse_links",
+"to": "src/pip/_internal/index/package_finder.py#LinkEvaluator",
+"project": "pypa-pip",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 668,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "src/pip/_internal/index/package_finder.py#LinkEvaluator",
+"to": "src/pip/_internal/models/candidate.py#InstallationCandidate",
+"project": "pypa-pip",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 671,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/pip/_internal/index/package_finder.py#LinkEvaluator",
+"to": "src/pip/_internal/models/installation_report.py",
+"project": "pypa-pip",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 672,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "drawn",
+"from": "src/pip/_internal/index/package_finder.py#find_best_candidate",
+"to": "src/pip/_internal/index/package_finder.py#get_applicable_candidates",
+"project": "pypa-pip",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 674,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed reaches-the-file",
+"source": "reverse",
+"from": "src/pip/_internal/index/package_finder.py#compute_best_candidate",
+"to": "src/pip/_internal/index/package_finder.py#find_best_candidate",
+"project": "pypa-pip",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout",
+"id": 683,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed reaches-the-file",
+"source": "swap",
+"from": "src/pip/_internal/resolution/resolvelib/resolver.py#Resolver.resolve",
+"to": "src/pip/_internal/resolution/resolvelib/provider.py#PipProvider.find_matches",
+"project": "pypa-pip",
+"groups": [
+"dispatch",
+"typehead"
+]
+},
+{
+"set": "holdout",
+"id": 685,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/pip/_internal/resolution/resolvelib/resolver.py#Resolver.resolve",
+"to": "src/pip/_internal/resolution/resolvelib/__init__.py",
+"project": "pypa-pip",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 693,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/pip/_internal/resolution/resolvelib/factory.py#Factory._iter_found_candidates",
+"to": "src/pip/_internal/index/sources.py",
+"project": "pypa-pip",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 702,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "drawn",
+"from": "src/types/PackageManager.ts#PackageManager",
+"to": "src/package-managers/npm.ts#latest",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout",
+"id": 703,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "drawn",
+"from": "src/types/PackageManager.ts#PackageManager",
+"to": "src/package-managers/npm.ts#greatest",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout",
+"id": 704,
+"lang": "ts",
+"word": "calls",
+"reason": "confirmed",
+"source": "drawn",
+"from": "src/package-managers/npm.ts#latest",
+"to": "src/package-managers/npm.ts#distTag",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 707,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "retarget",
+"from": "src/package-managers/npm.ts#greatest",
+"to": "src/package-managers/npm.ts#GreatestWithFallbackResult",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout",
+"id": 709,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "drawn",
+"from": "src/package-managers/npm.ts#fetchVersions",
+"to": "src/package-managers/npm.ts#fetchUpgradedPackument",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 733,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/index.ts#runUpgrades",
+"to": "src/lib/runLocal.ts#getOptionsPerPage",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 737,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "drawn",
+"from": "src/lib/runLocal.ts#runLocal",
+"to": "src/lib/findPackage.ts#findPackage",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 741,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/lib/runLocal.ts#runLocal",
+"to": "src/lib/getCurrentDependencies.ts#isGreaterThanSafe",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"route",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 748,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/lib/runLocal.ts#runLocal",
+"to": "src/lib/upgradePackageDefinitions.ts#mergeVersionResults",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"route",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 751,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/lib/runLocal.ts#runLocal",
+"to": "src/lib/findPackage.ts",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 761,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/lib/runLocal.ts#runLocal",
+"to": "src/lib/upgradePackageData.ts#replaceDependencySections",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"route",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 768,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/lib/upgradePackageDefinitions.ts#upgradePackageDefinitions",
+"to": "src/lib/queryVersions.ts#getPackageVersionProtected",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"dispatch",
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 769,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "wrong-kind",
+"from": "src/lib/upgradePackageDefinitions.ts#upgradePackageDefinitions",
+"to": "src/lib/queryVersions.ts#error",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 771,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/lib/upgradePackageDefinitions.ts#upgradePackageDefinitions",
+"to": "src/lib/upgradeJsonCatalogDependencies.ts",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 794,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "src/lib/getPeerDependenciesFromRegistry.ts#getPeerDependenciesFromRegistry",
+"to": "src/lib/upgradePackageDefinitions.ts#upgradePackageDefinitions",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 795,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/lib/upgradePackageDefinitions.ts#upgradePackageDefinitions",
+"to": "src/lib/getPeerDependenciesFromRegistry.ts#isCircularPeer",
+"project": "raineorshine-npm-check-updates",
+"groups": [
+"dispatch",
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 805,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed macro",
+"source": "reverse",
+"from": "src/exec/mod.rs#CommandTemplate",
+"to": "src/exec/mod.rs#CommandSet",
+"project": "sharkdp-fd",
+"groups": [
+"class",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 806,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "src/exec/mod.rs#CommandSet",
+"to": "src/exec/mod.rs#generate_custom_path_separator",
+"project": "sharkdp-fd",
+"groups": [
+"class",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 817,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "reverse",
+"from": "src/exec/mod.rs#ExecutionMode",
+"to": "src/exec/mod.rs#CommandSet",
+"project": "sharkdp-fd",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout",
+"id": 822,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: macro",
+"source": "swap",
+"from": "src/exec/job.rs#job",
+"to": "src/exec/mod.rs#CommandSet",
+"project": "sharkdp-fd",
+"groups": [
+"rust"
+]
+},
+{
+"set": "holdout",
+"id": 823,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/exec/mod.rs#CommandSet",
+"to": "src/exec/job.rs#job",
+"project": "sharkdp-fd",
+"groups": [
+"class",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 829,
+"lang": "rust",
+"word": "accesses",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/exec/job.rs#batch",
+"to": "src/exec/mod.rs#CommandSet",
+"project": "sharkdp-fd",
+"groups": [
+"accesses-other"
+]
+},
+{
+"set": "holdout",
+"id": 834,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: macro",
+"source": "swap",
+"from": "src/exec/job.rs#batch",
+"to": "src/exec/mod.rs#CommandSet",
+"project": "sharkdp-fd",
+"groups": [
+"rust"
+]
+},
+{
+"set": "holdout",
+"id": 836,
+"lang": "rust",
+"word": "accesses",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/exec/job.rs#job",
+"to": "src/exec/mod.rs#CommandSet",
+"project": "sharkdp-fd",
+"groups": [
+"accesses-other"
+]
+},
+{
+"set": "holdout",
+"id": 844,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "swap",
+"from": "src/exec/command.rs#execute_commands",
+"to": "src/exec/command.rs#OutputBuffer",
+"project": "sharkdp-fd",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 845,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/exec/command.rs#OutputBuffer",
+"to": "src/exec/command.rs#execute_commands",
+"project": "sharkdp-fd",
+"groups": [
+"class",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 849,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/walk.rs#WorkerState",
+"to": "src/walk.rs#scan",
+"project": "sharkdp-fd",
+"groups": [
+"class",
+"names",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 850,
+"lang": "rust",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/walk.rs#scan",
+"to": "src/walk.rs#lock",
+"project": "sharkdp-fd",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 857,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "reverse",
+"from": "src/output.rs#print_entry",
+"to": "src/walk.rs#ReceiverBuffer",
+"project": "sharkdp-fd",
+"groups": [
+"rust",
+"typehead",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 867,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: macro",
+"source": "swap",
+"from": "src/output.rs#print_entry",
+"to": "src/dir_entry.rs#DirEntry",
+"project": "sharkdp-fd",
+"groups": [
+"rust"
+]
+},
+{
+"set": "holdout",
+"id": 868,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/dir_entry.rs#DirEntry",
+"to": "src/output.rs#print_entry",
+"project": "sharkdp-fd",
+"groups": [
+"class",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 869,
+"lang": "rust",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/output.rs#print_entry",
+"to": "src/dir_entry.rs#starts_with_dash",
+"project": "sharkdp-fd",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 873,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/classes/flow-producer.ts#add",
+"to": "src/classes/flow-producer.ts#constructor",
+"project": "taskforcesh-bullmq",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 875,
+"lang": "ts",
+"word": "builds",
+"reason": "confirmed",
+"source": "drawn",
+"from": "src/classes/flow-producer.ts#addNode",
+"to": "src/classes/job.ts#Job",
+"project": "taskforcesh-bullmq",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout",
+"id": 878,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "retarget",
+"from": "src/classes/flow-producer.ts#addNode",
+"to": "src/classes/child-processor.ts",
+"project": "taskforcesh-bullmq",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout",
+"id": 900,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "wrong-kind",
+"from": "src/classes/queue.ts#add",
+"to": "src/classes/queue.ts#token",
+"project": "taskforcesh-bullmq",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 906,
+"lang": "ts",
+"word": "needs",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "retarget",
+"from": "src/classes/queue.ts#addJob",
+"to": "src/classes/main-worker.ts",
+"project": "taskforcesh-bullmq",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 909,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed computed",
+"source": "retarget",
+"from": "src/classes/job.ts#create",
+"to": "src/classes/job.ts#promote",
+"project": "taskforcesh-bullmq",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 910,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed computed",
+"source": "wrong-kind",
+"from": "src/classes/job.ts#create",
+"to": "src/classes/job.ts#unit",
+"project": "taskforcesh-bullmq",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 913,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/classes/main-worker.ts",
+"to": "src/classes/redis-queue-backend.ts#addJob",
+"project": "taskforcesh-bullmq",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 918,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "drawn",
+"from": "src/classes/redis-queue-backend.ts#addJobToTransaction",
+"to": "src/classes/redis-queue-backend.ts#execCommand",
+"project": "taskforcesh-bullmq",
+"groups": [
+"funcval",
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 921,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/classes/worker.ts#run",
+"to": "src/classes/worker.ts#maximumBlockTimeout",
+"project": "taskforcesh-bullmq",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 926,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "wrong-kind",
+"from": "src/classes/worker.ts#mainLoop",
+"to": "src/classes/worker.ts#processFn",
+"project": "taskforcesh-bullmq",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 933,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/classes/worker.ts#waitForJob",
+"to": "src/classes/worker.ts#moveToActive",
+"project": "taskforcesh-bullmq",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 940,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed reaches-the-file",
+"source": "reverse",
+"from": "src/classes/worker.ts#callProcessJob",
+"to": "src/classes/worker.ts#processJob",
+"project": "taskforcesh-bullmq",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout",
+"id": 941,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/classes/worker.ts#processJob",
+"to": "src/classes/worker.ts#delay",
+"project": "taskforcesh-bullmq",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 945,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/classes/worker.ts#constructor",
+"to": "src/classes/worker.ts#handleCompleted",
+"project": "taskforcesh-bullmq",
+"groups": [
+"dispatch",
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 949,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed reaches-the-file",
+"source": "retarget",
+"from": "src/classes/worker.ts#callProcessJob",
+"to": "src/classes/worker.ts#handleFailed",
+"project": "taskforcesh-bullmq",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout",
+"id": 953,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "reverse",
+"from": "src/classes/job.ts#moveToCompleted",
+"to": "src/classes/worker.ts#handleCompleted",
+"project": "taskforcesh-bullmq",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 954,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/classes/worker.ts#constructor",
+"to": "src/classes/job.ts#moveToCompleted",
+"project": "taskforcesh-bullmq",
+"groups": [
+"dispatch",
+"route"
+]
+},
+{
+"set": "holdout",
+"id": 955,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "src/classes/worker.ts#handleCompleted",
+"to": "src/classes/job.ts#result",
+"project": "taskforcesh-bullmq",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 960,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "reverse",
+"from": "src/classes/job.ts#moveToFailed",
+"to": "src/classes/worker.ts#handleFailed",
+"project": "taskforcesh-bullmq",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 961,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "src/classes/worker.ts#retryIfFailed",
+"to": "src/classes/job.ts#moveToFailed",
+"project": "taskforcesh-bullmq",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 968,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "axum/src/handler/service.rs#HandlerService",
+"to": "axum/src/handler/mod.rs#with_state",
+"project": "tokio-rs-axum",
+"groups": [
+"class",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 969,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed named",
+"source": "retarget",
+"from": "axum/src/handler/mod.rs#with_state",
+"to": "axum/src/handler/service.rs#state",
+"project": "tokio-rs-axum",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 982,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "swap",
+"from": "packages/client/src/internals/TRPCUntypedClient.ts#TRPCUntypedClient",
+"to": "packages/client/src/links/internals/createChain.ts#createChain",
+"project": "trpc-trpc",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 983,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "reverse",
+"from": "packages/client/src/links/internals/createChain.ts#createChain",
+"to": "packages/client/src/internals/TRPCUntypedClient.ts#TRPCUntypedClient",
+"project": "trpc-trpc",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 984,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "packages/client/src/internals/TRPCUntypedClient.ts#TRPCUntypedClient",
+"to": "packages/client/src/links/internals/createChain.ts#execute",
+"project": "trpc-trpc",
+"groups": [
+"class",
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 989,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "swap",
+"from": "packages/client/src/links/internals/createChain.ts#createChain",
+"to": "packages/client/src/links/types.ts#TRPCLink",
+"project": "trpc-trpc",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout",
+"id": 991,
+"lang": "ts",
+"word": "needs",
+"reason": "confirmed",
+"source": "retarget",
+"from": "packages/client/src/links/internals/dedupeLink.test.ts",
+"to": "packages/client/src/links/types.ts#TRPCLink",
+"project": "trpc-trpc",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout",
+"id": 995,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#resolveResponse",
+"to": "packages/server/src/unstable-core-do-not-import/http/contentType.ts#parse",
+"project": "trpc-trpc",
+"groups": [
+"dispatch",
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 996,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "wrong-kind",
+"from": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#resolveResponse",
+"to": "packages/server/src/unstable-core-do-not-import/http/contentType.ts#batchIndex",
+"project": "trpc-trpc",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 1003,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#resolveResponse",
+"to": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#resolveResponse",
+"project": "trpc-trpc",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 1006,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#resolveResponse",
+"to": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#formatError",
+"project": "trpc-trpc",
+"groups": [
+"dispatch",
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 1011,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#initResponse",
+"to": "packages/server/src/unstable-core-do-not-import/http/getHTTPStatusCode.ts#getStatusKeyFromCode",
+"project": "trpc-trpc",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout",
+"id": 1012,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts#initResponse",
+"to": "packages/server/src/unstable-core-do-not-import/http/getHTTPStatusCode.ts#METHOD_NOT_SUPPORTED",
+"project": "trpc-trpc",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout",
+"id": 1016,
+"lang": "ts",
+"word": "returns",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "drawn",
+"from": "packages/server/src/unstable-core-do-not-import/initTRPC.ts#TRPCBuilder",
+"to": "packages/server/src/unstable-core-do-not-import/initTRPC.ts#TRPCRootObject",
+"project": "trpc-trpc",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout",
+"id": 1026,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#ProcedureBuilder",
+"to": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#createBuilder",
+"project": "trpc-trpc",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout",
+"id": 1027,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#createResolver",
+"to": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#ProcedureBuilder",
+"project": "trpc-trpc",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout",
+"id": 1028,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "drawn",
+"from": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#ProcedureBuilder",
+"to": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#createResolver",
+"project": "trpc-trpc",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout",
+"id": 1031,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "swap",
+"from": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#createResolver",
+"to": "packages/server/src/unstable-core-do-not-import/procedure.ts#Procedure",
+"project": "trpc-trpc",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 5,
+"lang": "rust",
+"word": "accesses",
+"reason": "declined: impl-elsewhere",
+"source": "swap",
+"from": "actix-web/src/app.rs#App",
+"to": "actix-web/src/app_service.rs#AppInit",
+"project": "actix-actix-web",
+"groups": [
+"accesses-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 7,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "retarget",
+"from": "actix-web/src/app.rs#App",
+"to": "actix-web/src/app_service.rs#call",
+"project": "actix-actix-web",
+"groups": [
+"class",
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 8,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "wrong-kind",
+"from": "actix-web/src/app.rs#App",
+"to": "actix-web/src/app_service.rs#config",
+"project": "actix-actix-web",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 12,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "reverse",
+"from": "actix-web/src/app_service.rs#AppInitService",
+"to": "actix-web/src/app_service.rs#AppInit",
+"project": "actix-actix-web",
+"groups": [
+"class",
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 14,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "drawn",
+"from": "actix-web/src/app_service.rs#AppInitService",
+"to": "actix-web/src/app_service.rs#AppRouting",
+"project": "actix-actix-web",
+"groups": [
+"class",
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 15,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "drawn",
+"from": "actix-web/src/app_service.rs#AppRouting",
+"to": "actix-web/src/resource.rs#ResourceService",
+"project": "actix-actix-web",
+"groups": [
+"class",
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 19,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "reverse",
+"from": "actix-web/src/route.rs#RouteService",
+"to": "actix-web/src/resource.rs#ResourceService",
+"project": "actix-actix-web",
+"groups": [
+"class",
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 20,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "actix-web/src/resource.rs#ResourceService",
+"to": "actix-web/src/route.rs#to",
+"project": "actix-actix-web",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 24,
+"lang": "rust",
+"word": "holds",
+"reason": "declined: aliased",
+"source": "reverse",
+"from": "actix-web/src/route.rs#RouteService",
+"to": "actix-web/src/resource.rs#ResourceService",
+"project": "actix-actix-web",
+"groups": [
+"holds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 27,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "drawn",
+"from": "actix-web/src/route.rs#RouteService",
+"to": "actix-web/src/handler.rs#handler_service",
+"project": "actix-actix-web",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 42,
+"lang": "rust",
+"word": "conforms",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "actix-web/src/extract.rs#tuple_from_req",
+"to": "actix-web/src/extract.rs#FromRequest",
+"project": "actix-actix-web",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 52,
+"lang": "rust",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "actix-router/src/resource.rs#from",
+"to": "actix-router/src/resource.rs#construct",
+"project": "actix-actix-web",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 53,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "wrong-kind",
+"from": "actix-router/src/resource.rs#new",
+"to": "actix-router/src/resource.rs#Dynamic",
+"project": "actix-actix-web",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 55,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "reverse",
+"from": "actix-router/src/resource.rs#construct",
+"to": "actix-router/src/resource.rs#prefix",
+"project": "actix-actix-web",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 61,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: macro",
+"source": "retarget",
+"from": "actix-router/src/resource.rs#parse_param",
+"to": "actix-router/src/resource.rs#PatternType",
+"project": "actix-actix-web",
+"groups": [
+"rust"
+]
+},
+{
+"set": "holdout-b",
+"id": 63,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "reverse",
+"from": "actix-router/src/resource.rs#PatternType",
+"to": "actix-router/src/resource.rs#construct",
+"project": "actix-actix-web",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 68,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed computed",
+"source": "reverse",
+"from": "actix-router/src/resource.rs#capture_match_info_fn",
+"to": "actix-router/src/router.rs#recognize_fn",
+"project": "actix-actix-web",
+"groups": [
+"dispatch",
+"funcval",
+"rust"
+]
+},
+{
+"set": "holdout-b",
+"id": 69,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed computed",
+"source": "retarget",
+"from": "actix-router/src/router.rs#recognize_fn",
+"to": "actix-router/src/resource.rs#prefix_empty",
+"project": "actix-actix-web",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 74,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed computed",
+"source": "retarget",
+"from": "actix-router/src/resource.rs#capture_match_info_fn",
+"to": "actix-router/src/resource.rs#build_path_tail",
+"project": "actix-actix-web",
+"groups": [
+"dispatch",
+"funcval",
+"rust"
+]
+},
+{
+"set": "holdout-b",
+"id": 78,
+"lang": "ts",
+"word": "accesses",
+"reason": "declined: open",
+"source": "swap",
+"from": "drizzle-orm/src/node-postgres/driver.ts#construct",
+"to": "drizzle-orm/src/node-postgres/driver.ts#NodePgDriver",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"accesses-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 80,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "drizzle-orm/src/node-postgres/driver.ts#construct",
+"to": "drizzle-orm/src/node-postgres/driver.ts#construct",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 82,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "drizzle-orm/src/node-postgres/driver.ts#NodePgDriver",
+"to": "drizzle-orm/src/node-postgres/driver.ts#construct",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 83,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed handed-to-a-runner",
+"source": "retarget",
+"from": "drizzle-orm/src/node-postgres/driver.ts#construct",
+"to": "drizzle-orm/src/node-postgres/driver.ts#drizzle",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 89,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed handed-to-a-runner",
+"source": "wrong-kind",
+"from": "drizzle-orm/src/node-postgres/driver.ts#construct",
+"to": "drizzle-orm/src/node-postgres/driver.ts#connectionString",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 93,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "drizzle-orm/src/node-postgres/driver.ts#NodePgDriver",
+"to": "drizzle-orm/src/node-postgres/session.ts#count",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 98,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "drizzle-orm/src/node-postgres/driver.ts#NodePgDriver",
+"to": "drizzle-orm/src/node-postgres/session.ts#all",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 99,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "wrong-kind",
+"from": "drizzle-orm/src/node-postgres/driver.ts#NodePgDriver",
+"to": "drizzle-orm/src/node-postgres/session.ts#getTypeParser",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 110,
+"lang": "ts",
+"word": "conforms",
+"reason": "unread: endpoint-external",
+"source": "swap",
+"from": "drizzle-orm/src/node-postgres/session.ts#NodePgSession",
+"to": "drizzle-orm/src/node-postgres/session.ts#NodePgClient",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"conforms-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 111,
+"lang": "ts",
+"word": "holds",
+"reason": "unread: endpoint-external",
+"source": "retarget",
+"from": "drizzle-orm/src/node-postgres/session.ts#NodePgSession",
+"to": "drizzle-orm/src/node-postgres/session.ts#transaction",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 112,
+"lang": "ts",
+"word": "holds",
+"reason": "unread: endpoint-external",
+"source": "wrong-kind",
+"from": "drizzle-orm/src/node-postgres/session.ts#NodePgSession",
+"to": "drizzle-orm/src/node-postgres/session.ts#all",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 114,
+"lang": "ts",
+"word": "conforms",
+"reason": "unread: endpoint-external",
+"source": "swap",
+"from": "drizzle-orm/src/node-postgres/session.ts#NodePgPreparedQuery",
+"to": "drizzle-orm/src/node-postgres/session.ts#NodePgClient",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"conforms-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 115,
+"lang": "ts",
+"word": "holds",
+"reason": "unread: endpoint-external",
+"source": "wrong-kind",
+"from": "drizzle-orm/src/node-postgres/session.ts#NodePgPreparedQuery",
+"to": "drizzle-orm/src/node-postgres/session.ts#isResponseInArrayMode",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 116,
+"lang": "ts",
+"word": "returns",
+"reason": "unread: endpoint-external",
+"source": "drawn",
+"from": "drizzle-orm/src/node-postgres/session.ts#NodePgClient",
+"to": "drizzle-orm/src/node-postgres/session.ts#NodePgQueryResultHKT",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 118,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "drizzle-orm/src/pg-core/query-builders/select.ts#PgSelectBuilder",
+"to": "drizzle-orm/src/pg-core/query-builders/select.ts#orderBy",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 119,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "drizzle-orm/src/pg-core/query-builders/select.ts#PgSelectBuilder",
+"to": "drizzle-orm/src/pg-core/query-builders/select.ts#alias",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 122,
+"lang": "ts",
+"word": "conforms",
+"reason": "declined: not-declared",
+"source": "retarget",
+"from": "drizzle-orm/src/pg-core/query-builders/select.ts#getPgSetOperators",
+"to": "drizzle-orm/src/pg-core/query-builders/select.ts#PgSelectQueryBuilderBase",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 135,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "swap",
+"from": "drizzle-orm/src/pg-core/dialect.ts#buildSelectQuery",
+"to": "drizzle-orm/src/pg-core/query-builders/select.types.ts#PgSelectConfig",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"names"
+]
+},
+{
+"set": "holdout-b",
+"id": 140,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "drizzle-orm/src/pg-core/dialect.ts#buildSelectQuery",
+"to": "drizzle-orm/src/pg-core/dialect.ts#escapeName",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"names",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 148,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "drizzle-orm/src/pg-core/dialect.ts#buildUpdateSet",
+"to": "drizzle-orm/src/pg-core/dialect.ts#buildJoins",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 149,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "drizzle-orm/src/pg-core/dialect.ts#buildSelectQuery",
+"to": "drizzle-orm/src/pg-core/dialect.ts#fields",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 166,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "drizzle-orm/src/sql/sql.ts#sql",
+"to": "drizzle-orm/src/sql/sql.ts#SQLChunk",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 167,
+"lang": "ts",
+"word": "builds",
+"reason": "confirmed",
+"source": "drawn",
+"from": "drizzle-orm/src/sql/sql.ts#sql",
+"to": "drizzle-orm/src/sql/sql.ts#StringChunk",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 168,
+"lang": "ts",
+"word": "takes",
+"reason": "confirmed",
+"source": "drawn",
+"from": "drizzle-orm/src/sql/sql.ts#SQLChunk",
+"to": "drizzle-orm/src/sql/sql.ts#SQL",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 170,
+"lang": "ts",
+"word": "accesses",
+"reason": "declined: open",
+"source": "drawn",
+"from": "drizzle-orm/src/sql/sql.ts#SQL.buildQueryFromSourceParams",
+"to": "drizzle-orm/src/sql/sql.ts#Param",
+"project": "drizzle-team-drizzle-orm",
+"groups": [
+"accesses-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 172,
+"lang": "ts",
+"word": "conforms",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "src/adapter/bun/index.ts#BunAdapter",
+"to": "src/adapter/types.ts#ElysiaAdapter",
+"project": "elysiajs-elysia",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 174,
+"lang": "ts",
+"word": "holds",
+"reason": "declined: not-declared",
+"source": "swap",
+"from": "src/adapter/bun/index.ts#BunAdapter",
+"to": "src/adapter/types.ts#ElysiaAdapter",
+"project": "elysiajs-elysia",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 177,
+"lang": "ts",
+"word": "conforms",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "src/adapter/web-standard/index.ts#WebStandardAdapter",
+"to": "src/adapter/types.ts#ElysiaAdapter",
+"project": "elysiajs-elysia",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 182,
+"lang": "ts",
+"word": "calls",
+"reason": "confirmed",
+"source": "drawn",
+"from": "src/adapter/bun/index.ts#BunAdapter",
+"to": "src/adapter/bun/index.ts#mapRoutes",
+"project": "elysiajs-elysia",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 189,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "src/adapter/bun/compose.ts#createBunRouteHandler",
+"to": "src/adapter/bun/index.ts#mapRoutes",
+"project": "elysiajs-elysia",
+"groups": [
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 190,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "src/adapter/bun/index.ts#mapRoutes",
+"to": "src/adapter/bun/compose.ts#createContext",
+"project": "elysiajs-elysia",
+"groups": [
+"funcval",
+"route",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 191,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "src/adapter/bun/index.ts#mapRoutes",
+"to": "src/adapter/bun/compose.ts#route",
+"project": "elysiajs-elysia",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 195,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "drawn",
+"from": "src/adapter/bun/compose.ts#createBunRouteHandler",
+"to": "src/adapter/bun/handler.ts#mapResponse",
+"project": "elysiajs-elysia",
+"groups": [
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 202,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "drawn",
+"from": "src/adapter/bun/compose.ts#createBunRouteHandler",
+"to": "src/adapter/bun/handler.ts#mapCompactResponse",
+"project": "elysiajs-elysia",
+"groups": [
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 214,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "wrong-kind",
+"from": "src/compose.ts#composeHandler",
+"to": "src/compose.ts#schema",
+"project": "elysiajs-elysia",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 217,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "src/compose.ts#resolveChild",
+"to": "src/compose.ts#composeValidationFactory",
+"project": "elysiajs-elysia",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 224,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: incomplete",
+"source": "swap",
+"from": "src/index.ts#Elysia",
+"to": "src/index.ts#add",
+"project": "elysiajs-elysia",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 226,
+"lang": "ts",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "src/index.ts#add",
+"to": "src/index.ts#router",
+"project": "elysiajs-elysia",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 228,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "src/index.ts#add",
+"to": "src/index.ts#group",
+"project": "elysiajs-elysia",
+"groups": [
+"funcval",
+"names",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 229,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "src/index.ts#group",
+"to": "src/index.ts#onBeforeHandle",
+"project": "elysiajs-elysia",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 230,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "src/index.ts#group",
+"to": "src/index.ts#macro",
+"project": "elysiajs-elysia",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 238,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/types.ts#SchemaValidator",
+"to": "src/compose.ts#composeHandler",
+"project": "elysiajs-elysia",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 239,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "retarget",
+"from": "src/compose.ts#composeHandler",
+"to": "src/types.ts#safeParse",
+"project": "elysiajs-elysia",
+"groups": [
+"dynamic",
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 240,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "wrong-kind",
+"from": "src/compose.ts#composeHandler",
+"to": "src/types.ts#params",
+"project": "elysiajs-elysia",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 263,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "src/cli.ts#main",
+"to": "src/cli.ts#autorun",
+"project": "google-zx",
+"groups": [
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 269,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "src/cli.ts#main",
+"to": "src/cli.ts#i",
+"project": "google-zx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 271,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "reverse",
+"from": "src/cli.ts#runScript",
+"to": "src/cli.ts#main",
+"project": "google-zx",
+"groups": [
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 273,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "src/cli.ts#main",
+"to": "src/cli.ts#parseBoolean",
+"project": "google-zx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 283,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: incomplete",
+"source": "reverse",
+"from": "src/core.ts",
+"to": "src/index.ts",
+"project": "google-zx",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 286,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "src/goods.ts#question",
+"to": "src/goods.ts#sleep",
+"project": "google-zx",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 287,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "src/goods.ts#retry",
+"to": "src/goods.ts#lastErr",
+"project": "google-zx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 289,
+"lang": "ts",
+"word": "returns",
+"reason": "declined: incomplete",
+"source": "swap",
+"from": "src/util.ts#Duration",
+"to": "src/goods.ts#sleep",
+"project": "google-zx",
+"groups": [
+"returns-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 291,
+"lang": "ts",
+"word": "takes",
+"reason": "declined: incomplete",
+"source": "retarget",
+"from": "src/util.ts#Duration",
+"to": "src/goods.ts#tempfile",
+"project": "google-zx",
+"groups": [
+"takes-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 294,
+"lang": "ts",
+"word": "returns",
+"reason": "declined: incomplete",
+"source": "swap",
+"from": "src/util.ts#Duration",
+"to": "src/goods.ts#expBackoff",
+"project": "google-zx",
+"groups": [
+"returns-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 296,
+"lang": "ts",
+"word": "takes",
+"reason": "declined: incomplete",
+"source": "retarget",
+"from": "src/util.ts#Duration",
+"to": "src/goods.ts#stringify",
+"project": "google-zx",
+"groups": [
+"takes-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 298,
+"lang": "ts",
+"word": "takes",
+"reason": "confirmed",
+"source": "drawn",
+"from": "src/util.ts#Duration",
+"to": "src/util.ts#parseDuration",
+"project": "google-zx",
+"groups": [
+"takes-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 303,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "wrong-kind",
+"from": "src/goods.ts#spinner",
+"to": "src/core.ts#ac",
+"project": "google-zx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 304,
+"lang": "ts",
+"word": "needs",
+"reason": "declined: incomplete",
+"source": "reverse",
+"from": "src/core.ts#within",
+"to": "src/goods.ts#spinner",
+"project": "google-zx",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 305,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "drawn",
+"from": "src/goods.ts#retry",
+"to": "src/goods.ts#expBackoff",
+"project": "google-zx",
+"groups": [
+"funcval",
+"names",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 312,
+"lang": "ts",
+"word": "needs",
+"reason": "confirmed",
+"source": "retarget",
+"from": "src/goods.ts#sleep",
+"to": "src/vendor-extra.ts",
+"project": "google-zx",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 325,
+"lang": "ts",
+"word": "needs",
+"reason": "confirmed",
+"source": "retarget",
+"from": "src/goods.ts#expBackoff",
+"to": "src/vendor-extra.ts",
+"project": "google-zx",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 327,
+"lang": "ts",
+"word": "conforms",
+"reason": "declined: incomplete",
+"source": "swap",
+"from": "src/core.ts#PromiseCallback",
+"to": "src/core.ts#Snapshot",
+"project": "google-zx",
+"groups": [
+"conforms-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 331,
+"lang": "ts",
+"word": "conforms",
+"reason": "declined: incomplete",
+"source": "swap",
+"from": "src/core.ts#ProcessPromise",
+"to": "src/core.ts#Snapshot",
+"project": "google-zx",
+"groups": [
+"conforms-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 332,
+"lang": "ts",
+"word": "holds",
+"reason": "declined: incomplete",
+"source": "retarget",
+"from": "src/core.ts#cb",
+"to": "src/core.ts#Snapshot",
+"project": "google-zx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 336,
+"lang": "ts",
+"word": "needs",
+"reason": "unread: endpoint-external",
+"source": "reverse",
+"from": "src/vendor-core.ts#exec",
+"to": "src/core.ts#ProcessPromise.run",
+"project": "google-zx",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 343,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/plugins/mapset.ts#proxyMap_",
+"to": "src/plugins/mapset.ts#constructor",
+"project": "immerjs-immer",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 345,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed reaches-the-file",
+"source": "retarget",
+"from": "src/plugins/mapset.ts#proxyMap_",
+"to": "src/plugins/mapset.ts#set",
+"project": "immerjs-immer",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout-b",
+"id": 355,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/plugins/mapset.ts#proxySet_",
+"to": "src/plugins/mapset.ts#delete",
+"project": "immerjs-immer",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 356,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "wrong-kind",
+"from": "src/plugins/mapset.ts#proxySet_",
+"to": "src/plugins/mapset.ts#proxyMap_",
+"project": "immerjs-immer",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 357,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: receiver",
+"source": "reverse",
+"from": "src/plugins/mapset.ts#DraftSet",
+"to": "src/plugins/mapset.ts#proxySet_",
+"project": "immerjs-immer",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 358,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed reaches-the-file",
+"source": "retarget",
+"from": "src/plugins/mapset.ts#proxySet_",
+"to": "src/plugins/mapset.ts#values",
+"project": "immerjs-immer",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout-b",
+"id": 364,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/plugins/mapset.ts#DraftMap",
+"to": "src/core/proxy.ts#base_",
+"project": "immerjs-immer",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 374,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "drawn",
+"from": "src/plugins/patches.ts#generateArrayPatches",
+"to": "src/plugins/patches.ts#deepClonePatchValue",
+"project": "immerjs-immer",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 375,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "drawn",
+"from": "src/plugins/patches.ts#generatePatchesFromAssigned",
+"to": "src/plugins/patches.ts#deepClonePatchValue",
+"project": "immerjs-immer",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 379,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/core/immerClass.ts#createProxy",
+"to": "src/core/proxy.ts#readPropFromProto",
+"project": "immerjs-immer",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 380,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "wrong-kind",
+"from": "src/core/immerClass.ts#createProxy",
+"to": "src/core/proxy.ts#copy_",
+"project": "immerjs-immer",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 383,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: computed",
+"source": "retarget",
+"from": "src/core/finalize.ts#processResult",
+"to": "src/core/finalize.ts#processResult",
+"project": "immerjs-immer",
+"groups": [
+"funcval",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 391,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/marshmallow/schema.py#__apply_nested_option",
+"to": "src/marshmallow/schema.py#_serialize",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"dispatch",
+"nevernamed"
+]
+},
+{
+"set": "holdout-b",
+"id": 398,
+"lang": "python",
+"word": "calls",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "retarget",
+"from": "src/marshmallow/schema.py#from_dict",
+"to": "src/marshmallow/schema.py#_do_load",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"nevernamed",
+"other"
+]
+},
+{
+"set": "holdout-b",
+"id": 402,
+"lang": "python",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "retarget",
+"from": "src/marshmallow/schema.py#SchemaOpts",
+"to": "src/marshmallow/schema.py#_deserialize",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"class",
+"dynamic"
+]
+},
+{
+"set": "holdout-b",
+"id": 409,
+"lang": "python",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "retarget",
+"from": "src/marshmallow/schema.py#__init__",
+"to": "src/marshmallow/schema.py#_invoke_field_validators",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"dispatch",
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 410,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed overridden",
+"source": "wrong-kind",
+"from": "src/marshmallow/schema.py#_do_load",
+"to": "src/marshmallow/schema.py#kwargs",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 413,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed overridden",
+"source": "retarget",
+"from": "src/marshmallow/schema.py#_do_load",
+"to": "src/marshmallow/schema.py#resolve_hooks",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 414,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed overridden",
+"source": "wrong-kind",
+"from": "src/marshmallow/schema.py#_do_load",
+"to": "src/marshmallow/schema.py#dump_fields",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 416,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "swap",
+"from": "src/marshmallow/schema.py#_invoke_field_validators",
+"to": "src/marshmallow/error_store.py#store_error",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 420,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "swap",
+"from": "src/marshmallow/schema.py#_invoke_schema_validators",
+"to": "src/marshmallow/error_store.py#store_error",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 422,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/marshmallow/schema.py#_invoke_schema_validators",
+"to": "src/marshmallow/validate.py",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 425,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "reverse",
+"from": "src/marshmallow/schema.py#_get_fields",
+"to": "src/marshmallow/schema.py#SchemaMeta",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"nevernamed"
+]
+},
+{
+"set": "holdout-b",
+"id": 426,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/marshmallow/schema.py#SchemaMeta",
+"to": "src/marshmallow/schema.py#error",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 430,
+"lang": "python",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "src/marshmallow/schema.py#_get_fields_by_mro",
+"to": "src/marshmallow/schema.py#SchemaMeta",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout-b",
+"id": 431,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/marshmallow/schema.py#SchemaMeta",
+"to": "src/marshmallow/schema.py#item",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 435,
+"lang": "python",
+"word": "takes",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "drawn",
+"from": "src/marshmallow/schema.py#_get_fields",
+"to": "src/marshmallow/fields.py#Field",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 441,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/marshmallow/schema.py#_invoke_field_validators",
+"to": "src/marshmallow/schema.py#_get_fields",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 442,
+"lang": "python",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "wrong-kind",
+"from": "src/marshmallow/schema.py#_get_fields_by_mro",
+"to": "src/marshmallow/schema.py#processor",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 444,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "src/marshmallow/schema.py#SchemaMeta.get_declared_fields",
+"to": "src/marshmallow/schema.py#Schema",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 450,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "drawn",
+"from": "src/marshmallow/decorators.py#set_hook",
+"to": "src/marshmallow/decorators.py#MarshmallowHook",
+"project": "marshmallow-code-marshmallow",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 452,
+"lang": "ts",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "drawn",
+"from": "packages/mobx/src/api/action.ts#action",
+"to": "packages/mobx/src/core/action.ts#executeAction",
+"project": "mobxjs-mobx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 455,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "retarget",
+"from": "packages/mobx/src/api/action.ts#runInAction",
+"to": "packages/mobx/src/core/action.ts#IActionRunInfo",
+"project": "mobxjs-mobx",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout-b",
+"id": 459,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "packages/mobx/src/api/transaction.ts#transaction",
+"to": "packages/mobx/src/core/observable.ts#onBUO",
+"project": "mobxjs-mobx",
+"groups": [
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 466,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "packages/mobx/src/core/action.ts#executeAction",
+"to": "packages/mobx/src/core/action.ts#executeAction",
+"project": "mobxjs-mobx",
+"groups": [
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 467,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "wrong-kind",
+"from": "packages/mobx/src/core/action.ts#executeAction",
+"to": "packages/mobx/src/core/action.ts#writable",
+"project": "mobxjs-mobx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 470,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "packages/mobx/src/core/action.ts#allowStateChanges",
+"to": "packages/mobx/src/core/action.ts#_endAction",
+"project": "mobxjs-mobx",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 481,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed set-at-run-time",
+"source": "reverse",
+"from": "packages/mobx/src/core/reaction.ts#runReactions",
+"to": "packages/mobx/src/core/observable.ts#endBatch",
+"project": "mobxjs-mobx",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 494,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "packages/mobx/src/types/observableobject.ts#ObservableObjectAdministration",
+"to": "packages/mobx/src/types/observablevalue.ts#toString",
+"project": "mobxjs-mobx",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 495,
+"lang": "ts",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "wrong-kind",
+"from": "packages/mobx/src/types/observableobject.ts#ObservableObjectAdministration",
+"to": "packages/mobx/src/types/observablevalue.ts#interceptors_",
+"project": "mobxjs-mobx",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 507,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "packages/mobx/src/core/reaction.ts#setReactionScheduler",
+"to": "packages/mobx/src/core/derivation.ts#trackDerivedFunction",
+"project": "mobxjs-mobx",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 511,
+"lang": "ts",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "packages/mobx/src/core/derivation.ts#trackDerivedFunction",
+"to": "packages/mobx/src/core/derivation.ts#clearObserving",
+"project": "mobxjs-mobx",
+"groups": [
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 520,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/black/__init__.py#main",
+"to": "src/black/files.py#_path_is_ignored",
+"project": "psf-black",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 524,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "drawn",
+"from": "src/black/__init__.py#main",
+"to": "src/black/files.py#gen_python_files",
+"project": "psf-black",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 527,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/black/concurrency.py",
+"to": "src/black/files.py#gen_python_files",
+"project": "psf-black",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 528,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "drawn",
+"from": "src/black/cache.py#Cache.read",
+"to": "src/black/cache.py#Cache.filtered_cached",
+"project": "psf-black",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 535,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/black/concurrency.py#schedule_formatting",
+"to": "src/black/lines.py",
+"project": "psf-black",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 536,
+"lang": "python",
+"word": "calls",
+"reason": "declined: receiver",
+"source": "drawn",
+"from": "src/black/__init__.py#format_file_in_place",
+"to": "src/black/cache.py#Cache.write",
+"project": "psf-black",
+"groups": [
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 540,
+"lang": "python",
+"word": "needs",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/black/lines.py",
+"to": "src/black/cache.py#Cache.write",
+"project": "psf-black",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 555,
+"lang": "python",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "src/black/parsing.py#lib2to3_parse",
+"to": "src/black/linegen.py#LineGenerator",
+"project": "psf-black",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 559,
+"lang": "python",
+"word": "needs",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/black/numerics.py",
+"to": "src/black/lines.py#EmptyLineTracker",
+"project": "psf-black",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 567,
+"lang": "python",
+"word": "holds",
+"reason": "declined: quoted",
+"source": "reverse",
+"from": "src/black/lines.py#LinesBlock",
+"to": "src/black/lines.py#EmptyLineTracker",
+"project": "psf-black",
+"groups": [
+"holds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 570,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/black/lines.py#LinesBlock",
+"to": "src/black/lines.py#EmptyLineTracker",
+"project": "psf-black",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 573,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "drawn",
+"from": "src/black/lines.py#LinesBlock",
+"to": "src/black/linegen.py#transform_line",
+"project": "psf-black",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 574,
+"lang": "python",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "src/black/linegen.py#transform_line",
+"to": "src/black/lines.py#LinesBlock",
+"project": "psf-black",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 576,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "swap",
+"from": "src/black/linegen.py#transform_line",
+"to": "src/black/lines.py#LinesBlock",
+"project": "psf-black",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout-b",
+"id": 578,
+"lang": "python",
+"word": "needs",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/black/linegen.py#transform_line",
+"to": "src/black/report.py",
+"project": "psf-black",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 582,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/black/linegen.py#LineGenerator",
+"to": "src/black/linegen.py#internal_stmt",
+"project": "psf-black",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 592,
+"lang": "python",
+"word": "returns",
+"reason": "unconfirmed: signature-other-half",
+"source": "retarget",
+"from": "src/black/lines.py#Line",
+"to": "src/black/linegen.py#_over_length_only_due_to_subscript_comment",
+"project": "psf-black",
+"groups": [
+"returns-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 601,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "drawn",
+"from": "src/black/linegen.py#right_hand_split_with_omits",
+"to": "src/black/linegen.py#bracket_split_build_line",
+"project": "psf-black",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 602,
+"lang": "python",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "drawn",
+"from": "src/black/linegen.py#right_hand_split_with_omits",
+"to": "src/black/lines.py#can_be_split",
+"project": "psf-black",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 606,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unbound",
+"source": "drawn",
+"from": "src/trio/_core/_run.py#Task",
+"to": "src/trio/_core/_parking_lot.py#ParkingLot",
+"project": "python-trio-trio",
+"groups": [
+"class",
+"dynamic",
+"names"
+]
+},
+{
+"set": "holdout-b",
+"id": 609,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/trio/_core/_generated_io_kqueue.py",
+"to": "src/trio/_core/_parking_lot.py#ParkingLot",
+"project": "python-trio-trio",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 616,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/trio/_sync.py#Lock",
+"to": "src/trio/_core/_run_context.py",
+"project": "python-trio-trio",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 621,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/trio/_channel.py",
+"to": "src/trio/_core/_parking_lot.py#ParkingLot",
+"project": "python-trio-trio",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 622,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "reverse",
+"from": "src/trio/_core/_parking_lot.py#ParkingLot",
+"to": "src/trio/_sync.py#Semaphore",
+"project": "python-trio-trio",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 631,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/trio/_timeouts.py",
+"to": "src/trio/_core/_parking_lot.py#ParkingLot",
+"project": "python-trio-trio",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 633,
+"lang": "python",
+"word": "builds",
+"reason": "declined: not-constructed",
+"source": "retarget",
+"from": "src/trio/_sync.py#acquire_nowait",
+"to": "src/trio/_core/_parking_lot.py#ParkingLot",
+"project": "python-trio-trio",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 650,
+"lang": "python",
+"word": "needs",
+"reason": "advisory needs-one-level-up",
+"source": "retarget",
+"from": "src/trio/_sync.py#Condition",
+"to": "src/trio/_core/_run_context.py",
+"project": "python-trio-trio",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 652,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "reverse",
+"from": "src/trio/_core/_parking_lot.py#ParkingLot",
+"to": "src/trio/_sync.py#Condition",
+"project": "python-trio-trio",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 659,
+"lang": "python",
+"word": "holds",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "reverse",
+"from": "src/trio/_channel.py#MemoryChannelState",
+"to": "src/trio/_channel.py#MemorySendChannel",
+"project": "python-trio-trio",
+"groups": [
+"holds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 663,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/trio/_channel.py#MemorySendChannel",
+"to": "src/trio/_channel.py#value",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 666,
+"lang": "python",
+"word": "holds",
+"reason": "unconfirmed: compiler-could-not-say",
+"source": "reverse",
+"from": "src/trio/_channel.py#MemoryChannelState",
+"to": "src/trio/_channel.py#MemoryReceiveChannel",
+"project": "python-trio-trio",
+"groups": [
+"holds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 686,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/trio/_core/_run.py#NurseryManager",
+"to": "src/trio/_core/_run.py#tiebreaker",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 688,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/trio/_core/_run.py#__repr__",
+"to": "src/trio/_core/_run.py#CancelScope",
+"project": "python-trio-trio",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 691,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "reverse",
+"from": "src/trio/_core/_run.py#Nursery",
+"to": "src/trio/_core/_run.py#NurseryManager",
+"project": "python-trio-trio",
+"groups": [
+"class",
+"dynamic",
+"nevernamed"
+]
+},
+{
+"set": "holdout-b",
+"id": 693,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/trio/_core/_run.py#NurseryManager",
+"to": "src/trio/_core/_run.py#args",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 706,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "src/trio/_core/_run.py#Nursery",
+"to": "src/trio/_core/_run.py#_attempt_delivery_of_any_pending_cancel",
+"project": "python-trio-trio",
+"groups": [
+"class",
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 707,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/trio/_core/_run.py#Nursery",
+"to": "src/trio/_core/_run.py#strict_exception_groups",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 709,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "drawn",
+"from": "src/trio/_core/_run.py#Task",
+"to": "src/trio/_core/_run.py#Task._activate_cancel_status",
+"project": "python-trio-trio",
+"groups": [
+"class",
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 711,
+"lang": "python",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "src/trio/_core/_run.py#CancelScope.cancel",
+"to": "src/trio/_core/_run.py#CancelStatus",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 718,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unbound",
+"source": "retarget",
+"from": "src/trio/_core/_run.py#__repr__",
+"to": "src/trio/_core/_run.py#Task",
+"project": "python-trio-trio",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout-b",
+"id": 719,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "wrong-kind",
+"from": "src/trio/_core/_run.py#CancelStatus",
+"to": "src/trio/_core/_run.py#task",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 727,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "retarget",
+"from": "src/trio/_core/_run.py#setup_runner",
+"to": "src/trio/_core/_run.py#_NoStatus",
+"project": "python-trio-trio",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 729,
+"lang": "python",
+"word": "calls",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "src/trio/_core/_run.py#Runner",
+"to": "src/trio/_core/_run.py#setup_runner",
+"project": "python-trio-trio",
+"groups": [
+"class",
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 730,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unbound",
+"source": "retarget",
+"from": "src/trio/_core/_run.py#setup_runner",
+"to": "src/trio/_core/_run.py#CancelScope",
+"project": "python-trio-trio",
+"groups": [
+"dynamic",
+"names"
+]
+},
+{
+"set": "holdout-b",
+"id": 733,
+"lang": "python",
+"word": "calls",
+"reason": "declined: receiver",
+"source": "reverse",
+"from": "src/trio/_core/_run.py#unrolled_run",
+"to": "src/trio/_core/_run.py#run",
+"project": "python-trio-trio",
+"groups": [
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 736,
+"lang": "python",
+"word": "needs",
+"reason": "unconfirmed: end-marked-external",
+"source": "retarget",
+"from": "src/trio/_core/_thread_cache.py",
+"to": "src/trio/_core/_run.py#Runner.reschedule",
+"project": "python-trio-trio",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 737,
+"lang": "python",
+"word": "accesses",
+"reason": "declined: not-declared",
+"source": "drawn",
+"from": "src/trio/_core/_run.py#unrolled_run",
+"to": "src/trio/_core/_run.py#Runner.runq",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 738,
+"lang": "python",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "src/trio/_core/_run.py#Runner.reschedule",
+"to": "src/trio/_core/_run.py#Runner.runq",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 745,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unbound",
+"source": "reverse",
+"from": "src/trio/_core/_run.py#Deadlines",
+"to": "src/trio/_core/_run.py#Runner",
+"project": "python-trio-trio",
+"groups": [
+"class",
+"dynamic"
+]
+},
+{
+"set": "holdout-b",
+"id": 746,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed unbound",
+"source": "retarget",
+"from": "src/trio/_core/_run.py#effective_deadline",
+"to": "src/trio/_core/_run.py#Deadlines",
+"project": "python-trio-trio",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout-b",
+"id": 754,
+"lang": "python",
+"word": "holds",
+"reason": "unread: endpoint-external",
+"source": "wrong-kind",
+"from": "src/trio/_core/_run.py#Runner",
+"to": "src/trio/_abc.py#receive_some",
+"project": "python-trio-trio",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 755,
+"lang": "python",
+"word": "needs",
+"reason": "confirmed",
+"source": "reverse",
+"from": "src/trio/_abc.py#Clock",
+"to": "src/trio/_core/_run.py#Runner",
+"project": "python-trio-trio",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 756,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/trio/_abc.py#Clock",
+"to": "src/trio/_core/_run.py#Runner",
+"project": "python-trio-trio",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 758,
+"lang": "python",
+"word": "calls",
+"reason": "unread: endpoint-external",
+"source": "wrong-kind",
+"from": "src/trio/_core/_run.py#Runner",
+"to": "src/trio/_abc.py#__slots__",
+"project": "python-trio-trio",
+"groups": [
+"kind-text"
+]
+},
+{
+"set": "holdout-b",
+"id": 760,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "swap",
+"from": "src/trio/_core/_run.py#unrolled_run",
+"to": "src/trio/_core/_run.py#Deadlines",
+"project": "python-trio-trio",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 761,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/trio/_core/_run.py#Deadlines",
+"to": "src/trio/_core/_run.py#unrolled_run",
+"project": "python-trio-trio",
+"groups": [
+"class",
+"dynamic",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 762,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/trio/_core/_run.py#unrolled_run",
+"to": "src/trio/_core/_run.py#deadline",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 763,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "wrong-kind",
+"from": "src/trio/_core/_run.py#unrolled_run",
+"to": "src/trio/_core/_run.py#binding",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 766,
+"lang": "python",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "swap",
+"from": "src/trio/_core/_run.py#unrolled_run",
+"to": "src/trio/_abc.py#Clock",
+"project": "python-trio-trio",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 767,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/trio/_abc.py#Clock",
+"to": "src/trio/_core/_run.py#unrolled_run",
+"project": "python-trio-trio",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 768,
+"lang": "python",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "retarget",
+"from": "src/trio/_core/_run.py#current_clock",
+"to": "src/trio/_abc.py#Clock",
+"project": "python-trio-trio",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout-b",
+"id": 769,
+"lang": "python",
+"word": "calls",
+"reason": "unread: endpoint-external",
+"source": "wrong-kind",
+"from": "src/trio/_core/_run.py#unrolled_run",
+"to": "src/trio/_abc.py#type",
+"project": "python-trio-trio",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 770,
+"lang": "python",
+"word": "needs",
+"reason": "confirmed",
+"source": "reverse",
+"from": "src/trio/_abc.py#Clock",
+"to": "src/trio/_core/_run.py#unrolled_run",
+"project": "python-trio-trio",
+"groups": [
+"needs-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 792,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "src/iter/par_bridge.rs#ParallelBridge",
+"to": "src/iter/plumbing/mod.rs#bridge_unindexed",
+"project": "rayon-rs-rayon",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 797,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/iter/plumbing/mod.rs#Splitter",
+"to": "src/iter/plumbing/mod.rs#bridge_unindexed",
+"project": "rayon-rs-rayon",
+"groups": [
+"class",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 798,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/iter/plumbing/mod.rs#helper",
+"to": "src/iter/plumbing/mod.rs#Splitter",
+"project": "rayon-rs-rayon",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 805,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "drawn",
+"from": "src/iter/plumbing/mod.rs#bridge_unindexed",
+"to": "src/iter/plumbing/mod.rs#Reducer",
+"project": "rayon-rs-rayon",
+"groups": [
+"typehead"
+]
+},
+{
+"set": "holdout-b",
+"id": 809,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "rayon-core/src/job.rs#StackJob",
+"to": "rayon-core/src/join/mod.rs#join_context",
+"project": "rayon-rs-rayon",
+"groups": [
+"class",
+"funcval",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 810,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "rayon-core/src/join/mod.rs#call_a",
+"to": "rayon-core/src/job.rs#StackJob",
+"project": "rayon-rs-rayon",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 815,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "reverse",
+"from": "rayon-core/src/latch.rs#SpinLatch",
+"to": "rayon-core/src/join/mod.rs#join_context",
+"project": "rayon-rs-rayon",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 816,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed local-callee",
+"source": "retarget",
+"from": "rayon-core/src/join/mod.rs#join",
+"to": "rayon-core/src/latch.rs#SpinLatch",
+"project": "rayon-rs-rayon",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 822,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "rayon-core/src/latch.rs#set",
+"to": "rayon-core/src/registry.rs#WorkerThread",
+"project": "rayon-rs-rayon",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 826,
+"lang": "rust",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "rayon-core/src/job.rs#StackJob",
+"to": "rayon-core/src/registry.rs#WorkerThread",
+"project": "rayon-rs-rayon",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout-b",
+"id": 832,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "retarget",
+"from": "rayon-core/src/registry.rs#WorkerThread",
+"to": "rayon-core/src/registry.rs#push_fifo",
+"project": "rayon-rs-rayon",
+"groups": [
+"class",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 835,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "rayon-core/src/registry.rs#WorkerThread",
+"to": "rayon-core/src/registry.rs#main_loop",
+"project": "rayon-rs-rayon",
+"groups": [
+"class",
+"nevernamed",
+"rust",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 836,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed computed",
+"source": "retarget",
+"from": "rayon-core/src/registry.rs#main_loop",
+"to": "rayon-core/src/registry.rs#DefaultSpawn",
+"project": "rayon-rs-rayon",
+"groups": [
+"names"
+]
+},
+{
+"set": "holdout-b",
+"id": 838,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed computed",
+"source": "drawn",
+"from": "rayon-core/src/registry.rs#main_loop",
+"to": "rayon-core/src/registry.rs#WorkerThread::wait_until",
+"project": "rayon-rs-rayon",
+"groups": [
+"names"
+]
+},
+{
+"set": "holdout-b",
+"id": 840,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "drawn",
+"from": "rayon-core/src/registry.rs#WorkerThread::wait_until",
+"to": "rayon-core/src/registry.rs#WorkerThread::find_work",
+"project": "rayon-rs-rayon",
+"groups": [
+"dispatch",
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 843,
+"lang": "rust",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "rayon-core/src/job.rs#JobRef::execute",
+"to": "rayon-core/src/registry.rs#WorkerThread::find_work",
+"project": "rayon-rs-rayon",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout-b",
+"id": 865,
+"lang": "rust",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "reverse",
+"from": "src/redirect.rs#Policy",
+"to": "src/async_impl/client.rs#Config",
+"project": "seanmonstar-reqwest",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout-b",
+"id": 868,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: macro",
+"source": "retarget",
+"from": "src/connect.rs#new_rustls_tls",
+"to": "src/connect.rs#Connector",
+"project": "seanmonstar-reqwest",
+"groups": [
+"rust"
+]
+},
+{
+"set": "holdout-b",
+"id": 870,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed unbound",
+"source": "reverse",
+"from": "src/connect.rs#Connector",
+"to": "src/connect.rs#ConnectorBuilder",
+"project": "seanmonstar-reqwest",
+"groups": [
+"class",
+"names"
+]
+},
+{
+"set": "holdout-b",
+"id": 872,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "drawn",
+"from": "src/async_impl/request.rs#RequestBuilder::send",
+"to": "src/async_impl/request.rs#Request",
+"project": "seanmonstar-reqwest",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 884,
+"lang": "rust",
+"word": "holds",
+"reason": "declined: aliased",
+"source": "reverse",
+"from": "src/redirect.rs#ActionKind",
+"to": "src/redirect.rs#Action",
+"project": "seanmonstar-reqwest",
+"groups": [
+"holds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 892,
+"lang": "rust",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/bin/bat/main.rs#main",
+"to": "src/bin/bat/main.rs#ColorSchemeCollector",
+"project": "sharkdp-bat",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 898,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "drawn",
+"from": "src/bin/bat/app.rs#new",
+"to": "src/bin/bat/clap_app.rs#build_app",
+"project": "sharkdp-bat",
+"groups": [
+"rust"
+]
+},
+{
+"set": "holdout-b",
+"id": 901,
+"lang": "rust",
+"word": "needs",
+"reason": "declined: dynamic",
+"source": "retarget",
+"from": "src/bin/bat/completions.rs",
+"to": "src/bin/bat/clap_app.rs#build_app",
+"project": "sharkdp-bat",
+"groups": [
+"dynamic"
+]
+},
+{
+"set": "holdout-b",
+"id": 905,
+"lang": "rust",
+"word": "calls",
+"reason": "advisory calls-one-level-up",
+"source": "retarget",
+"from": "src/bin/bat/main.rs#run",
+"to": "src/bin/bat/app.rs#is_truecolor_terminal",
+"project": "sharkdp-bat",
+"groups": [
+"route"
+]
+},
+{
+"set": "holdout-b",
+"id": 910,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed elsewhere",
+"source": "reverse",
+"from": "src/bin/bat/app.rs#config",
+"to": "src/bin/bat/main.rs#run",
+"project": "sharkdp-bat",
+"groups": [
+"names",
+"nevernamed"
+]
+},
+{
+"set": "holdout-b",
+"id": 911,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed named",
+"source": "retarget",
+"from": "src/bin/bat/main.rs#get_languages",
+"to": "src/bin/bat/app.rs#config",
+"project": "sharkdp-bat",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 918,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed named",
+"source": "retarget",
+"from": "src/bin/bat/main.rs#run_cache_subcommand",
+"to": "src/controller.rs#new",
+"project": "sharkdp-bat",
+"groups": [
+"funcval"
+]
+},
+{
+"set": "holdout-b",
+"id": 920,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "drawn",
+"from": "src/controller.rs#new",
+"to": "src/controller.rs#run",
+"project": "sharkdp-bat",
+"groups": [
+"nevernamed",
+"rust"
+]
+},
+{
+"set": "holdout-b",
+"id": 930,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/input.rs#OpenedInput",
+"to": "src/input.rs#Input",
+"project": "sharkdp-bat",
+"groups": [
+"class",
+"nevernamed"
+]
+},
+{
+"set": "holdout-b",
+"id": 931,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed may-create",
+"source": "retarget",
+"from": "src/input.rs#try_new",
+"to": "src/input.rs#OpenedInput",
+"project": "sharkdp-bat",
+"groups": [
+"nevernamed",
+"rust",
+"typehead",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 937,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: macro",
+"source": "drawn",
+"from": "src/controller.rs#print_input",
+"to": "src/input.rs#OpenedInput",
+"project": "sharkdp-bat",
+"groups": [
+"rust"
+]
+},
+{
+"set": "holdout-b",
+"id": 939,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "swap",
+"from": "src/controller.rs#print_input",
+"to": "src/input.rs#OpenedInput",
+"project": "sharkdp-bat",
+"groups": [
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 944,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/controller.rs#print_input",
+"to": "src/controller.rs#print_input",
+"project": "sharkdp-bat",
+"groups": [
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 948,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/controller.rs#run_with_error_handler",
+"to": "src/controller.rs#print_file_ranges",
+"project": "sharkdp-bat",
+"groups": [
+"funcval",
+"nevernamed",
+"route",
+"rust"
+]
+},
+{
+"set": "holdout-b",
+"id": 953,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "reverse",
+"from": "src/input.rs#InputReader",
+"to": "src/controller.rs#print_file_ranges",
+"project": "sharkdp-bat",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 954,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/controller.rs#print_file_ranges",
+"to": "src/input.rs#description",
+"project": "sharkdp-bat",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 958,
+"lang": "rust",
+"word": "builds",
+"reason": "declined: nothing recorded",
+"source": "swap",
+"from": "src/controller.rs#print_file_ranges",
+"to": "src/printer.rs#Printer",
+"project": "sharkdp-bat",
+"groups": [
+"builds-other"
+]
+},
+{
+"set": "holdout-b",
+"id": 959,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed routine-not-found",
+"source": "reverse",
+"from": "src/printer.rs#Printer",
+"to": "src/controller.rs#print_file_ranges",
+"project": "sharkdp-bat",
+"groups": [
+"class"
+]
+},
+{
+"set": "holdout-b",
+"id": 960,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed receiver",
+"source": "retarget",
+"from": "src/controller.rs#new",
+"to": "src/printer.rs#Printer",
+"project": "sharkdp-bat",
+"groups": [
+"nevernamed",
+"rust"
+]
+},
+{
+"set": "holdout-b",
+"id": 962,
+"lang": "rust",
+"word": "feeds",
+"reason": "declined: absent",
+"source": "drawn",
+"from": "src/controller.rs#print_file_ranges",
+"to": "src/output.rs#OutputHandle",
+"project": "sharkdp-bat",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 966,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "reverse",
+"from": "src/output.rs#OutputHandle",
+"to": "src/controller.rs#print_file_ranges",
+"project": "sharkdp-bat",
+"groups": [
+"class",
+"untyped"
+]
+},
+{
+"set": "holdout-b",
+"id": 967,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: not-closed abstract-receiver",
+"source": "retarget",
+"from": "src/controller.rs#print_file",
+"to": "src/output.rs#OutputHandle",
+"project": "sharkdp-bat",
+"groups": [
+"dispatch"
+]
+},
+{
+"set": "holdout-b",
+"id": 968,
+"lang": "rust",
+"word": "calls",
+"reason": "unread: endpoint-external",
+"source": "wrong-kind",
+"from": "src/controller.rs#print_file_ranges",
+"to": "src/output.rs#FmtWrite",
+"project": "sharkdp-bat",
+"groups": [
+"kind-compiler"
+]
+},
+{
+"set": "holdout-b",
+"id": 969,
+"lang": "rust",
+"word": "calls",
+"reason": "declined: no-body",
+"source": "drawn",
+"from": "src/printer.rs#InteractivePrinter",
+"to": "src/printer.rs#print_line",
+"project": "sharkdp-bat",
+"groups": [
+"class",
+"names",
+"untyped"
+]
+}
+]
