@@ -1,0 +1,1739 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "repository-find-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 240.408,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1855264300,
+      "version": 1,
+      "versionNonce": 804413048,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Repository.find Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Repository.find Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-node-0",
+      "type": "rectangle",
+      "x": 140,
+      "y": 20,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#E3F2FD",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1960754907,
+      "version": 1,
+      "versionNonce": 965812949,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-node-0-label"
+        },
+        {
+          "id": "repository-find-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "node": "repo_find",
+        "ref": "packages/typeorm/src/repository/Repository.ts#find"
+      }
+    },
+    {
+      "id": "repository-find-flow-node-1",
+      "type": "rectangle",
+      "x": 120,
+      "y": 400,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#E8F5E9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1941266570,
+      "version": 1,
+      "versionNonce": 438670814,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-node-1-label"
+        },
+        {
+          "id": "repository-find-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-find-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-find-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "node": "em_find",
+        "ref": "packages/typeorm/src/entity-manager/EntityManager.ts#find"
+      }
+    },
+    {
+      "id": "repository-find-flow-node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 780,
+      "width": 400,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#E8F5E9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1372356197,
+      "version": 1,
+      "versionNonce": 1148161775,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-node-2-label"
+        },
+        {
+          "id": "repository-find-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "node": "em_createqb",
+        "ref": "packages/typeorm/src/entity-manager/EntityManager.ts#createQueryBuilder"
+      }
+    },
+    {
+      "id": "repository-find-flow-node-3",
+      "type": "rectangle",
+      "x": 500,
+      "y": 780,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#F3E5F5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 65678924,
+      "version": 1,
+      "versionNonce": 236234776,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-node-3-label"
+        },
+        {
+          "id": "repository-find-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-find-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "node": "sqb_getmany",
+        "ref": "packages/typeorm/src/query-builder/SelectQueryBuilder.ts#getMany"
+      }
+    },
+    {
+      "id": "repository-find-flow-node-4",
+      "type": "rectangle",
+      "x": 440,
+      "y": 1160,
+      "width": 440,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#F3E5F5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 885767423,
+      "version": 1,
+      "versionNonce": 1728152601,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-node-4-label"
+        },
+        {
+          "id": "repository-find-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-find-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "node": "sqb_getraw",
+        "ref": "packages/typeorm/src/query-builder/SelectQueryBuilder.ts#getRawAndEntities"
+      }
+    },
+    {
+      "id": "repository-find-flow-node-5",
+      "type": "rectangle",
+      "x": 460,
+      "y": 1540,
+      "width": 420,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#F3E5F5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 654995310,
+      "version": 1,
+      "versionNonce": 1268803474,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-node-5-label"
+        },
+        {
+          "id": "repository-find-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-find-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "node": "sqb_loadraw",
+        "ref": "packages/typeorm/src/query-builder/SelectQueryBuilder.ts#loadRawResults"
+      }
+    },
+    {
+      "id": "repository-find-flow-node-6",
+      "type": "rectangle",
+      "x": 540,
+      "y": 1920,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#FFE0B2",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1011642841,
+      "version": 1,
+      "versionNonce": 525322531,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-node-6-label"
+        },
+        {
+          "id": "repository-find-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-find-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "node": "qr_query",
+        "ref": "packages/typeorm/src/query-runner/QueryRunner.ts#query"
+      }
+    },
+    {
+      "id": "repository-find-flow-node-7",
+      "type": "rectangle",
+      "x": 440,
+      "y": 2300,
+      "width": 440,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#F3E5F5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1740613840,
+      "version": 1,
+      "versionNonce": 1909094828,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-node-7-label"
+        },
+        {
+          "id": "repository-find-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-find-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "node": "transformer",
+        "ref": "packages/typeorm/src/query-builder/transformer/RawSqlResultsToEntityTransformer.ts#transform"
+      }
+    },
+    {
+      "id": "repository-find-flow-node-8",
+      "type": "rectangle",
+      "x": 580,
+      "y": 2680,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#F5F5F5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1656927299,
+      "version": 1,
+      "versionNonce": 719540573,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-node-8-label"
+        },
+        {
+          "id": "repository-find-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "node": "entity",
+        "state": "external"
+      }
+    },
+    {
+      "id": "repository-find-flow-edge-0",
+      "type": "arrow",
+      "x": 255.33333333333331,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1773570668,
+      "version": 1,
+      "versionNonce": 743470008,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "edge": {
+          "from": "repo_find",
+          "to": "em_find",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-find-flow-node-0",
+        "focus": -0.04848484848484851,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "repository-find-flow-node-1",
+        "focus": 0.041025641025640686,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-find-flow-edge-1",
+      "type": "arrow",
+      "x": 212,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 231907205,
+      "version": 1,
+      "versionNonce": 571821967,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "edge": {
+          "from": "em_find",
+          "to": "em_createqb",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-find-flow-node-1",
+        "focus": 0.29230769230769227,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "repository-find-flow-node-2",
+        "focus": -0.04000000000000002,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-find-flow-edge-2",
+      "type": "arrow",
+      "x": 298.66666666666663,
+      "y": 472.8,
+      "width": 363.33333333333337,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 15109418,
+      "version": 1,
+      "versionNonce": 1049522430,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "edge": {
+          "from": "em_find",
+          "to": "sqb_getmany",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          300.0666666666666,
+          32
+        ],
+        [
+          363.33333333333337,
+          32
+        ],
+        [
+          363.33333333333337,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-find-flow-node-1",
+        "focus": -0.3743589743589741,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "repository-find-flow-node-3",
+        "focus": -0.04705882352941174,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-find-flow-edge-3",
+      "type": "arrow",
+      "x": 662,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 776928379,
+      "version": 1,
+      "versionNonce": 364491765,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "edge": {
+          "from": "sqb_getmany",
+          "to": "sqb_getraw",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-find-flow-node-3",
+        "focus": 0.04705882352941174,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "repository-find-flow-node-4",
+        "focus": 0.009090909090909009,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-find-flow-edge-4",
+      "type": "arrow",
+      "x": 662,
+      "y": 1234.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1342495472,
+      "version": 1,
+      "versionNonce": 268743244,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "edge": {
+          "from": "sqb_getraw",
+          "to": "sqb_loadraw",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-find-flow-node-4",
+        "focus": -0.009090909090909009,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "repository-find-flow-node-5",
+        "focus": -0.03809523809523819,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-find-flow-edge-5",
+      "type": "arrow",
+      "x": 662,
+      "y": 1615.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1232866169,
+      "version": 1,
+      "versionNonce": 1094597443,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "edge": {
+          "from": "sqb_loadraw",
+          "to": "qr_query",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-find-flow-node-5",
+        "focus": 0.03809523809523819,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "repository-find-flow-node-6",
+        "focus": -0.06153846153846127,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-find-flow-edge-6",
+      "type": "arrow",
+      "x": 662,
+      "y": 1995.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 876321806,
+      "version": 1,
+      "versionNonce": 1838078386,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "edge": {
+          "from": "qr_query",
+          "to": "transformer",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-find-flow-node-6",
+        "focus": 0.06153846153846177,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "repository-find-flow-node-7",
+        "focus": 0.00909090909090919,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-find-flow-edge-7",
+      "type": "arrow",
+      "x": 662,
+      "y": 2376.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1892802079,
+      "version": 1,
+      "versionNonce": 1151812793,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "repository-find-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow",
+        "edge": {
+          "from": "transformer",
+          "to": "entity",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "repository-find-flow-node-7",
+        "focus": -0.00909090909090919,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "repository-find-flow-node-8",
+        "focus": 0.025,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "repository-find-flow-node-0-label",
+      "type": "text",
+      "x": 167.19,
+      "y": 47.5,
+      "width": 165.62,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2085107334,
+      "version": 1,
+      "versionNonce": 1393875178,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "Repository.find()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-node-0",
+      "originalText": "Repository.find()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-node-1-label",
+      "type": "text",
+      "x": 150.1,
+      "y": 427.5,
+      "width": 199.8,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1777131067,
+      "version": 1,
+      "versionNonce": 475066293,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "EntityManager.find()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-node-1",
+      "originalText": "EntityManager.find()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-node-2-label",
+      "type": "text",
+      "x": 46.56,
+      "y": 807.5,
+      "width": 346.88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 2093928652,
+      "version": 1,
+      "versionNonce": 1577088920,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "EntityManager.createQueryBuilder()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-node-2",
+      "originalText": "EntityManager.createQueryBuilder()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-node-3-label",
+      "type": "text",
+      "x": 527.95,
+      "y": 807.5,
+      "width": 284.1,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 717845097,
+      "version": 1,
+      "versionNonce": 1181233523,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "SelectQueryBuilder.getMany()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-node-3",
+      "originalText": "SelectQueryBuilder.getMany()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-node-4-label",
+      "type": "text",
+      "x": 464.74,
+      "y": 1187.5,
+      "width": 390.52,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 996000010,
+      "version": 1,
+      "versionNonce": 1748336478,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "SelectQueryBuilder.getRawAndEntities()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-node-4",
+      "originalText": "SelectQueryBuilder.getRawAndEntities()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-node-5-label",
+      "type": "text",
+      "x": 491.41999999999996,
+      "y": 1567.5,
+      "width": 357.16,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 260018959,
+      "version": 1,
+      "versionNonce": 489885417,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "SelectQueryBuilder.loadRawResults()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-node-5",
+      "originalText": "SelectQueryBuilder.loadRawResults()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-node-6-label",
+      "type": "text",
+      "x": 572.97,
+      "y": 1947.5,
+      "width": 194.06,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 905371232,
+      "version": 1,
+      "versionNonce": 1223021500,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "QueryRunner.query()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-node-6",
+      "originalText": "QueryRunner.query()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-node-7-label",
+      "type": "text",
+      "x": 452.48,
+      "y": 2315,
+      "width": 415.03999999999996,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1823553069,
+      "version": 1,
+      "versionNonce": 760630935,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "RawSqlResultsToEntityTransformer.transf\norm()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-node-7",
+      "originalText": "RawSqlResultsToEntityTransformer.transform()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-node-8-label",
+      "type": "text",
+      "x": 619.18,
+      "y": 2707.5,
+      "width": 81.64,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 31721310,
+      "version": 1,
+      "versionNonce": 1900036738,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "Entity[]",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-node-8",
+      "originalText": "Entity[]",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-edge-0-label",
+      "type": "text",
+      "x": 232.1173333333333,
+      "y": 232.4,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1386861321,
+      "version": 1,
+      "versionNonce": 57816211,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-edge-0",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-edge-1-label",
+      "type": "text",
+      "x": 188.784,
+      "y": 613.1999999999999,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 229018092,
+      "version": 1,
+      "versionNonce": 1059039800,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-edge-2-label",
+      "type": "text",
+      "x": 575.5173333333332,
+      "y": 494.8,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 816322779,
+      "version": 1,
+      "versionNonce": 1468649685,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-edge-2",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-edge-3-label",
+      "type": "text",
+      "x": 638.784,
+      "y": 993.9999999999999,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1667246118,
+      "version": 1,
+      "versionNonce": 1685659146,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-edge-4-label",
+      "type": "text",
+      "x": 638.784,
+      "y": 1374.7999999999997,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1325678029,
+      "version": 1,
+      "versionNonce": 1125682871,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-edge-5-label",
+      "type": "text",
+      "x": 638.784,
+      "y": 1755.6,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 323204096,
+      "version": 1,
+      "versionNonce": 1871512796,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-edge-6-label",
+      "type": "text",
+      "x": 596.104,
+      "y": 2136.4,
+      "width": 131.792,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 356120239,
+      "version": 1,
+      "versionNonce": 2133109001,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "raw rows @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-edge-6",
+      "originalText": "raw rows @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "repository-find-flow-edge-7-label",
+      "type": "text",
+      "x": 633.608,
+      "y": 2517.2000000000003,
+      "width": 56.784,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 305867178,
+      "version": 1,
+      "versionNonce": 113299070,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "repository-find-flow"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repository-find-flow-edge-7",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

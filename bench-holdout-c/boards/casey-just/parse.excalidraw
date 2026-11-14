@@ -1,0 +1,1730 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 409.94399999999996,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1335505375,
+      "version": 1,
+      "versionNonce": 973333881,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Justfile Lexing and Parsing Pipeline",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Justfile Lexing and Parsing Pipeline",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-0",
+      "type": "ellipse",
+      "x": 80,
+      "y": 20,
+      "width": 220,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 452359842,
+      "version": 1,
+      "versionNonce": 1890180758,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-node-0-label"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "node": "source",
+        "state": "external"
+      }
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-1",
+      "type": "rectangle",
+      "x": 100,
+      "y": 440,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 929228755,
+      "version": 1,
+      "versionNonce": 1690904621,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-node-1-label"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "node": "lexer_struct",
+        "ref": "src/lexer.rs#Lexer"
+      }
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-2",
+      "type": "rectangle",
+      "x": 100,
+      "y": 820,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 73783204,
+      "version": 1,
+      "versionNonce": 320845616,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-node-2-label"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "node": "tokenize",
+        "ref": "src/lexer.rs#tokenize"
+      }
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-3",
+      "type": "rectangle",
+      "x": 100,
+      "y": 1200,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1828380221,
+      "version": 1,
+      "versionNonce": 1412480295,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-node-3-label"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "node": "token_type",
+        "ref": "src/token.rs#Token"
+      }
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-4",
+      "type": "rectangle",
+      "x": 20,
+      "y": 1580,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 239907782,
+      "version": 1,
+      "versionNonce": 1415557162,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-node-4-label"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "node": "token_stream"
+      }
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-5",
+      "type": "rectangle",
+      "x": 100,
+      "y": 1960,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 182672023,
+      "version": 1,
+      "versionNonce": 2072211057,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-node-5-label"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "node": "parser_struct",
+        "ref": "src/parser.rs#Parser"
+      }
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-6",
+      "type": "rectangle",
+      "x": 100,
+      "y": 2340,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1779849064,
+      "version": 1,
+      "versionNonce": 1603635268,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-node-6-label"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "node": "parse_ast",
+        "ref": "src/parser.rs#parse_ast"
+      }
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-7",
+      "type": "rectangle",
+      "x": 100,
+      "y": 2720,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 309546513,
+      "version": 1,
+      "versionNonce": 1215995163,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-node-7-label"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "node": "ast_type",
+        "ref": "src/ast.rs#Ast"
+      }
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-8",
+      "type": "rectangle",
+      "x": 100,
+      "y": 3100,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1553443610,
+      "version": 1,
+      "versionNonce": 903950574,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-node-8-label"
+        },
+        {
+          "id": "justfile-lexing-and-parsing-pipeline-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "node": "analyzer",
+        "ref": "src/analyzer.rs#Analyzer"
+      }
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-0",
+      "type": "arrow",
+      "x": 182,
+      "y": 132,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 782960949,
+      "version": 1,
+      "versionNonce": 1724602303,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "edge": {
+          "from": "source",
+          "to": "lexer_struct",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-0",
+        "focus": 0.07272727272727271,
+        "gap": 7.83466483330737
+      },
+      "endBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-1",
+        "focus": 0.025,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-1",
+      "type": "arrow",
+      "x": 182,
+      "y": 512.8,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 431716124,
+      "version": 1,
+      "versionNonce": 1436522024,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "edge": {
+          "from": "lexer_struct",
+          "to": "tokenize",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-1",
+        "focus": -0.025,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-2",
+        "focus": 0.025,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-2",
+      "type": "arrow",
+      "x": 182,
+      "y": 893.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1253024491,
+      "version": 1,
+      "versionNonce": 1527614693,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "edge": {
+          "from": "tokenize",
+          "to": "token_type",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-2",
+        "focus": -0.025,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-3",
+        "focus": 0.025,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-3",
+      "type": "arrow",
+      "x": 182,
+      "y": 1274.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1989430618,
+      "version": 1,
+      "versionNonce": 1863145518,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "edge": {
+          "from": "token_type",
+          "to": "token_stream",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-3",
+        "focus": -0.025,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-4",
+        "focus": -0.04705882352941191,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-4",
+      "type": "arrow",
+      "x": 182,
+      "y": 1655.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 624800489,
+      "version": 1,
+      "versionNonce": 191478515,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "edge": {
+          "from": "token_stream",
+          "to": "parser_struct",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-4",
+        "focus": 0.04705882352941191,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-5",
+        "focus": 0.024999999999997725,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-5",
+      "type": "arrow",
+      "x": 182,
+      "y": 2035.9999999999998,
+      "width": 0,
+      "height": 300.8000000000004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1064014368,
+      "version": 1,
+      "versionNonce": 1063055484,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "edge": {
+          "from": "parser_struct",
+          "to": "parse_ast",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.40000000000032
+        ],
+        [
+          0,
+          300.3000000000004
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-5",
+        "focus": -0.025,
+        "gap": 4.000000000000227
+      },
+      "endBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-6",
+        "focus": -0.08888888888888931,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-6",
+      "type": "arrow",
+      "x": 182,
+      "y": 2416.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 540501775,
+      "version": 1,
+      "versionNonce": 1855310569,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "edge": {
+          "from": "parse_ast",
+          "to": "ast_type",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-6",
+        "focus": 0.08888888888888931,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-7",
+        "focus": 0.025,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-7",
+      "type": "arrow",
+      "x": 182,
+      "y": 2797.6000000000004,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 363950526,
+      "version": 4,
+      "versionNonce": 650956898,
+      "isDeleted": true,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "justfile-lexing-and-parsing-pipeline-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline",
+        "edge": {
+          "from": "ast_type",
+          "to": "analyzer",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-7",
+        "focus": -0.025,
+        "gap": 2.399999999999636
+      },
+      "endBinding": {
+        "elementId": "justfile-lexing-and-parsing-pipeline-node-8",
+        "focus": 0.025,
+        "gap": 1.5999999999994543
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-0-label",
+      "type": "text",
+      "x": 129.40825406947977,
+      "y": 55.07359312880715,
+      "width": 121.62,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 832597891,
+      "version": 1,
+      "versionNonce": 1001715101,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "Source Text\n(justfile)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-node-0",
+      "originalText": "Source Text\n(justfile)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-1-label",
+      "type": "text",
+      "x": 153.8,
+      "y": 467.5,
+      "width": 52.400000000000006,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1779179822,
+      "version": 1,
+      "versionNonce": 823072594,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "Lexer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-node-1",
+      "originalText": "Lexer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-2-label",
+      "type": "text",
+      "x": 130.55,
+      "y": 847.5,
+      "width": 98.9,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1873585969,
+      "version": 1,
+      "versionNonce": 1774290363,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "tokenize()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-node-2",
+      "originalText": "tokenize()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-3-label",
+      "type": "text",
+      "x": 150.37,
+      "y": 1227.5,
+      "width": 59.260000000000005,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 395996404,
+      "version": 1,
+      "versionNonce": 108999360,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "Token",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-node-3",
+      "originalText": "Token",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-4-label",
+      "type": "text",
+      "x": 122.94,
+      "y": 1595,
+      "width": 134.12,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 95707191,
+      "version": 1,
+      "versionNonce": 1590556049,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "Token Stream\n(Vec<Token>)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-node-4",
+      "originalText": "Token Stream\n(Vec<Token>)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-5-label",
+      "type": "text",
+      "x": 148.62,
+      "y": 1987.5,
+      "width": 62.76,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 222114194,
+      "version": 1,
+      "versionNonce": 1669390022,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "Parser",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-node-5",
+      "originalText": "Parser",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-6-label",
+      "type": "text",
+      "x": 132.1,
+      "y": 2367.5,
+      "width": 115.8,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 813412277,
+      "version": 1,
+      "versionNonce": 1111585599,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "parse_ast()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-node-6",
+      "originalText": "parse_ast()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-7-label",
+      "type": "text",
+      "x": 162.28,
+      "y": 2747.5,
+      "width": 35.44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 2126248296,
+      "version": 1,
+      "versionNonce": 1616088644,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "Ast",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-node-7",
+      "originalText": "Ast",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-node-8-label",
+      "type": "text",
+      "x": 139.45999999999998,
+      "y": 3127.5,
+      "width": 81.08000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 301404555,
+      "version": 1,
+      "versionNonce": 1887456773,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "Analyzer",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-node-8",
+      "originalText": "Analyzer",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-0-label",
+      "type": "text",
+      "x": 153.38400000000001,
+      "y": 272.4,
+      "width": 57.232,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1673679708,
+      "version": 1,
+      "versionNonce": 510466152,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-edge-0",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-1-label",
+      "type": "text",
+      "x": 158.784,
+      "y": 653.1999999999999,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2102224697,
+      "version": 1,
+      "versionNonce": 1779289091,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-2-label",
+      "type": "text",
+      "x": 153.608,
+      "y": 1034,
+      "width": 56.784,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 916855190,
+      "version": 1,
+      "versionNonce": 1316816506,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-edge-2",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-3-label",
+      "type": "text",
+      "x": 153.61599999999999,
+      "y": 1414.7999999999997,
+      "width": 56.768,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1400808779,
+      "version": 1,
+      "versionNonce": 1450460613,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-edge-3",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-4-label",
+      "type": "text",
+      "x": 153.38400000000001,
+      "y": 1795.6,
+      "width": 57.232,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1445854384,
+      "version": 1,
+      "versionNonce": 88081932,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "@needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-edge-4",
+      "originalText": "@needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-5-label",
+      "type": "text",
+      "x": 158.784,
+      "y": 2176.4,
+      "width": 46.432,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1383464189,
+      "version": 1,
+      "versionNonce": 1892289767,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-6-label",
+      "type": "text",
+      "x": 153.608,
+      "y": 2557.2000000000003,
+      "width": 56.784,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 646625242,
+      "version": 1,
+      "versionNonce": 1878458286,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-edge-6",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "justfile-lexing-and-parsing-pipeline-edge-7-label",
+      "type": "text",
+      "x": 153.61599999999999,
+      "y": 2938.0000000000005,
+      "width": 56.768,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1356975775,
+      "version": 2,
+      "versionNonce": 2109660729,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "justfile-lexing-and-parsing-pipeline"
+      },
+      "text": "@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "justfile-lexing-and-parsing-pipeline-edge-7",
+      "originalText": "@feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

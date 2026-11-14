@@ -1,0 +1,2872 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "entity-metadata-building-from-decorators-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 528,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1586294787,
+      "version": 1,
+      "versionNonce": 1946369821,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "role": "title"
+      },
+      "text": "Entity Metadata Building from Decorators",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Entity Metadata Building from Decorators",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 700,
+      "width": 260,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e3f2fd",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 2047327750,
+      "version": 1,
+      "versionNonce": 1201088362,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-node-0-label"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "node": "storage",
+        "ref": "packages/typeorm/src/metadata-args/MetadataArgsStorage.ts"
+      }
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-1",
+      "type": "rectangle",
+      "x": 740,
+      "y": 460,
+      "width": 280,
+      "height": 200,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3e0",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1206184663,
+      "version": 1,
+      "versionNonce": 1475024305,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-node-1-label"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-14",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "node": "builder",
+        "ref": "packages/typeorm/src/metadata-builder/EntityMetadataBuilder.ts#build"
+      }
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-2",
+      "type": "rectangle",
+      "x": 1560,
+      "y": 380,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 655878056,
+      "version": 1,
+      "versionNonce": 1472585860,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-node-2-label"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "node": "createEntity",
+        "ref": "packages/typeorm/src/metadata-builder/EntityMetadataBuilder.ts#createEntityMetadata"
+      }
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-3",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 20,
+      "width": 360,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 908601681,
+      "version": 1,
+      "versionNonce": 1043265883,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-node-3-label"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "node": "step1",
+        "ref": "packages/typeorm/src/metadata-builder/EntityMetadataBuilder.ts#computeEntityMetadataStep1"
+      }
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-4",
+      "type": "rectangle",
+      "x": 1540,
+      "y": 540,
+      "width": 360,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f3e5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 112399330,
+      "version": 1,
+      "versionNonce": 1634135254,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-node-4-label"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "node": "step2",
+        "ref": "packages/typeorm/src/metadata-builder/EntityMetadataBuilder.ts#computeEntityMetadataStep2"
+      }
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-5",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 880,
+      "width": 380,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f1f8e9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1528283923,
+      "version": 1,
+      "versionNonce": 1093821037,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-node-5-label"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-11",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-12",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-13",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "node": "junctionBuilder",
+        "ref": "packages/typeorm/src/metadata-builder/JunctionEntityMetadataBuilder.ts#build"
+      }
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-6",
+      "type": "rectangle",
+      "x": 1540,
+      "y": 700,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f1f8e9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1138872548,
+      "version": 1,
+      "versionNonce": 1553372528,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-node-6-label"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "node": "joinColumnBuilder",
+        "ref": "packages/typeorm/src/metadata-builder/RelationJoinColumnBuilder.ts#build"
+      }
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-7",
+      "type": "rectangle",
+      "x": 1500,
+      "y": 200,
+      "width": 440,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f1f8e9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1063859069,
+      "version": 1,
+      "versionNonce": 1940445287,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-node-7-label"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-14",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-15",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "node": "closureBuilder",
+        "ref": "packages/typeorm/src/metadata-builder/ClosureJunctionEntityMetadataBuilder.ts#build"
+      }
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-8",
+      "type": "rectangle",
+      "x": 2460,
+      "y": 760,
+      "width": 220,
+      "height": 200,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#c8e6c9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 951579326,
+      "version": 1,
+      "versionNonce": 1242162018,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-node-8-label"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-13",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-metadata-building-from-decorators-edge-15",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "node": "entityMeta",
+        "ref": "packages/typeorm/src/metadata/EntityMetadata.ts"
+      }
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-0",
+      "type": "arrow",
+      "x": 272,
+      "y": 747.6476190476191,
+      "width": 464.79999999999995,
+      "height": 183.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1549635993,
+      "version": 1,
+      "versionNonce": 1514507747,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "storage",
+          "to": "builder",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -183.79999999999995
+        ],
+        [
+          140.5,
+          -183.79999999999995
+        ],
+        [
+          221.575,
+          -183.79999999999995
+        ],
+        [
+          302.65,
+          -183.79999999999995
+        ],
+        [
+          464.29999999999995,
+          -183.79999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-0",
+        "focus": -0.3193197278911568,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-1",
+        "focus": -0.038476190476190227,
+        "gap": 3.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-1",
+      "type": "arrow",
+      "x": 1016.8,
+      "y": 549.5619047619048,
+      "width": 552.4000000000001,
+      "height": 131.4285714285714,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 131123344,
+      "version": 1,
+      "versionNonce": 1917584492,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "builder",
+          "to": "createEntity",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          -131.4285714285714
+        ],
+        [
+          210.48571428571427,
+          -131.4285714285714
+        ],
+        [
+          295.9642857142858,
+          -131.4285714285714
+        ],
+        [
+          381.4428571428573,
+          -131.4285714285714
+        ],
+        [
+          551.9000000000001,
+          -131.4285714285714
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-1",
+        "focus": -0.10438095238095238,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-2",
+        "focus": 0.04666666666666517,
+        "gap": 9.200000000000045
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-2",
+      "type": "arrow",
+      "x": 1869.2,
+      "y": 418.1333333333334,
+      "width": 589.9999999999998,
+      "height": 435.13333333333327,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 681429951,
+      "version": 1,
+      "versionNonce": 2058323417,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "createEntity",
+          "to": "entityMeta",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          509.9999999999998,
+          0
+        ],
+        [
+          509.9999999999998,
+          2.5666666666667197
+        ],
+        [
+          509.9999999999998,
+          435.13333333333327
+        ],
+        [
+          589.4999999999998,
+          435.13333333333327
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-2",
+        "focus": -0.04666666666666517,
+        "gap": 9.200000000000045
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-8",
+        "focus": 0.06733333333333383,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-3",
+      "type": "arrow",
+      "x": 1016.8,
+      "y": 492.41904761904766,
+      "width": 509.06666666666683,
+      "height": 407.6190476190477,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1151514926,
+      "version": 1,
+      "versionNonce": 1277189970,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "builder",
+          "to": "step1",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -407.6190476190477
+        ],
+        [
+          50.72380952380968,
+          -407.6190476190477
+        ],
+        [
+          165.30952380952408,
+          -407.6190476190477
+        ],
+        [
+          279.89523809523826,
+          -407.6190476190477
+        ],
+        [
+          508.56666666666683,
+          -407.6190476190477
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-1",
+        "focus": -0.6758095238095232,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-3",
+        "focus": -0.2959999999999998,
+        "gap": 5.866666666666788
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-4",
+      "type": "arrow",
+      "x": 272,
+      "y": 719.6476190476191,
+      "width": 1253.8666666666668,
+      "height": 675.8476190476191,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 743664421,
+      "version": 1,
+      "versionNonce": 73179567,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "storage",
+          "to": "step1",
+          "claim": "needs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -675.8476190476191
+        ],
+        [
+          292.84285714285727,
+          -675.8476190476191
+        ],
+        [
+          1119.2,
+          -675.8476190476191
+        ],
+        [
+          1119.2,
+          -668.1809523809524
+        ],
+        [
+          1253.3666666666668,
+          -668.1809523809524
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-0",
+        "focus": -0.719319727891157,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-3",
+        "focus": 0.37066666666666676,
+        "gap": 5.866666666666788
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-5",
+      "type": "arrow",
+      "x": 1885.8666666666668,
+      "y": 68.13333333333333,
+      "width": 573.333333333333,
+      "height": 727.9904761904762,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 603775244,
+      "version": 1,
+      "versionNonce": 244724440,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "step1",
+          "to": "entityMeta",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          541.333333333333,
+          0
+        ],
+        [
+          541.333333333333,
+          109.32857142857165
+        ],
+        [
+          541.333333333333,
+          727.9904761904762
+        ],
+        [
+          572.833333333333,
+          727.9904761904762
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-3",
+        "focus": -0.03733333333333348,
+        "gap": 5.866666666666788
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-8",
+        "focus": 0.6387619047619042,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-6",
+      "type": "arrow",
+      "x": 1016.8,
+      "y": 578.1333333333334,
+      "width": 522.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 351367579,
+      "version": 1,
+      "versionNonce": 549741973,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "builder",
+          "to": "step2",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          261.20000000000005,
+          0
+        ],
+        [
+          521.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-1",
+        "focus": 0.1813333333333351,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-4",
+        "focus": 0.04666666666666341,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-7",
+      "type": "arrow",
+      "x": 1899.2,
+      "y": 578.1333333333334,
+      "width": 559.9999999999998,
+      "height": 303.7047619047619,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1737032266,
+      "version": 1,
+      "versionNonce": 1234772638,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "step2",
+          "to": "entityMeta",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          215.9261904761904,
+          0
+        ],
+        [
+          323.88928571428573,
+          0
+        ],
+        [
+          431.85238095238105,
+          0
+        ],
+        [
+          455.9999999999998,
+          0
+        ],
+        [
+          455.9999999999998,
+          303.7047619047619
+        ],
+        [
+          559.4999999999998,
+          303.7047619047619
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-4",
+        "focus": -0.046666666666664615,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-8",
+        "focus": -0.218380952380953,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-8",
+      "type": "arrow",
+      "x": 1016.8,
+      "y": 606.704761904762,
+      "width": 515.7333333333333,
+      "height": 135.6095238095238,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1566799617,
+      "version": 1,
+      "versionNonce": 1583857483,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "builder",
+          "to": "joinColumnBuilder",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          96.14285714285711
+        ],
+        [
+          229.52857142857147,
+          96.14285714285711
+        ],
+        [
+          374.4000000000001,
+          96.14285714285711
+        ],
+        [
+          374.4000000000001,
+          135.6095238095238
+        ],
+        [
+          515.2333333333333,
+          135.6095238095238
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-1",
+        "focus": 0.4670476190476207,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-6",
+        "focus": 0.15371428571428458,
+        "gap": 7.466666666666697
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-9",
+      "type": "arrow",
+      "x": 272,
+      "y": 775.6476190476191,
+      "width": 1260.5333333333333,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 762741592,
+      "version": 2,
+      "versionNonce": 2050991668,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "storage",
+          "to": "joinColumnBuilder",
+          "claim": "needs"
+        },
+        "via": [
+          "packages/typeorm/src/metadata-builder/EntityMetadataBuilder.ts#relationJoinColumnBuilder"
+        ]
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          630.2666666666667,
+          0
+        ],
+        [
+          1260.0333333333333,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-0",
+        "focus": 0.08068027210884315,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-6",
+        "focus": -0.5129523809523803,
+        "gap": 7.466666666666697
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-10",
+      "type": "arrow",
+      "x": 1872.5333333333333,
+      "y": 758.9809523809524,
+      "width": 586.6666666666665,
+      "height": 151.42857142857144,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1990506390,
+      "version": 1,
+      "versionNonce": 206553210,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "joinColumnBuilder",
+          "to": "entityMeta",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          92.26190476190482,
+          0
+        ],
+        [
+          184.52380952380963,
+          0
+        ],
+        [
+          369.0476190476188,
+          0
+        ],
+        [
+          458.6666666666665,
+          0
+        ],
+        [
+          458.6666666666665,
+          151.42857142857144
+        ],
+        [
+          586.1666666666665,
+          151.42857142857144
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-6",
+        "focus": 0.17961904761904787,
+        "gap": 7.466666666666697
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-8",
+        "focus": -0.5040952380952398,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-11",
+      "type": "arrow",
+      "x": 1016.8,
+      "y": 635.2761904761905,
+      "width": 502.4000000000001,
+      "height": 287.03809523809525,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1178590247,
+      "version": 1,
+      "versionNonce": 174674881,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "builder",
+          "to": "junctionBuilder",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          247.57142857142856
+        ],
+        [
+          147.14761904761895,
+          247.57142857142856
+        ],
+        [
+          374.4000000000001,
+          247.57142857142856
+        ],
+        [
+          374.4000000000001,
+          287.03809523809514
+        ],
+        [
+          501.9000000000001,
+          286.53809523809525
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-1",
+        "focus": 0.7527619047619045,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-5",
+        "focus": 0.15371428571427528,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-12",
+      "type": "arrow",
+      "x": 272,
+      "y": 803.6476190476191,
+      "width": 1247.2,
+      "height": 152,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 501406712,
+      "version": 2,
+      "versionNonce": 1422837076,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-12-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "storage",
+          "to": "junctionBuilder",
+          "claim": "needs"
+        },
+        "via": [
+          "packages/typeorm/src/metadata-builder/EntityMetadataBuilder.ts#junctionEntityMetadataBuilder"
+        ]
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          152
+        ],
+        [
+          547.6,
+          152
+        ],
+        [
+          722.5,
+          152
+        ],
+        [
+          897.4000000000001,
+          152
+        ],
+        [
+          1246.7,
+          152
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-0",
+        "focus": 0.4806802721088432,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-5",
+        "focus": -0.5129523809523813,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-13",
+      "type": "arrow",
+      "x": 1899.2,
+      "y": 938.9809523809524,
+      "width": 559.9999999999998,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 138779809,
+      "version": 1,
+      "versionNonce": 2019714667,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-13-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "junctionBuilder",
+          "to": "entityMeta",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          279.9999999999998,
+          0
+        ],
+        [
+          559.4999999999998,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-5",
+        "focus": 0.1796190476190484,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-8",
+        "focus": -0.7898095238095233,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-14",
+      "type": "arrow",
+      "x": 1016.8,
+      "y": 520.9904761904763,
+      "width": 482.4000000000001,
+      "height": 272.857142857143,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1129294002,
+      "version": 1,
+      "versionNonce": 1653735782,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-14-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "builder",
+          "to": "closureBuilder",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          -1.1368683772161603e-13
+        ],
+        [
+          56,
+          -272.857142857143
+        ],
+        [
+          104.77142857142849,
+          -272.857142857143
+        ],
+        [
+          293.5857142857142,
+          -272.857142857143
+        ],
+        [
+          387.992857142857,
+          -272.857142857143
+        ],
+        [
+          481.9000000000001,
+          -272.857142857143
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-1",
+        "focus": -0.3900952380952318,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-7",
+        "focus": 0.03733333333333351,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-15",
+      "type": "arrow",
+      "x": 1939.2,
+      "y": 248.13333333333333,
+      "width": 519.9999999999998,
+      "height": 576.5619047619048,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1511135267,
+      "version": 1,
+      "versionNonce": 442730173,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-metadata-building-from-decorators-edge-15-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators",
+        "edge": {
+          "from": "closureBuilder",
+          "to": "entityMeta",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          463.9999999999998,
+          0
+        ],
+        [
+          463.9999999999998,
+          84.2809523809525
+        ],
+        [
+          463.9999999999998,
+          576.5619047619048
+        ],
+        [
+          519.4999999999998,
+          576.5619047619048
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-7",
+        "focus": -0.03733333333333351,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "entity-metadata-building-from-decorators-node-8",
+        "focus": 0.3530476190476206,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-0-label",
+      "type": "text",
+      "x": 45.499999999999986,
+      "y": 757.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 551985655,
+      "version": 1,
+      "versionNonce": 694085457,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "MetadataArgsStorage",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-node-0",
+      "originalText": "MetadataArgsStorage",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-1-label",
+      "type": "text",
+      "x": 764.5,
+      "y": 535,
+      "width": 231.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 2035720530,
+      "version": 1,
+      "versionNonce": 1800543878,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "EntityMetadataBuilder\n.build()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-node-1",
+      "originalText": "EntityMetadataBuilder\n.build()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-2-label",
+      "type": "text",
+      "x": 1589,
+      "y": 407.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 797511285,
+      "version": 1,
+      "versionNonce": 30669823,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "createEntityMetadata()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-node-2",
+      "originalText": "createEntityMetadata()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-3-label",
+      "type": "text",
+      "x": 1546,
+      "y": 57.5,
+      "width": 308,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1045625128,
+      "version": 1,
+      "versionNonce": 1774349572,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "computeEntityMetadataStep1()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-node-3",
+      "originalText": "computeEntityMetadataStep1()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-4-label",
+      "type": "text",
+      "x": 1566,
+      "y": 567.5,
+      "width": 308,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1093400387,
+      "version": 1,
+      "versionNonce": 1251461725,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "computeEntityMetadataStep2()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-node-4",
+      "originalText": "computeEntityMetadataStep2()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-5-label",
+      "type": "text",
+      "x": 1550.5,
+      "y": 905,
+      "width": 319,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1020845038,
+      "version": 1,
+      "versionNonce": 529872146,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "JunctionEntityMetadataBuilder\n.build()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-node-5",
+      "originalText": "JunctionEntityMetadataBuilder\n.build()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-6-label",
+      "type": "text",
+      "x": 1572.5,
+      "y": 725,
+      "width": 275,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1002237681,
+      "version": 1,
+      "versionNonce": 1310100859,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "RelationJoinColumnBuilder\n.build()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-node-6",
+      "originalText": "RelationJoinColumnBuilder\n.build()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-7-label",
+      "type": "text",
+      "x": 1522,
+      "y": 225,
+      "width": 396.00000000000006,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 625482932,
+      "version": 1,
+      "versionNonce": 1282386816,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "ClosureJunctionEntityMetadataBuilder\n.build()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-node-7",
+      "originalText": "ClosureJunctionEntityMetadataBuilder\n.build()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-node-8-label",
+      "type": "text",
+      "x": 2493,
+      "y": 847.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 2108442527,
+      "version": 1,
+      "versionNonce": 8083769,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "EntityMetadata",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-node-8",
+      "originalText": "EntityMetadata",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-0-label",
+      "type": "text",
+      "x": 320.1,
+      "y": 553.8476190476191,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1769141664,
+      "version": 1,
+      "versionNonce": 1761514236,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "decorator args @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-0",
+      "originalText": "decorator args @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-1-label",
+      "type": "text",
+      "x": 1152.4857142857143,
+      "y": 408.1333333333334,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1501097325,
+      "version": 1,
+      "versionNonce": 692098519,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "table args @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-1",
+      "originalText": "table args @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-2-label",
+      "type": "text",
+      "x": 2282.3999999999996,
+      "y": 410.7000000000001,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 321292618,
+      "version": 1,
+      "versionNonce": 1922344862,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "from TableArgs @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-2",
+      "originalText": "from TableArgs @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-3-label",
+      "type": "text",
+      "x": 970.7238095238097,
+      "y": 74.79999999999995,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 450371407,
+      "version": 1,
+      "versionNonce": 924727337,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "for each entity @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-3",
+      "originalText": "for each entity @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-4-label",
+      "type": "text",
+      "x": 446.04285714285726,
+      "y": 33.799999999999955,
+      "width": 237.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 215535628,
+      "version": 1,
+      "versionNonce": 550465496,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "column/relation args @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-4",
+      "originalText": "column/relation args @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-5-label",
+      "type": "text",
+      "x": 2317.2,
+      "y": 167.46190476190498,
+      "width": 220.00000000000003,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 846850729,
+      "version": 1,
+      "versionNonce": 1723993523,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "columns, relations @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-5",
+      "originalText": "columns, relations @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-6-label",
+      "type": "text",
+      "x": 1181.2,
+      "y": 568.1333333333334,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1851002310,
+      "version": 1,
+      "versionNonce": 2146590250,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "for each entity @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-6",
+      "originalText": "for each entity @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-7-label",
+      "type": "text",
+      "x": 2238.652380952381,
+      "y": 568.1333333333334,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1461697915,
+      "version": 1,
+      "versionNonce": 1448707829,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "computed views @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-7",
+      "originalText": "computed views @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-8-label",
+      "type": "text",
+      "x": 1158.3285714285714,
+      "y": 692.8476190476191,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 241181528,
+      "version": 1,
+      "versionNonce": 168199732,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "for relations @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-8",
+      "originalText": "for relations @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-9-label",
+      "type": "text",
+      "x": 801.0666666666666,
+      "y": 765.6476190476191,
+      "width": 202.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 121958949,
+      "version": 1,
+      "versionNonce": 781461167,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "join column args @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-9",
+      "originalText": "join column args @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-10-label",
+      "type": "text",
+      "x": 2140.3809523809523,
+      "y": 748.9809523809524,
+      "width": 202.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1242520775,
+      "version": 1,
+      "versionNonce": 612672737,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "FK, join columns @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-10",
+      "originalText": "FK, join columns @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-11-label",
+      "type": "text",
+      "x": 1062.7476190476189,
+      "y": 872.8476190476191,
+      "width": 202.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 995834914,
+      "version": 1,
+      "versionNonce": 1867302678,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "for many-to-many @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-11",
+      "originalText": "for many-to-many @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-12-label",
+      "type": "text",
+      "x": 722.8,
+      "y": 945.6476190476191,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 687695301,
+      "version": 1,
+      "versionNonce": 603047631,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "join table args @needs",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-12",
+      "originalText": "join table args @needs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-13-label",
+      "type": "text",
+      "x": 2078,
+      "y": 928.9809523809524,
+      "width": 202.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "am",
+      "roundness": null,
+      "seed": 299735928,
+      "version": 1,
+      "versionNonce": 1753889748,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "junction entity @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-13",
+      "originalText": "junction entity @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-14-label",
+      "type": "text",
+      "x": 1051.1714285714284,
+      "y": 238.13333333333333,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "an",
+      "roundness": null,
+      "seed": 713241043,
+      "version": 1,
+      "versionNonce": 547202605,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "for trees @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-14",
+      "originalText": "for trees @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-metadata-building-from-decorators-edge-15-label",
+      "type": "text",
+      "x": 2297.6,
+      "y": 322.4142857142858,
+      "width": 211.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ao",
+      "roundness": null,
+      "seed": 1733080382,
+      "version": 1,
+      "versionNonce": 506991330,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-metadata-building-from-decorators"
+      },
+      "text": "closure junction @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-metadata-building-from-decorators-edge-15",
+      "originalText": "closure junction @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

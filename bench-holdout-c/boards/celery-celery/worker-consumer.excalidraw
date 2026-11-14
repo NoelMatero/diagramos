@@ -1,0 +1,1731 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "worker-consumer-message-reception-to-poo-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 686.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1712177157,
+      "version": 1,
+      "versionNonce": 120158479,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Worker Consumer: Message Reception to Pool Execution",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Worker Consumer: Message Reception to Pool Execution",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-0",
+      "type": "rectangle",
+      "x": 200,
+      "y": 20,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 640177644,
+      "version": 1,
+      "versionNonce": 1400098360,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-node-0-label"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "node": "broker",
+        "state": "external"
+      }
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-1",
+      "type": "rectangle",
+      "x": 120,
+      "y": 400,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1245997829,
+      "version": 1,
+      "versionNonce": 1228450319,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-node-1-label"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "node": "drain_events",
+        "ref": "celery/worker/loops.py"
+      }
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-2",
+      "type": "rectangle",
+      "x": 160,
+      "y": 780,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1029200042,
+      "version": 1,
+      "versionNonce": 1706150782,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-node-2-label"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "node": "on_task_received",
+        "ref": "celery/worker/consumer/consumer.py#Consumer.create_task_handler"
+      }
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-3",
+      "type": "rectangle",
+      "x": 140,
+      "y": 1160,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1791019003,
+      "version": 1,
+      "versionNonce": 1021120117,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-node-3-label"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "node": "strategy",
+        "ref": "celery/worker/strategy.py#default"
+      }
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-4",
+      "type": "rectangle",
+      "x": 120,
+      "y": 1560,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 209102448,
+      "version": 1,
+      "versionNonce": 925371596,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-node-4-label"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "node": "request",
+        "ref": "celery/worker/request.py#Request@declared"
+      }
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-5",
+      "type": "rectangle",
+      "x": 120,
+      "y": 1960,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 99473145,
+      "version": 1,
+      "versionNonce": 1751225795,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-node-5-label"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "node": "on_task_request",
+        "ref": "celery/worker/consumer/consumer.py#Consumer"
+      }
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-6",
+      "type": "rectangle",
+      "x": 100,
+      "y": 2360,
+      "width": 360,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1890412430,
+      "version": 1,
+      "versionNonce": 347223090,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-node-6-label"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "node": "execute_pool",
+        "ref": "celery/worker/request.py#Request@declared"
+      }
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-7",
+      "type": "rectangle",
+      "x": 160,
+      "y": 2740,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 759409055,
+      "version": 1,
+      "versionNonce": 1808441145,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-node-7-label"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "node": "pool_apply",
+        "state": "external"
+      }
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-8",
+      "type": "rectangle",
+      "x": 160,
+      "y": 3120,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1611671476,
+      "version": 1,
+      "versionNonce": 1431895168,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-node-8-label"
+        },
+        {
+          "id": "worker-consumer-message-reception-to-poo-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "node": "pool_worker",
+        "state": "external"
+      }
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-0",
+      "type": "arrow",
+      "x": 286,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 153233251,
+      "version": 1,
+      "versionNonce": 1890238205,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "edge": {
+          "from": "broker",
+          "to": "drain_events",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-0",
+        "focus": -0.075,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-1",
+        "focus": -0.02352941176470587,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-1",
+      "type": "arrow",
+      "x": 286,
+      "y": 472.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 130738674,
+      "version": 1,
+      "versionNonce": 1612774566,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "edge": {
+          "from": "drain_events",
+          "to": "on_task_received",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-1",
+        "focus": 0.02352941176470587,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-2",
+        "focus": -0.030769230769230885,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-2",
+      "type": "arrow",
+      "x": 286,
+      "y": 853.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 2040748941,
+      "version": 1,
+      "versionNonce": 780531319,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "edge": {
+          "from": "on_task_received",
+          "to": "strategy",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-2",
+        "focus": 0.030769230769230885,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-3",
+        "focus": -0.026666666666666516,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-3",
+      "type": "arrow",
+      "x": 286,
+      "y": 1254.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 275809332,
+      "version": 2,
+      "versionNonce": 2097846784,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "edge": {
+          "from": "strategy",
+          "to": "request",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-3",
+        "focus": 0.026666666666666516,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-4",
+        "focus": 0.037500000000000006,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-4",
+      "type": "arrow",
+      "x": 286,
+      "y": 1655.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1543714407,
+      "version": 2,
+      "versionNonce": 1940056065,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "edge": {
+          "from": "request",
+          "to": "on_task_request",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-4",
+        "focus": -0.037500000000000006,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-5",
+        "focus": -0.02352941176470599,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-5",
+      "type": "arrow",
+      "x": 286,
+      "y": 2056,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 991951062,
+      "version": 1,
+      "versionNonce": 907922618,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "edge": {
+          "from": "on_task_request",
+          "to": "execute_pool",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-5",
+        "focus": 0.02352941176470599,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-6",
+        "focus": 0.03333333333333351,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-6",
+      "type": "arrow",
+      "x": 286,
+      "y": 2436.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1670588897,
+      "version": 1,
+      "versionNonce": 573600427,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "edge": {
+          "from": "execute_pool",
+          "to": "pool_apply",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-6",
+        "focus": -0.03333333333333351,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-7",
+        "focus": -0.030769230769230393,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-7",
+      "type": "arrow",
+      "x": 286,
+      "y": 2817.6000000000004,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 908107576,
+      "version": 1,
+      "versionNonce": 1040734612,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "worker-consumer-message-reception-to-poo-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo",
+        "edge": {
+          "from": "pool_apply",
+          "to": "pool_worker",
+          "claim": "feeds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-7",
+        "focus": 0.030769230769230393,
+        "gap": 2.399999999999636
+      },
+      "endBinding": {
+        "elementId": "worker-consumer-message-reception-to-poo-node-8",
+        "focus": -0.030769230769230393,
+        "gap": 1.5999999999994543
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-0-label",
+      "type": "text",
+      "x": 247,
+      "y": 47.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2050048649,
+      "version": 1,
+      "versionNonce": 1034337043,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "Broker",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-node-0",
+      "originalText": "Broker",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-1-label",
+      "type": "text",
+      "x": 152.5,
+      "y": 427.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 892205420,
+      "version": 1,
+      "versionNonce": 2035560632,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "connection.drain_events()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-node-1",
+      "originalText": "connection.drain_events()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-2-label",
+      "type": "text",
+      "x": 191,
+      "y": 807.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1479510107,
+      "version": 1,
+      "versionNonce": 297686869,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "on_task_received()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-node-2",
+      "originalText": "on_task_received()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-3-label",
+      "type": "text",
+      "x": 169,
+      "y": 1185,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 182949798,
+      "version": 1,
+      "versionNonce": 514696330,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "task_message_handler()\n[strategy]",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-node-3",
+      "originalText": "task_message_handler()\n[strategy]",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-4-label",
+      "type": "text",
+      "x": 175.5,
+      "y": 1585,
+      "width": 209.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1988865357,
+      "version": 1,
+      "versionNonce": 2102203703,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "Request instance\ncreated & populated",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-node-4",
+      "originalText": "Request instance\ncreated & populated",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-5-label",
+      "type": "text",
+      "x": 147,
+      "y": 1985,
+      "width": 286,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 986391424,
+      "version": 1,
+      "versionNonce": 700549980,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "Consumer.on_task_request()\n(task_reserved)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-node-5",
+      "originalText": "Consumer.on_task_request()\n(task_reserved)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-6-label",
+      "type": "text",
+      "x": 126,
+      "y": 2387.5,
+      "width": 308,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1019307567,
+      "version": 1,
+      "versionNonce": 962146185,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "Request.execute_using_pool()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-node-6",
+      "originalText": "Request.execute_using_pool()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-7-label",
+      "type": "text",
+      "x": 191,
+      "y": 2767.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 969054506,
+      "version": 1,
+      "versionNonce": 1089819902,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "pool.apply_async()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-node-7",
+      "originalText": "pool.apply_async()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-node-8-label",
+      "type": "text",
+      "x": 185.5,
+      "y": 3147.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1358824065,
+      "version": 1,
+      "versionNonce": 1521572299,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "Pool Worker Process",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-node-8",
+      "originalText": "Pool Worker Process",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-0-label",
+      "type": "text",
+      "x": 206.8,
+      "y": 222.4,
+      "width": 158.4,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1611285246,
+      "version": 1,
+      "versionNonce": 1847788962,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "message from queue\n@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-edge-0",
+      "originalText": "message from queue @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-1-label",
+      "type": "text",
+      "x": 202.39999999999998,
+      "y": 603.1999999999999,
+      "width": 167.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 955219859,
+      "version": 1,
+      "versionNonce": 2077237229,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "on_message callback\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-edge-1",
+      "originalText": "on_message callback @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-2-label",
+      "type": "text",
+      "x": 211.2,
+      "y": 983.9999999999999,
+      "width": 149.60000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 689610820,
+      "version": 1,
+      "versionNonce": 1001961808,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "strategies[type_]\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-edge-2",
+      "originalText": "strategies[type_] @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-3-label",
+      "type": "text",
+      "x": 255.2,
+      "y": 1394.7999999999997,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 242711297,
+      "version": 1,
+      "versionNonce": 552209227,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-edge-3",
+      "originalText": "@builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-4-label",
+      "type": "text",
+      "x": 206.8,
+      "y": 1795.6,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 884197346,
+      "version": 1,
+      "versionNonce": 1283606742,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "handle(req) @feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-edge-4",
+      "originalText": "handle(req) @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-5-label",
+      "type": "text",
+      "x": 259.6,
+      "y": 2196.4,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 40102791,
+      "version": 1,
+      "versionNonce": 1462627489,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-6-label",
+      "type": "text",
+      "x": 206.8,
+      "y": 2567.2000000000003,
+      "width": 158.4,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1168793912,
+      "version": 1,
+      "versionNonce": 870629268,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "apply_async(trace,\n...) @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-edge-6",
+      "originalText": "apply_async(trace, ...) @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "worker-consumer-message-reception-to-poo-edge-7-label",
+      "type": "text",
+      "x": 224.39999999999998,
+      "y": 2948.0000000000005,
+      "width": 123.20000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1632760965,
+      "version": 1,
+      "versionNonce": 327687823,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "worker-consumer-message-reception-to-poo"
+      },
+      "text": "task execution\n@feeds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "worker-consumer-message-reception-to-poo-edge-7",
+      "originalText": "task execution @feeds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

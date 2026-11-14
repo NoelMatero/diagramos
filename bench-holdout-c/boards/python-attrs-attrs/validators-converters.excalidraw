@@ -1,0 +1,1849 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "validators-converters-on-setattr-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 528,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 52186415,
+      "version": 1,
+      "versionNonce": 2054345865,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "role": "title"
+      },
+      "text": "Validators, Converters & on_setattr Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Validators, Converters & on_setattr Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-0",
+      "type": "rectangle",
+      "x": 1780,
+      "y": 300,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1689022002,
+      "version": 1,
+      "versionNonce": 1738336742,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-node-0-label"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "node": "attr",
+        "ref": "src/attr/_make.py#Attribute"
+      }
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-1",
+      "type": "rectangle",
+      "x": 2360,
+      "y": 120,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 2070863267,
+      "version": 1,
+      "versionNonce": 527331133,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-node-1-label"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "node": "converter_type",
+        "ref": "src/attr/_make.py#Converter"
+      }
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-2",
+      "type": "rectangle",
+      "x": 40,
+      "y": 20,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 470413172,
+      "version": 1,
+      "versionNonce": 34185792,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-node-2-label"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "node": "init_script",
+        "ref": "src/attr/_make.py#_make_init_script"
+      }
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-3",
+      "type": "rectangle",
+      "x": 20,
+      "y": 240,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1810895309,
+      "version": 1,
+      "versionNonce": 1247234743,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-node-3-label"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "node": "setattr_hook",
+        "ref": "src/attr/_make.py#add_setattr"
+      }
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-4",
+      "type": "rectangle",
+      "x": 760,
+      "y": 260,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 402750742,
+      "version": 1,
+      "versionNonce": 291154170,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-node-4-label"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "node": "pipe",
+        "ref": "src/attr/setters.py#pipe"
+      }
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-5",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 140,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1738318247,
+      "version": 1,
+      "versionNonce": 259275841,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-node-5-label"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "node": "convert",
+        "ref": "src/attr/setters.py#convert"
+      }
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-6",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 300,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1061134712,
+      "version": 1,
+      "versionNonce": 1507438036,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-node-6-label"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "node": "validate",
+        "ref": "src/attr/setters.py#validate"
+      }
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-7",
+      "type": "rectangle",
+      "x": 680,
+      "y": 80,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 698507809,
+      "version": 1,
+      "versionNonce": 2104315627,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-node-7-label"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "validators-converters-on-setattr-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "node": "obj_setattr",
+        "state": "external"
+      }
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-0",
+      "type": "arrow",
+      "x": 1932,
+      "y": 331.46666666666664,
+      "width": 420.8000000000002,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1948350661,
+      "version": 1,
+      "versionNonce": 1841016783,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "edge": {
+          "from": "attr",
+          "to": "converter_type",
+          "claim": "holds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          137.69999999999982,
+          0
+        ],
+        [
+          206.55000000000018,
+          0
+        ],
+        [
+          275.4000000000001,
+          0
+        ],
+        [
+          312.8000000000002,
+          0
+        ],
+        [
+          312.8000000000002,
+          -130
+        ],
+        [
+          420.3000000000002,
+          -130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-0",
+        "focus": -0.21333333333333282,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-1",
+        "focus": -0.35777777777777814,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-1",
+      "type": "arrow",
+      "x": 292,
+      "y": 61.3333333333333,
+      "width": 2060.8,
+      "height": 97.66666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1384004012,
+      "version": 1,
+      "versionNonce": 2012561656,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "edge": {
+          "from": "init_script",
+          "to": "converter_type",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          1.4210854715202004e-14
+        ],
+        [
+          32,
+          -17.53333333333329
+        ],
+        [
+          1070.4666666666667,
+          -17.53333333333329
+        ],
+        [
+          1952.8000000000002,
+          -17.53333333333329
+        ],
+        [
+          1952.8000000000002,
+          80.13333333333334
+        ],
+        [
+          2060.3,
+          80.13333333333334
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-2",
+        "focus": -0.1733333333333348,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-1",
+        "focus": 0.642222222222222,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-2",
+      "type": "arrow",
+      "x": 292,
+      "y": 94.66666666666663,
+      "width": 394.4,
+      "height": 23.466666666666697,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 387361723,
+      "version": 1,
+      "versionNonce": 891252789,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "edge": {
+          "from": "init_script",
+          "to": "obj_setattr",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          -0.5
+        ],
+        [
+          52.23333333333335,
+          0
+        ],
+        [
+          104.4666666666667,
+          0
+        ],
+        [
+          208.93333333333334,
+          0
+        ],
+        [
+          286.4,
+          0
+        ],
+        [
+          286.4,
+          23.466666666666697
+        ],
+        [
+          393.9,
+          23.966666666666683
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-2",
+        "focus": 0.4933333333333326,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-7",
+        "focus": 0.23733333333333353,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-3",
+      "type": "arrow",
+      "x": 292,
+      "y": 314.79999999999995,
+      "width": 461.0666666666666,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 792330858,
+      "version": 1,
+      "versionNonce": 87814206,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "edge": {
+          "from": "setattr_hook",
+          "to": "pipe",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          230.5333333333333,
+          0
+        ],
+        [
+          460.5666666666666,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-3",
+        "focus": 0.4959999999999987,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-4",
+        "focus": -0.0959999999999993,
+        "gap": 6.933333333333394
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-4",
+      "type": "arrow",
+      "x": 913.0666666666666,
+      "y": 298.1333333333333,
+      "width": 366.13333333333344,
+      "height": 126.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1585630137,
+      "version": 1,
+      "versionNonce": 1897595267,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "edge": {
+          "from": "pipe",
+          "to": "convert",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          65.33333333333337,
+          0
+        ],
+        [
+          65.33333333333337,
+          -126.66666666666669
+        ],
+        [
+          119.73333333333335,
+          -126.66666666666669
+        ],
+        [
+          181.33333333333348,
+          -126.66666666666669
+        ],
+        [
+          242.9333333333334,
+          -126.66666666666669
+        ],
+        [
+          365.63333333333344,
+          -126.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-4",
+        "focus": -0.2373333333333338,
+        "gap": 6.933333333333394
+      },
+      "endBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-5",
+        "focus": 0.21333333333333282,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-5",
+      "type": "arrow",
+      "x": 913.0666666666666,
+      "y": 331.46666666666664,
+      "width": 366.13333333333344,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 911352112,
+      "version": 1,
+      "versionNonce": 1579514764,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "edge": {
+          "from": "pipe",
+          "to": "validate",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          183.0666666666666,
+          0
+        ],
+        [
+          365.63333333333344,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-4",
+        "focus": 0.4293333333333334,
+        "gap": 6.933333333333394
+      },
+      "endBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-6",
+        "focus": 0.21333333333333282,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-6",
+      "type": "arrow",
+      "x": 1439.2,
+      "y": 171.46666666666664,
+      "width": 913.6000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1461658719,
+      "version": 1,
+      "versionNonce": 273523961,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "edge": {
+          "from": "convert",
+          "to": "converter_type",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          456.79999999999995,
+          0
+        ],
+        [
+          913.1000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-5",
+        "focus": -0.21333333333333282,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-1",
+        "focus": 0.1422222222222219,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-7",
+      "type": "arrow",
+      "x": 1439.2,
+      "y": 331.46666666666664,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1653543246,
+      "version": 1,
+      "versionNonce": 1235820018,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "edge": {
+          "from": "validate",
+          "to": "attr",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999986,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-6",
+        "focus": -0.21333333333333282,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-0",
+        "focus": 0.21333333333333282,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-8",
+      "type": "arrow",
+      "x": 292,
+      "y": 281.46666666666664,
+      "width": 394.4,
+      "height": 130,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 567800781,
+      "version": 1,
+      "versionNonce": 643829943,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "validators-converters-on-setattr-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow",
+        "edge": {
+          "from": "setattr_hook",
+          "to": "obj_setattr",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -130
+        ],
+        [
+          132.2,
+          -130
+        ],
+        [
+          263.29999999999995,
+          -130
+        ],
+        [
+          328.8499999999999,
+          -130
+        ],
+        [
+          393.9,
+          -130
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-3",
+        "focus": -0.17066666666666738,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "validators-converters-on-setattr-flow-node-7",
+        "focus": -0.4293333333333328,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-0-label",
+      "type": "text",
+      "x": 1810.5,
+      "y": 327.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 869124947,
+      "version": 1,
+      "versionNonce": 1091390125,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "Attribute",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-node-0",
+      "originalText": "Attribute",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-1-label",
+      "type": "text",
+      "x": 2390.5,
+      "y": 167.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1888964286,
+      "version": 1,
+      "versionNonce": 1051178850,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "Converter",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-node-1",
+      "originalText": "Converter",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-2-label",
+      "type": "text",
+      "x": 70.99999999999999,
+      "y": 57.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1324206529,
+      "version": 1,
+      "versionNonce": 1063263243,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "Generated __init__",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-node-2",
+      "originalText": "Generated __init__",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-3-label",
+      "type": "text",
+      "x": 44.499999999999986,
+      "y": 277.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 657332484,
+      "version": 1,
+      "versionNonce": 1634511376,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "Generated __setattr__",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-node-3",
+      "originalText": "Generated __setattr__",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-4-label",
+      "type": "text",
+      "x": 807,
+      "y": 297.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1398404679,
+      "version": 1,
+      "versionNonce": 1156860257,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "pipe()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-node-4",
+      "originalText": "pipe()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-5-label",
+      "type": "text",
+      "x": 1310.5,
+      "y": 167.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1151718818,
+      "version": 1,
+      "versionNonce": 264006550,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "convert()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-node-5",
+      "originalText": "convert()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-6-label",
+      "type": "text",
+      "x": 1305,
+      "y": 327.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 843579205,
+      "version": 1,
+      "versionNonce": 1147235151,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "validate()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-node-6",
+      "originalText": "validate()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-node-7-label",
+      "type": "text",
+      "x": 711,
+      "y": 117.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 455619832,
+      "version": 1,
+      "versionNonce": 150593620,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "object.__setattr__",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-node-7",
+      "originalText": "object.__setattr__",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-0-label",
+      "type": "text",
+      "x": 2137,
+      "y": 321.46666666666664,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 609364396,
+      "version": 1,
+      "versionNonce": 1217925368,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "converter @holds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-edge-0",
+      "originalText": "converter @holds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-1-label",
+      "type": "text",
+      "x": 1336.0666666666666,
+      "y": 33.80000000000001,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 215733193,
+      "version": 1,
+      "versionNonce": 1972826451,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-edge-1",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-2-label",
+      "type": "text",
+      "x": 443.73333333333335,
+      "y": 84.66666666666663,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 822675686,
+      "version": 1,
+      "versionNonce": 1658408138,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "bypass @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-edge-2",
+      "originalText": "bypass @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-3-label",
+      "type": "text",
+      "x": 496.1333333333333,
+      "y": 304.79999999999995,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1999870875,
+      "version": 1,
+      "versionNonce": 1324123029,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-edge-3",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-4-label",
+      "type": "text",
+      "x": 1006.4,
+      "y": 161.46666666666664,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 703653568,
+      "version": 1,
+      "versionNonce": 1329747612,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-edge-4",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-5-label",
+      "type": "text",
+      "x": 1069.7333333333331,
+      "y": 321.46666666666664,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1926786189,
+      "version": 1,
+      "versionNonce": 2098182519,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-edge-5",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-6-label",
+      "type": "text",
+      "x": 1869.6,
+      "y": 161.46666666666664,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1137674858,
+      "version": 1,
+      "versionNonce": 1822492734,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-7-label",
+      "type": "text",
+      "x": 1579.1999999999998,
+      "y": 321.46666666666664,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 642649455,
+      "version": 1,
+      "versionNonce": 142015177,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-edge-7",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "validators-converters-on-setattr-flow-edge-8-label",
+      "type": "text",
+      "x": 371.4,
+      "y": 141.46666666666664,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1522985732,
+      "version": 1,
+      "versionNonce": 452935696,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "validators-converters-on-setattr-flow"
+      },
+      "text": "final @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "validators-converters-on-setattr-flow-edge-8",
+      "originalText": "final @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

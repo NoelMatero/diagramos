@@ -1,0 +1,1930 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "entity-persistence-flow-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 303.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1190840547,
+      "version": 1,
+      "versionNonce": 1286667133,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Entity Persistence Flow",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Entity Persistence Flow",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-node-0",
+      "type": "rectangle",
+      "x": 40,
+      "y": 20,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 2055968486,
+      "version": 1,
+      "versionNonce": 459200202,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-node-0-label"
+        },
+        {
+          "id": "entity-persistence-flow-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "node": "executor",
+        "ref": "packages/typeorm/src/persistence/EntityPersistExecutor.ts#execute"
+      }
+    },
+    {
+      "id": "entity-persistence-flow-node-1",
+      "type": "rectangle",
+      "x": 60,
+      "y": 400,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 512167479,
+      "version": 1,
+      "versionNonce": 1920327569,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-node-1-label"
+        },
+        {
+          "id": "entity-persistence-flow-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-persistence-flow-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "node": "subjects",
+        "ref": "packages/typeorm/src/persistence/Subject.ts"
+      }
+    },
+    {
+      "id": "entity-persistence-flow-node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 800,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 2109344520,
+      "version": 1,
+      "versionNonce": 709421156,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-node-2-label"
+        },
+        {
+          "id": "entity-persistence-flow-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-persistence-flow-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "node": "cascades",
+        "ref": "packages/typeorm/src/persistence/subject-builder/CascadesSubjectBuilder.ts#build"
+      }
+    },
+    {
+      "id": "entity-persistence-flow-node-3",
+      "type": "rectangle",
+      "x": 60,
+      "y": 1180,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1383276593,
+      "version": 1,
+      "versionNonce": 1748107451,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-node-3-label"
+        },
+        {
+          "id": "entity-persistence-flow-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-persistence-flow-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "node": "loader",
+        "ref": "packages/typeorm/src/persistence/SubjectDatabaseEntityLoader.ts#load"
+      }
+    },
+    {
+      "id": "entity-persistence-flow-node-4",
+      "type": "rectangle",
+      "x": 20,
+      "y": 1580,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 162616770,
+      "version": 1,
+      "versionNonce": 933823798,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-node-4-label"
+        },
+        {
+          "id": "entity-persistence-flow-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-persistence-flow-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "node": "relations",
+        "ref": "packages/typeorm/src/persistence/subject-builder/OneToManySubjectBuilder.ts"
+      }
+    },
+    {
+      "id": "entity-persistence-flow-node-5",
+      "type": "rectangle",
+      "x": 60,
+      "y": 1980,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1258724211,
+      "version": 1,
+      "versionNonce": 372233037,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-node-5-label"
+        },
+        {
+          "id": "entity-persistence-flow-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-persistence-flow-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "node": "subjectexec",
+        "ref": "packages/typeorm/src/persistence/SubjectExecutor.ts#execute"
+      }
+    },
+    {
+      "id": "entity-persistence-flow-node-6",
+      "type": "rectangle",
+      "x": 20,
+      "y": 2360,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 403278660,
+      "version": 1,
+      "versionNonce": 1574218320,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-node-6-label"
+        },
+        {
+          "id": "entity-persistence-flow-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-persistence-flow-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "node": "sorter",
+        "ref": "packages/typeorm/src/persistence/SubjectTopologicalSorter.ts"
+      }
+    },
+    {
+      "id": "entity-persistence-flow-node-7",
+      "type": "rectangle",
+      "x": 80,
+      "y": 2760,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1733418205,
+      "version": 1,
+      "versionNonce": 518369351,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-node-7-label"
+        },
+        {
+          "id": "entity-persistence-flow-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-persistence-flow-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "node": "insert",
+        "ref": "packages/typeorm/src/persistence/SubjectExecutor.ts#executeInsertOperations"
+      }
+    },
+    {
+      "id": "entity-persistence-flow-node-8",
+      "type": "rectangle",
+      "x": 80,
+      "y": 3140,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1426254238,
+      "version": 1,
+      "versionNonce": 500273858,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-node-8-label"
+        },
+        {
+          "id": "entity-persistence-flow-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "entity-persistence-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "node": "update",
+        "ref": "packages/typeorm/src/persistence/SubjectExecutor.ts#executeUpdateOperations"
+      }
+    },
+    {
+      "id": "entity-persistence-flow-node-9",
+      "type": "rectangle",
+      "x": 60,
+      "y": 3520,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1561228783,
+      "version": 1,
+      "versionNonce": 962296905,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-node-9-label"
+        },
+        {
+          "id": "entity-persistence-flow-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "node": "remove",
+        "ref": "packages/typeorm/src/persistence/SubjectExecutor.ts#executeRemoveOperations"
+      }
+    },
+    {
+      "id": "entity-persistence-flow-edge-0",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 92,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 657862521,
+      "version": 1,
+      "versionNonce": 1296361283,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "edge": {
+          "from": "executor",
+          "to": "subjects",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-persistence-flow-node-0",
+        "focus": 0.005333333333333212,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "entity-persistence-flow-node-1",
+        "focus": -0.006153846153845883,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-persistence-flow-edge-1",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 492.8,
+      "width": 0,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 767491824,
+      "version": 1,
+      "versionNonce": 470507084,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "edge": {
+          "from": "subjects",
+          "to": "cascades",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999992
+        ],
+        [
+          0,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-persistence-flow-node-1",
+        "focus": 0.006153846153845883,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "entity-persistence-flow-node-2",
+        "focus": 0.05750000000000002,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-persistence-flow-edge-2",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 873.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1317798431,
+      "version": 1,
+      "versionNonce": 1353576633,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "edge": {
+          "from": "cascades",
+          "to": "loader",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-persistence-flow-node-2",
+        "focus": -0.05750000000000002,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "entity-persistence-flow-node-3",
+        "focus": 0.07666666666666658,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-persistence-flow-edge-3",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 1274.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 301318158,
+      "version": 1,
+      "versionNonce": 2039842226,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "edge": {
+          "from": "loader",
+          "to": "relations",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-persistence-flow-node-3",
+        "focus": -0.07666666666666658,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "entity-persistence-flow-node-4",
+        "focus": 0.05750000000000011,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-persistence-flow-edge-4",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 1675.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1804387205,
+      "version": 1,
+      "versionNonce": 773585807,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "edge": {
+          "from": "relations",
+          "to": "subjectexec",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-persistence-flow-node-4",
+        "focus": -0.05750000000000011,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "entity-persistence-flow-node-5",
+        "focus": 0.07666666666666686,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-persistence-flow-edge-5",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 2056,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1198567020,
+      "version": 1,
+      "versionNonce": 945233848,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "edge": {
+          "from": "subjectexec",
+          "to": "sorter",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-persistence-flow-node-5",
+        "focus": -0.07666666666666663,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "entity-persistence-flow-node-6",
+        "focus": 0.05750000000000011,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-persistence-flow-edge-6",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 2456.8,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 201924731,
+      "version": 1,
+      "versionNonce": 566255605,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "edge": {
+          "from": "sorter",
+          "to": "insert",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-persistence-flow-node-6",
+        "focus": -0.05750000000000011,
+        "gap": 3.199999999999818
+      },
+      "endBinding": {
+        "elementId": "entity-persistence-flow-node-7",
+        "focus": -0.007272727272727692,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-persistence-flow-edge-7",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 2837.6000000000004,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1587589418,
+      "version": 1,
+      "versionNonce": 1251286270,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "edge": {
+          "from": "insert",
+          "to": "update",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-persistence-flow-node-7",
+        "focus": 0.007272727272727692,
+        "gap": 2.399999999999636
+      },
+      "endBinding": {
+        "elementId": "entity-persistence-flow-node-8",
+        "focus": -0.007272727272727692,
+        "gap": 1.5999999999994543
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-persistence-flow-edge-8",
+      "type": "arrow",
+      "x": 189.20000000000002,
+      "y": 3218.4000000000005,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1417356769,
+      "version": 1,
+      "versionNonce": 1600267947,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "entity-persistence-flow-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow",
+        "edge": {
+          "from": "update",
+          "to": "remove",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "entity-persistence-flow-node-8",
+        "focus": 0.007272727272727692,
+        "gap": 1.5999999999994543
+      },
+      "endBinding": {
+        "elementId": "entity-persistence-flow-node-9",
+        "focus": 0.07666666666666663,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "entity-persistence-flow-node-0-label",
+      "type": "text",
+      "x": 124,
+      "y": 35,
+      "width": 132,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 423173207,
+      "version": 1,
+      "versionNonce": 1601503793,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "Execute Save\nOperation",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-node-0",
+      "originalText": "Execute Save\nOperation",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-node-1-label",
+      "type": "text",
+      "x": 113,
+      "y": 425,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 2033894194,
+      "version": 1,
+      "versionNonce": 1135392998,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "Build Subjects\nfrom Entities",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-node-1",
+      "originalText": "Build Subjects\nfrom Entities",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-node-2-label",
+      "type": "text",
+      "x": 103,
+      "y": 815,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1881060821,
+      "version": 1,
+      "versionNonce": 2041076447,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "Build Cascaded\nSubjects",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-node-2",
+      "originalText": "Build Cascaded\nSubjects",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-node-3-label",
+      "type": "text",
+      "x": 103,
+      "y": 1205,
+      "width": 154,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 490451208,
+      "version": 1,
+      "versionNonce": 1130445412,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "Load DB State\nfor Comparison",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-node-3",
+      "originalText": "Load DB State\nfor Comparison",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-node-4-label",
+      "type": "text",
+      "x": 48,
+      "y": 1605,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 777183139,
+      "version": 1,
+      "versionNonce": 1012766013,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "Build Relations\n(1-to-M, 1-to-1, M-to-M)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-node-4",
+      "originalText": "Build Relations\n(1-to-M, 1-to-1, M-to-M)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-node-5-label",
+      "type": "text",
+      "x": 136,
+      "y": 1995,
+      "width": 88,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 740818254,
+      "version": 1,
+      "versionNonce": 627352050,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "Subject\nExecutor",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-node-5",
+      "originalText": "Subject\nExecutor",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-node-6-label",
+      "type": "text",
+      "x": 92,
+      "y": 2385,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 369190225,
+      "version": 1,
+      "versionNonce": 556297563,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "Topological Sort\nInsert Order",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-node-6",
+      "originalText": "Topological Sort\nInsert Order",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-node-7-label",
+      "type": "text",
+      "x": 107.5,
+      "y": 2787.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 536662804,
+      "version": 1,
+      "versionNonce": 426087008,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "Execute Inserts",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-node-7",
+      "originalText": "Execute Inserts",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-node-8-label",
+      "type": "text",
+      "x": 107.5,
+      "y": 3167.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1168636031,
+      "version": 1,
+      "versionNonce": 1907568281,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "Execute Updates",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-node-8",
+      "originalText": "Execute Updates",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-node-9-label",
+      "type": "text",
+      "x": 92,
+      "y": 3547.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 842814906,
+      "version": 1,
+      "versionNonce": 341445134,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "Execute Removals",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-node-9",
+      "originalText": "Execute Removals",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-edge-0-label",
+      "type": "text",
+      "x": 123.20000000000002,
+      "y": 232.4,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1242347520,
+      "version": 1,
+      "versionNonce": 771641564,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "creates @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-edge-0",
+      "originalText": "creates @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-edge-1-label",
+      "type": "text",
+      "x": 123.20000000000002,
+      "y": 633.1999999999999,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 97337805,
+      "version": 1,
+      "versionNonce": 25811639,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "for each @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-edge-1",
+      "originalText": "for each @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-edge-2-label",
+      "type": "text",
+      "x": 114.4,
+      "y": 1013.9999999999999,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1225010602,
+      "version": 1,
+      "versionNonce": 1160911486,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "load state @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-edge-2",
+      "originalText": "load state @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-edge-3-label",
+      "type": "text",
+      "x": 136.4,
+      "y": 1414.7999999999997,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1275263663,
+      "version": 1,
+      "versionNonce": 1033237769,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "build @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-edge-3",
+      "originalText": "build @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-edge-4-label",
+      "type": "text",
+      "x": 118.80000000000001,
+      "y": 1815.6,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1148161516,
+      "version": 1,
+      "versionNonce": 2106652216,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "executor @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-edge-4",
+      "originalText": "executor @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-edge-5-label",
+      "type": "text",
+      "x": 105.60000000000001,
+      "y": 2196.4,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 158521097,
+      "version": 1,
+      "versionNonce": 1105428627,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "sort inserts @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-edge-5",
+      "originalText": "sort inserts @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-edge-6-label",
+      "type": "text",
+      "x": 162.8,
+      "y": 2597.2000000000003,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 438905894,
+      "version": 1,
+      "versionNonce": 585787914,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-edge-7-label",
+      "type": "text",
+      "x": 118.80000000000001,
+      "y": 2978.0000000000005,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1735466203,
+      "version": 1,
+      "versionNonce": 368778453,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "recompute @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-edge-7",
+      "originalText": "recompute @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "entity-persistence-flow-edge-8-label",
+      "type": "text",
+      "x": 162.8,
+      "y": 3358.8000000000006,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 393379128,
+      "version": 1,
+      "versionNonce": 1911083924,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "entity-persistence-flow"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "entity-persistence-flow-edge-8",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

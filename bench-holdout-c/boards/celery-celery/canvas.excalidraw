@@ -1,0 +1,2548 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "canvas-building-and-executing-chain-grou-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 805.2,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 754358285,
+      "version": 1,
+      "versionNonce": 2056139767,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "role": "title"
+      },
+      "text": "Canvas: Building and Executing Chain, Group, Chord Signatures",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Canvas: Building and Executing Chain, Group, Chord Signatures",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-0",
+      "type": "rectangle",
+      "x": 1780,
+      "y": 40,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f4f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1787398772,
+      "version": 1,
+      "versionNonce": 350921536,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-0-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "sig",
+        "ref": "celery/canvas.py#Signature"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-1",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 240,
+      "width": 160,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f4f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 980397261,
+      "version": 1,
+      "versionNonce": 1563970487,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-1-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "chain",
+        "ref": "celery/canvas.py#_chain"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-2",
+      "type": "rectangle",
+      "x": 1480,
+      "y": 420,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f4f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 858523954,
+      "version": 1,
+      "versionNonce": 2055072486,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-2-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "group",
+        "ref": "celery/canvas.py#group"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-3",
+      "type": "rectangle",
+      "x": 1180,
+      "y": 20,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e8f4f8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1240365219,
+      "version": 1,
+      "versionNonce": 844066877,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-3-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "chord",
+        "ref": "celery/canvas.py#_chord"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-4",
+      "type": "rectangle",
+      "x": 540,
+      "y": 180,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff4e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 230636664,
+      "version": 1,
+      "versionNonce": 1824173780,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-4-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "or_op",
+        "ref": "celery/canvas.py#Signature.__or__"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-5",
+      "type": "rectangle",
+      "x": 600,
+      "y": 20,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff4e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 2015493409,
+      "version": 1,
+      "versionNonce": 273567723,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-5-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "group_or",
+        "ref": "celery/canvas.py#group.__or__"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-6",
+      "type": "rectangle",
+      "x": 580,
+      "y": 540,
+      "width": 200,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff4e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1719736342,
+      "version": 1,
+      "versionNonce": 607889914,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-6-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "chain_or",
+        "ref": "celery/canvas.py#_chain.__or__"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-7",
+      "type": "rectangle",
+      "x": 500,
+      "y": 360,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f0e6ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 907820199,
+      "version": 1,
+      "versionNonce": 576011585,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-7-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-12",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "prepare",
+        "ref": "celery/canvas.py#_chain.prepare_steps"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-8",
+      "type": "rectangle",
+      "x": 2080,
+      "y": 440,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#f0e6ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1796600492,
+      "version": 1,
+      "versionNonce": 785218552,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-8-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "prepared",
+        "ref": "celery/canvas.py#group._prepared"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-9",
+      "type": "rectangle",
+      "x": 2440,
+      "y": 60,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffe6e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 213463493,
+      "version": 1,
+      "versionNonce": 613673679,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-9-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "freeze_sig",
+        "ref": "celery/canvas.py#Signature.freeze"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-10",
+      "type": "rectangle",
+      "x": 20,
+      "y": 360,
+      "width": 160,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e6f0e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 212829921,
+      "version": 1,
+      "versionNonce": 1507252651,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-node-10-label"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "canvas-building-and-executing-chain-grou-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "node": "run",
+        "ref": "celery/canvas.py#_chain.run"
+      }
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-0",
+      "type": "arrow",
+      "x": 1348,
+      "y": 298.1333333333333,
+      "width": 440,
+      "height": 199.46666666666664,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 225337035,
+      "version": 1,
+      "versionNonce": 181750341,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "chain",
+          "to": "sig",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          79.9333333333334,
+          0
+        ],
+        [
+          159.8666666666668,
+          0
+        ],
+        [
+          319.73333333333335,
+          0
+        ],
+        [
+          332,
+          0
+        ],
+        [
+          332,
+          -199.46666666666664
+        ],
+        [
+          439.5,
+          -199.46666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-1",
+        "focus": -0.03111111111111063,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-0",
+        "focus": 0.022222222222222518,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-1",
+      "type": "arrow",
+      "x": 1648,
+      "y": 444.26666666666665,
+      "width": 140,
+      "height": 315.59999999999997,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1940431546,
+      "version": 1,
+      "versionNonce": 299319566,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "group",
+          "to": "sig"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -315.59999999999997
+        ],
+        [
+          139.5,
+          -315.59999999999997
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-2",
+        "focus": -0.5146666666666677,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-0",
+        "focus": -0.4777777777777775,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-2",
+      "type": "arrow",
+      "x": 1348,
+      "y": 68.66666666666667,
+      "width": 440,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 734065045,
+      "version": 1,
+      "versionNonce": 1883802527,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "chord",
+          "to": "sig",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          220,
+          0
+        ],
+        [
+          439.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-3",
+        "focus": -0.026666666666667595,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-0",
+        "focus": 0.5222222222222226,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-3",
+      "type": "arrow",
+      "x": 776,
+      "y": 238.66666666666666,
+      "width": 412,
+      "height": 23.46666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 809078524,
+      "version": 1,
+      "versionNonce": 215550600,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "or_op",
+          "to": "chain",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          23.46666666666667
+        ],
+        [
+          194.26666666666665,
+          23.46666666666667
+        ],
+        [
+          303.1333333333332,
+          23.46666666666667
+        ],
+        [
+          357.5666666666666,
+          23.46666666666667
+        ],
+        [
+          411.5,
+          23.46666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-4",
+        "focus": 0.17333333333333298,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-1",
+        "focus": 0.6311111111111106,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-4",
+      "type": "arrow",
+      "x": 776,
+      "y": 205.33333333333331,
+      "width": 412,
+      "height": 119.99999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1618721263,
+      "version": 1,
+      "versionNonce": 509446217,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "or_op",
+          "to": "chord",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          66.5,
+          0
+        ],
+        [
+          133,
+          0
+        ],
+        [
+          266,
+          0
+        ],
+        [
+          304,
+          0
+        ],
+        [
+          304,
+          -119.99999999999999
+        ],
+        [
+          411.5,
+          -119.99999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-4",
+        "focus": -0.49333333333333446,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-3",
+        "focus": -0.30666666666666637,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-5",
+      "type": "arrow",
+      "x": 776,
+      "y": 52,
+      "width": 412,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1483746718,
+      "version": 1,
+      "versionNonce": 47423170,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "group_or",
+          "to": "chord",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          206,
+          0
+        ],
+        [
+          411.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-5",
+        "focus": -0.19999999999999998,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-3",
+        "focus": 0.3599999999999996,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-6",
+      "type": "arrow",
+      "x": 776,
+      "y": 572,
+      "width": 412,
+      "height": 237.86666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1000362057,
+      "version": 1,
+      "versionNonce": 350678739,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "chain_or",
+          "to": "chain",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          81.23333333333335,
+          0
+        ],
+        [
+          162.4666666666667,
+          0
+        ],
+        [
+          324.9333333333334,
+          0
+        ],
+        [
+          352,
+          0
+        ],
+        [
+          352,
+          -237.86666666666667
+        ],
+        [
+          411.5,
+          -237.86666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-6",
+        "focus": -0.20000000000000004,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-1",
+        "focus": -0.5688888888888894,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-7",
+      "type": "arrow",
+      "x": 172,
+      "y": 402,
+      "width": 324,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 2142130688,
+      "version": 1,
+      "versionNonce": 459521756,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "run",
+          "to": "prepare"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          162,
+          0
+        ],
+        [
+          323.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-10",
+        "focus": -0.15999999999999998,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-7",
+        "focus": 0.15999999999999986,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-8",
+      "type": "arrow",
+      "x": 172,
+      "y": 435.33333333333337,
+      "width": 2276,
+      "height": 520,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1316216691,
+      "version": 1,
+      "versionNonce": 2066865997,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "run",
+          "to": "freeze_sig"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          216.66666666666663
+        ],
+        [
+          1289.6666666666665,
+          216.66666666666663
+        ],
+        [
+          2168,
+          216.66666666666663
+        ],
+        [
+          2168,
+          -303.33333333333337
+        ],
+        [
+          2275.5,
+          -303.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-10",
+        "focus": 0.5066666666666678,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-9",
+        "focus": -0.4400000000000013,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-9",
+      "type": "arrow",
+      "x": 1188,
+      "y": 310.1333333333333,
+      "width": 412,
+      "height": 108.5333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 220109250,
+      "version": 1,
+      "versionNonce": 480973110,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "chain",
+          "to": "prepare"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          -84,
+          0
+        ],
+        [
+          -84,
+          100.19999999999999
+        ],
+        [
+          -160.0666666666666,
+          100.19999999999999
+        ],
+        [
+          -380,
+          100.19999999999999
+        ],
+        [
+          -380,
+          108.5333333333333
+        ],
+        [
+          -411.5,
+          108.5333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-1",
+        "focus": -0.1688888888888894,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-7",
+        "focus": 0.17333333333333256,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-10",
+      "type": "arrow",
+      "x": 1648,
+      "y": 477.6,
+      "width": 440,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1759699396,
+      "version": 1,
+      "versionNonce": 603444688,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "group",
+          "to": "prepared"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          220,
+          0
+        ],
+        [
+          439.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-2",
+        "focus": 0.15200000000000086,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-8",
+        "focus": 0.0599999999999992,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-11",
+      "type": "arrow",
+      "x": 1948,
+      "y": 98.66666666666667,
+      "width": 500,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 942355293,
+      "version": 1,
+      "versionNonce": 1695079367,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "sig",
+          "to": "freeze_sig"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          250,
+          0
+        ],
+        [
+          499.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-0",
+        "focus": -0.022222222222222598,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-9",
+        "focus": 0.22666666666666538,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-12",
+      "type": "arrow",
+      "x": 776,
+      "y": 385.3333333333333,
+      "width": 412,
+      "height": 99.19999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1519037506,
+      "version": 1,
+      "versionNonce": 2110533814,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "canvas-building-and-executing-chain-grou-edge-12-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou",
+        "edge": {
+          "from": "prepare",
+          "to": "chain"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          63.89999999999998,
+          0
+        ],
+        [
+          127.79999999999995,
+          0
+        ],
+        [
+          255.5999999999999,
+          0
+        ],
+        [
+          304,
+          0
+        ],
+        [
+          304,
+          -99.19999999999999
+        ],
+        [
+          411.5,
+          -99.19999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-7",
+        "focus": -0.49333333333333373,
+        "gap": 4
+      },
+      "endBinding": {
+        "elementId": "canvas-building-and-executing-chain-grou-node-1",
+        "focus": 0.2311111111111106,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-0-label",
+      "type": "text",
+      "x": 1810.5,
+      "y": 87.5,
+      "width": 99.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1050184897,
+      "version": 1,
+      "versionNonce": 154211595,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "Signature",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-0",
+      "originalText": "Signature",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-1-label",
+      "type": "text",
+      "x": 1227,
+      "y": 287.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 383310852,
+      "version": 1,
+      "versionNonce": 725459728,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "_chain",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-1",
+      "originalText": "_chain",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-2-label",
+      "type": "text",
+      "x": 1532.5,
+      "y": 457.5,
+      "width": 55.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 595103315,
+      "version": 1,
+      "versionNonce": 182338477,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "group",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-2",
+      "originalText": "group",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-3-label",
+      "type": "text",
+      "x": 1227,
+      "y": 57.5,
+      "width": 66,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1614942654,
+      "version": 1,
+      "versionNonce": 142127202,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "_chord",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-3",
+      "originalText": "_chord",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-4-label",
+      "type": "text",
+      "x": 572,
+      "y": 217.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 569557573,
+      "version": 1,
+      "versionNonce": 238183503,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "Signature.__or__",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-4",
+      "originalText": "Signature.__or__",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-5-label",
+      "type": "text",
+      "x": 624,
+      "y": 47.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 181598200,
+      "version": 1,
+      "versionNonce": 1389025620,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "group.__or__",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-5",
+      "originalText": "group.__or__",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-6-label",
+      "type": "text",
+      "x": 608.5,
+      "y": 567.5,
+      "width": 143,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1124383047,
+      "version": 1,
+      "versionNonce": 247808609,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "_chain.__or__",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-6",
+      "originalText": "_chain.__or__",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-7-label",
+      "type": "text",
+      "x": 530,
+      "y": 397.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 877697186,
+      "version": 1,
+      "versionNonce": 1502438550,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "_chain.prepare_steps",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-7",
+      "originalText": "_chain.prepare_steps",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-8-label",
+      "type": "text",
+      "x": 2107.5,
+      "y": 467.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1223541961,
+      "version": 1,
+      "versionNonce": 97866835,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "group._prepared",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-8",
+      "originalText": "group._prepared",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-9-label",
+      "type": "text",
+      "x": 2472,
+      "y": 97.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1617173164,
+      "version": 1,
+      "versionNonce": 1490449400,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "Signature.freeze",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-9",
+      "originalText": "Signature.freeze",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-node-10-label",
+      "type": "text",
+      "x": 44.99999999999999,
+      "y": 397.5,
+      "width": 110.00000000000001,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 16504376,
+      "version": 1,
+      "versionNonce": 354414228,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "_chain.run",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-node-10",
+      "originalText": "_chain.run",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-0-label",
+      "type": "text",
+      "x": 1628.1333333333334,
+      "y": 288.1333333333333,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 406613622,
+      "version": 1,
+      "versionNonce": 661765338,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-0",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-2-label",
+      "type": "text",
+      "x": 1528.4,
+      "y": 58.66666666666667,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1202926396,
+      "version": 1,
+      "versionNonce": 312235976,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-2",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-3-label",
+      "type": "text",
+      "x": 908.6666666666666,
+      "y": 252.13333333333333,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1328518297,
+      "version": 1,
+      "versionNonce": 450905827,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "builds @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-3",
+      "originalText": "builds @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-4-label",
+      "type": "text",
+      "x": 980.4,
+      "y": 195.33333333333331,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 136280506,
+      "version": 1,
+      "versionNonce": 1223407118,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "builds @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-4",
+      "originalText": "builds @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-5-label",
+      "type": "text",
+      "x": 916,
+      "y": 42,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 462101631,
+      "version": 1,
+      "versionNonce": 642046617,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "creates @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-5",
+      "originalText": "creates @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-6-label",
+      "type": "text",
+      "x": 1034.9333333333334,
+      "y": 562,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1412227344,
+      "version": 1,
+      "versionNonce": 658937324,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "extends @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-6",
+      "originalText": "extends @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-7-label",
+      "type": "text",
+      "x": 312,
+      "y": 392,
+      "width": 44,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 473247197,
+      "version": 1,
+      "versionNonce": 1623077703,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-7",
+      "originalText": "calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-8-label",
+      "type": "text",
+      "x": 1439.6666666666665,
+      "y": 642,
+      "width": 44,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 34283854,
+      "version": 1,
+      "versionNonce": 1509314034,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-8",
+      "originalText": "calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-9-label",
+      "type": "text",
+      "x": 979.5333333333334,
+      "y": 400.3333333333333,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 70648739,
+      "version": 1,
+      "versionNonce": 1894727997,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "unpacks via",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-9",
+      "originalText": "unpacks via",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-10-label",
+      "type": "text",
+      "x": 1819.6,
+      "y": 467.6,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 610011089,
+      "version": 1,
+      "versionNonce": 970341595,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "unrolls via",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-10",
+      "originalText": "unrolls via",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-11-label",
+      "type": "text",
+      "x": 2167.2,
+      "y": 88.66666666666667,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 777483668,
+      "version": 1,
+      "versionNonce": 840131040,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "defines",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-11",
+      "originalText": "defines",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "canvas-building-and-executing-chain-grou-edge-12-label",
+      "type": "text",
+      "x": 991.9999999999999,
+      "y": 375.3333333333333,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 1018004003,
+      "version": 1,
+      "versionNonce": 1426810045,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "canvas-building-and-executing-chain-grou"
+      },
+      "text": "processes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "canvas-building-and-executing-chain-grou-edge-12",
+      "originalText": "processes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
