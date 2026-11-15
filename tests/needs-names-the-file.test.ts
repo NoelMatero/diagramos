@@ -131,9 +131,10 @@ describe("never red: the import writes the name the arrow points at", () => {
 describe("Rust: a use names the item, wherever pub use moved it", () => {
   const crate = {
     "Cargo.toml": CARGO,
-    "src/lib.rs": "mod datetime;\nmod naive;\npub use datetime::DateTime;\npub use datetime::Utc;\n",
+    "src/lib.rs": "mod datetime;\nmod naive;\nmod offset;\npub use datetime::DateTime;\npub use datetime::Utc;\n",
     "src/datetime/mod.rs": "pub struct DateTime;\npub struct Utc;\nimpl DateTime { pub fn from_utc() -> Self { DateTime } }\n",
-    "src/naive.rs": "use crate::{DateTime, Utc};\npub fn naive() -> DateTime { let _ = Utc; DateTime::from_utc() }\n",
+    "src/naive.rs": "use crate::{DateTime};\npub fn naive() -> DateTime { DateTime::from_utc() }\n",
+    "src/offset.rs": "use crate::Utc;\npub fn offset() -> Utc { Utc }\n",
   };
 
   it("confirms the arrow onto the item", async () => {
@@ -152,7 +153,7 @@ describe("Rust: a use names the item, wherever pub use moved it", () => {
 
   it("confirms an arrow onto another item of that file, as a direct import would", async () => {
     // The key calls this true: the file takes `Utc` from there.
-    const report = await check(crate, "src/naive.rs", "src/datetime/mod.rs#DateTime");
+    const report = await check(crate, "src/offset.rs", "src/datetime/mod.rs#DateTime");
     expect(report.edges.filter((finding) => accuses(finding.kind))).toEqual([]);
   });
 });
