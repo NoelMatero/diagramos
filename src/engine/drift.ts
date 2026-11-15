@@ -5158,7 +5158,17 @@ export function checkDrift(
          */
         const strict = edge.claim === "needs";
         const word = edge.claim;
-        const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger);
+        /*
+         * What the far end names, for an import that reaches it only through
+         * re-exports (#450): the name the tail would have written if it is
+         * that end it imports.
+         */
+        const wanted = [...new Set([toNode.ref, ...(toNode.refs ?? [])].flatMap((anchor) => {
+          const parsed = anchor ? parseRef(anchor) : undefined;
+          if (!parsed?.symbol || parsed.path !== toPath) return [];
+          return [parsed.symbol.replace(/@.*$/, ""), ...(parsed.owner ? [parsed.owner] : [])];
+        }))];
+        const needs = checkNeeds(fromPath, toPath, workspace, importCache.configs, options?.ledger, undefined, wanted);
         /*
          * What an import red rests on (#393): an absence the text read off
          * every import it could place, and none it could not. The question is
@@ -5181,7 +5191,7 @@ export function checkDrift(
                 unanswered = `\`${written}\` in ${file}`;
               }
               return answer === undefined || answer === "outside" ? answer : answer.file;
-            });
+            }, wanted);
             const noAnswer = unanswered === undefined ? undefined : `the compiler gave no answer about where ${unanswered} leads`;
             if (again.verdict === "confirmed") {
               return { does: true, said: `${fromPath} imports ${toPath}: \`${again.evidence.specifier}\` lands there` };
@@ -5373,12 +5383,39 @@ export function checkDrift(
              * head defines, which may reach it through a re-export -- the
              * route is a note, and it says which name kept it one.
              */
-            const held = needs.handedOn === "*"
-              ? ` ${fromPath} has a star import, which may hand on what ${toPath} defines, so this is not called wrong.`
-              : needs.handedOn && needs.handedOn !== "?"
-                ? ` ${fromPath} writes \`${needs.handedOn}\`, which ${toPath} defines and a re-export `
-                  + `may hand on, so this is not called wrong.`
-                : "";
+            const held = needs.named
+              ? ` ${fromPath} writes \`${needs.named}\`, ${wanted.length > 0 ? "the name this arrow points at" : `which ${toPath} defines`}, and gets it from ${toPath} `
+                + `through ${needs.via.join(" -> ")}: a needs arrow means an import that names ${toPath} itself, `
+                + `but that is not called wrong.`
+              : needs.handedOn === "*"
+                ? ` ${fromPath} has a star import, which may hand on what ${toPath} defines, so this is not called wrong.`
+                : needs.handedOn && needs.handedOn !== "?"
+                  ? ` ${fromPath} writes \`${needs.handedOn}\`, which ${toPath} defines and a re-export `
+                    + `may hand on, so this is not called wrong.`
+                  : "";
+            /*
+             * A package Python runs on the way to a module the tail names
+             * (#450): the line names the module, not the package, and the
+             * file never uses the package. Not called wrong: pyright lists it.
+             */
+            if (needs.loaded) {
+              recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
+                from: fromPath,
+                to: toPath,
+                fromLabel: fromNode.label,
+                toLabel: toNode.label,
+                fromRef,
+                toRef,
+                kind: "needs-one-level-up",
+                detail: `this arrow says ${oneLine(fromNode.label) || fromPath} needs `
+                  + `${oneLine(toNode.label) || toPath}, and ${fromPath} line ${needs.evidence.line} imports a module `
+                  + `inside that package (\`${needs.evidence.specifier}\` is on the way), which makes Python run `
+                  + `${toPath} but does not name it, and nothing else in ${fromPath} uses it. Not called wrong. `
+                  + `Point the arrow at the module ${fromPath} imports, or leave it and read it as "depends on".`,
+                route,
+              }, rests: needsRests(needs.unplaced) });
+              continue;
+            }
             recordEdge(edge, fromNode, toNode, { kind: "finding", finding: {
               from: fromPath,
               to: toPath,
