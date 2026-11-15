@@ -141,6 +141,7 @@ const REASONS: Record<string, Label> = {
   "needs/said:backwards": { kind: "cannot-see", why: "the compiler sees the forward import and the reader does not" },
   "needs/said:indirect": { kind: "cannot-see", why: "the compiler sees a direct import and the reader reaches the far end only through another file -- mostly a Python `__init__.py` re-export. Amber, not red: the tail writes a name the head defines, or star-imports, so it may be using it (#323)" },
   "needs/said:indirect-accused": { kind: "cannot-see", why: "the same, and called wrong: the reader reaches the far end only through another file and the guard did not hold it back. A false red; must be 0 in every language" },
+  "needs/said:loaded": { kind: "not-an-arrow", why: "a Python package the file passes through on the way to a module it imports (`import a.b.c` and `a/b/__init__.py`), and never uses itself. Python runs it and pyright lists it; the line does not name it, so the reader leaves it not sure rather than confirming it, and never accuses it (#450)" },
   "needs/said:refuted": { kind: "cannot-see", why: "the compiler sees the import and the reader finds none, and no chain either: a false red. Every one must be in the licence's `known` (#323)" },
 
   "takes/no-signature": { kind: "cannot-see", why: "the name is declared as something the reader does not read as a function" },
@@ -344,9 +345,9 @@ for (const tree of trees) {
           () => {
             const verdict = checkNeeds(from, to, workspace, configs);
             // An indirect verdict the arrow would be called wrong on is a false red, and counted apart.
-            return verdict.verdict === "indirect" && verdict.mayAccuse
-              ? { kind: "no", verdict: "indirect-accused" }
-              : bucket(verdict);
+            if (verdict.verdict === "indirect" && verdict.mayAccuse) return { kind: "no", verdict: "indirect-accused" };
+            if (verdict.verdict === "indirect" && verdict.loaded) return { kind: "no", verdict: "loaded" };
+            return bucket(verdict);
           });
       }
       timings.push(`${name} needs (${referee}) ${((Date.now() - began) / 1000).toFixed(0)}s`);

@@ -425,8 +425,28 @@ export function childModule(directory: string, segment: string, workspace: Works
   const flat = join(directory, `${segment}.rs`);
   if (existsExactly(flat, workspace)) return { file: flat, directory: join(directory, segment) };
   const folded = join(join(directory, segment), "mod.rs");
-  if (existsExactly(folded, workspace)) return { file: folded, directory: join(directory, segment) };
+  if (existsExactly(folded, workspace) && listedExactly(directory, segment, workspace)) {
+    return { file: folded, directory: join(directory, segment) };
+  }
   return undefined;
+}
+
+/**
+ * Whether `directory` lists `name` spelled exactly so (#449).
+ *
+ * `existsExactly` checks a file's own name, and for `datetime/mod.rs` that is
+ * `mod.rs`, which every module directory has. On macOS `use crate::DateTime`
+ * then found `src/DateTime/mod.rs` -- the directory `datetime`, under another
+ * capital -- and chrono's correct arrow onto `datetime/mod.rs#DateTime` went
+ * red: the import landed on a file that does not exist, and the walk reached
+ * the real one through `lib.rs`. An unreadable directory lists as empty, and
+ * there the `stat` answer stands, as it does above.
+ */
+function listedExactly(directory: string, name: string, workspace: Workspace): boolean {
+  const absolute = workspace.resolve(directory === "" ? "." : directory);
+  if (!absolute) return false;
+  const entries = workspace.list(absolute);
+  return entries.length === 0 || entries.includes(name);
 }
 
 /**

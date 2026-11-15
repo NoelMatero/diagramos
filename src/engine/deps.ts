@@ -202,6 +202,15 @@ export interface FileDependency {
    */
   names?: readonly string[];
   /**
+   * True for a package a Python `import a.b.c` loads on the way to the module
+   * it names: `a` and `a.b` (2026-11-15, #450). Python runs their
+   * `__init__.py`, pyright lists them, and a walk goes through them; but the
+   * line names `a.b.c`, so on its own this is not the import an `@needs`
+   * arrow onto `a/b/__init__.py` claims. The file names the package where it
+   * goes on to use it -- `a.b.other`, or `a.b` bare -- which `needs.ts` reads.
+   */
+  loaded?: boolean;
+  /**
    * True when the path is only a Rust visibility marker: the `crate` in
    * `pub(crate)`, the `super` in `pub(super)`, the `crate::a` in
    * `pub(in crate::a)`.

@@ -464,16 +464,18 @@ describe("an import that is not there (#323)", () => {
       .toMatchObject({ verdict: "indirect", via: ["service.py"], mayAccuse: false, handedOn: "db" });
   });
 
-  it("follows a star re-export chain and confirms, rather than reporting a route", () => {
+  it("reports a star re-export chain as a route, and never accuses it", () => {
     // Django's shape: the package hands on what it imported by name, and a file
-    // that star-imports the package has the class (#323).
+    // that star-imports the package has the class (#323). It was confirmed;
+    // since #450 a Python import names the module it writes, so `models/base.py`
+    // is two files on. The star keeps it a note: it may be using the class.
     const django = {
       "gis/__init__.py": "from models import *\n",
       "models/__init__.py": "from models.base import Model\n",
       "models/base.py": "class Model:\n    pass\n",
     };
-    expect(checkNeeds("gis/__init__.py", "models/base.py", fakeWorkspace(django)).verdict)
-      .toBe("confirmed");
+    expect(checkNeeds("gis/__init__.py", "models/base.py", fakeWorkspace(django)))
+      .toMatchObject({ verdict: "indirect", via: ["models/__init__.py"], mayAccuse: false, handedOn: "*" });
   });
 
   it("names the files between when the tail reaches the head through them", () => {
@@ -500,10 +502,14 @@ describe("an import that is not there (#323)", () => {
       "lib/index.ts": 'export { db } from "./database";\n',
       "lib/database.ts": "export const db = 1;\n",
     };
-    // A barrel that re-exports the name confirms instead: `export { db } from`
-    // is that file's export arriving here (#323).
-    expect(checkNeeds("app.ts", "lib/database.ts", fakeWorkspace(barrel)).verdict)
-      .toBe("confirmed");
+    // A barrel is a file in between (#450): the import names `lib/index.ts`,
+    // which hands `db` on. It confirmed until the decision that an `@needs`
+    // means the import names the file; now it is the route, and an accusation.
+    expect(checkNeeds("app.ts", "lib/database.ts", fakeWorkspace(barrel)))
+      .toMatchObject({ verdict: "indirect", via: ["lib/index.ts"], mayAccuse: true });
+    // Unless the arrow points at the very name the import writes.
+    expect(checkNeeds("app.ts", "lib/database.ts", fakeWorkspace(barrel), undefined, undefined, undefined, ["db"]))
+      .toMatchObject({ verdict: "indirect", mayAccuse: false, named: "db" });
   });
 
   it("confirms a Rust name imported through the module that re-exports it", () => {
