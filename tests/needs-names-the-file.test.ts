@@ -257,6 +257,12 @@ describe("Python star imports: a literal __all__ is exactly what the star brings
 });
 
 describe("a re-export chain is a route, not the import (#450)", () => {
+  it("TypeScript: a file that only star-re-exports the barrel writes no name, and is red", async () => {
+    const files = { ...BARREL, "src/client.ts": 'export * from "./index";\n' };
+    const report = await check(files, "src/client.ts", "src/links/types.ts");
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-indirect"]);
+  });
+
   it("TypeScript: tRPC's arrow onto another name of the far file is red with the hops", async () => {
     const files = { ...BARREL, "src/links/dedupe.test.ts": 'import type { OperationLink } from "../index";\nexport const x: OperationLink[] = [];\n' };
     const report = await check(files, "src/links/dedupe.test.ts", "src/links/types.ts#TRPCLink");
@@ -267,7 +273,9 @@ describe("a re-export chain is a route, not the import (#450)", () => {
     );
   });
 
-  it("TypeScript: zx's arrow onto the file behind `export *` is red", async () => {
+  it("TypeScript: zx's arrow onto the file behind `export *` is a note, no longer green", async () => {
+    // The arrow points at the whole file and the import writes names it
+    // defines (#373's probe measured this shape as correct): never red.
     const files = {
       "src/vendor.ts": 'export * from "./vendor-core";\nexport * from "./vendor-extra";\n',
       "src/vendor-core.ts": "export const chalk = 1;\n",
@@ -275,8 +283,9 @@ describe("a re-export chain is a route, not the import (#450)", () => {
       "src/goods.ts": 'import { fs, minimist } from "./vendor";\nexport function sleep() { return fs + minimist; }\n',
     };
     const report = await check(files, "src/goods.ts#sleep", "src/vendor-extra.ts");
-    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-indirect"]);
-    expect(report.edges[0]!.detail).toContain("src/goods.ts → src/vendor.ts → src/vendor-extra.ts");
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-one-level-up"]);
+    expect(report.edges[0]!.detail).toContain("src/goods.ts writes `fs`, which src/vendor-extra.ts defines");
+    expect(report.edges[0]!.route).toEqual(["src/goods.ts", "src/vendor.ts", "src/vendor-extra.ts"]);
   });
 
   it("TypeScript: depends still holds over the barrels", async () => {

@@ -830,7 +830,8 @@ function reexported(
 /**
  * The arrow's own end, written in the tail and handed on to it from the head
  * through re-exports (#450): `import { Link } from "./lib"`, `lib/index.ts`
- * writing `export * from "./link"`, and the arrow onto `lib/link.ts#Link`.
+ * writing `export * from "./link"`, and the arrow onto `lib/link.ts#Link` --
+ * or onto `lib/link.ts` itself, whose names are all that end.
  * Also the name written anywhere else in the tail -- `lib.Link` after `import
  * * as lib` -- since a star hands on every name. Words are read off the whole
  * text: reading too many only keeps a note.
@@ -844,14 +845,21 @@ function namedThrough(
   ledger?: Ledger,
 ): string | undefined {
   const names = wanted.filter((name) => /^[A-Za-z_$][\w$]*$/.test(name));
-  if (names.length === 0) return undefined;
+  const whole = wanted.length === 0;
   for (const written of hopsOf(from, workspace, cache, ledger).hops) {
     if (written.on === to) continue;
-    for (const name of names) {
+    /*
+     * An arrow onto a whole file points at everything it declares, so any
+     * name the import writes and the chain hands on from there is that end
+     * (#373's probe: `import { double } from "./lib"`, the arrow onto
+     * `lib/util.ts`, measured as a correct arrow that must never go red).
+     */
+    for (const name of whole ? written.names ?? [] : names) {
       if ((written.names ?? []).includes(name)
         && handsOn(written.on, name, to, workspace, cache, ledger, new Set([from]))) return name;
     }
   }
+  if (names.length === 0) return undefined;
   const absolute = workspace.resolve(from);
   if (!absolute) return names[0];
   const words = new Set(workspace.read(absolute).match(/[A-Za-z_$][\w$]*/g) ?? []);

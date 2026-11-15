@@ -5384,7 +5384,7 @@ export function checkDrift(
              * route is a note, and it says which name kept it one.
              */
             const held = needs.named
-              ? ` ${fromPath} writes \`${needs.named}\`, the name this arrow points at, and gets it from ${toPath} `
+              ? ` ${fromPath} writes \`${needs.named}\`, ${wanted.length > 0 ? "the name this arrow points at" : `which ${toPath} defines`}, and gets it from ${toPath} `
                 + `through ${needs.via.join(" -> ")}: a needs arrow means an import that names ${toPath} itself, `
                 + `but that is not called wrong.`
               : needs.handedOn === "*"

@@ -504,12 +504,17 @@ describe("an import that is not there (#323)", () => {
     };
     // A barrel is a file in between (#450): the import names `lib/index.ts`,
     // which hands `db` on. It confirmed until the decision that an `@needs`
-    // means the import names the file; now it is the route, and an accusation.
+    // means the import names the file; now it is the route. Never accused
+    // while the import writes the end's name -- `db`, which the whole file
+    // `database.ts` declares, or the arrow's own `#db`.
     expect(checkNeeds("app.ts", "lib/database.ts", fakeWorkspace(barrel)))
-      .toMatchObject({ verdict: "indirect", via: ["lib/index.ts"], mayAccuse: true });
-    // Unless the arrow points at the very name the import writes.
+      .toMatchObject({ verdict: "indirect", via: ["lib/index.ts"], mayAccuse: false, named: "db" });
     expect(checkNeeds("app.ts", "lib/database.ts", fakeWorkspace(barrel), undefined, undefined, undefined, ["db"]))
       .toMatchObject({ verdict: "indirect", mayAccuse: false, named: "db" });
+    // An arrow onto another name of that file is the route, and an accusation.
+    const two = { ...barrel, "lib/database.ts": "export const db = 1;\nexport const pool = 2;\n" };
+    expect(checkNeeds("app.ts", "lib/database.ts", fakeWorkspace(two), undefined, undefined, undefined, ["pool"]))
+      .toMatchObject({ verdict: "indirect", via: ["lib/index.ts"], mayAccuse: true });
   });
 
   it("confirms a Rust name imported through the module that re-exports it", () => {
