@@ -13,9 +13,10 @@
  * `@calls` arrow was never caught.
  *
  * Each language here pins three things: the wrong arrow that now goes red,
- * the right one that stays unaccused, and the guard -- a call through an
- * interface, a trait or a Protocol lands on a declaration something else
- * stands in for at runtime, and no accusation rests on it.
+ * the right one that stays unaccused, and a call through an interface, a
+ * trait or a Protocol. That lands on a declaration something else stands in
+ * for at runtime -- a method of the same name (#351), so a head of another
+ * name is not it unless the repository stores the head under that name.
  */
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -121,10 +122,16 @@ describe("TypeScript: a call through an optional field", () => {
     expect(accusations(await checked("run.ts#run", "signal.ts#fire"))).toEqual([]);
   }, 120_000);
 
-  it("accuses nothing on a call through an interface", async () => {
+  it("reads a call through an interface as one to a method of its name (#351)", async () => {
     write(FILES);
-    // `warn` is declared on an interface: whatever implements `Logger` is what
-    // runs, so the call is not placed and the arrow is not accused.
+    // `warn` is declared on an interface: whatever implements `Logger` runs,
+    // and each is a method named `warn` -- never `render`, which nothing
+    // stores under another name.
+    expect(accusations(await checked("run.ts#report", "render.ts#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
+  }, 120_000);
+
+  it("accuses nothing on a call through an interface when the head is stored", async () => {
+    write({ ...FILES, "wire.ts": "import { render } from \"./render\";\nexport const logger = { warn: render };\n" });
     expect(accusations(await checked("run.ts#report", "render.ts#render"))).toEqual([]);
   }, 120_000);
 });
@@ -158,10 +165,15 @@ describe("Python: a call on a module reached through a module", () => {
     expect(accusations(await checked("run.py#welcome", "thing.py#greet"))).toEqual([]);
   }, 120_000);
 
-  it("accuses nothing on a call through a Protocol", async () => {
+  it("reads a call through a Protocol as one to a method of its name (#351)", async () => {
     write(FILES);
     // pyright answers `Greeter.greet`, whose body is `...`: the class that
-    // satisfies the Protocol is what runs, and nothing here says which.
+    // satisfies the Protocol is what runs, and it runs a `greet`.
+    expect(accusations(await checked("run.py#through", "render.py#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
+  }, 120_000);
+
+  it("accuses nothing on a call through a Protocol when the head is stored", async () => {
+    write({ ...FILES, "wire.py": "from render import render\n\n\nclass Loud:\n    greet = render\n" });
     expect(accusations(await checked("run.py#through", "render.py#render"))).toEqual([]);
   }, 120_000);
 });
@@ -197,10 +209,19 @@ describe("Rust: a call on a type's name", () => {
     expect(accusations(await checked("src/run.rs#run", "src/own.rs#cast"))).toEqual([]);
   }, 180_000);
 
-  it.skipIf(!hasRustAnalyzer)("accuses nothing on a call through a trait", async () => {
+  it.skipIf(!hasRustAnalyzer)("reads a call through a trait as one to a method of its name (#351)", async () => {
     write(FILES);
     // rust-analyzer answers the trait's `fn load(&self) -> u32;`, which has no
-    // body: whatever implements `Store` is what runs.
+    // body: whatever implements `Store` runs, and it runs a `load`.
+    expect(accusations(await checked("src/run.rs#through", "src/render.rs#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
+  }, 180_000);
+
+  it.skipIf(!hasRustAnalyzer)("accuses nothing on a call through a trait when the head is wrapped in a closure", async () => {
+    write({
+      ...FILES,
+      "src/lib.rs": "pub mod own;\npub mod store;\npub mod run;\npub mod render;\npub mod wire;\n",
+      "src/wire.rs": "pub fn wire() -> Box<dyn Fn(u32) -> u32> {\n    Box::new(move |n| crate::render::render(n))\n}\n",
+    });
     expect(accusations(await checked("src/run.rs#through", "src/render.rs#render"))).toEqual([]);
   }, 180_000);
 });

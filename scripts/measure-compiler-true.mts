@@ -12,6 +12,11 @@
  *   ... --one=<project>    one project, in this process (prints raw JSON)
  *   ... --names=plain      Rust: draw a method as `file#new`, not `file#Money::new`
  *                          (#382). TypeScript and Python always draw `Class.method`.
+ *   ... --dispatched       TypeScript, only `@calls` arrows through a call the compiler
+ *                          resolves to an interface's or an abstract method (#351),
+ *                          drawn to each routine stored under that method: a class
+ *                          that implements it, or an object literal typed by the
+ *                          interface naming a routine or wrapping one in an arrow.
  *   ... --class-tails      only `@calls` arrows drawn FROM a class or struct (#459):
  *                          each call the compiler resolves in a method becomes
  *                          "the method's class calls it", drawn at the class in
@@ -83,7 +88,8 @@ const showCases = args.includes("--cases");
 /** How a method's box is drawn: `Type::method` / `Class.method`, or `--names=plain`. */
 const plainNames = flag("names") === "plain";
 const classTails = args.includes("--class-tails");
-const words = (flag("words")?.split(",") ?? (classTails ? ["calls"] : undefined)) as TrueWord[] | undefined;
+const dispatched = args.includes("--dispatched");
+const words = (flag("words")?.split(",") ?? (classTails || dispatched ? ["calls"] : undefined)) as TrueWord[] | undefined;
 const WORDS: TrueWord[] = ["holds", "takes", "returns", "conforms", "calls", "accesses"];
 
 /** The pinned clones live in the main checkout; a worktree has none. */
@@ -193,7 +199,7 @@ async function measureOne(project: string): Promise<ProjectResult> {
   if (language === "ts") {
     const ts = (await import("typescript")).default;
     const { typescriptTruePairs } = await import("./lib/compiler-true-ts");
-    pairs = typescriptTruePairs(ts, root, dirs);
+    pairs = typescriptTruePairs(ts, root, dirs, { dispatched });
   } else if (language === "python") {
     pairs = pythonTruePairs(project, dirs);
   } else {
