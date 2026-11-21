@@ -72,6 +72,7 @@ import {
   type Bindings, type CallSide, type CallsNotClosed,
 } from "./calls";
 import { declarationName, escapeName, NAME_END } from "./declared";
+import { providedByHost, providedByLanguage } from "./builtins";
 import { mayAccuse } from "./licence";
 import { each, incomplete, parametersOf, parseSource, type Language, type Node } from "./parse";
 
@@ -856,7 +857,8 @@ function isSomethingElse(
   names: ConstructsNames | undefined,
 ): boolean {
   if (!bindings.imported.has(name)) {
-    return bindings.local.has(name) && declaredApart(source, language, name, wanted, names?.side.file, names);
+    if (!bindings.local.has(name)) return providedApart(name, source, language, wanted);
+    return declaredApart(source, language, name, wanted, names?.side.file, names);
   }
   if (!names) return false;
   const placed = placeName(name, names.side, bindings);
@@ -870,6 +872,52 @@ function isSomethingElse(
 }
 
 const isTypeScript = (language: Language) => language === "ts" || language === "tsx";
+
+/**
+ * Whether `new Error()`, `new Map()` or `new URL()` is the language's or the
+ * host's own class: the file neither declares nor imports the name, binds it
+ * nowhere (a parameter, a destructured local, a reassignment), and the name
+ * is on the list `builtins.ts` dumps from a bare realm or the host. None of
+ * those can be the head or a subclass of it, so writing one is no doubt
+ * about what the body creates. Before this, every body that threw an `Error`
+ * was quiet about creating none of the head.
+ *
+ * A host name (`Response`, `Headers`, `URL`) a repository may declare as a
+ * global of its own, in a script file that every other script shares. So a
+ * host name counts only in a module, where an unimported name cannot be
+ * another file's declaration, and never when it is one of the head's names.
+ */
+function providedApart(name: string, source: string, language: Language, wanted: Set<string>): boolean {
+  if (wanted.has(name) || !isTypeScript(language)) return false;
+  const tree = parseSource(source, language);
+  if (!tree) return false;
+  let module = false;
+  for (let at = 0; at < tree.rootNode.childCount; at += 1) {
+    if (/^(import|export)_statement$/.test(tree.rootNode.child(at)?.type ?? "")) module = true;
+  }
+  if (!providedByLanguage(name, language) && !(module && providedByHost(name, language))) return false;
+  let bound = false;
+  each(tree.rootNode, (node) => {
+    if (bound) return;
+    for (const field of BINDS[node.type] ?? []) {
+      const part = node.childForFieldName(field);
+      if (part) each(part, (leaf) => { if (leaf.childCount === 0 && leaf.text === name) bound = true; });
+    }
+  });
+  return !bound;
+}
+
+/** Where each TypeScript node that binds a name writes it. */
+const BINDS: Record<string, string[]> = {
+  variable_declarator: ["name"],
+  required_parameter: ["pattern"],
+  optional_parameter: ["pattern"],
+  arrow_function: ["parameter"],
+  catch_clause: ["parameter"],
+  assignment_expression: ["left"],
+  augmented_assignment_expression: ["left"],
+  for_in_statement: ["left"],
+};
 
 /**
  * Whether `source` declares `name` exactly as a class or a routine, and a
@@ -1241,7 +1289,7 @@ function pythonAbsence(
    * own `multi_items`, and "does `multi_items` make one?" was never asked.
    */
   const tailIsAClass = declaresClass(source, routine);
-  const verdict = callsBetween({ ...names.side, routine }, { ...names.head, names: targets }, tailIsAClass);
+  const verdict = callsBetween({ ...names.side, routine }, { ...names.head, names: targets }, tailIsAClass, true);
   if (verdict.verdict === "backwards") {
     if (!mayAccuse("builds", "python")) return undefined;
     const { name, line, wrote } = verdict.evidence;
@@ -1360,18 +1408,32 @@ function assigned(node: Node): Node | undefined {
   return undefined;
 }
 
+const wholeWord = (name: string) => new RegExp(`(^|[^\\w])${escapeName(name)}($|[^\\w])`);
+
 /** Whether this Python source declares `name` as a `def` -- and only as that. */
 function declaresRoutine(source: string, name: string): boolean {
   const tree = parseSource(source, "python");
   if (!tree) return false;
   let routine = false;
   let other = false;
-  each(tree.rootNode, (node) => {
+  /*
+   * An assignment inside a function binds a local of that function, which no
+   * call from anywhere else can land on (#504): trio's `_run.py` has
+   * `current_task = repr(..)` inside one method and `def current_task()` at
+   * the top, and the local kept every call to the function a doubt.
+   */
+  const visit = (node: Node, local: boolean): void => {
+    // `global current_task` makes a function's assignment the module's.
+    if (/^(global|nonlocal)_statement$/.test(node.type) && wholeWord(name).test(node.text)) other = true;
     const declared = node.childForFieldName("name") ?? assigned(node);
-    if (!declared || declared.childCount !== 0 || declared.text !== name) return;
-    if (parametersOf(node) && node.childForFieldName("body")) routine = true;
-    else if (node.childForFieldName("body") || assigned(node)) other = true;
-  });
+    if (declared && declared.childCount === 0 && declared.text === name) {
+      if (parametersOf(node) && node.childForFieldName("body")) routine = true;
+      else if (node.childForFieldName("body") || (assigned(node) && !local)) other = true;
+    }
+    const inside = local || node.type === "function_definition";
+    for (let at = 0; at < node.childCount; at += 1) visit(node.child(at)!, inside);
+  };
+  visit(tree.rootNode, false);
   return routine && !other;
 }
 
@@ -1512,7 +1574,13 @@ export function constructions(
    */
   if (reverse && mayAccuse("builds", reverse.language)) {
     const theirs = new Set(reverse.names);
-    for (const routineName of reverse.routines) {
+    /*
+     * The head's own declaration as well as every routine in its file: a
+     * class's field initializers run when it is made, and are its code too
+     * (#504). hono's `TrieRouter` makes its `Node` in `#node = new Node()`,
+     * which no routine of the file holds.
+     */
+    for (const routineName of new Set([...reverse.routines, ...targets])) {
       for (const body of routinesNamed(reverse.source, routineName, reverse.language).routines) {
         const { made, why } = madeIn(body, reverse.source);
         if (why) continue;

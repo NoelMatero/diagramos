@@ -2114,6 +2114,13 @@ export function callsBetween(
    * and the question goes on to whether the tail's own calls close.
    */
   backwards = true,
+  /**
+   * `@builds` asking (#504): the head is a class, and the question is only
+   * whether the body creates one. A call to a plain routine in the class's own file -- one of its methods,
+   * most often, run on a value that already exists -- creates none, so it is not a reason
+   * to stay quiet (`plainRoutinesOnly`).
+   */
+  madeOnly = false,
 ): CallsVerdict {
   const wanted = new Set(to.names);
   /*
@@ -2209,7 +2216,7 @@ export function callsBetween(
   if (typeTail && typeTail.routines.length === 0 && from.language !== "rust") {
     return { verdict: "absent", notClosed: "routine-not-found" };
   }
-  const closed = closedBodyRefutes(from, to, compiled);
+  const closed = closedBodyRefutes(from, to, compiled, madeOnly);
   /*
    * A reason the closed reading found comes first: it may be one a compiler
    * can still answer, and a live check asks only about the reason it is
@@ -2257,8 +2264,9 @@ function closedBodyRefutes(
   to: CallSide & { names: string[] },
   /** Already read by `callsBetween`, when it had to be. */
   known?: CompiledTail,
+  madeOnly = false,
 ): { evidence: CallsRefutedEvidence } | { reached: CallsWrongRoutineEvidence } | { why: CallsNotClosed } {
-  const text = textClosed(from, to);
+  const text = textClosed(from, to, madeOnly);
   /*
    * Closed, and still not the end of it: every call the text wrote was
    * placed, and the head can run without being written as one. A body can
@@ -3053,6 +3061,7 @@ function onlyAMethod(source: string, language: Language, name: string): boolean 
 function textClosed(
   from: CallSide & { routine: string },
   to: CallSide & { names: string[] },
+  madeOnly = false,
 ): { evidence: CallsRefutedEvidence; readMacros?: true } | { reached: CallsWrongRoutineEvidence; readMacros?: true } | { why: CallsNotClosed } {
   const typeTail = typeTailOf(from.source, from.language, from.routine);
   const reading = typeTail ? ownBodies(from) : callSitesIn(from);
@@ -3128,6 +3137,11 @@ function textClosed(
          *                                          does this reader
          *   a different routine, named             the thing worth saying
          */
+        // Run on a value of the head that already exists: it creates none (#504).
+        if (madeOnly && site.declaredAs !== undefined && plainRoutinesOnly(to, site.declaredAs)) {
+          sites += 1;
+          continue;
+        }
         if (site.declaredAs === undefined || to.names.includes(site.declaredAs)) {
           const stopped = stop("reaches-the-file");
           if (stopped) return stopped;
@@ -3858,6 +3872,69 @@ function cannotBeTheHead(to: CallSide & { names: string[] }, landed: string): bo
     if (headType) return !writtenInside(source, language, head, landed) && !(landedType && lineageOf(to, landed).has(head));
     return true;
   });
+}
+
+/**
+ * Whether every routine the head's file declares under `name` is a plain
+ * Python `def` that creates none of the head (#504): undecorated (or only
+ * marked abstract, overloaded or final), not a dunder, its own body never
+ * naming the head and never writing `cls`, `type`, `__class__`, `__new__`,
+ * `copy`, `deepcopy` or `replace`. Nothing else in the file -- a class, or
+ * an assignment at module or class level -- may carry the name.
+ *
+ * A call placed there runs a function, and only calling the class creates
+ * one. httpx's `charset_encoding` calls `self.headers.get(..)`, a method of
+ * the very `Headers` the arrow points at, on a value that already exists;
+ * before, any call landing in the head's own file kept the arrow quiet.
+ *
+ * Every other shape stays a doubt: a classmethod or a staticmethod is how
+ * Python spells another constructor, a dunder may be `__init__` or
+ * `__call__`, any other decorator may hand back anything, and a routine that
+ * may build a copy of the head is the head's own code making one, which
+ * `@builds` stays quiet about rather than judge (#360). The placement names
+ * the routine, not which of several same-named ones it is, so each must pass.
+ */
+function plainRoutinesOnly(to: CallSide & { names: string[] }, name: string): boolean {
+  if (to.language !== "python" || DUNDER.test(name)) return false;
+  const tree = parseSource(to.source, to.language);
+  if (!tree) return false;
+  const makes = new RegExp(`\\b(${to.names.map(escapeName).join("|")}|cls|type|__class__|__new__|copy|deepcopy|replace)\\b`);
+  let plain = 0;
+  let other = false;
+  const visit = (node: Node, local: boolean): void => {
+    let routine: Node | null = node.type === "function_definition" ? node : null;
+    if (node.type === "decorated_definition") {
+      const inner = node.childForFieldName("definition");
+      if (inner?.type === "function_definition" && inner.childForFieldName("name")?.text === name) {
+        for (let at = 0; at < node.childCount; at += 1) {
+          const decorator = node.child(at);
+          if (decorator?.type === "decorator" && !MARKS_ONLY.test(decorator.text)) other = true;
+        }
+        routine = inner;
+      }
+    }
+    if (routine?.childForFieldName("name")?.text === name) {
+      if (makes.test(routine.childForFieldName("body")?.text ?? "")) other = true;
+      else plain += 1;
+      return;
+    }
+    if (node.type === "class_definition" && node.childForFieldName("name")?.text === name) other = true;
+    if (!local && assignsName(node, name)) other = true;
+    const inside = local || node.type === "function_definition";
+    for (let at = 0; at < node.childCount; at += 1) visit(node.child(at)!, inside);
+  };
+  visit(tree.rootNode, false);
+  return plain > 0 && !other;
+}
+
+/** Decorators that only mark a routine and hand back the same function. */
+const MARKS_ONLY = /^@\s*((abc\.)?abstractmethod|(typing\.)?(overload|override|final))\s*$/;
+
+/** Whether this node is an assignment whose left side is the bare name. */
+function assignsName(node: Node, name: string): boolean {
+  if (node.type !== "assignment" && node.type !== "augmented_assignment") return false;
+  const left = node.childForFieldName("left");
+  return left !== null && left.childCount === 0 && left.text === name;
 }
 
 /**

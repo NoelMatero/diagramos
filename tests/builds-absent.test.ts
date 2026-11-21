@@ -214,6 +214,71 @@ describe("TypeScript: a construction that may be a Widget under another name", (
   });
 });
 
+describe("TypeScript: the language's own classes are not the head", () => {
+  /*
+   * `throw new Error(..)`, `new Map()`, `new URL(..)`: a class the file never
+   * declares or imports, from the realm or the host. None of them can be the
+   * head or a subclass of it, so they are no doubt about what the body
+   * creates. Before, any one of them kept the arrow quiet.
+   */
+  const red = async (factory: string, widget = WIDGET) => {
+    const report = await checked("src/factory.ts#build", "src/widget.ts#Widget", ts(factory, widget));
+    expect(accusations(report).map((finding) => finding.kind)).toEqual(["builds-refuted"]);
+    return accusations(report)[0]!;
+  };
+  const quiet = async (factory: string, widget = WIDGET, made = "src/widget.ts#Widget") => {
+    const report = await checked("src/factory.ts#build", made, ts(factory, widget));
+    expect(accusations(report)).toEqual([]);
+  };
+
+  it("is red on a body that throws an Error and creates no Widget (vite's transformMiddleware)", async () => {
+    const finding = await red("export function build(x: number) { if (!x) throw new Error(\"no\"); return new Map(); }\n");
+    expect(finding.detail).toContain("it creates Error, Map instead");
+  });
+
+  it("is red on a host class in a module, new URL()", () => red(
+    "import { helper } from \"./helper\";\nexport function build() { return new URL(helper()); }\n"));
+
+  it("never calls it wrong when the head carries the built-in's name", () => quiet(
+    "export function build() { return new Response(); }\n",
+    "export class Response { go() {} }\n", "src/widget.ts#Response"));
+
+  it("stays quiet when a parameter shadows it", () => quiet(
+    "export function build(Map: any) { return new Map(); }\n"));
+
+  it("stays quiet when a destructured local shadows it", () => quiet(
+    "export function build(deps: any) { const { Map } = deps; return new Map(); }\n"));
+
+  it("stays quiet when the file reassigns it", () => quiet(
+    "import { Widget } from \"./widget\";\n(globalThis as any).x = 1;\nError = Widget as any;\nexport function build() { return new Error(); }\n"));
+
+  it("stays quiet on a host class in a script, which may be another script's global", () => quiet(
+    "function build() { return new Headers(); }\n"));
+
+  it("stays quiet when a file declares it globally", () => quiet(
+    "declare global { var Map: any }\nexport function build() { return new Map(); }\n"));
+});
+
+describe("TypeScript: the head makes the tail in a field initializer", () => {
+  // hono's `Node -> TrieRouter`: the router makes its Node in `#node = new Node()`.
+  const files = (node: string) => ts("", WIDGET, {
+    "src/node.ts": node,
+    "src/router.ts": "import { Node } from \"./node\";\nexport class TrieRouter { #node = new Node(); add() { this.#node.insert(); } }\n",
+  });
+
+  it("is backwards when only the head's field initializer makes the tail", async () => {
+    const report = await checked("src/node.ts#Node", "src/router.ts#TrieRouter",
+      files("export class Node { insert() { return 1; } }\n"));
+    expect(accusations(report).map((finding) => finding.kind)).toEqual(["builds-backwards"]);
+  });
+
+  it("stays quiet when the tail may make the head under another name", async () => {
+    const report = await checked("src/node.ts#Node", "src/router.ts#TrieRouter", files(
+      "import { TrieRouter } from \"./router\";\nconst R = TrieRouter;\nexport class Node { insert() { return 1; } router() { return new (R as any)(); } }\n"));
+    expect(accusations(report)).toEqual([]);
+  });
+});
+
 describe("TypeScript: the rest of #360's table", () => {
   it("stays quiet on a class component rendered through a variable, const C = Widget; <C />", async () => {
     const report = await checked("src/factory.tsx#build", "src/widget.tsx#Widget", {
@@ -275,6 +340,72 @@ describe("Python: a function that creates something else", () => {
       "class Maker:\n    def run(self):\n        return 1\n",
       "from .factory import Maker\n\nclass Widget:\n    def make(self, other: Widget | None = None):\n        return Maker()\n"));
     expect(accusations(report).map((finding) => finding.kind)).toEqual(["builds-backwards"]);
+  });
+});
+
+describe("Python: a call to the class's own method creates none of it", () => {
+  /*
+   * requests' `prepare_body -> PreparedRequest`, httpx's `charset_encoding ->
+   * Headers`: the body calls methods of the head's class on a value that
+   * already exists, and creates none. Before, any call landing in the head's
+   * own file kept the arrow quiet. Each quiet case below is a method that is
+   * another way to make one.
+   */
+  const PREPARED = "class Prepared:\n    def __init__(self):\n        self.body = None\n\n"
+    + "    def length(self, body):\n        return len(body)\n\n"
+    + "    def prepare_body(self, data):\n        self.body = data\n        self.length(data)\n";
+  const check = (models: string) => checked("src/models.py#prepare_body", "src/models.py#Prepared",
+    { "src/__init__.py": "", "src/models.py": models });
+  const quiet = async (models: string) => expect(accusations(await check(models))).toEqual([]);
+
+  it("goes red when the body only runs the class's plain methods", async () => {
+    expect(accusations(await check(PREPARED)).map((finding) => finding.kind)).toEqual(["builds-refuted"]);
+  });
+
+  it("stays quiet when that method may copy the class", () => quiet(PREPARED.replace(
+    "        return len(body)\n", "        return self.copy()\n\n    def copy(self):\n        return type(self)()\n")));
+
+  it("stays quiet when that method names the class", () => quiet(PREPARED.replace(
+    "        return len(body)\n", "        return Prepared()\n")));
+
+  it("stays quiet on a classmethod, another constructor", () => quiet(PREPARED.replace(
+    "    def length(self, body):\n        return len(body)\n", "    @classmethod\n    def length(cls, body):\n        return 1\n")));
+
+  it("stays quiet on a dunder", () => quiet(PREPARED.replace("        self.length(data)\n", "        self.__init__()\n")));
+
+  it("goes red when a module-level def shares the method's name and makes nothing either", async () => {
+    expect(accusations(await check(PREPARED + "\ndef length(x):\n    return x\n")).map((finding) => finding.kind))
+      .toEqual(["builds-refuted"]);
+  });
+
+  it("stays quiet when another routine of that name may make the class", () => quiet(
+    PREPARED + "\ndef length(x):\n    return Prepared()\n"));
+
+  it("stays quiet when the method carries a decorator that may hand back anything", () => quiet(PREPARED.replace(
+    "    def length(self, body):\n", "    @cached\n    def length(self, body):\n")));
+
+  it("stays quiet when the class keeps a value under that name", () => quiet(
+    PREPARED + "\nlength = Prepared\n"));
+});
+
+describe("Python: a local that shares a called function's name", () => {
+  // trio's `acquire_nowait -> ParkingLot`: `_run.py` declares `def current_task()`
+  // and, inside another method, a local `current_task = repr(..)`.
+  const build = "from .helpers import current\n\ndef build():\n    return current()\n";
+  const check = (helpers: string) => checked("src/factory.py#build", "src/widget.py#Widget",
+    py(build, PY_WIDGET, { "src/helpers.py": helpers }));
+  const helpers = "def current():\n    return 1\n\ndef other():\n    current = 2\n    return current\n";
+
+  it("goes red: a local inside another function is not what the call lands on", async () => {
+    expect(accusations(await check(helpers)).map((finding) => finding.kind)).toEqual(["builds-refuted"]);
+  });
+
+  it("stays quiet when `global` makes that assignment the module's", async () => {
+    expect(accusations(await check("def current():\n    return 1\n\ndef other():\n    global current\n    current = 2\n"))).toEqual([]);
+  });
+
+  it("stays quiet when the module rebinds the name", async () => {
+    expect(accusations(await check(helpers + "\ncurrent = 3\n"))).toEqual([]);
   });
 });
 
