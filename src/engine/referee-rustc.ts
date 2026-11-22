@@ -55,6 +55,22 @@ export interface CompiledCrates {
   crateOf(file: string): CompiledCrate | undefined;
   /** Whether any crate was read, so a board can say what checked it. */
   answered: boolean;
+  /**
+   * Each package the files belong to, and whether its crate was read: what a
+   * measurement states in its header, so a run whose builds all failed says
+   * so instead of scoring as though the compiler had nothing to add.
+   */
+  crates: CrateOutcome[];
+}
+
+/** One package's build, as a run reports it. `why` is set when nothing was read. */
+export interface CrateOutcome {
+  /** The package's `Cargo.toml`, repo-relative. */
+  manifest: string;
+  built: boolean;
+  /** Not a failure: the package has no library target, so there is nothing to build. */
+  nothingToBuild?: boolean;
+  why?: string;
 }
 
 export interface CompileOptions {
@@ -64,7 +80,7 @@ export interface CompileOptions {
   cacheDir?: string;
 }
 
-const NONE: CompiledCrates = { crateOf: () => undefined, answered: false };
+const none = (crates: CrateOutcome[] = []): CompiledCrates => ({ crateOf: () => undefined, answered: false, crates });
 
 /** Why a directory walk stops: a build's output, a dependency's tree, a VCS's. */
 const SKIP = new Set(["target", "node_modules", ".git"]);
@@ -82,7 +98,7 @@ export async function compileCrates(
   files: readonly string[],
   options: CompileOptions,
 ): Promise<CompiledCrates> {
-  if (process.platform === "win32" || files.length === 0) return NONE;
+  if (process.platform === "win32" || files.length === 0) return none();
   const cache = options.cacheDir ?? rustcCacheDir();
 
   const byManifest = new Map<string, string[]>();
@@ -92,12 +108,39 @@ export async function compileCrates(
   }
 
   const found = new Map<string, CompiledCrate>();
+  const crates: CrateOutcome[] = [];
   await Promise.all([...byManifest].map(async ([manifest, owned]) => {
-    const crate = await crateFor(manifest, root, cache, options.until);
-    if (crate) for (const file of owned) found.set(file, crate);
+    const got = await crateFor(manifest, root, cache, options.until);
+    const where = path.relative(root, manifest);
+    if ("crate" in got) {
+      for (const file of owned) found.set(file, got.crate);
+      crates.push({ manifest: where, built: true });
+    } else {
+      crates.push({ manifest: where, built: false, why: got.why, ...(got.nothingToBuild ? { nothingToBuild: true } : {}) });
+    }
   }));
-  if (found.size === 0) return NONE;
-  return { crateOf: (file) => found.get(file), answered: true };
+  crates.sort((a, b) => a.manifest.localeCompare(b.manifest));
+  if (found.size === 0) return none(crates);
+  return { crateOf: (file) => found.get(file), answered: true, crates };
+}
+
+/**
+ * Why a build failed, in words somebody can act on, from its `build.log`.
+ *
+ * The one cause worth naming apart is the one a fresh machine hits: the
+ * build is `--offline`, so a package whose dependencies were never
+ * downloaded fails before compiling anything (2026-11-22: every Rust crate
+ * on a new machine, and the run said nothing). Anything else is the log's
+ * first error line, which is what a person would read first anyway.
+ */
+export function buildFailureReason(log: string | undefined): string {
+  if (log === undefined || log.trim() === "") return "the build failed and left no log";
+  if (/no matching package named|failed to download|--offline was specified|offline mode|failed to get `[^`]+` as a dependency/i.test(log)) {
+    return "its dependencies are not downloaded (the build is offline): run `cargo fetch` in it";
+  }
+  const first = log.split("\n").map((line) => line.trim()).find((line) => /^error(\[|:)/.test(line));
+  const said = (first ?? log.trim().split("\n")[0]!).replace(/\s+/g, " ");
+  return `the build failed: ${said.length > 160 ? `${said.slice(0, 160)}…` : said}`;
 }
 
 /** The nearest `Cargo.toml` above a file, without leaving the repository. */
@@ -149,9 +192,12 @@ function packageOf(manifest: string): Package | undefined {
 /** Parsed dumps, by dump path and its modification time: a 3 MB dump is worth reading once. */
 const parsed = new Map<string, { stamp: string; crate: CompiledCrate }>();
 
-async function crateFor(manifest: string, root: string, cache: string, until: number): Promise<CompiledCrate | undefined> {
+type Got = { crate: CompiledCrate } | { why: string; nothingToBuild?: boolean };
+
+async function crateFor(manifest: string, root: string, cache: string, until: number): Promise<Got> {
   const found = packageOf(manifest);
-  if (!found?.lib) return undefined;
+  if (!found) return { why: "`cargo metadata` could not read its Cargo.toml" };
+  if (!found.lib) return { why: "no library target, so nothing to build", nothingToBuild: true };
   const lib = found.lib;
 
   const key = hash(manifest);
@@ -180,18 +226,22 @@ async function crateFor(manifest: string, root: string, cache: string, until: nu
     return crate;
   };
 
+  const failed = (): Got => ({ why: buildFailureReason(readText(path.join(directory, "build.log"))) });
   const ready = read();
-  if (ready) return ready;
-  if (readText(failedFile) === inputs) return undefined;
+  if (ready) return { crate: ready };
+  if (readText(failedFile) === inputs) return failed();
   if (!building(lock)) start(manifest, found.workspace, directory, inputs, lock);
 
   while (Date.now() < until) {
     await new Promise((resolve) => setTimeout(resolve, 100));
     const crate = read();
-    if (crate) return crate;
-    if (!building(lock)) return read();
+    if (crate) return { crate };
+    if (!building(lock)) {
+      const last = read();
+      return last ? { crate: last } : failed();
+    }
   }
-  return undefined;
+  return { why: "still building when the check's time ran out" };
 }
 
 /**

@@ -58,7 +58,7 @@ import type { PyrightLspReferee } from "./referee-python-lsp";
 import type { RustLspReferee } from "./referee-rust-lsp";
 import { resolvePythonReceivers } from "./referee-python";
 import { resolveRustReceivers } from "./referee-rust";
-import { compileCrates, type CompiledCrates } from "./referee-rustc";
+import { compileCrates, type CompiledCrates, type CrateOutcome } from "./referee-rustc";
 
 /** The languages this file can put a question to, in the order a note names them. */
 const LIVE_LANGUAGES = ["python", "rust"] as const;
@@ -112,7 +112,19 @@ export interface RefereeNote {
   silent: readonly string[];
   /** True when the first pass settled everything, so nothing needed asking. */
   nothingToAsk: boolean;
+  /**
+   * How many questions each one was asked in this check and how many it
+   * answered, by the same names as `answered`. Counted, not inferred: a
+   * server that started and then answered nothing is in `answered` above and
+   * shows here as `answered: 0`. `rustc` counts the files whose crate was
+   * asked for and the ones it had a crate for.
+   */
+  questions?: Readonly<Record<string, Questions>>;
+  /** The Rust packages whose crates were asked for, built or not and why. */
+  crates?: readonly CrateOutcome[];
 }
+
+export interface Questions { asked: number; answered: number }
 
 export interface LiveCheck {
   report: DriftReport;
@@ -267,6 +279,13 @@ export async function refereedCheckLive(
   const answered = new Set<string>();
   const silent = new Set<string>();
   const closers: (() => void)[] = [];
+  const questions: Record<string, Questions> = {};
+  const count = (name: string, asked: number, answeredCount: number) => {
+    const row = questions[name] ?? { asked: 0, answered: 0 };
+    row.asked += asked;
+    row.answered += answeredCount;
+    questions[name] = row;
+  };
   /** Rust tails whose arrows asked for the compiler's list, and the builds that answer them. */
   const compilable = new Set<string>();
   let crates: Promise<CompiledCrates> | undefined;
@@ -353,6 +372,8 @@ export async function refereedCheckLive(
           if (Date.now() >= until) { silent.add(language); continue; }
           const resolved = await resolve(root, queries, pool);
           closers.push(resolved.close);
+          count(language, queries.length,
+            queries.filter((query) => resolved.cache.get(query.file, query.at, query.extra) !== undefined).length);
           if (resolved.started) answered.add(language); else silent.add(language);
           const previous = answers[language][kind];
           answers[language][kind] = (file, at, extra) => previous(file, at, extra) ?? resolved.cache.get(file, at, extra);
@@ -364,6 +385,31 @@ export async function refereedCheckLive(
     const compiled = crates ? await crates : undefined;
     if (compiled?.answered) answered.add("rustc");
     else if (crates) silent.add("rustc");
+    if (compiled) count("rustc", compilable.size, [...compilable].filter((file) => compiled.crateOf(file) !== undefined).length);
+
+    /*
+     * The TypeScript compiler answers in process, so its questions are
+     * counted where the real check asks them: every answer it gives, or
+     * declines to give, passes through here unchanged.
+     */
+    const counted = <A extends unknown[], R>(method: ((...args: A) => R) | undefined) =>
+      method === undefined ? undefined : (...args: A): R => {
+        const answer = method(...args);
+        count("typescript", 1, answer === undefined ? 0 : 1);
+        return answer;
+      };
+    const tsAsk = ts ? {
+      resolveReceiver: counted(ts.resolveReceiver.bind(ts)),
+      declarationAt: counted(ts.declarationAt?.bind(ts)),
+      kindAt: counted(ts.kindAt?.bind(ts)),
+      renderableAt: counted(ts.renderableAt?.bind(ts)),
+      parentsOutsideAt: counted(ts.parentsOutsideAt?.bind(ts)),
+      ancestorsAt: counted(ts.ancestorsAt?.bind(ts)),
+      typePartsAt: counted(ts.typePartsAt?.bind(ts)),
+      fitsAt: counted(ts.fitsAt?.bind(ts)),
+      importTargetAt: counted(ts.importTargetAt?.bind(ts)),
+      memberAt: counted(ts.memberAt?.bind(ts)),
+    } : undefined;
 
     /*
      * The merged referee the real check reports through. No half knows the
@@ -375,50 +421,50 @@ export async function refereedCheckLive(
         if (language === "python" || language === "rust") {
           return answers[language].receiver(file, at) as never;
         }
-        return ts?.resolveReceiver(file, at);
+        return tsAsk?.resolveReceiver?.(file, at);
       },
       declarationAt: (file, at) => {
         const language = languageOf(file);
         if (language === "python" || language === "rust") {
           return answers[language].definition(file, at) as never;
         }
-        return ts?.declarationAt?.(file, at);
+        return tsAsk?.declarationAt?.(file, at);
       },
       kindAt: (file, at) => {
         const language = languageOf(file);
         if (language === "python" || language === "rust") {
           return answers[language].kind(file, at) as never;
         }
-        return ts?.kindAt?.(file, at);
+        return tsAsk?.kindAt?.(file, at);
       },
-      renderableAt: (file, at) => ts?.renderableAt?.(file, at),
-      parentsOutsideAt: (file, at) => ts?.parentsOutsideAt?.(file, at),
+      renderableAt: (file, at) => tsAsk?.renderableAt?.(file, at),
+      parentsOutsideAt: (file, at) => tsAsk?.parentsOutsideAt?.(file, at),
       ancestorsAt: (file, at) => {
         const language = languageOf(file);
         if (language === "python" || language === "rust") {
           return answers[language].ancestor(file, at) as never;
         }
-        return ts?.ancestorsAt?.(file, at);
+        return tsAsk?.ancestorsAt?.(file, at);
       },
       typePartsAt: (file, at) => {
         const language = languageOf(file);
         if (language === "python" || language === "rust") return answers[language].typeParts(file, at) as never;
-        return ts?.typePartsAt?.(file, at);
+        return tsAsk?.typePartsAt?.(file, at);
       },
       fitsAt: (file, at, target) => {
         const language = languageOf(file);
         if (language === "python" || language === "rust") return answers[language].fits(file, at, fitsKey(target)) as never;
-        return ts?.fitsAt?.(file, at, target);
+        return tsAsk?.fitsAt?.(file, at, target);
       },
       importTargetAt: (file, at) => {
         const language = languageOf(file);
         if (language === "python" || language === "rust") return answers[language].import(file, at) as never;
-        return ts?.importTargetAt?.(file, at);
+        return tsAsk?.importTargetAt?.(file, at);
       },
       memberAt: (file, at, name) => {
         const language = languageOf(file);
         if (language === "python" || language === "rust") return answers[language].member(file, at, name) as never;
-        return ts?.memberAt?.(file, at, name);
+        return tsAsk?.memberAt?.(file, at, name);
       },
       ...(compiled?.answered ? { compiledCrateOf: (file: string) => compiled.crateOf(file) } : {}),
     };
@@ -430,6 +476,8 @@ export async function refereedCheckLive(
         answered: [...answered].sort(),
         silent: [...silent].filter((one) => !answered.has(one)).sort(),
         nothingToAsk: false,
+        questions,
+        ...(compiled ? { crates: compiled.crates } : {}),
       },
     };
   } finally {

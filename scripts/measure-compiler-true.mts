@@ -23,7 +23,14 @@
  *                          the method's own file. A class calls what its own
  *                          code calls, so every one is correct too.
  *
- * **A measurement: it prints and never fails.**
+ * **A measurement that fails only when it could not measure** (Fonseca 2017,
+ * recommendation 1). It exits 1 when the pairs come to 0, or when more than
+ * a quarter of the projects crashed, gave no pairs, or had a referee that
+ * could not run -- on 2026-11-22 every Rust build failed for want of
+ * downloaded dependencies, and this printed "0 pairs" and exited 0. Its
+ * header says which compilers the checker's live arm got answers from, which
+ * Rust crates built, and any sleep during the run. Reds never fail it: they
+ * are the finding, and are printed.
  *
  * ## The question
  *
@@ -78,7 +85,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { ClosedBodyReferee } from "../src/engine/drift";
+import type { CrateOutcome } from "../src/engine/referee-rustc";
 import type { TruePair, TrueWord } from "./lib/compiler-true-ts";
+import { pausesLine, readPowerLogSleeps, watchPauses, type Pause } from "./lib/run-pauses";
+import { CompilerTally, judgeCompilerTrue, type TallyData } from "./lib/run-validity";
 
 const args = process.argv.slice(2);
 const flag = (name: string) => args.find((one) => one.startsWith(`--${name}=`))?.split("=")[1];
@@ -123,6 +133,14 @@ interface ProjectResult {
   tally: Record<string, number>;
   /** Every red, by arm. Must be empty on `live`. */
   reds: Record<Arm, string[]>;
+  /** The pairs the referee gave, before any `--words` or shape filter: 0 is a project that measured nothing. */
+  pairs: number;
+  /** Set when the referee that makes the pairs could not run, with why. */
+  couldNotRun?: string;
+  /** Which compilers answered the live arm's checks. */
+  compilers: TallyData;
+  /** Times the child did not run while asking the checker. */
+  pauses: Pause[];
 }
 
 if (only) {
@@ -139,6 +157,7 @@ if (!trees) {
 }
 const results: ProjectResult[] = [];
 const failed: string[] = [];
+const runStarted = Date.now();
 const self = fileURLToPath(import.meta.url);
 const projects = flag("projects")?.split(",") ?? Object.keys(trees);
 for (const project of projects) {
@@ -157,15 +176,30 @@ for (const project of projects) {
     failed.push(`${project}: its result line did not parse (${line.length} characters)`);
   }
 }
-report(results, failed);
+const valid = report(results, failed);
+process.exit(valid ? 0 : 1);
 
-function report(results: ProjectResult[], failed: string[]): void {
+/** Prints the run, and says whether it measured anything. */
+function report(results: ProjectResult[], failed: string[]): boolean {
   const tally: Record<string, number> = {};
   for (const one of results) for (const [key, count] of Object.entries(one.tally)) tally[key] = (tally[key] ?? 0) + count;
   const count = (keep: (parts: string[]) => boolean) =>
     Object.entries(tally).filter(([key]) => keep(key.split(" "))).reduce((total, [, n]) => total + n, 0);
 
   console.log(`\ncompiler-true pairs, ${language}: ${results.length} project(s)`);
+  const compilers = new CompilerTally();
+  for (const one of results) compilers.merge(one.compilers);
+  const pauses = results.flatMap((one) => one.pauses);
+  console.log(`  ${pausesLine(pauses, readPowerLogSleeps(runStarted, Date.now()))}`);
+  console.log(`  referee: ${results.map((one) => `${one.project} ${one.pairs}${one.couldNotRun ? ` (${one.couldNotRun})` : ""}`).join(", ") || "no project measured"}`);
+  for (const line of compilers.lines([language])) console.log(`  ${line}`);
+  const verdict = judgeCompilerTrue(language, results.map((one) => ({
+    project: one.project, pairs: one.pairs, ...(one.couldNotRun ? { couldNotRun: one.couldNotRun } : {}),
+  })), failed);
+  // The live arm is the number the licence rests on: a checker whose compiler answered nothing measured the text reading.
+  const problems = compilers.problems([language]).map((one) => `NOT VALID: the live arm's ${one}`);
+  for (const line of [...verdict.lines.filter((one) => one.startsWith("NOT VALID")), ...problems]) console.log(`  ${line}`);
+  for (const line of verdict.lines.filter((one) => !one.startsWith("NOT VALID") && !failed.includes(one))) console.log(`  ${line}`);
   console.log("  word       pairs   compiler-only   red live   red off   green live");
   for (const word of words ?? WORDS) {
     const pairs = count(([w, , arm]) => w === word && arm === "off");
@@ -190,12 +224,17 @@ function report(results: ProjectResult[], failed: string[]): void {
     console.log("\n  FAILED, and not counted:");
     for (const one of failed) console.log(`    ${one}`);
   }
+  if (!verdict.valid || problems.length > 0) {
+    for (const line of [...verdict.lines, ...problems]) process.stderr.write(`compiler-true: ${line}\n`);
+  }
+  return verdict.valid && problems.length === 0;
 }
 
 async function measureOne(project: string): Promise<ProjectResult> {
   const root = path.join(CORPUS, project);
   const dirs = TREES[language]![project] ?? [];
   let pairs: TruePair[];
+  let couldNotRun: string | undefined;
   if (language === "ts") {
     const ts = (await import("typescript")).default;
     const { typescriptTruePairs } = await import("./lib/compiler-true-ts");
@@ -204,12 +243,20 @@ async function measureOne(project: string): Promise<ProjectResult> {
     pairs = pythonTruePairs(project, dirs);
   } else {
     const { rustTruePairs } = await import("./lib/compiler-true-rust");
-    pairs = await rustTruePairs(root, plainNames);
+    pairs = await rustTruePairs(root, plainNames, (crates: readonly CrateOutcome[]) => {
+      const tried = crates.filter((crate) => !crate.nothingToBuild);
+      const built = tried.filter((crate) => crate.built).length;
+      if (tried.length > 0 && built === 0) {
+        couldNotRun = `the Rust compiler built none of ${tried.length} crates: ${tried[0]!.why ?? "no reason recorded"}`;
+      }
+    });
   }
+  const referee = pairs.length;
   if (words) pairs = pairs.filter((pair) => words.includes(pair.word));
   if (classTails) pairs = classTailPairs(pairs);
   process.stderr.write(`${project}: ${pairs.length} pairs\n`);
-  return askChecker(project, root, pairs);
+  const result = await askChecker(project, root, pairs);
+  return { ...result, pairs: referee, ...(couldNotRun ? { couldNotRun } : {}) };
 }
 
 /**
@@ -250,7 +297,8 @@ function pythonTruePairs(project: string, dirs: string[]): TruePair[] {
  * arrows to a board, and never two between the same two boxes, so a finding
  * on a node pair is one arrow's.
  */
-async function askChecker(project: string, root: string, pairs: TruePair[]): Promise<ProjectResult> {
+async function askChecker(project: string, root: string, pairs: TruePair[]):
+  Promise<Omit<ProjectResult, "pairs" | "couldNotRun">> {
   const { liveRefereePool, refereedCheckLive } = await import("../src/engine/referee-live");
   const { checkDrift, createWorkspace, newCheckCache, ACCUSING_EDGE_KINDS } = await import("../src/engine/drift");
   const { emptyBoard } = await import("../src/engine/board-file");
@@ -263,7 +311,9 @@ async function askChecker(project: string, root: string, pairs: TruePair[]): Pro
   const accusing = new Set<string>(ACCUSING_EDGE_KINDS);
   const cache = newCheckCache(createWorkspace(root));
   const pool = liveRefereePool(() => Date.now() + 120_000);
-  const result: ProjectResult = { project, tally: {}, reds: { live: [], off: [] } };
+  const compilers = new CompilerTally();
+  const pauses = watchPauses();
+  const result = { project, tally: {} as Record<string, number>, reds: { live: [], off: [] } as Record<Arm, string[]> };
 
   // Batches with no two arrows between the same boxes.
   const batches: TruePair[][] = [];
@@ -294,7 +344,12 @@ async function askChecker(project: string, root: string, pairs: TruePair[]): Pro
     for (const arm of ["off", "live"] as const) {
       let report;
       try {
-        report = arm === "off" ? run(undefined) : (await refereedCheckLive(root, run, { budgetMs: 120_000, pool })).report;
+        if (arm === "off") report = run(undefined);
+        else {
+          const live = await refereedCheckLive(root, run, { budgetMs: 120_000, pool });
+          compilers.add(project, live.checkedWith);
+          report = live.report;
+        }
       } catch (error) {
         for (const pair of batch) bump(result, `${pair.word} ${pair.how} ${arm} throw`);
         process.stderr.write(`${project}: ${arm} threw ${(error as Error).message.slice(0, 80)}\n`);
@@ -322,9 +377,10 @@ async function askChecker(project: string, root: string, pairs: TruePair[]): Pro
     if (batches.indexOf(batch) % 25 === 0) process.stderr.write(`${project}: ${done}/${pairs.length}\n`);
   }
   pool.close();
-  return result;
+  pauses.stop();
+  return { ...result, compilers: compilers.toJSON(), pauses: pauses.pauses() };
 }
 
-function bump(result: ProjectResult, key: string): void {
+function bump(result: { tally: Record<string, number> }, key: string): void {
   result.tally[key] = (result.tally[key] ?? 0) + 1;
 }

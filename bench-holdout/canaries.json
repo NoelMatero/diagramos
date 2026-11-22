@@ -1,0 +1,61 @@
+{
+  "picked": "2026-11-22 on main b527698 (run-must-fail PR), the same way as bench/canaries.json: planted mistakes that went red with the compilers answering and were not red with no compiler at all. 'needs' here is read off which compilers answered that arrow's check (the run with the Rust compiler switched off was not made for this set). Harness: ~/bench-canary/pick.mts.",
+  "canaries": [
+    {
+      "project": "honojs-hono",
+      "claim": "conforms|src/router/trie-router/router.ts#TrieRouter|src/router/trie-router/node.ts#Node|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@conforms src/router/trie-router/router.ts#TrieRouter -> src/router/trie-router/node.ts#Node  (conforms-absent)"
+    },
+    {
+      "project": "trpc-trpc",
+      "claim": "conforms|packages/server/src/unstable-core-do-not-import/initTRPC.ts#TRPCRootObject|packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#ProcedureBuilder|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@conforms packages/server/src/unstable-core-do-not-import/initTRPC.ts#TRPCRootObject -> packages/server/src/unstable-core-do-not-import/procedureBuilder.ts#ProcedureBuilder  (conforms-absent)"
+    },
+    {
+      "project": "taskforcesh-bullmq",
+      "claim": "calls|src/classes/flow-producer.ts#emit|src/classes/flow-producer.ts#addChildren|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@calls src/classes/flow-producer.ts#emit -> src/classes/flow-producer.ts#addChildren  (calls-refuted)"
+    },
+    {
+      "project": "Textualize-rich",
+      "claim": "calls|rich/text.py#Text|rich/style.py#_bgcolor|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@calls rich/text.py#Text -> rich/style.py#_bgcolor  (end-lacks-part)"
+    },
+    {
+      "project": "Textualize-rich",
+      "claim": "calls|rich/table.py#Table|rich/console.py#_TERM_COLORS|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@calls rich/table.py#Table -> rich/console.py#_TERM_COLORS  (end-lacks-part)"
+    },
+    {
+      "project": "chronotope-chrono",
+      "claim": "holds|src/naive/datetime/mod.rs#NaiveDateTime|src/naive/mod.rs#Days|",
+      "language": "rust",
+      "needs": "rust",
+      "arrow": "@holds src/naive/datetime/mod.rs#NaiveDateTime -> src/naive/mod.rs#Days  (holds-absent)"
+    },
+    {
+      "project": "sharkdp-fd",
+      "claim": "calls|src/exec/command.rs#OutputBuffer|src/exec/command.rs#execute_commands|",
+      "language": "rust",
+      "needs": "rust",
+      "arrow": "@calls src/exec/command.rs#OutputBuffer -> src/exec/command.rs#execute_commands  (calls-refuted)"
+    },
+    {
+      "project": "tokio-rs-axum",
+      "claim": "calls|axum/src/routing/method_routing.rs#call_with_state|axum/src/routing/route.rs#call_owned|",
+      "language": "rust",
+      "needs": "rustc",
+      "arrow": "@calls axum/src/routing/method_routing.rs#call_with_state -> axum/src/routing/route.rs#call_owned  (calls-refuted)"
+    }
+  ]
+}

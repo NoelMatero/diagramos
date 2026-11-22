@@ -1,0 +1,89 @@
+{
+  "picked": "2026-11-22 on main b527698 (run-must-fail PR). Each one is a planted mistake that went red with the compilers answering and was NOT red when the same arrow was checked with no compiler at all (checkDrift with no referee); 'needs: rust' ones also stayed red with the Rust compiler switched off (compiler: false), so rust-analyzer is what catches them, and 'needs: rustc' ones went quiet with it off. To re-pick: run the bench's arrows with no referee and with the full live check, and keep reds that only the live check produces, spread over projects and compilers. Harness used: ~/bench-canary/pick.mts.",
+  "canaries": [
+    {
+      "project": "TanStack-query",
+      "claim": "needs|packages/react-query/src/types.ts|packages/react-query/src/useBaseQuery.ts#useBaseQuery|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@needs packages/react-query/src/types.ts -> packages/react-query/src/useBaseQuery.ts#useBaseQuery  (backwards-edge)"
+    },
+    {
+      "project": "nestjs-nest",
+      "claim": "conforms|packages/common/pipes/parse-int.pipe.ts#ParseIntPipe|packages/common/pipes/parse-int.pipe.ts#ParseIntPipeOptions|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@conforms packages/common/pipes/parse-int.pipe.ts#ParseIntPipe -> packages/common/pipes/parse-int.pipe.ts#ParseIntPipeOptions  (conforms-absent)"
+    },
+    {
+      "project": "vuejs-core",
+      "claim": "conforms|packages/runtime-core/src/scheduler.ts#SchedulerJob|packages/runtime-core/src/scheduler.ts#SchedulerJobFlags|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@conforms packages/runtime-core/src/scheduler.ts#SchedulerJob -> packages/runtime-core/src/scheduler.ts#SchedulerJobFlags  (conforms-absent)"
+    },
+    {
+      "project": "python-poetry-poetry",
+      "claim": "needs|src/poetry/repositories/abstract_repository.py#AbstractRepository|src/poetry/repositories/repository_pool.py#RepositoryPool|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@needs src/poetry/repositories/abstract_repository.py#AbstractRepository -> src/poetry/repositories/repository_pool.py#RepositoryPool  (backwards-edge)"
+    },
+    {
+      "project": "encode-httpx",
+      "claim": "holds|httpx/_models.py#Response|httpx/_models.py#cookies|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@holds httpx/_models.py#Response -> httpx/_models.py#cookies  (end-lacks-part)"
+    },
+    {
+      "project": "pallets-flask",
+      "claim": "calls|src/flask/app.py#wsgi_app|src/flask/app.py#collect_errors|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@calls src/flask/app.py#wsgi_app -> src/flask/app.py#collect_errors  (end-lacks-part)"
+    },
+    {
+      "project": "pydantic-pydantic",
+      "claim": "holds|pydantic/_internal/_model_construction.py#ModelMetaclass|pydantic/_internal/_config.py#ConfigWrapper|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@holds pydantic/_internal/_model_construction.py#ModelMetaclass -> pydantic/_internal/_config.py#ConfigWrapper  (holds-absent)"
+    },
+    {
+      "project": "clap",
+      "claim": "builds|clap_builder/src/mkeymap.rs#_build|clap_builder/src/mkeymap.rs#MKeyMap|",
+      "language": "rust",
+      "needs": "rustc",
+      "arrow": "@builds clap_builder/src/mkeymap.rs#_build -> clap_builder/src/mkeymap.rs#MKeyMap  (builds-refuted)"
+    },
+    {
+      "project": "ripgrep",
+      "claim": "builds|crates/searcher/src/searcher/core.rs#after_context_by_line|crates/searcher/src/sink.rs#SinkMatch|",
+      "language": "rust",
+      "needs": "rustc",
+      "arrow": "@builds crates/searcher/src/searcher/core.rs#after_context_by_line -> crates/searcher/src/sink.rs#SinkMatch  (builds-refuted)"
+    },
+    {
+      "project": "anyhow",
+      "claim": "calls|src/error.rs#construct_from_adhoc|src/wrapper.rs#fmt|",
+      "language": "rust",
+      "needs": "rustc",
+      "arrow": "@calls src/error.rs#construct_from_adhoc -> src/wrapper.rs#fmt  (calls-refuted)"
+    },
+    {
+      "project": "regex",
+      "claim": "needs|regex-lite/src/pikevm.rs|regex-lite/src/string.rs|",
+      "language": "rust",
+      "needs": "rust",
+      "arrow": "@needs regex-lite/src/pikevm.rs -> regex-lite/src/string.rs  (backwards-edge)"
+    },
+    {
+      "project": "clap",
+      "claim": "calls|clap_lex/src/lib.rs#ParsedArg|clap_lex/src/lib.rs#to_value_os|",
+      "language": "rust",
+      "needs": "rust",
+      "arrow": "@calls clap_lex/src/lib.rs#ParsedArg -> clap_lex/src/lib.rs#to_value_os  (calls-wrong-routine)"
+    }
+  ]
+}
