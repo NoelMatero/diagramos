@@ -132,6 +132,11 @@ describe("the far end names one of the class's own fields and a routine both: no
     expect(said(ask("src/router.ts", TS_FIELD, "Router", ["handler"]))).toBe("not sure");
   });
 
+  it("TypeScript: a constructor parameter that is also a property, and a function of that name", () => {
+    const source = TS_FIELD.source.replace("  handler = 0;\n", "  constructor(private handler: number) {}\n");
+    expect(said(ask("src/router.ts", { ...TS_FIELD, source }, "Router", ["handler"]))).toBe("not sure");
+  });
+
   it("Python: a class attribute and a function of that name", () => {
     expect(said(ask("app/router.py", PY_FIELD, "Router", ["handler"]))).toBe("not sure");
   });
@@ -145,6 +150,11 @@ describe("what keeps its answer", () => {
 
   it("TypeScript: a method of the class named like a function of the file stays green (a method is not a field)", () => {
     const source = TS_FIELD.source.replace("  handler = 0;\n", "  handler() { return 0; }\n").replace("handler(this.handler)", "this.handler()");
+    expect(said(ask("src/router.ts", { ...TS_FIELD, source }, "Router", ["handler"]))).toBe("green");
+  });
+
+  it("TypeScript: a constructor whose parameter is not a property leaves the class green", () => {
+    const source = TS_FIELD.source.replace("  handler = 0;\n", "  constructor(handler: number) {}\n").replace("handler(this.handler)", "handler(1)");
     expect(said(ask("src/router.ts", { ...TS_FIELD, source }, "Router", ["handler"]))).toBe("green");
   });
 
@@ -182,7 +192,7 @@ describe("in a whole check, the arrow is neither green nor red", () => {
         edges: [{ from: "tail", to: "head", claim: "calls" }],
       });
       const report = checkDrift(board, fakeWorkspace({ [file]: spec.source }), { edges: true });
-      expect(report.edges.filter((edge) => ACCUSING_EDGE_KINDS.includes(edge.kind))).toEqual([]);
+      expect(report.edges.filter((edge) => (ACCUSING_EDGE_KINDS as readonly string[]).includes(edge.kind))).toEqual([]);
       expect(report.claims.callsConfirmed).toBe(0);
     });
   }

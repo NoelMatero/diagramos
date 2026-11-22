@@ -3430,7 +3430,7 @@ function ownFieldNamed(tail: TypeTail, name: string, language: Language): boolea
     if (member.type === "public_field_definition" && member.childForFieldName("name")?.text === name) return true;
     if (member.type === "method_definition" && member.childForFieldName("name")?.text === "constructor") {
       const parameters = member.childForFieldName("parameters");
-      for (const parameter of parameters ? namedKids(parameter) : []) {
+      for (const parameter of parameters ? namedKids(parameters) : []) {
         // `private handler: H`, `readonly handler: H`: a parameter that is also a property.
         const held = /^(public|private|protected|readonly)\s/.test(parameter.text);
         if (held && parameter.childForFieldName("pattern")?.text === name) return true;
