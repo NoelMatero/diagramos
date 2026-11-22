@@ -114,6 +114,22 @@ export type NeedsVerdict =
     verdict: "indirect"; via: string[]; evidence: NeedsEvidence; mayAccuse: boolean; unplaced: boolean;
     /** A name the head defines that the tail writes, which keeps a Python chain from being accused. */
     handedOn?: string;
+    /**
+     * The name of the arrow's own end, which the tail's import writes and
+     * re-exports hand on from the head (2026-11-15, #450): `import { Thing }
+     * from "./lib"` with the arrow onto `lib/thing.ts#Thing`. Not the import
+     * the arrow claims, and not one anybody who wrote that line would call
+     * wrong, so never accused.
+     */
+    named?: string;
+    /**
+     * The tail's only link is a Python package it loads on the way to a
+     * module it names (`import a.b.c` and the arrow onto `a/b/__init__.py`),
+     * and it never uses that package itself (#450). `via` is empty: Python
+     * runs the file, the line does not name it. Never accused -- pyright
+     * calls it an import.
+     */
+    loaded?: true;
   }
   /**
    * The tail does not import the head and nothing it imports leads there,
@@ -145,6 +161,12 @@ interface Declared {
   /** Every repo file this one declares a dependency on. Empty when `refused`. */
   on: Map<string, NeedsEvidence>;
   /**
+   * Python packages this file only loads on the way to a module it names, and
+   * never uses itself (`deps.ts` `loaded`): not in `on`, so they confirm
+   * nothing, and kept apart so nothing reads them as an absence either.
+   */
+  loaded: Map<string, NeedsEvidence>;
+  /**
    * Imports the text could not place and nothing answered for (#393): a
    * sibling package by name, a Rust macro path. Absence in `on` is not
    * written evidence while there are any.
@@ -164,11 +186,11 @@ function declares(
   ledger?: Ledger,
   place?: PlaceImport,
 ): Declared {
-  if (!licenceFor(file)) return { on: new Map(), unplaced: 0, refused: "unlicensed" };
+  if (!licenceFor(file)) return { on: new Map(), loaded: new Map(), unplaced: 0, refused: "unlicensed" };
 
   const absolute = workspace.resolve(file);
   if (!absolute || workspace.stat(absolute) !== "file") {
-    return { on: new Map(), unplaced: 0, refused: "unreadable" };
+    return { on: new Map(), loaded: new Map(), unplaced: 0, refused: "unreadable" };
   }
 
   /*
@@ -176,14 +198,17 @@ function declares(
    * is told that rather than this. The order costs one directory lookup and buys
    * the more useful sentence.
    */
-  if (!vouchedFor(ledger, file)) return { on: new Map(), unplaced: 0, refused: "unvouched" };
+  if (!vouchedFor(ledger, file)) return { on: new Map(), loaded: new Map(), unplaced: 0, refused: "unvouched" };
 
   const read = readDependencies(file, workspace.read(absolute), workspace, cache);
-  if (!read) return { on: new Map(), unplaced: 0, refused: "unreadable" };
+  if (!read) return { on: new Map(), loaded: new Map(), unplaced: 0, refused: "unreadable" };
 
   const on = new Map<string, NeedsEvidence>();
+  const loaded = new Map<string, NeedsEvidence>();
   const placed = placedByCompiler(file, read, place);
-  for (const dependency of [...read.dependencies, ...placed.dependencies]) {
+  const all = [...read.dependencies, ...placed.dependencies];
+  const usesPackage = packageUse(workspace.read(absolute), all);
+  for (const dependency of all) {
     if (!dependency.file) continue;
     /*
      * `pub(crate)` names the crate root and uses nothing in it (#319). Read as
@@ -191,17 +216,22 @@ function declares(
      * `lib.rs`, and the backwards arrow `fnv.rs -> lib.rs#GlobSet` went green.
      */
     if (dependency.visibility) continue;
+    const evidence = { file, on: dependency.file, specifier: dependency.specifier, line: dependency.line };
+    /*
+     * A package `import a.b.c` passes through, and the file never names
+     * again (#450): pip's `install.py` writes `import
+     * pip._internal.self_outdated_check` and nothing else of `pip._internal`,
+     * and the arrow onto `pip/_internal/__init__.py` went green on it.
+     */
+    if (dependency.loaded && !usesPackage(dependency.specifier)) {
+      if (!loaded.has(dependency.file)) loaded.set(dependency.file, evidence);
+      continue;
+    }
     // First mention wins: a file importing the same module twice should quote the
     // line somebody would look at first.
-    if (!on.has(dependency.file)) {
-      on.set(dependency.file, {
-        file,
-        on: dependency.file,
-        specifier: dependency.specifier,
-        line: dependency.line,
-      });
-    }
+    if (!on.has(dependency.file)) on.set(dependency.file, evidence);
   }
+  for (const target of on.keys()) loaded.delete(target);
 
   /*
    * Order matters here, and it is the pessimistic one: a file that is both
@@ -221,15 +251,42 @@ function declares(
    * blindness, not an absence, and since #323 an absence is an accusation.
    */
   const unplaced = placed.unanswered;
-  if (!readerCanPlace(file, workspace, cache)) return { on, unplaced, blind: "unreadable" };
-  if (!read.complete) return { on, unplaced, blind: "incomplete" };
+  if (!readerCanPlace(file, workspace, cache)) return { on, loaded, unplaced, blind: "unreadable" };
+  if (!read.complete) return { on, loaded, unplaced, blind: "incomplete" };
   /*
    * Only the escapes that can bring in a file the text never names (#344). A
    * `table[name]()` calls something already imported, so "and it imports
    * nothing else" is as true with one as without.
    */
-  if (mayHideAnImport(read.dynamic)) return { on, unplaced, blind: "dynamic" };
-  return { on, unplaced };
+  if (mayHideAnImport(read.dynamic)) return { on, loaded, unplaced, blind: "dynamic" };
+  return { on, loaded, unplaced };
+}
+
+/**
+ * Whether a Python file uses a package it imports a module through (#450):
+ * writes `a.b` bare, or `a.b.<name>` where `<name>` is not the next step of a
+ * module path it imports. `import a.b.c` binds `a`, so `a.b.helper()` is the
+ * package's own `helper`, and the file names the package. Read off the whole
+ * text, comments and strings too: reading too much only confirms, the way
+ * the language would let the file use it.
+ */
+function packageUse(source: string, dependencies: readonly FileDependency[]): (specifier: string) => boolean {
+  const memo = new Map<string, boolean>();
+  return (specifier) => {
+    const known = memo.get(specifier);
+    if (known !== undefined) return known;
+    const steps = new Set<string>();
+    for (const one of dependencies) {
+      if (one.specifier.startsWith(`${specifier}.`)) steps.add(one.specifier.slice(specifier.length + 1).split(".")[0]!);
+    }
+    const escaped = specifier.replace(/\./g, "\\.");
+    let used = false;
+    for (const match of source.matchAll(new RegExp(`(?<![\\w.])${escaped}(?:\\s*\\.\\s*([A-Za-z_]\\w*))?(?!\\w)`, "g"))) {
+      if (match[1] === undefined || !steps.has(match[1])) { used = true; break; }
+    }
+    memo.set(specifier, used);
+    return used;
+  };
 }
 
 /**
@@ -277,6 +334,12 @@ export function checkNeeds(
    * resting on the absence of them says so in `unplaced`.
    */
   place?: PlaceImport,
+  /**
+   * The names the arrow's far end points at -- its symbol and that symbol's
+   * owner (`types.ts#Link.run` is `run` and `Link`) -- read where an import
+   * reaches the head only through re-exports (#450). None for a file.
+   */
+  wanted: readonly string[] = [],
 ): NeedsVerdict {
   if (from === to) return { verdict: "withheld", why: "same-file" };
 
@@ -297,8 +360,57 @@ export function checkNeeds(
    * being unable to pick between two accusations was never a reason to decline
    * the one fact on the board.
    */
-  const forward = tail.on.get(to) ?? reexported(from, to, workspace, cache, ledger);
-  if (forward) return { verdict: "confirmed", evidence: forward };
+  const direct = tail.on.get(to);
+  if (direct) return { verdict: "confirmed", evidence: direct };
+  /*
+   * A Python package the tail only passes through on the way to a module it
+   * names (#450). Python runs it and pyright lists it, so it is no absence;
+   * the line does not name it, so it is not the import either.
+   */
+  const loaded = tail.loaded.get(to);
+  if (loaded) return { verdict: "indirect", via: [], evidence: loaded, mayAccuse: false, unplaced: tail.unplaced > 0, loaded: true };
+  /*
+   * An import that reaches the head only through re-exports (#450, decided
+   * 2026-11-08: `@needs` means the import written in the tail names the
+   * head's file). What an import names is the language's own answer:
+   *
+   * - a Rust `use` names an item, wherever `pub use` moved it -- `use
+   *   crate::DateTime` is `datetime/mod.rs`'s `DateTime`, and rust-analyzer
+   *   goes there -- so it confirms;
+   * - a TypeScript import names the file its specifier resolves to, and a
+   *   Python one the module it writes. `import { OperationLink } from "../.."`
+   *   names `index.ts`; tRPC's arrow onto `links/types.ts`, three files on,
+   *   was confirmed, and it is a route.
+   *
+   * So in TypeScript and Python the chain is walked like any other, never
+   * confirmed. Where the tail's import writes the name the arrow itself points
+   * at (`import { Link } from "./lib"`, the arrow onto `lib/link.ts#Link`), the
+   * person who wrote that line would not call it wrong: the route stays a
+   * note and says why. Only that and a red on the route: a chain the old
+   * reading confirmed never goes to the backwards or the absent red.
+   */
+  const handed = reexported(from, to, workspace, cache, ledger);
+  if (handed && languageOf(from) === "rust") return { verdict: "confirmed", evidence: handed.evidence };
+  const licensed = (axis: "absence" | "indirect") => [from, to].every((file) => {
+    const language = languageOf(file);
+    return language !== undefined && mayAccuse("needs", language, axis);
+  });
+  if (handed) {
+    const walk = walkImports(from, to, workspace, cache, ledger, place);
+    if (!walk.reached) return { verdict: "absent" };
+    const named = namedThrough(from, to, wanted, workspace, cache, ledger);
+    const handedOn = mayBeHandedOn(from, to, workspace);
+    return {
+      verdict: "indirect",
+      via: walk.reached.via,
+      evidence: walk.reached.first,
+      ...(handedOn ? { handedOn } : {}),
+      ...(named ? { named } : {}),
+      // Accusing is an absence of the direct import, so it needs both files whole.
+      mayAccuse: licensed("indirect") && !tail.blind && !head.blind && handedOn === undefined && named === undefined,
+      unplaced: tail.unplaced > 0,
+    };
+  }
 
   /*
    * Past here everything rests on an *absence* -- either "nothing connects
@@ -334,10 +446,6 @@ export function checkNeeds(
    * wrong. So the chain is ruled out before the accusation is made, the way
    * `calls` rules out a call two hops away.
    */
-  const licensed = (axis: "absence" | "indirect") => [from, to].every((file) => {
-    const language = languageOf(file);
-    return language !== undefined && mayAccuse("needs", language, axis);
-  });
   const walk = walkImports(from, to, workspace, cache, ledger, place);
   if (walk.reached) {
     const handedOn = mayBeHandedOn(from, to, workspace);
@@ -399,11 +507,78 @@ function mayBeHandedOn(from: string, to: string, workspace: Workspace): string |
   const head = moduleNames(workspace.read(headPath));
   const own = moduleNames(tail);
   if (!head || !own) return "?";
-  // `from x import *` takes whatever x has, and x may have it from the head.
-  if (own.star) return "*";
+  /*
+   * `from x import *` takes whatever x has, and x may have it from the head --
+   * unless x lists what it hands out (#450): a literal `__all__` that is the
+   * whole of a star import, by the language's rule. Lifted only where every
+   * star in the tail leads to such a list of names x defines itself, so the
+   * star can hand on nothing from anywhere else (trio's `_run.py` star-imports
+   * five generated files, each with its `__all__`).
+   */
+  if (own.star && !starsAreListed(from, tail, workspace)) return "*";
   const words = new Set(tail.match(/[A-Za-z_]\w*/g) ?? []);
   return [...head.defined].find((name) =>
     !/^__\w+__$/.test(name) && words.has(name) && (!own.defined.has(name) || own.imported.has(name)));
+}
+
+/**
+ * Whether every star import in a Python file leads to a plain module (not a
+ * package) whose literal `__all__` lists only names that module defines
+ * itself (#450). Then the star
+ * brings exactly those names, and none of them is anybody else's. A list built
+ * up -- `__all__ +=`, `.extend`, a second assignment, anything not a list or
+ * tuple of strings -- is not read, and neither is a star nothing placed.
+ */
+function starsAreListed(file: string, source: string, workspace: Workspace): boolean {
+  const read = readDependencies(file, source, workspace);
+  if (!read) return false;
+  const stars = read.dependencies.filter((dependency) => dependency.star);
+  if (stars.length === 0) return false;
+  return stars.every((star) => {
+    /*
+     * A package's star also hands on its submodules, which `__all__` does not
+     * list: pyright calls Django's `models/__init__.py` (`from
+     * django.db.models.fields import *`) an import of `fields/mixins.py`, and
+     * the first run of this rule called that wrong. Plain modules only.
+     */
+    if (!star.file || star.file === "__init__.py" || star.file.endsWith("/__init__.py")) return false;
+    const absolute = workspace.resolve(star.file);
+    if (!absolute || workspace.stat(absolute) !== "file") return false;
+    const text = workspace.read(absolute);
+    const listed = literalAll(text);
+    const names = moduleNames(text);
+    if (!listed || !names) return false;
+    return listed.every((name) => names.defined.has(name) && !names.imported.has(name));
+  });
+}
+
+/**
+ * The names a Python module's `__all__` lists, when it is one literal list or
+ * tuple of strings assigned once at the top level and never touched again.
+ */
+function literalAll(source: string): string[] | undefined {
+  const tree = parseSource(source, "python");
+  if (!tree) return undefined;
+  let listed: string[] | undefined;
+  let mentions = 0;
+  each(tree.rootNode, (node) => {
+    if (node.type === "identifier" && node.text === "__all__") mentions += 1;
+  });
+  for (const statement of named(tree.rootNode)) {
+    if (statement.type !== "expression_statement") continue;
+    const assignment = named(statement)[0];
+    if (assignment?.type !== "assignment") continue;
+    const left = assignment.childForFieldName("left");
+    const right = assignment.childForFieldName("right");
+    if (left?.type !== "identifier" || left.text !== "__all__" || !right) continue;
+    if (listed !== undefined) return undefined;
+    if (right.type !== "list" && right.type !== "tuple") return undefined;
+    const items = named(right).filter((item) => item.type !== "comment");
+    if (!items.every((item) => item.type === "string" && /^["'][A-Za-z_]\w*["']$/.test(item.text))) return undefined;
+    listed = items.map((item) => item.text.slice(1, -1));
+  }
+  // Any other mention -- `__all__ +=`, `__all__.extend(...)` -- may change it.
+  return listed !== undefined && mentions === 1 ? listed : undefined;
 }
 
 /**
@@ -628,7 +803,7 @@ function reexported(
   workspace: Workspace,
   cache: ConfigCache,
   ledger?: Ledger,
-): NeedsEvidence | undefined {
+): { evidence: NeedsEvidence } | undefined {
   const own = hopsOf(from, workspace, cache, ledger).hops;
   for (const written of own) {
     if (written.on === to) continue;
@@ -641,7 +816,7 @@ function reexported(
         written.on, to, workspace, cache, new Set([from]),
         languageOf(written.on) === "python",
       );
-      if (reached) return written;
+      if (reached) return { evidence: written };
       continue;
     }
     /*
@@ -653,10 +828,49 @@ function reexported(
      * planted mistake that stopping early turned green.
      */
     for (const name of written.names ?? []) {
-      if (handsOn(written.on, name, to, workspace, cache, ledger, new Set([from]))) return written;
+      if (handsOn(written.on, name, to, workspace, cache, ledger, new Set([from]))) return { evidence: written };
     }
   }
   return undefined;
+}
+
+/**
+ * The arrow's own end, written in the tail and handed on to it from the head
+ * through re-exports (#450): `import { Link } from "./lib"`, `lib/index.ts`
+ * writing `export * from "./link"`, and the arrow onto `lib/link.ts#Link` --
+ * or onto `lib/link.ts` itself, whose names are all that end.
+ * Also the name written anywhere else in the tail -- `lib.Link` after `import
+ * * as lib` -- since a star hands on every name. Words are read off the whole
+ * text: reading too many only keeps a note.
+ */
+function namedThrough(
+  from: string,
+  to: string,
+  wanted: readonly string[],
+  workspace: Workspace,
+  cache: ConfigCache,
+  ledger?: Ledger,
+): string | undefined {
+  const names = wanted.filter((name) => /^[A-Za-z_$][\w$]*$/.test(name));
+  const whole = wanted.length === 0;
+  for (const written of hopsOf(from, workspace, cache, ledger).hops) {
+    if (written.on === to) continue;
+    /*
+     * An arrow onto a whole file points at everything it declares, so any
+     * name the import writes and the chain hands on from there is that end
+     * (#373's probe: `import { double } from "./lib"`, the arrow onto
+     * `lib/util.ts`, measured as a correct arrow that must never go red).
+     */
+    for (const name of whole ? written.names ?? [] : names) {
+      if ((written.names ?? []).includes(name)
+        && handsOn(written.on, name, to, workspace, cache, ledger, new Set([from]))) return name;
+    }
+  }
+  if (names.length === 0) return undefined;
+  const absolute = workspace.resolve(from);
+  if (!absolute) return names[0];
+  const words = new Set(workspace.read(absolute).match(/[A-Za-z_$][\w$]*/g) ?? []);
+  return names.find((name) => words.has(name));
 }
 
 /**

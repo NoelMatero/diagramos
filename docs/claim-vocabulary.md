@@ -119,6 +119,29 @@ draw the hops, or to mark the arrow a summary with `via`, below. An
 [Item 53](#forty-two-times-a-measurement-contradicted-the-design) has the
 numbers.
 
+**What "the import names the file" means, per language (#450, 2026-11-15).**
+`@needs` is direct: the import written in the tail names the head's file. What
+an import names is the language's own answer, and it is not the same thing in
+all three:
+
+| language | an import names | so a re-export in between is |
+|---|---|---|
+| TypeScript | the file its specifier resolves to | a file in between: `import { X } from "./lib"` reaches `lib/x.ts` in two hops |
+| Python | the module the line writes: `from m import x` names `m` (and `m.x` if that is a module); `import a.b.c` names `a.b.c` | a file in between; and `a/b/__init__.py`, which Python runs on the way to `a.b.c`, is named only where the file goes on to use `a.b` itself |
+| Rust | the item its path names, wherever `pub use` moved it | not in between: `use crate::DateTime` is `datetime/mod.rs`'s `DateTime` |
+
+Each matches the answer key's tooling for that language (the TypeScript
+compiler's module resolution, pyright's module, rust-analyzer's definition).
+One exception keeps the reading from surprising anybody: where the tail's
+import writes the very name the arrow points at (`import { X } from "./lib"`,
+the arrow onto `lib/x.ts#X`), the route is a note and never red, in TypeScript
+and Python alike. A Python package the file only passes through is a note too,
+never red, because pyright lists it as imported.
+
+Python's star guard reads `__all__`: a star import of a module whose `__all__`
+is one literal list of names that module defines itself brings exactly those
+names and nothing from anywhere else, so it no longer keeps a route a note.
+
 **Since #375 a summary can say it is one.** Every finding with that reading
 (`calls-one-level-up`, `calls-indirect`, `needs-one-level-up`, `needs-indirect`) carries the
 route it found as `route`, and the draw-time result names it to the agent while

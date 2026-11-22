@@ -304,7 +304,7 @@ export function readPythonDependencies(
   const topLevel = moduleLevelStatements(root);
   const dependencies: FileDependency[] = [];
   const dynamic = new Set<DynamicReason>();
-  const seen = new Set<string>();
+  const seen = new Map<string, FileDependency>();
 
   /**
    * One edge, recorded once.
@@ -322,11 +322,16 @@ export function readPythonDependencies(
     names: string[] = [],
     unplaced = false,
     library = false,
+    loaded = false,
   ) => {
     const key = `${specifier}\0${file ?? ""}\0${deferred}`;
-    if (seen.has(key)) return;
-    seen.add(key);
-    dependencies.push({
+    const already = seen.get(key);
+    if (already) {
+      // `import a.b.c` loads `a.b`; a later `import a.b` names it.
+      if (!loaded) delete already.loaded;
+      return;
+    }
+    const dependency: FileDependency = {
       specifier,
       ...(file ? { file } : {}),
       line: lineOf(source, node),
@@ -335,7 +340,10 @@ export function readPythonDependencies(
       ...(names.length > 0 ? { names } : {}),
       ...(unplaced && !file ? { unplaced: { start: node.startIndex, end: node.startIndex + node.text.length } } : {}),
       ...(library && !file ? { library: true as const } : {}),
-    });
+      ...(loaded ? { loaded: true as const } : {}),
+    };
+    seen.set(key, dependency);
+    dependencies.push(dependency);
   };
 
   /** An absolute or already-anchored module path, plus the prefixes a binding loads. */
@@ -369,7 +377,8 @@ export function readPythonDependencies(
           star && length === parts.length,
           length === parts.length ? names : [],
           length === parts.length && here,
-          length === parts.length && library);
+          length === parts.length && library,
+          length < parts.length);
       }
     }
   };
