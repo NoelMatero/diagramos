@@ -168,7 +168,14 @@ export type CallsWithheld =
    * checked how often this reader is wrong about it. Confirming is unaffected;
    * it is the accusation that needs the licence (#198).
    */
-  | "unlicensed";
+  | "unlicensed"
+  /**
+   * The tail is a class or struct, and the far end's name is both one of its
+   * own fields and a routine of the same file (a field and its getter). The
+   * call found lands on the name, and the board does not say which of the two
+   * it points at.
+   */
+  | "head-is-a-field";
 
 /** Where the call was written, so a report can quote a file and a line. */
 export interface CallsEvidence {
@@ -2130,6 +2137,19 @@ export function callsBetween(
    */
   const typeTail = typeTailOf(from.source, from.language, from.routine);
   const forward = callsTo(from, from.routine, { file: to.file, names: wanted, hooked: runsOnRead(to, to.names) }, typeTail?.nodes);
+  /*
+   * The far end names one of the class's own fields as well as a routine of
+   * that file: bat's `Input` has a field `description` and a getter
+   * `description()`. A call is placed by file and name, so `self.description()`
+   * lands on "description" either way, and the board does not say which one
+   * it means -- the answer key takes a name declared inside the tail for the
+   * tail's own, the field, which nothing calls. Not sure, and only for the
+   * confirmation: a class that calls neither is wrong under both readings.
+   */
+  if (forward.evidence && typeTail && from.file === to.file
+    && to.names.some((name) => ownFieldNamed(typeTail, name, from.language) && isRoutine(to.source, name, to.language))) {
+    return { verdict: "withheld", why: "head-is-a-field" };
+  }
   if (forward.evidence) return { verdict: "confirmed", evidence: forward.evidence };
   /*
    * A doubt reading forwards was the end of it until #357: the text could not
@@ -3385,6 +3405,39 @@ function typeTailOf(source: string, language: Language, name: string): TypeTail 
   typeTails_.set(tree, known);
   if (!known.has(name)) known.set(name, readTypeTail(tree, source, language, name) ?? null);
   return known.get(name) ?? undefined;
+}
+
+/**
+ * Whether the class or struct declares a field called `name` in its own
+ * body: a Rust struct's field, a TypeScript class property or constructor
+ * parameter property, a Python class attribute. Members only -- a local
+ * inside one of its routines is not a field, and neither is a method.
+ */
+function ownFieldNamed(tail: TypeTail, name: string, language: Language): boolean {
+  const declaration = tail.nodes[0]!;
+  const body = declaration.childForFieldName("body");
+  if (!body) return false;
+  for (const member of namedKids(body)) {
+    if (language === "rust") {
+      if (member.type === "field_declaration" && member.childForFieldName("name")?.text === name) return true;
+      continue;
+    }
+    if (language === "python") {
+      const assigned = member.type === "expression_statement" ? firstNamed(member) : undefined;
+      if (assigned?.type === "assignment" && assigned.childForFieldName("left")?.text === name) return true;
+      continue;
+    }
+    if (member.type === "public_field_definition" && member.childForFieldName("name")?.text === name) return true;
+    if (member.type === "method_definition" && member.childForFieldName("name")?.text === "constructor") {
+      const parameters = member.childForFieldName("parameters");
+      for (const parameter of parameters ? namedKids(parameter) : []) {
+        // `private handler: H`, `readonly handler: H`: a parameter that is also a property.
+        const held = /^(public|private|protected|readonly)\s/.test(parameter.text);
+        if (held && parameter.childForFieldName("pattern")?.text === name) return true;
+      }
+    }
+  }
+  return false;
 }
 
 /** The one declaration of `name` in this file, when it is a class or a struct and nothing else is declared under that name. */

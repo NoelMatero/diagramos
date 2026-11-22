@@ -169,6 +169,8 @@ export const UNDECIDED_BUCKETS: Record<Labelled, BucketLabel> & Record<string, B
     why: "the tail is a class a decorator, derive or attribute macro writes code into, and that code is not in the text (#459)" },
   "declined: not-closed tail-elsewhere": { bucket: "work", cost: 2,
     why: "the tail is a class with code outside its declaration -- an impl in another file of the crate, a method set from outside -- or no crate file list to rule that out (#459)" },
+  "declined: head-is-a-field": { bucket: "never", cost: 1,
+    why: "the tail is a class, and the far end's name is one of its own fields as well as a routine of that file -- a field and its getter; the board does not say which it points at" },
   "declined: not-closed called-implicitly": { bucket: "never", cost: 1,
     why: "the head is a trait method on a type the tail handles, which an operator, `?`, formatting or a drop can run unwritten (#357)" },
   "unconfirmed: feeds-runs-the-other-way": { bucket: "never", cost: 1,
