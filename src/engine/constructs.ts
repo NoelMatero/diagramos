@@ -1418,7 +1418,7 @@ function declaresRoutine(source: string, name: string): boolean {
   let other = false;
   /*
    * An assignment inside a function binds a local of that function, which no
-   * call from anywhere else can land on (#504): trio's `_run.py` has
+   * call from anywhere else can land on (#503): trio's `_run.py` has
    * `current_task = repr(..)` inside one method and `def current_task()` at
    * the top, and the local kept every call to the function a doubt.
    */
@@ -1577,7 +1577,7 @@ export function constructions(
     /*
      * The head's own declaration as well as every routine in its file: a
      * class's field initializers run when it is made, and are its code too
-     * (#504). hono's `TrieRouter` makes its `Node` in `#node = new Node()`,
+     * (#503). hono's `TrieRouter` makes its `Node` in `#node = new Node()`,
      * which no routine of the file holds.
      */
     for (const routineName of new Set([...reverse.routines, ...targets])) {

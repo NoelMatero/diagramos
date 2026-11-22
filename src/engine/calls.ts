@@ -2115,7 +2115,7 @@ export function callsBetween(
    */
   backwards = true,
   /**
-   * `@builds` asking (#504): the head is a class, and the question is only
+   * `@builds` asking (#503): the head is a class, and the question is only
    * whether the body creates one. A call to a plain routine in the class's own file -- one of its methods,
    * most often, run on a value that already exists -- creates none, so it is not a reason
    * to stay quiet (`plainRoutinesOnly`).
@@ -3137,7 +3137,7 @@ function textClosed(
          *                                          does this reader
          *   a different routine, named             the thing worth saying
          */
-        // Run on a value of the head that already exists: it creates none (#504).
+        // Run on a value of the head that already exists: it creates none (#503).
         if (madeOnly && site.declaredAs !== undefined && plainRoutinesOnly(to, site.declaredAs)) {
           sites += 1;
           continue;
@@ -3876,7 +3876,7 @@ function cannotBeTheHead(to: CallSide & { names: string[] }, landed: string): bo
 
 /**
  * Whether every routine the head's file declares under `name` is a plain
- * Python `def` that creates none of the head (#504): undecorated (or only
+ * Python `def` that creates none of the head (#503): undecorated (or only
  * marked abstract, overloaded or final), not a dunder, its own body never
  * naming the head and never writing `cls`, `type`, `__class__`, `__new__`,
  * `copy`, `deepcopy` or `replace`. Nothing else in the file -- a class, or
