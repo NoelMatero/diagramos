@@ -248,6 +248,18 @@ describe("Python star imports: a literal __all__ is exactly what the star brings
     expect(report.edges.filter((finding) => accuses(finding.kind))).toEqual([]);
   });
 
+  it("keeps the note when the starred module is a package, whose star also hands on its submodules (Django)", async () => {
+    const files = {
+      "pkg/__init__.py": "",
+      "pkg/head.py": "def thing():\n    return 1\n",
+      "pkg/gen/__init__.py": "from pkg.gen.inner import helper\n__all__ = [\"made\"]\n\n\ndef made():\n    return 2\n",
+      "pkg/gen/inner.py": "from pkg.head import thing\n\n\ndef helper():\n    return thing()\n",
+      "pkg/tail.py": "from pkg.gen import *\n\n\ndef run():\n    return made()\n",
+    };
+    const report = await check(files, "pkg/tail.py", "pkg/head.py");
+    expect(report.edges.filter((finding) => accuses(finding.kind))).toEqual([]);
+  });
+
   it("is red when every star leads to a literal __all__ of the module's own names (trio's generated files)", async () => {
     const gen = "__all__ = [\"made\"]\n\n\ndef made():\n    return 2\n";
     const report = await check(layered(gen), "pkg/tail.py", "pkg/head.py");

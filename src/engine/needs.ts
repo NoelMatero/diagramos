@@ -522,8 +522,9 @@ function mayBeHandedOn(from: string, to: string, workspace: Workspace): string |
 }
 
 /**
- * Whether every star import in a Python file leads to a module whose literal
- * `__all__` lists only names that module defines itself (#450). Then the star
+ * Whether every star import in a Python file leads to a plain module (not a
+ * package) whose literal `__all__` lists only names that module defines
+ * itself (#450). Then the star
  * brings exactly those names, and none of them is anybody else's. A list built
  * up -- `__all__ +=`, `.extend`, a second assignment, anything not a list or
  * tuple of strings -- is not read, and neither is a star nothing placed.
@@ -534,7 +535,13 @@ function starsAreListed(file: string, source: string, workspace: Workspace): boo
   const stars = read.dependencies.filter((dependency) => dependency.star);
   if (stars.length === 0) return false;
   return stars.every((star) => {
-    if (!star.file) return false;
+    /*
+     * A package's star also hands on its submodules, which `__all__` does not
+     * list: pyright calls Django's `models/__init__.py` (`from
+     * django.db.models.fields import *`) an import of `fields/mixins.py`, and
+     * the first run of this rule called that wrong. Plain modules only.
+     */
+    if (!star.file || star.file === "__init__.py" || star.file.endsWith("/__init__.py")) return false;
     const absolute = workspace.resolve(star.file);
     if (!absolute || workspace.stat(absolute) !== "file") return false;
     const text = workspace.read(absolute);
