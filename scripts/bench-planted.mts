@@ -42,16 +42,39 @@
  * The number that matters most is the last column of the TRUE CLAIMS table:
  * a red on a correct board is the one mistake this tool cannot take back
  * (AGENTS.md, `licence.ts`).
+ *
+ * ## A run that could not check fails (Fonseca 2017, recommendation 1)
+ *
+ * A score taken while a compiler was broken looks exactly like a real one:
+ * on 2026-11-22 a new machine had no Rust dependencies, every Rust build
+ * failed offline, and every arrow that needed the Rust compiler came back
+ * "not sure" with nothing in the output to say why. So:
+ *
+ * - **Canaries first.** `<set>/canaries.json` names a few arrows per language
+ *   that are wrong on purpose and only a compiler catches. They are asked
+ *   before anything is scored, in this environment; a language whose canaries
+ *   do not all go red stops the run (exit 3) with the most likely reason.
+ *   `--no-canary` skips them and says so in the header. The canaries get
+ *   their own caches and servers, closed before the scored run starts.
+ * - **The header states which compilers answered**, counted from the checks
+ *   (`scripts/lib/run-validity.ts`), with every Rust crate that did not build
+ *   and why, and any pause or sleep during the run (`run-pauses.ts`).
+ * - **NOT VALID, exit 3,** when a compiler asked in the run answered nothing,
+ *   when no Rust crate built, or when a project stalled (NOT MEASURED). The
+ *   score still prints, so it can be read, under a line that says it must
+ *   not be compared. An empty run (no answer keys) exits 1.
  */
 import path from "node:path";
 
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type CheckCache } from "../src/engine/drift";
-import { liveRefereePool, refereedCheckLive, type LiveRefereePool } from "../src/engine/referee-live";
+import { liveRefereePool, refereedCheckLive, type LiveRefereePool, type RefereeNote } from "../src/engine/referee-live";
 import { initEngine } from "../src/engine/parse";
 import { recordRun, waitForQuiet } from "./lib/bench-busy";
 import { librariesLine, useLibraries } from "./lib/bench-libraries";
 import { BENCH_DIR, HOLDOUT, SET } from "./lib/bench-set";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
+import { pausesLine, readPowerLogSleeps, watchPauses } from "./lib/run-pauses";
+import { CompilerTally, judgeCanaries, languageGroup, loadCanaries, type CanaryAnswer } from "./lib/run-validity";
 import { stallWindowMs, watchForStall } from "./lib/stall-watchdog";
 import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
 
@@ -70,6 +93,10 @@ const wantSource = flag("source");
 const details = argv.includes("--details");
 /** Start at once even while another bench, measure script or vitest is running (#403). */
 const noWait = argv.includes("--no-wait");
+/** Skip the canaries (`bench/canaries.json`); the header says so. */
+const noCanary = argv.includes("--no-canary");
+/** Exit code of a run that could not check what it scored. */
+const NOT_VALID_EXIT = 3;
 /**
  * The holdout set is read for its score and nothing else (bench-holdout/README.md).
  * Its arrows are never printed, except the two kinds that are safety failures
@@ -142,6 +169,12 @@ function poolFor(project: string): LiveRefereePool {
   return pools.pool;
 }
 
+/** Close the servers held for the last project, so the next ask starts its own. */
+function closePools(): void {
+  pools?.pool.close();
+  pools = undefined;
+}
+
 /**
  * Why an undecided arrow was left undecided, in one slug (#320).
  *
@@ -172,6 +205,9 @@ function withheldReasons(report: ReturnType<typeof checkDrift>): string[] {
 let lastAsked: { ms: number; gate: string } = { ms: 0, gate: "" };
 
 /** What the checker said about one arrow, run on a board of its own. */
+/** Which compilers answered the last arrow's check, for the run's header. */
+let lastNote: RefereeNote = { answered: [], silent: [], nothingToAsk: true };
+
 async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detail: string; reason: string }> {
   const cache = cacheFor(key.project);
   const { workspace } = cache;
@@ -186,13 +222,14 @@ async function ask(key: Key, claim: KeyClaim): Promise<{ outcome: Outcome; detai
    * two thirds of the corpus.
    */
   const began = performance.now();
-  const { report } = await refereedCheckLive(
+  const { report, checkedWith } = await refereedCheckLive(
     rootOf(key.project),
     (referee) => checkDrift(board, workspace, {
       edges: true, cache, ...(referee ? { closedBodyReferee: referee } : {}),
     }),
     { budgetMs: BENCH_BUDGET_MS, pool: poolFor(key.project) },
   );
+  lastNote = checkedWith;
   const gated = (report as { gated?: Array<{ kind: string; outcome: string; said?: string }> }).gated ?? [];
   lastAsked = {
     ms: performance.now() - began,
@@ -280,13 +317,18 @@ function table(title: string, note: string, rows: Map<string, Row>, caught: (row
 if (!noWait) await waitForQuiet((line) => console.error(`  ${line}`));
 /* Whether another run shared the machine anyway (#489): `--no-wait`, a run started without the gate. */
 const machine = recordRun(`bench-planted ${argv.join(" ")}`);
+/* Times this process did not run -- most likely the Mac asleep -- for the header (2026-11-15: 79 s and 76 s, unrecorded). */
+const pauses = watchPauses();
+const runStarted = Date.now();
 
 await initEngine();
 
 const loaded = plantedKeys(REPO).filter((k) => !wantProject || k.project === wantProject);
 if (loaded.length === 0) {
-  console.log(`No answer keys under ${BENCH_DIR}/boards. Run scripts/bench-planted-key.mts first.`);
-  process.exit(0);
+  // Nothing scored is not a score: a run that read no keys must not pass as one.
+  console.log(`No answer keys under ${BENCH_DIR}/boards${wantProject ? ` for --project=${wantProject}` : ""}.`
+    + " Run scripts/bench-planted-key.mts first.");
+  process.exit(1);
 }
 
 const plantedByWord = new Map<string, Row>();
@@ -365,9 +407,65 @@ watchForStall({
 });
 const failedProjects = new Map<string, string>();
 type Asked = Awaited<ReturnType<typeof ask>> & { asked: typeof lastAsked };
+/*
+ * The canaries, before anything is scored. Only the languages this run
+ * scores are asked; a set with no canaries file has none, and its header
+ * says the compiler counts are its only check.
+ */
+const scoredLanguages = new Set(loaded.flatMap((key) => key.claims)
+  .filter((claim) => wanted(claim) && claim.truth !== "undecidable").map((claim) => languageGroup(claim.language)));
+const canaries = noCanary ? [] : loadCanaries(REPO, BENCH_DIR).filter((one) => scoredLanguages.has(languageGroup(one.language)));
+const canaryTally = new CompilerTally();
+const canaryAnswers: CanaryAnswer[] = [];
+let stall = newStall();
+const allKeys = canaries.length > 0 ? plantedKeys(REPO) : [];
+for (const canary of canaries) {
+  const key = allKeys.find((one) => one.project === canary.project && one.claims.some((claim) => claim.id === canary.claim));
+  const claim = key?.claims.find((one) => one.id === canary.claim);
+  if (!key || !claim) {
+    canaryAnswers.push({ canary, outcome: "missing", detail: `claim ${canary.claim} is not in ${canary.project}'s answer keys` });
+    continue;
+  }
+  lastNote = { answered: [], silent: [], nothingToAsk: true };
+  const asking = ask(key, claim);
+  const got = await Promise.race([asking, stall]);
+  if (got === STALLED) {
+    canaryAnswers.push({ canary, outcome: "stalled", detail: stallReason });
+    closePools();
+    stall = newStall();
+    continue;
+  }
+  canaryTally.add(canary.project, lastNote);
+  canaryAnswers.push({ canary, outcome: got.outcome, detail: got.detail });
+}
+/* The scored run starts from what it would have started from with no canaries. */
+closePools();
+held.clear();
+current = undefined;
+const canaryVerdict = judgeCanaries(canaryAnswers, canaryTally);
+const canaryLines = noCanary
+  ? ["canaries: skipped (--no-canary); nothing in this run showed its compilers can catch a mistake"]
+  : canaries.length === 0
+    ? [`canaries: none for this set (${BENCH_DIR}/canaries.json); the compiler counts above are its only check`]
+    : ["canaries -- wrong on purpose, only a compiler catches them, asked first:", ...canaryVerdict.lines.map((line) => `  ${line}`)];
+if (canaryVerdict.failed.length > 0) {
+  const lines = [
+    "#296 · PLANTED MISTAKES -- NOT RUN",
+    `  NOT VALID: the canaries did not go red for ${canaryVerdict.failed.join(", ")}, so this machine could not`
+      + " check those arrows. Nothing was scored. Fix the reason below and run again.",
+    `  ${librariesLine()}`,
+    ...canaryLines.map((line) => `  ${line}`),
+    ...canaryTally.lines(canaryVerdict.failed).map((line) => `  ${line}`),
+  ];
+  for (const line of lines) console.log(line);
+  for (const line of lines) console.error(line);
+  process.exit(NOT_VALID_EXIT);
+}
+
+/* Which compilers answered the scored checks, per project (`run-validity.ts`). */
+const tally = new CompilerTally();
 /** Per board, per claim: what the checker said. */
 const answers = new Map<Key, Map<KeyClaim, Asked>>();
-let stall = newStall();
 for (const key of loaded) {
   if (failedProjects.has(key.project)) continue;
   const said = new Map<KeyClaim, Asked>();
@@ -378,6 +476,7 @@ for (const key of loaded) {
     const got = await Promise.race([asking, stall]);
     if (got !== STALLED) {
       said.set(claim, { ...got, asked: lastAsked });
+      tally.add(key.project, lastNote);
       continue;
     }
     failedProjects.set(key.project, stallReason);
@@ -446,6 +545,23 @@ console.log();
 console.log("#296 · PLANTED MISTAKES, AND WHAT THE CHECKER SAID");
 console.log(`  ${librariesLine()}`);
 console.log(`  ${machine.line()}`);
+console.log(`  ${pausesLine(pauses.pauses(), readPowerLogSleeps(runStarted, Date.now()))}`);
+for (const line of tally.lines(scoredLanguages)) console.log(`  ${line}`);
+for (const line of canaryLines) console.log(`  ${line}`);
+/*
+ * A compiler asked in this run that answered nothing, or a project left out:
+ * the score below still prints so it can be read, and the run exits non-zero
+ * so that nothing takes it as a base.
+ */
+const problems = [
+  ...tally.problems(scoredLanguages),
+  ...(failedProjects.size > 0 ? [`${failedProjects.size} project${failedProjects.size === 1 ? "" : "s"} not measured (below)`] : []),
+];
+if (problems.length > 0) {
+  console.log("  NOT VALID -- this run could not check everything it scores; compare it with no other run:");
+  for (const problem of problems) console.log(`    ${problem}`);
+  for (const problem of problems) console.error(`  NOT VALID: ${problem}`);
+}
 if (failedProjects.size > 0) {
   console.log(`  NOT MEASURED, ${failedProjects.size} project${failedProjects.size === 1 ? "" : "s"}, left out of every count below;`
     + " compare this run with no other:");
@@ -622,3 +738,5 @@ listed();
  * script hanging after printing its whole report.
  */
 pools?.pool.close();
+pauses.stop();
+if (problems.length > 0) process.exitCode = NOT_VALID_EXIT;

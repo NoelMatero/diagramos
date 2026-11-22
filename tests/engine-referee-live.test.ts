@@ -97,6 +97,9 @@ describe("a Python call on a value whose type the text does not give", () => {
 
     expect(live.report.edges.filter((finding) => finding.kind === "calls-refuted")).toHaveLength(1);
     expect(live.checkedWith.answered).toContain("python");
+    // Counted, so a measurement can say how much pyright answered, not only that it started.
+    expect(live.checkedWith.questions?.python?.asked).toBeGreaterThan(0);
+    expect(live.checkedWith.questions?.python?.answered).toBeGreaterThan(0);
   }, 120_000);
 
   it("still confirms the arrow the resolver places at the far end", async () => {
@@ -275,6 +278,9 @@ describe("a machine with Rust but no rust-analyzer", () => {
     expect(live.report.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
     expect(live.checkedWith.answered).not.toContain("rust");
     expect(refereeSentence(live.checkedWith)).toContain("rust-analyzer did not answer");
+    // Asked, and none answered: what a bench header adds up and fails on.
+    expect(live.checkedWith.questions?.rust?.asked).toBeGreaterThan(0);
+    expect(live.checkedWith.questions?.rust?.answered).toBe(0);
     // Nothing left failing in the background after the check has answered.
     // Which way the handshake and the exit race depends on the machine; the
     // ordering CI hit is pinned deterministically by `connectTo`'s own test.

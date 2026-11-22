@@ -26,11 +26,17 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
 import type { Node } from "../../src/engine/parse";
+import type { CrateOutcome } from "../../src/engine/referee-rustc";
 import type { TruePair } from "./compiler-true-ts";
 
 interface Header { args: string[]; ret: string; lines: string[] }
 
-export async function rustTruePairs(root: string, plainNames = false): Promise<TruePair[]> {
+export async function rustTruePairs(
+  root: string,
+  plainNames = false,
+  /** Told which crates built and why the others did not, so a run can say it read nothing (2026-11-22). */
+  onCrates?: (crates: readonly CrateOutcome[]) => void,
+): Promise<TruePair[]> {
   const { compileCrates, rustcCacheDir } = await import("../../src/engine/referee-rustc");
   const { compiledBodiesOf } = await import("../../src/engine/compiled-calls");
   const { initEngine, parseSource } = await import("../../src/engine/parse");
@@ -49,6 +55,7 @@ export async function rustTruePairs(root: string, plainNames = false): Promise<T
   const absolute = walk(root);
   const files = absolute.map((one) => path.relative(root, one));
   const crates = await compileCrates(root, files, { until: Date.now() + 900_000 });
+  onCrates?.(crates.crates);
 
   // Raw MIR by printed path, one map per Cargo.toml: two crates in one
   // workspace may each print a function as `subcommands`.
