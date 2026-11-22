@@ -39,6 +39,18 @@ def class_at(path, line):
         if n.type == "classdef" and n.name.start_pos[0] == line: return n
     return None
 
+def in_subscript(leaf, top):
+    """Whether this name sits inside `[...]` below `top`: a type argument, not a base."""
+    node = leaf.parent
+    while node is not None and node is not top:
+        if node.type == "trailer" and node.children and getattr(node.children[0], "value", None) == "[":
+            return True
+        # `metaclass=M`: a keyword argument's value is not a base either.
+        if node.type == "argument" and any(getattr(c, "value", None) == "=" for c in node.children):
+            return True
+        node = node.parent
+    return False
+
 def ancestors(d, depth=0, seen=None):
     """Every project class a jedi class Name derives from, at any depth (#362's review)."""
     seen = set() if seen is None else seen
@@ -54,6 +66,8 @@ def ancestors(d, depth=0, seen=None):
         # A keyword argument's name (`metaclass=`) is not a base.
         nxt = leaf.get_next_leaf()
         if nxt is not None and nxt.value == "=": continue
+        # A type argument is not a base: `Listener[StapledStream]` derives from Listener only.
+        if in_subscript(leaf, ch[3]): continue
         try:
             inferred = script.infer(*leaf.start_pos)
         except Exception:

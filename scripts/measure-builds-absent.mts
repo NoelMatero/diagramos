@@ -551,14 +551,17 @@ function typescriptPairs(ts: typeof import("typescript"), root: string, dirs: st
   const namesOf = (type: import("typescript").Type | undefined): string[] => {
     if (!type) return [];
     if (type.isUnion()) return type.types.flatMap(namesOf).concat(type.aliasSymbol ? [type.aliasSymbol.name] : []);
-    return [type.aliasSymbol?.name, type.symbol?.name].filter((one): one is string => Boolean(one));
+    // Only a type declared in the files read: lib.dom's `Headers` is not the repository's `Headers`.
+    const ours = (symbol: import("typescript").Symbol | undefined) =>
+      symbol?.declarations?.some((one) => reading.has(one.getSourceFile().fileName)) ? symbol.name : undefined;
+    return [ours(type.aliasSymbol), ours(type.symbol)].filter((one): one is string => Boolean(one));
   };
   const symbolName = (symbol: import("typescript").Symbol | undefined) => {
     if (!symbol) return undefined;
     if (symbol.flags & ts.SymbolFlags.Alias) {
       try { symbol = checker.getAliasedSymbol(symbol); } catch { /* keep the alias */ }
     }
-    return symbol.name;
+    return symbol.declarations?.some((one) => reading.has(one.getSourceFile().fileName)) ? symbol.name : undefined;
   };
   const routineOf = (node: import("typescript").Node): string | undefined => {
     if ((ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) && node.name && ts.isIdentifier(node.name) && node.body) {

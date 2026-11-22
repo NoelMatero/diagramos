@@ -113,6 +113,13 @@ export function refereeRoutines(source: string, language: Language): RefereeRout
     let code = line.replace(/(\/\/|#).*$/, "");
     if (language === "rust") {
       /*
+       * A string or char literal is text, not code (#422): clap writes
+       * `"..for the Command {}.."` and regex `write!(f, "StartByteMap{{")`,
+       * and both read as building the struct. Blanked, braces included, so
+       * the depth count does not move on them either.
+       */
+      code = code.replace(/\br(#*)"[\s\S]*?"\1|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)'/g, (text) => " ".repeat(text.length));
+      /*
        * Two things in Rust text look exactly like a struct literal and make
        * nothing, and both cost a disagreement here.
        *
