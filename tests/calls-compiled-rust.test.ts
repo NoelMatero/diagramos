@@ -55,7 +55,9 @@ const FILES: Record<string, string> = {
     + "pub fn pong(n: u8) -> u8 {\n    ping(n)\n}\n\n"
     + "pub fn vtable() -> u8 {\n    3\n}\n\n"
     + "pub struct Counter;\n\nimpl Counter {\n    pub fn bump(&self) -> u8 {\n        1\n    }\n\n"
-    + "    pub fn push(&self) -> u8 {\n        2\n    }\n}\n",
+    + "    pub fn push(&self) -> u8 {\n        2\n    }\n}\n\n"
+    // A second `bump`, on another type: a box written `Tally::bump` is not what `c.bump()` calls (fill study, 2026-11).
+    + "pub struct Tally;\n\nimpl Tally {\n    pub fn bump(&self) -> u8 {\n        3\n    }\n}\n",
   "src/transport.rs":
     "pub trait Transport {\n    fn handle(&self) -> u8;\n}\n\npub struct Http;\n\n"
     + "impl Transport for Http {\n    fn handle(&self) -> u8 {\n        1\n    }\n}\n\n"
@@ -290,6 +292,32 @@ describe.skipIf(!HAS_CARGO)("Rust @calls, read through the compiler's own call l
     const elsewhere = await check([SAME_NAME_ELSEWHERE]);
     expect(elsewhere.report.claims.callsConfirmed).toBe(0);
     expect(redOf(elsewhere).size).toBe(0);
+  }, 180_000);
+});
+
+describe.skipIf(!HAS_CARGO)("a box written Type::method, confirmed from rustc's list (fill study, 2026-11)", () => {
+  /*
+   * `bumped` calls `c.bump()` inside a macro, so only rustc's list can say
+   * so. Asked over the owner view, the list is matched to the owner's own
+   * declaration: `Counter::bump` stays green and `Tally::bump`, the other
+   * `bump` in the file, is not confirmed by it -- and is not red either.
+   */
+  beforeAll(() => {
+    repo = mkdtempSync(path.join(tmpdir(), "calls-compiled-owner-"));
+    write(FILES);
+  });
+
+  afterAll(() => {
+    rmSync(repo, { recursive: true, force: true });
+  });
+
+  it("confirms the owner's method and not its namesake", async () => {
+    const own = await check([[`${C}bumped`, `${H}Counter::bump`]]);
+    expect(own.checkedWith.answered).toContain("rustc");
+    expect(own.report.claims.callsConfirmed).toBe(1);
+    const other = await check([[`${C}bumped`, `${H}Tally::bump`]]);
+    expect(other.report.claims.callsConfirmed).toBe(0);
+    expect(redOf(other).size).toBe(0);
   }, 180_000);
 });
 

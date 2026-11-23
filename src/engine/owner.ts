@@ -27,6 +27,7 @@
  * name sits under the owner at all -- an owner spelled some way this cannot
  * read -- nothing is hidden, and the reading stays what #409 made it.
  */
+import { declaredShapes } from "./body";
 import { declarationName } from "./declared";
 import { parseSource, type Language, type Node } from "./parse";
 
@@ -62,12 +63,21 @@ interface Declared {
 function declarationsOf(source: string, language: Language, name: string): Declared[] | undefined {
   const tree = parseSource(source, language);
   if (!tree) return undefined;
+  /*
+   * The declarations `body.ts` indexes, and only those. A node with a `name`
+   * field is not always one: Rust's `DeserializeError::generic(..)` is a
+   * scoped path whose `name` is `generic`, and taking it for a declaration
+   * hid the call itself -- 77 correct Rust calls lost their green in
+   * `measure:compiler-true` before this.
+   */
+  const declared = new Set((declaredShapes(source, language)?.get(name) ?? []).map(({ nameNode }) => nameNode.startIndex));
+  if (declared.size === 0) return [];
   const found: Declared[] = [];
   const visit = (node: Node, owners: string[]): void => {
     if (node.type === "token_tree") return;
     if (node.type !== "impl_item") {
       const named = declarationName(node);
-      if (named?.text === name) found.push({ name: named, owners });
+      if (named?.text === name && declared.has(named.startIndex)) found.push({ name: named, owners });
     }
     const inside = [...owners, ...ownerNames(node)];
     for (let index = 0; index < node.childCount; index += 1) {

@@ -6431,9 +6431,16 @@ export function checkDrift(
                 };
                 const ownTail = callSide(fromAnchor, over, importCache.configs, options?.closedBodyReferee, true, overrides, stored);
                 const ownHead = callSide(toAnchor, over, importCache.configs, options?.closedBodyReferee);
-                // rustc's call list is keyed by plain names and cannot tell owners apart.
+                /*
+                 * rustc's call list stays: it is matched to declarations in
+                 * the text it is handed, so over this view it reads only the
+                 * owner's body and counts only a call to the owner's routine
+                 * (`compiledBodiesOf`, `ownCallIn`). Without it, a call only
+                 * rustc can see -- one inside a macro -- could never confirm
+                 * the owner's own routine (`calls-compiled-rust.test.ts`).
+                 */
                 const strict = ownTail && ownHead
-                  ? readCalls({ ...ownTail, compiled: undefined }, { ...ownHead, ownerOnly: true }, over, false)
+                  ? readCalls(ownTail, { ...ownHead, ownerOnly: true }, over, false)
                   : undefined;
                 if (strict?.verdict !== "confirmed") verdict = { verdict: "withheld", why: "other-owner" };
               }
