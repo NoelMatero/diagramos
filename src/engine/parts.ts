@@ -418,6 +418,42 @@ function readDeclaration(node: Node, nameNode: Node, language: Language, ask?: A
 }
 
 /**
+ * Whether a declaration is a type or a module and nothing that runs: a class,
+ * a struct, an interface, a trait, an enum, a module, or a type alias.
+ *
+ * The question a claim about a *function* has to ask before it reads one
+ * (fill study, 2026-11): `@takes` and `@returns` read a signature, `@feeds` a
+ * result, `@calls` a body, and every one of those is somewhere inside a class
+ * -- in its constructor, its first method -- without being the class's. Read
+ * through, "`Auth` takes `Request`" was green off `Auth.auth_flow`, and 69 of
+ * the 93 wrong arrows the code confirmed on 123 boards were that shape.
+ *
+ * Read off the grammar's fields, as everything here is: a container is
+ * `isContainer`, an alias is the `type` keyword (TypeScript, Rust) or
+ * Python's `TypeAlias` annotation. A routine has `parameters` and never
+ * qualifies, so a name declared both ways -- `interface Foo` beside `function
+ * Foo` -- is read through its routine by the callers, which ask this per
+ * declaration.
+ */
+export function runsNothing(node: Node, language: Language): boolean {
+  if (parametersOf(node) !== null) return false;
+  if (isContainer(node) || aliasesAType(node)) return true;
+  const written = node.childForFieldName("type");
+  return language === "python" && written !== null && aliasesByAnnotation(written.text);
+}
+
+/**
+ * Whether every declaration of `name` in this file runs nothing
+ * (`runsNothing`), and there is at least one. A name out of a macro is never
+ * read so: nothing says what it is.
+ */
+export function onlyTypes(source: string, name: string, language: Language): boolean {
+  const declarations = declaredShapes(source, language)?.get(name) ?? [];
+  return declarations.length > 0
+    && declarations.every(({ node, soup }) => !soup && runsNothing(node, language));
+}
+
+/**
  * A container is a declaration with a `body` field and none of `parameters`,
  * `value`, `right` or `type`: a struct, a class, an interface, an enum, a
  * trait, a module.

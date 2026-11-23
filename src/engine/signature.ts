@@ -143,6 +143,7 @@ import { aliasesFor, aliasNames, standsFor, writesWhatItStandsFor } from "./alia
 import { declarationName } from "./declared";
 import { typeParametersIn, unwrittenNames, unwrittenType, type Site } from "./gate";
 import { mayAccuse } from "./licence";
+import { runsNothing } from "./parts";
 import { incomplete, INSTANCE_NAMES, parametersOf, parseSource, qualifiedTail, type Language, type Node } from "./parse";
 
 /** Which half of a signature a claim is about. */
@@ -204,7 +205,13 @@ export type SignatureWithheld =
    * everything inside the quotes was read by scanning text rather than by
    * parsing a type, and "I did not find it in that text" is not an absence.
    */
-  | "quoted-annotation";
+  | "quoted-annotation"
+  /**
+   * The head was written `Type::method`, a `method` in this file confirms,
+   * and it is some other type's (`owner.ts`). The plain name says yes, so
+   * this is no red; the owner's own says no, so it is no green either.
+   */
+  | "other-owner";
 
 /** Where the type was named, so a report can quote a file and a line. */
 export interface SignatureEvidence {
@@ -406,11 +413,24 @@ function signatureNode(node: Node): Node | undefined {
       if (found) return found;
     }
   }
+  /*
+   * A function wrapped on the way to its name -- `const f = memo((a: A) =>
+   * ..)` -- is found by looking inside. Never inside something with a body
+   * of its own and no parameters: that is a class, written as a value
+   * (`const Auth = class { constructor(r: Request) {} }`), and its first
+   * method is not its signature (fill study, 2026-11; see `runsNothing`).
+   */
   let found: Node | undefined;
-  each(node, (current) => {
-    if (!found && current !== node && FUNCTIONISH.test(current.type)
-      && parametersOf(current)) found = current;
-  });
+  const look = (current: Node): void => {
+    if (found) return;
+    if (current !== node && FUNCTIONISH.test(current.type) && parametersOf(current)) { found = current; return; }
+    if (current !== node && current.childForFieldName("body") && !parametersOf(current)) return;
+    for (let index = 0; index < current.childCount; index += 1) {
+      const child = current.child(index);
+      if (child) look(child);
+    }
+  };
+  look(node);
   return found;
 }
 
@@ -668,6 +688,16 @@ export function signatureNames(
 
   for (const { node: declaration, self } of declarations) {
     sawName = true;
+    /*
+     * A class, a trait, an interface, a module or a type alias has no
+     * signature of its own, whatever the functions inside it say (fill
+     * study, 2026-11). Read through, "`Auth` takes `Request`" was confirmed
+     * off `Auth.auth_flow(self, request: Request)` -- 60 wrong greens on 123
+     * boards. Nothing is read here, so a name that is only a type comes back
+     * `no-signature`, and the kind check after the reader (`parts.ts`) says
+     * what is wrong with the arrow where it is licensed to.
+     */
+    if (runsNothing(declaration, language)) continue;
     const signature = signatureNode(declaration);
     if (!signature) continue;
     sawSignature = true;

@@ -59,7 +59,14 @@ export type FeedsWithheld =
   /** One end anchors a file rather than a symbol, so there is no call to look for. */
   | "not-symbols"
   /** No file that can see both ends could be read, so nowhere to look. */
-  | "nowhere-to-look";
+  | "nowhere-to-look"
+  /**
+   * The tail is a type and nothing else -- a class, a struct, an alias --
+   * which has no result to feed anybody. Not read at all: `use(Lock())`
+   * builds a `Lock`, and taking that call for a function's result was how a
+   * class came to "feed" things (fill study, 2026-11).
+   */
+  | "not-a-routine";
 
 /** Where the flow was written down, so the report can quote it. */
 export interface FeedsEvidence {
