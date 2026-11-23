@@ -97,11 +97,25 @@ function declarationsOf(source: string, language: Language, name: string): Decla
  * is the owner's -- or nothing to go on: no declaration of it sits under the
  * owner, or the file does not parse.
  */
-export function ownerView(source: string, language: Language, name: string, owner: string): string | undefined {
+export function ownerView(
+  source: string,
+  language: Language,
+  name: string,
+  owner: string,
+  /**
+   * Owners whose declaration of the name stays in sight too: the arrow's
+   * other end, when it is the same name in the same file. `Client.__init__`
+   * calling `BaseClient.__init__` through `super()` is a correct arrow, and a
+   * view that hid every other `__init__` hid the caller with them -- 31
+   * Python and 19 TypeScript compiler-true calls lost their green so.
+   */
+  keep: readonly string[] = [],
+): string | undefined {
   const declared = declarationsOf(source, language, name);
   if (!declared) return undefined;
-  const others = declared.filter((one) => !one.owners.includes(owner));
-  if (others.length === 0 || others.length === declared.length) return undefined;
+  if (!declared.some((one) => one.owners.includes(owner))) return undefined;
+  const others = declared.filter((one) => !one.owners.includes(owner) && !keep.some((kept) => one.owners.includes(kept)));
+  if (others.length === 0) return undefined;
   let view = source;
   for (const { name: leaf } of others) {
     const start = leaf.startIndex;

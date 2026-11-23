@@ -6413,15 +6413,27 @@ export function checkDrift(
              */
             if (verdict.verdict === "confirmed") {
               const masks = new Map<string, string>();
-              const hide = (file: string, path: string, node: { ref?: string; refs?: string[] }, name: string | undefined) => {
-                const owner = ownerOf(node, path);
-                const language = languageOf(file);
-                if (!owner || !name || !language) return;
-                const view = ownerView(masks.get(file) ?? workspace.read(file), language, name, owner);
-                if (view !== undefined) masks.set(file, view);
-              };
-              hide(fromFile, fromPath, fromNode, fromEnd.symbols[0]);
-              hide(toFile, toPath, toNode, toEnd.symbols[0]);
+              const ends = [
+                { file: fromFile, name: fromEnd.symbols[0], owner: ownerOf(fromNode, fromPath) },
+                { file: toFile, name: toEnd.symbols[0], owner: ownerOf(toNode, toPath) },
+              ];
+              for (const [at, end] of ends.entries()) {
+                const other = ends[1 - at]!;
+                const language = languageOf(end.file);
+                if (!end.owner || !end.name || !language) continue;
+                /*
+                 * The other end is the same name in the same file: its own
+                 * declaration stays in sight, or the view would hide the
+                 * caller of `super().__init__()` along with the callee's
+                 * namesakes. Written with no owner, there is no telling which
+                 * declaration it is, and nothing is hidden for this end.
+                 */
+                const same = other.file === end.file && other.name === end.name;
+                if (same && !other.owner) continue;
+                const view = ownerView(masks.get(end.file) ?? workspace.read(end.file), language, end.name, end.owner,
+                  same ? [other.owner!] : []);
+                if (view !== undefined) masks.set(end.file, view);
+              }
               if (masks.size > 0) {
                 const over: Workspace = {
                   resolve: (relative) => workspace.resolve(relative),

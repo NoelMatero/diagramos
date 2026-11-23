@@ -48,6 +48,21 @@ describe("an owner view", () => {
     expect(ownerView(one, "rust", "generic", "Error")).toBeUndefined();
   });
 
+  it("keeps the other end's own declaration when both ends are one name in one file", () => {
+    // `Client.__init__` calling `BaseClient.__init__` through `super()`: hiding
+    // every other `__init__` hid the caller too, and 31 Python and 19
+    // TypeScript compiler-true calls lost their green.
+    const py = [
+      "class BaseClient:", "    def __init__(self):", "        pass", "",
+      "class Client(BaseClient):", "    def __init__(self):", "        super().__init__()", "",
+      "class Other:", "    def __init__(self):", "        pass", "",
+    ].join("\n");
+    const view = ownerView(py, "python", "__init__", "BaseClient", ["Client"]);
+    expect(changed(py, view)).toEqual(["def __init__(self):"]);
+    expect(view!.split("\n")[5]).toBe("    def __init__(self):");
+    expect(view!.split("\n")[9]).toBe("    def ________(self):");
+  });
+
   it("hides nothing when no declaration sits under the owner", () => {
     expect(ownerView(RUST, "rust", "generic", "Nowhere")).toBeUndefined();
   });
