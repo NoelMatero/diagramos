@@ -250,9 +250,6 @@ describe("refusals: a withdrawn red with an end of the right kind stays not sure
         ["@holds into a type, Rust", RS, "src/lib.rs#Holder", "src/lib.rs#Context", "holds"],
         ["@takes from a type into a generic function, TypeScript", TS, "src/router.ts#Context", "src/router.ts#process", "takes"],
         ["@takes from a type into a generic function, Rust", RS, "src/lib.rs#Context", "src/lib.rs#process", "takes"],
-        // The reader read the constructor at the head: the kind check does not overrule it about that end.
-        ["@takes into a class whose constructor the reader read, TypeScript", TS, "src/router.ts#Context", "src/router.ts#Service", "takes"],
-        ["@takes into a class whose constructor the reader read, Python", PY, "src/schema.py#Meta", "src/fields.py#Field", "takes"],
         // A name declared twice, once as a type: it has the part, so nothing lacks it.
         ["@takes from a name declared as a function and an interface, TypeScript", TS, "src/router.ts#Cfg", "src/router.ts#process", "takes"],
         ["@takes from a name declared as a struct and a function, Rust", RS, "src/lib.rs#Thing", "src/lib.rs#process", "takes"],
@@ -315,7 +312,7 @@ describe("a wrong kind of end the withdrawn red hid", () => {
         ["@holds into an interface's method, TypeScript", TS, "src/smart.ts#Holder", "src/router.ts#match", "holds", "a function is not a type"],
         ["@holds into a trait's method, Rust", RS, "src/lib.rs#Holder", "src/lib.rs#Router::find", "holds", "a function is not a type"],
         ["@takes drawn from a function, TypeScript", TS, "src/smart.ts#helper", "src/router.ts#process", "takes", "a function is not a type"],
-        ["@takes drawn from a function, Python", PY, "src/schema.py#_get_fields", "src/fields.py#Field", "takes", "a function is not a type"],
+        ["@takes drawn from a function, Python", PY, "src/schema.py#_get_fields", "src/fields.py#process", "takes", "a function is not a type"],
         ["@takes drawn from a function, Rust", RS, "src/lib.rs#helper", "src/lib.rs#process", "takes", "a function is not a type"],
       ];
       for (const [name, files, from, to, claim, says] of wrong) {
@@ -326,6 +323,26 @@ describe("a wrong kind of end the withdrawn red hid", () => {
           expect(report.unconfirmedEdges).toEqual([]);
         });
       }
+    });
+  }
+});
+
+describe("a class at the head of @takes is the wrong kind, whatever its constructor names", () => {
+  /*
+   * Until the fill study (2026-11) the signature reader read a class's
+   * constructor as the class's signature, and these two went through #463's
+   * withdrawn red. A class has no signature of its own: the arrow is red
+   * straight away, from the kind check after the reader, with nothing to
+   * withdraw.
+   */
+  for (const [how, referee] of WITHDRAWN) {
+    it.each([
+      ["TypeScript", TS, "src/router.ts#Context", "src/router.ts#Service"],
+      ["Python", PY, "src/schema.py#Meta", "src/fields.py#Field"],
+    ] as const)(`with ${how}, %s`, async (_name, files, from, to) => {
+      const { wrongKind, withdrawn } = await check(files, from, to, "takes", referee);
+      expect(withdrawn).toEqual([]);
+      expect(wrongKind?.detail).toContain("no parameters or return type");
     });
   }
 });

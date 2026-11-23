@@ -57,7 +57,7 @@ import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } f
 import { licenceFor, mayAccuse } from "./licence";
 import { outsideCallsIn } from "./outside";
 import { lackingPhrase } from "./summary";
-import { lackingEnd, PART_NEEDED, PART_WORDS, type LackingEnd, type ValueKind } from "./parts";
+import { lackingEnd, onlyTypes, PART_NEEDED, PART_WORDS, type LackingEnd, type ValueKind } from "./parts";
 import { languageOf, parametersOf, type Language } from "./parse";
 import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
@@ -79,6 +79,7 @@ import { heldTypes, type HoldsWithheld } from "./holds";
 import { conformedTypes, declaredBases, type ConformsWithheld } from "./conforms";
 import { overridesIn, type Overrides } from "./overrides";
 import { storedIn, type Stored, type StoredSource } from "./stored";
+import { ownerView, pickingOwner } from "./owner";
 import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
 import { boardIsNewer, newerBuildClaimError } from "./version";
@@ -980,7 +981,8 @@ function withheldTallyOf(claims: ClaimTally, claim: ArrowClaim): Record<string, 
 /** What the fix is, per part: where the arrow's end should be instead. */
 const LACKING_FIX: Record<LackingEnd["part"], string> = {
   body: "Start the arrow at the function that does it",
-  signature: "Point the arrow at the function whose parameters or return type name it",
+  signature: "Point the arrow at the function whose parameters or return type name it "
+    + "(a constructor or a method is that function, drawn as a box of its own)",
   result: "Start the arrow at the function that produces the value",
   fields: "Anchor that end at the type that has the field",
   bases: "Start the arrow at the type that declares the base",
@@ -3322,6 +3324,23 @@ function symbolsOf(node: { ref?: string; refs?: string[] }, file: string, worksp
 }
 
 /**
+ * The owner the box's first named ref was written with, when it picks one
+ * declaration of the name out of several: `Policy` in
+ * `redirect.rs#Policy::redirect`. Confirming asks for that owner's own
+ * declaration (`owner.ts`); refuting never looks at it (#409).
+ */
+function ownerOf(node: { ref?: string; refs?: string[] }, file: string): string | undefined {
+  for (const anchor of [node.ref, ...(node.refs ?? [])]) {
+    const raw = anchor?.trim();
+    if (!raw) continue;
+    const { path: target, symbol, owner } = parseRef(raw);
+    if (!symbol) continue;
+    return pickingOwner(owner, target || file);
+  }
+  return undefined;
+}
+
+/**
  * The symbols a box lists, grouped by the file they live in.
  *
  * Grouped because the self-support rule is a question about one file's text:
@@ -5571,10 +5590,24 @@ export function checkDrift(
            * read without that file is an absence built on not having looked.
            */
           const fromLanguage = languageOf(fromFile);
-          const verdict = signatureNames(
-            workspace.read(toFile), toEnd.symbols[0]!, fromEnd.symbols, position, language,
-            fromLanguage ? { source: workspace.read(fromFile), language: fromLanguage } : undefined,
+          const subject = fromLanguage ? { source: workspace.read(fromFile), language: fromLanguage } : undefined;
+          let verdict = signatureNames(
+            workspace.read(toFile), toEnd.symbols[0]!, fromEnd.symbols, position, language, subject,
           );
+          /*
+           * A head written `Type::method` is that type's method when this
+           * confirms (`owner.ts`): asked again over a view of the file in
+           * which no other `method` can answer. The plain reading stands for
+           * everything else, so this only ever turns a green to "not sure".
+           */
+          const toOwner = ownerOf(toNode, toPath);
+          if (verdict.verdict === "confirmed" && toOwner) {
+            const view = ownerView(workspace.read(toFile), language, toEnd.symbols[0]!, toOwner);
+            if (view !== undefined
+              && signatureNames(view, toEnd.symbols[0]!, fromEnd.symbols, position, language, subject).verdict !== "confirmed") {
+              verdict = { verdict: "withheld", why: "other-owner" };
+            }
+          }
 
           if (verdict.verdict === "confirmed") {
             if (claimed) claims.signatureConfirmed += 1;
@@ -5973,6 +6006,8 @@ export function checkDrift(
         language: Language, toLanguage: Language | undefined, forCalls = false,
         /** `@calls`' own tail, whose placements a handed-in value is judged by (#432). */
         calls?: CallSide,
+        /** The files as read: an owner view of them, for `@calls`' second reading (`owner.ts`). */
+        over: Workspace = workspace,
       ) => {
         /*
          * Python's imports, which are the only thing that separates
@@ -6007,11 +6042,11 @@ export function checkDrift(
            * builds them: the second opinion, "go to definition" on the
            * tail, and the overridden methods.
            */
-          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true, overrides);
-          const head = callSide(toAnchor, workspace, importCache.configs, options?.closedBodyReferee);
+          const tail = callSide(fromAnchor, over, importCache.configs, options?.closedBodyReferee, true, overrides);
+          const head = callSide(toAnchor, over, importCache.configs, options?.closedBodyReferee);
           if (tail) names = { side: tail, target: toAnchor, ancestors, ...(head ? { head } : {}) };
         } else if (language === "python" || language === "ts" || language === "tsx") {
-          const tail = callSide(fromAnchor, workspace, importCache.configs);
+          const tail = callSide(fromAnchor, over, importCache.configs);
           if (tail) names = { side: tail, target: toAnchor, ancestors };
         } else if (language === "rust" && edge.state !== "planned") {
           /*
@@ -6020,16 +6055,16 @@ export function checkDrift(
            * makes. `callSide` offers the compiled crate only to a side that
            * asks for it, the way `@calls`' tail does.
            */
-          const tail = callSide(fromAnchor, workspace, importCache.configs, options?.closedBodyReferee, true);
+          const tail = callSide(fromAnchor, over, importCache.configs, options?.closedBodyReferee, true);
           if (tail) names = { side: tail, target: toAnchor };
         }
         if (names && calls) names = { ...names, calls };
         const verdict = constructions(
-          workspace.read(fromFile), fromEnd.symbols[0]!, toEnd.symbols, language,
+          over.read(fromFile), fromEnd.symbols[0]!, toEnd.symbols, language,
           toLanguage && edge.state !== "planned"
             ? {
-              source: workspace.read(toFile),
-              routines: routineNamesIn(workspace.read(toFile), toLanguage),
+              source: over.read(toFile),
+              routines: routineNamesIn(over.read(toFile), toLanguage),
               language: toLanguage,
               names: fromEnd.symbols,
             }
@@ -6221,130 +6256,206 @@ export function checkDrift(
           if (!tail || !head) {
             noteCalled("unreadable");
           } else {
-            let verdict: CallsVerdict = callsBetween(
-              { ...tail, routine: fromEnd.symbols[0]! },
-              { ...head, names: toEnd.symbols },
-            );
-            if (
-              claimed && tail.language === "rust" && !tail.compiled?.()
-              && (verdict.verdict === "withheld" || (verdict.verdict === "absent" && verdict.notClosed))
-            ) {
-              claims.callsCompilable += 1;
-            }
-
             /*
-             * A class at the head (#374): "main calls Parser" is true when
-             * main creates a Parser or calls anything Parser declares.
-             *
-             * `callsBetween` asks only whether a call lands in the class's
-             * file, which is neither half. A call to `p.parse()` landed there
-             * and was never confirmed, and a struct literal, a subclass, an
-             * inherited method or an `impl` two files away landed nowhere
-             * near it -- so a correct arrow was called wrong. Now the two
-             * halves are asked of what already reads them: the call list, for
-             * a call that comes to rest on the class's own routine
-             * (`callsIntoType`), and `@builds`' reading of the same body,
-             * with every guard #362 gave it. Either one confirms. Wrong needs
-             * all three: the old reading's own "no call reaches its file",
-             * every call placed and none the class's, and `@builds` closing
-             * on "creates none". So this can take a red away and never add
-             * one: the bench's 4 reds it withdrew were wrong arrows whose
-             * body names the class or could build it as a literal.
+             * What this word's readers say about the arrow, over one view of
+             * the files: the workspace itself, or an owner view of it
+             * (`owner.ts`) in which a `Type::method` end's other namesakes
+             * cannot answer. Only the first view counts toward the tallies.
              */
-            if (
-              verdict.verdict !== "confirmed"
-              && toEnd.symbols.every((name) => isTypeName(head.source, name, head.language))
-            ) {
-              // Rust has no inheritance: a trait's default method is held by
-              // the trait, which `callsIntoType` treats as dispatch anyway.
-              const inherits = head.language !== "rust" && toEnd.symbols.some((name) => {
-                const read = declaredBases(head.source, name, head.language);
-                return "why" in read || read.bases.length > 0;
-              });
-              const routine = fromEnd.symbols[0]!;
-              const own = callsIntoType({ ...tail, routine }, { ...head, names: toEnd.symbols }, inherits);
-              const made = own.verdict === "confirmed" ? undefined
-                : readConstructions(tail.language, head.language, true, tail).verdict;
-              if (own.verdict === "confirmed") {
-                verdict = { verdict: "confirmed", evidence: own.evidence };
-              } else if (made?.verdict === "confirmed") {
-                verdict = { verdict: "confirmed", evidence: {
-                  name: made.evidence.name, inside: routine, line: made.evidence.line, wrote: made.evidence.wrote,
-                } };
-              } else if (verdict.verdict === "backwards" && own.verdict === "closed") {
-                /*
-                 * The class's code calls the tail, and every call the tail
-                 * makes was placed and none is the class's: turn it round.
-                 * "Turn it round" says the forward call is absent, and before
-                 * this reading nothing could see the forward half of vite's
-                 * `ModuleGraph` pairs -- each side calling the other -- so 204
-                 * correct arrows said it (`measure:builds-absent
-                 * --word=calls`). A forward reading that is still open is
-                 * quiet below instead, with its reason, which is also what
-                 * lets a live check put the open call to a language server.
-                 */
-              } else if (own.verdict === "open") {
-                /*
-                 * A forward doubt no compiler can settle -- `x()(n)`, a call
-                 * nothing names (#400) -- is not the one to report when the
-                 * class's reading stopped on a value whose type a compiler
-                 * can give: that answer is what can still confirm it, and a
-                 * live check asks only for the reasons it is shown. nest's
-                 * `RouterExplorer -> RoutePathFactory` went unconfirmed so.
-                 */
-                const answerable = own.why === "receiver" || own.why === "abstract-receiver";
-                if (verdict.verdict !== "withheld" || answerable) verdict = { verdict: "absent", notClosed: own.why };
-              } else if (made?.verdict !== "refuted") {
-                if (verdict.verdict !== "withheld") verdict = { verdict: "absent", notClosed: "may-create" };
-              } else if (verdict.verdict === "refuted") {
-                /*
-                 * Rust runs a type's trait methods without a call written:
-                 * `a >= b` runs a derived `PartialOrd`, a scope's end runs
-                 * `Drop`. The red already needs rustc's body for the routine
-                 * (`@builds`' "creates none"), and if that body so much as
-                 * names the type, the text's closed list is not the whole of
-                 * it -- regex's `special.rs#matches` compares `StateID`s and
-                 * writes none (#374, `measure:builds-absent --word=calls`).
-                 */
-                const compiled = tail.language === "rust" ? compiledBodiesFor({ ...tail, routine }, toEnd.symbols) : undefined;
-                const named = compiled?.bodies.some((body) => toEnd.symbols.some((name) => body.words.has(name)
-                  || body.calls.some((call) => call.kind === "named" && call.through === name)));
-                verdict = named
-                  ? { verdict: "absent", notClosed: "called-implicitly" }
-                  : { verdict: "refuted", evidence: { routine, line: own.line, sites: own.sites } };
+            const readCalls = (
+              tail: CallSide, head: CallSide & { ownerOnly?: boolean }, over: Workspace, counting: boolean,
+            ): CallsVerdict => {
+              let verdict: CallsVerdict = callsBetween(
+                { ...tail, routine: fromEnd.symbols[0]! },
+                { ...head, names: toEnd.symbols },
+              );
+              if (
+                claimed && tail.language === "rust" && !tail.compiled?.()
+                && (verdict.verdict === "withheld" || (verdict.verdict === "absent" && verdict.notClosed))
+              ) {
+                if (counting) claims.callsCompilable += 1;
               }
-              // "Creates none" in Rust waits on the compiler, which a live check starts only when asked.
-              if (claimed && own.verdict === "closed" && made?.verdict === "absent" && made.awaitsCompiler) {
-                claims.callsCompilable += 1;
-              }
-            }
 
+              /*
+               * A class at the head (#374): "main calls Parser" is true when
+               * main creates a Parser or calls anything Parser declares.
+               *
+               * `callsBetween` asks only whether a call lands in the class's
+               * file, which is neither half. A call to `p.parse()` landed there
+               * and was never confirmed, and a struct literal, a subclass, an
+               * inherited method or an `impl` two files away landed nowhere
+               * near it -- so a correct arrow was called wrong. Now the two
+               * halves are asked of what already reads them: the call list, for
+               * a call that comes to rest on the class's own routine
+               * (`callsIntoType`), and `@builds`' reading of the same body,
+               * with every guard #362 gave it. Either one confirms. Wrong needs
+               * all three: the old reading's own "no call reaches its file",
+               * every call placed and none the class's, and `@builds` closing
+               * on "creates none". So this can take a red away and never add
+               * one: the bench's 4 reds it withdrew were wrong arrows whose
+               * body names the class or could build it as a literal.
+               */
+              if (
+                verdict.verdict !== "confirmed"
+                && toEnd.symbols.every((name) => isTypeName(head.source, name, head.language))
+              ) {
+                // Rust has no inheritance: a trait's default method is held by
+                // the trait, which `callsIntoType` treats as dispatch anyway.
+                const inherits = head.language !== "rust" && toEnd.symbols.some((name) => {
+                  const read = declaredBases(head.source, name, head.language);
+                  return "why" in read || read.bases.length > 0;
+                });
+                const routine = fromEnd.symbols[0]!;
+                const own = callsIntoType({ ...tail, routine }, { ...head, names: toEnd.symbols }, inherits);
+                const made = own.verdict === "confirmed" ? undefined
+                  : readConstructions(tail.language, head.language, true, tail, over).verdict;
+                if (own.verdict === "confirmed") {
+                  verdict = { verdict: "confirmed", evidence: own.evidence };
+                } else if (made?.verdict === "confirmed") {
+                  verdict = { verdict: "confirmed", evidence: {
+                    name: made.evidence.name, inside: routine, line: made.evidence.line, wrote: made.evidence.wrote,
+                  } };
+                } else if (verdict.verdict === "backwards" && own.verdict === "closed") {
+                  /*
+                   * The class's code calls the tail, and every call the tail
+                   * makes was placed and none is the class's: turn it round.
+                   * "Turn it round" says the forward call is absent, and before
+                   * this reading nothing could see the forward half of vite's
+                   * `ModuleGraph` pairs -- each side calling the other -- so 204
+                   * correct arrows said it (`measure:builds-absent
+                   * --word=calls`). A forward reading that is still open is
+                   * quiet below instead, with its reason, which is also what
+                   * lets a live check put the open call to a language server.
+                   */
+                } else if (own.verdict === "open") {
+                  /*
+                   * A forward doubt no compiler can settle -- `x()(n)`, a call
+                   * nothing names (#400) -- is not the one to report when the
+                   * class's reading stopped on a value whose type a compiler
+                   * can give: that answer is what can still confirm it, and a
+                   * live check asks only for the reasons it is shown. nest's
+                   * `RouterExplorer -> RoutePathFactory` went unconfirmed so.
+                   */
+                  const answerable = own.why === "receiver" || own.why === "abstract-receiver";
+                  if (verdict.verdict !== "withheld" || answerable) verdict = { verdict: "absent", notClosed: own.why };
+                } else if (made?.verdict !== "refuted") {
+                  if (verdict.verdict !== "withheld") verdict = { verdict: "absent", notClosed: "may-create" };
+                } else if (verdict.verdict === "refuted") {
+                  /*
+                   * Rust runs a type's trait methods without a call written:
+                   * `a >= b` runs a derived `PartialOrd`, a scope's end runs
+                   * `Drop`. The red already needs rustc's body for the routine
+                   * (`@builds`' "creates none"), and if that body so much as
+                   * names the type, the text's closed list is not the whole of
+                   * it -- regex's `special.rs#matches` compares `StateID`s and
+                   * writes none (#374, `measure:builds-absent --word=calls`).
+                   */
+                  const compiled = tail.language === "rust" ? compiledBodiesFor({ ...tail, routine }, toEnd.symbols) : undefined;
+                  const named = compiled?.bodies.some((body) => toEnd.symbols.some((name) => body.words.has(name)
+                    || body.calls.some((call) => call.kind === "named" && call.through === name)));
+                  verdict = named
+                    ? { verdict: "absent", notClosed: "called-implicitly" }
+                    : { verdict: "refuted", evidence: { routine, line: own.line, sites: own.sites } };
+                }
+                // "Creates none" in Rust waits on the compiler, which a live check starts only when asked.
+                if (claimed && own.verdict === "closed" && made?.verdict === "absent" && made.awaitsCompiler) {
+                  if (counting) claims.callsCompilable += 1;
+                }
+              }
+
+              /*
+               * A type alias at the head (#476): answered the way an interface
+               * there is, which is never with a red.
+               *
+               * The readings above take the head for a routine that has to be
+               * called by its own name, and an alias is never called by its own
+               * name. `viaConst` calling `handle`, declared as a `Handler`, *is*
+               * calling a Handler, and it went red as "the one that reaches
+               * a.ts calls `handle`" -- while the same arrow at an interface was
+               * "not sure", because a literal may make one and a value of it may
+               * be what is called. Both hold for an alias whatever it names: a
+               * function type or a call signature (any value of it, under any
+               * name), an object type (a literal), a union or an intersection
+               * (any member), a generic (what it names), another type (a
+               * declaration somewhere else). So the shape is not read; the
+               * accusations are withheld, and a confirmation stands.
+               *
+               * Any one name is enough. A box standing for several names, one of
+               * them an alias, may be drawn at the alias, and a red would be an
+               * answer about the others.
+               */
+              if (
+                (verdict.verdict === "refuted" || verdict.verdict === "wrong-routine" || verdict.verdict === "backwards")
+                && toEnd.symbols.some((name) => onlyATypeAlias(head.source, name, head.language))
+              ) {
+                verdict = { verdict: "absent", notClosed: "type-alias" };
+              }
+              return verdict;
+            };
             /*
-             * A type alias at the head (#476): answered the way an interface
-             * there is, which is never with a red.
-             *
-             * The readings above take the head for a routine that has to be
-             * called by its own name, and an alias is never called by its own
-             * name. `viaConst` calling `handle`, declared as a `Handler`, *is*
-             * calling a Handler, and it went red as "the one that reaches
-             * a.ts calls `handle`" -- while the same arrow at an interface was
-             * "not sure", because a literal may make one and a value of it may
-             * be what is called. Both hold for an alias whatever it names: a
-             * function type or a call signature (any value of it, under any
-             * name), an object type (a literal), a union or an intersection
-             * (any member), a generic (what it names), another type (a
-             * declaration somewhere else). So the shape is not read; the
-             * accusations are withheld, and a confirmation stands.
-             *
-             * Any one name is enough. A box standing for several names, one of
-             * them an alias, may be drawn at the alias, and a red would be an
-             * answer about the others.
+             * A type alias at the tail runs nothing (fill study, 2026-11):
+             * TanStack's `Action`, a union of action interfaces, was read
+             * through code around it and "`Action` calls `Mutation`" came
+             * back green. Not read, so the kind check below has the last
+             * word -- which for an alias is "not sure", as nothing measured
+             * lets it call one the wrong kind of end.
              */
-            if (
-              (verdict.verdict === "refuted" || verdict.verdict === "wrong-routine" || verdict.verdict === "backwards")
-              && toEnd.symbols.some((name) => onlyATypeAlias(head.source, name, head.language))
-            ) {
-              verdict = { verdict: "absent", notClosed: "type-alias" };
+            let verdict: CallsVerdict = fromEnd.symbols.every((name) => onlyATypeAlias(tail.source, name, tail.language))
+              ? { verdict: "withheld", why: "not-a-routine" }
+              : readCalls(tail, head, workspace, true);
+            /*
+             * An end written `Type::method` confirms only through that type's
+             * own `method` (`owner.ts`). Asked again over a view of the files
+             * in which no other declaration of the name can answer; if that
+             * view does not confirm, the arrow is "not sure". Every other
+             * verdict is the plain reading's, so this takes a green away and
+             * never adds a red (#409).
+             */
+            if (verdict.verdict === "confirmed") {
+              const masks = new Map<string, string>();
+              const ends = [
+                { file: fromFile, name: fromEnd.symbols[0], owner: ownerOf(fromNode, fromPath) },
+                { file: toFile, name: toEnd.symbols[0], owner: ownerOf(toNode, toPath) },
+              ];
+              for (const [at, end] of ends.entries()) {
+                const other = ends[1 - at]!;
+                const language = languageOf(end.file);
+                if (!end.owner || !end.name || !language) continue;
+                /*
+                 * The other end is the same name in the same file: its own
+                 * declaration stays in sight, or the view would hide the
+                 * caller of `super().__init__()` along with the callee's
+                 * namesakes. Written with no owner, there is no telling which
+                 * declaration it is, and nothing is hidden for this end.
+                 */
+                const same = other.file === end.file && other.name === end.name;
+                if (same && !other.owner) continue;
+                const view = ownerView(masks.get(end.file) ?? workspace.read(end.file), language, end.name, end.owner,
+                  same ? [other.owner!] : []);
+                if (view !== undefined) masks.set(end.file, view);
+              }
+              if (masks.size > 0) {
+                const over: Workspace = {
+                  resolve: (relative) => workspace.resolve(relative),
+                  stat: (absolute) => workspace.stat(absolute),
+                  read: (absolute) => masks.get(absolute) ?? workspace.read(absolute),
+                  list: (absolute) => workspace.list(absolute),
+                };
+                const ownTail = callSide(fromAnchor, over, importCache.configs, options?.closedBodyReferee, true, overrides, stored);
+                const ownHead = callSide(toAnchor, over, importCache.configs, options?.closedBodyReferee);
+                /*
+                 * rustc's call list stays: it is matched to declarations in
+                 * the text it is handed, so over this view it reads only the
+                 * owner's body and counts only a call to the owner's routine
+                 * (`compiledBodiesOf`, `ownCallIn`). Without it, a call only
+                 * rustc can see -- one inside a macro -- could never confirm
+                 * the owner's own routine (`calls-compiled-rust.test.ts`).
+                 */
+                const strict = ownTail && ownHead
+                  ? readCalls(ownTail, { ...ownHead, ownerOnly: true }, over, false)
+                  : undefined;
+                if (strict?.verdict !== "confirmed") verdict = { verdict: "withheld", why: "other-owner" };
+              }
             }
 
             /*
@@ -6951,10 +7062,22 @@ export function checkDrift(
             unanswered("not-symbols");
           }
         } else {
-          const pool = feedsCandidates();
-          const feeds = pool === undefined
-            ? { verdict: "withheld" as const, why: "nowhere-to-look" as const }
-            : checkFeeds(fromEnd, toEnd, pool);
+          /*
+           * A class, a struct or an alias at the tail has no result to feed
+           * anybody (fill study, 2026-11). `use(Lock())` hands a new `Lock`
+           * on, and reading the call `Lock()` as a function's result made
+           * "`Lock` feeds `use`" green -- the arrow means `@takes`. Not read,
+           * so the kind check below says so where it is licensed to.
+           */
+          const fromLanguage = languageOf(fromFile);
+          const typeTail = fromLanguage !== undefined
+            && fromEnd.symbols.every((name) => onlyTypes(workspace.read(fromFile), name, fromLanguage));
+          const pool = typeTail ? undefined : feedsCandidates();
+          const feeds = typeTail
+            ? { verdict: "withheld" as const, why: "not-a-routine" as const }
+            : pool === undefined
+              ? { verdict: "withheld" as const, why: "nowhere-to-look" as const }
+              : checkFeeds(fromEnd, toEnd, pool);
           if (feeds.verdict === "confirmed") {
             if (claimed) claims.feedsConfirmed += 1;
             edgesChecked += 1;

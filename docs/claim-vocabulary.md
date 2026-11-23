@@ -5027,6 +5027,54 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     tails that write a name the head defines, one end marked external, and
     one red a compiler could not back.
 
+54. **An end must be the right kind before it is read, and a `Type::method`
+    box confirms only through that type (fill study, 2026-11).**
+
+    Filling 123 boards' arrows from the code (`~/bench-queue/fill-study-2026-11.md`)
+    found 93 confirmed arrows wrong, and 80 of them were two habits. #42 above
+    left the first one in place on purpose: `signatureNode` descended into a
+    class body, so "`Auth` takes `Request`" was green off `Auth.auth_flow`,
+    and stopping that "turns a green into a red wherever a constructor's
+    parameter names the type". The fill study is the measurement that
+    decision was waiting for: all 60 such greens were read by hand and every
+    one was wrong, and the answer key agrees (a `@takes` head must be a
+    routine). So a declaration that runs nothing -- `runsNothing` in
+    `parts.ts`, a container by the grammar's fields or a type alias -- has no
+    signature, `@feeds` does not read a tail that is only a type, and `@calls`
+    does not read a tail that is only an alias. The red that follows is
+    #297's, on the licence `measure:parts` already earned; an alias stays
+    "not sure". The second habit was #409's: an owner read off for every
+    reader. A confirmation is now asked again over an *owner view* of the
+    file (`owner.ts`, the name's other declarations renamed to underscores
+    of the same length) and stands only if it still confirms there; refuting
+    keeps the plain reading.
+
+    | measured on the branch | before | after |
+    |---|---:|---:|
+    | fill study, wrong arrows confirmed (main / holdout / holdout-b) | 33 / 33 / 27 | 3 / 8 / 2 |
+    | fill study, boards showing a wrong arrow once folded | 14 / 8 / 8 | 2 / 3 / 2 |
+    | fill study, true arrows confirmed | 1,355 / 1,030 / 899 | 1,355 / 1,029 / 897 |
+    | `bench:planted` caught (main / holdout / holdout-b) | 704 / 484 / 436 | 706 / 485 / 437 |
+    | `bench:planted` false reds, wrong greens | 0 / 0 / 0, 0 / 4 / 4 | 0 / 0 / 0, 0 / 4 / 3 |
+
+    The three true arrows that lost their green had each been confirmed off
+    another class's method of the same name in the same file: aiohttp's
+    `UrlDispatcher.resolve` off `Resource.resolve`, DRF's
+    `Field.run_validation` off a subclass's `run_validation`, reqwest's
+    `Policy::redirect` off `TowerRedirectPolicy::redirect` (and that one is
+    a key error: the `custom` it calls is a closure field, not
+    `Policy::custom`). `bench:planted`'s own wrong-kind plants only ever move
+    the type end, which is why it never saw the first habit.
+
+    `measure:compiler-true --words=takes,returns,calls` (correct code only)
+    found the owner view's two first-build bugs, both green losses and no
+    reds: it took Rust's `DeserializeError::generic(..)` path for a
+    declaration and hid the call (77 Rust calls), and it hid the caller when
+    both ends are one name in one file, `super().__init__()` (31 Python, 19
+    TypeScript). Fixed and re-run: Rust and TypeScript identical to main,
+    Python 3 of 2,528 calls "not sure" where main said green, 0 new reds in
+    any language.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is

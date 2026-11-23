@@ -168,7 +168,18 @@ export type CallsWithheld =
    * checked how often this reader is wrong about it. Confirming is unaffected;
    * it is the accusation that needs the licence (#198).
    */
-  | "unlicensed";
+  | "unlicensed"
+  /**
+   * The tail is a type alias, which runs nothing (fill study, 2026-11). Not
+   * read: the code around the alias is not its body.
+   */
+  | "not-a-routine"
+  /**
+   * An end was written `Type::method`, the plain name confirms, and the
+   * owner's own `method` does not (`owner.ts`): another type's namesake
+   * answered. Not a red -- the plain reading said yes -- and not a green.
+   */
+  | "other-owner";
 
 /** Where the call was written, so a report can quote a file and a line. */
 export interface CallsEvidence {
@@ -1863,7 +1874,7 @@ function resolves(
   callee: Callee,
   side: CallSide,
   bindings: Bindings,
-  target: { file: string; names: Set<string> },
+  target: { file: string; names: Set<string>; ownerOnly?: boolean; readFor?: string },
   /** The call and its routine's holder, as `placeOf` takes them (#468). */
   site?: Node,
   holder?: Node,
@@ -1895,6 +1906,15 @@ function resolves(
    */
   if (callee.kind === "own") {
     const placed = placeOwn(callee, { ...side, declarationAt: undefined }, holder, site);
+    /*
+     * Over an owner view, a class tail read through its bases (#459): a
+     * base's `self.write()` that a subclass declares again runs that
+     * subclass's `write` on one of its own, which is not the base's -- aiohttp's
+     * `BytesPayload` "calling" `Payload.write` through the inherited
+     * `write_with_length` it replaces (fill study, 2026-11).
+     */
+    if (target.ownerOnly && target.readFor !== undefined && "file" in placed && placed.overridden
+      && holder?.childForFieldName("name")?.text !== target.readFor) return "receiver";
     return "file" in placed && placed.file === target.file ? "yes" : landsOnTarget(callee, side, target);
   }
 
@@ -2013,10 +2033,14 @@ function callsTo(
     file: string; names: Set<string>;
     /** A head an attribute read by name can run (#431): `runsOnRead`. */
     hooked?: boolean;
+    /** Only a call reaching the head's own declaration counts (`callsBetween`'s `ownerOnly`). */
+    ownerOnly?: boolean;
   },
   /** The nodes to read instead of the routines of that name: a class or struct tail's own code (#459). */
   own?: Node[],
 ): { evidence?: CallsEvidence; why?: CallsWithheld } {
+  // A class read through its bases: a base's `self.x()` runs this class's `x` where it declares one.
+  if (own && target.ownerOnly) target = { ...target, readFor: routine } as typeof target;
   const bindings = bindingsIn(side.source, side.language);
   if (!bindings) return { why: "unreadable" };
 
@@ -2106,7 +2130,16 @@ function ownHolder(body: Node): Node | undefined {
  */
 export function callsBetween(
   from: CallSide & { routine: string },
-  to: CallSide & { names: string[] },
+  to: CallSide & {
+    names: string[];
+    /**
+     * Asked over an owner view (`owner.ts`): only a call that reaches the
+     * head's own declaration may confirm. A `self.write()` in a base class
+     * that a subclass declares again runs the subclass's `write` on one of
+     * those, so it is not that.
+     */
+    ownerOnly?: boolean;
+  },
   /**
    * Whether a call the other way is an answer (#417). `@builds` reads Python
    * through this function, and there a call from the head to the tail is a
@@ -2129,7 +2162,9 @@ export function callsBetween(
    * ones too, which a name match never found (`impl<'a> Reader<'a>`).
    */
   const typeTail = typeTailOf(from.source, from.language, from.routine);
-  const forward = callsTo(from, from.routine, { file: to.file, names: wanted, hooked: runsOnRead(to, to.names) }, typeTail?.nodes);
+  const forward = callsTo(from, from.routine, {
+    file: to.file, names: wanted, hooked: runsOnRead(to, to.names), ...(to.ownerOnly ? { ownerOnly: true } : {}),
+  }, typeTail?.nodes);
   if (forward.evidence) return { verdict: "confirmed", evidence: forward.evidence };
   /*
    * A doubt reading forwards was the end of it until #357: the text could not

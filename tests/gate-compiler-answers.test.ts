@@ -104,6 +104,12 @@ describe("a call on a local whose type comes from a typed return", () => {
   }, 120_000);
 });
 
+/*
+ * The `@takes` heads below are the constructor itself (`Wrapper.__init__`,
+ * `DefaultValuePipe.constructor`), not the class: since the fill study
+ * (2026-11) a class at the head of `@takes` is the wrong kind of end and red
+ * before any signature is read, and these tests are about the signature.
+ */
 describe("Python types written in brackets are written", () => {
   it("does not take `dict[str, Any]` for a type parameter, and still finds `class A[T]`'s", () => {
     const names = (source: string) => [...typeParametersIn(parseSource(source, "python")!.rootNode, source)];
@@ -118,7 +124,7 @@ describe("Python types written in brackets are written", () => {
       "model.py": "class Engine:\n    pass\n",
       "config.py": "from typing import Any\n\n\nclass Wrapper:\n    def __init__(self, config: dict[str, Any] | None, name: str) -> None:\n        self.config = config\n",
     });
-    expect(await redsOf(repo, ["model.py#Engine", "config.py#Wrapper", "takes"], { compiler: false })).toEqual(["signature-absent"]);
+    expect(await redsOf(repo, ["model.py#Engine", "config.py#Wrapper.__init__", "takes"], { compiler: false })).toEqual(["signature-absent"]);
   }, 60_000);
 });
 
@@ -132,7 +138,7 @@ describe("an alias pyright prints by its name", () => {
 
   it("is opened, and a wrong arrow goes red", async () => {
     repo = scratchRepo(HTTPX);
-    expect(await redsOf(repo, ["model.py#Engine", "request.py#Request", "takes"])).toEqual(["signature-absent"]);
+    expect(await redsOf(repo, ["model.py#Engine", "request.py#Request.__init__", "takes"])).toEqual(["signature-absent"]);
   }, 120_000);
 
   it("still confirms an arrow to a type the alias stands for", async () => {
@@ -140,7 +146,7 @@ describe("an alias pyright prints by its name", () => {
       ...HTTPX,
       "types_.py": "from typing import Mapping, Union\nfrom model import Engine\n\nParams = Union[Mapping[str, str], Engine]\nData = str\n",
     });
-    const { each: [arrow] } = await verdicts(repo, [["model.py#Engine", "request.py#Request", "takes"]]);
+    const { each: [arrow] } = await verdicts(repo, [["model.py#Engine", "request.py#Request.__init__", "takes"]]);
     expect(arrow!.reds).toEqual([]);
   }, 120_000);
 });
@@ -209,7 +215,7 @@ describe("a red the compiler could not settle says what it asked", () => {
       "meta.ts": "export interface ArgumentMetadata {\n  type: string;\n}\n",
       "pipe.ts": "export class DefaultValuePipe<T = any, R = any> {\n  constructor(protected readonly defaultValue: R) {}\n}\n",
     });
-    const { report } = await verdicts(repo, [["meta.ts#ArgumentMetadata", "pipe.ts#DefaultValuePipe", "takes"]]);
+    const { report } = await verdicts(repo, [["meta.ts#ArgumentMetadata", "pipe.ts#DefaultValuePipe.constructor", "takes"]]);
     const [arrow] = report.unconfirmedEdges;
     expect(arrow?.reason).toBe("compiler-could-not-say");
     expect(arrow?.detail).toContain("the compiler says `defaultValue` is a type parameter, `any` or `unknown`");
@@ -222,7 +228,7 @@ describe("a red the compiler could not settle says what it asked", () => {
       "meta.ts": "export interface ArgumentMetadata {\n  type: string;\n}\n",
       "pipe.ts": "export class DefaultValuePipe<T = any, R = any> {\n  constructor(protected readonly defaultValue: R) {}\n}\n",
     });
-    const { report } = await verdicts(repo, [["meta.ts#ArgumentMetadata", "pipe.ts#DefaultValuePipe", "takes"]], { compiler: false });
+    const { report } = await verdicts(repo, [["meta.ts#ArgumentMetadata", "pipe.ts#DefaultValuePipe.constructor", "takes"]], { compiler: false });
     const [arrow] = report.unconfirmedEdges;
     expect(arrow?.reason).toBe("rests-on-unwritten");
     expect(arrow?.detail).toContain("no compiler was running to check it");
