@@ -981,7 +981,8 @@ function withheldTallyOf(claims: ClaimTally, claim: ArrowClaim): Record<string, 
 /** What the fix is, per part: where the arrow's end should be instead. */
 const LACKING_FIX: Record<LackingEnd["part"], string> = {
   body: "Start the arrow at the function that does it",
-  signature: "Point the arrow at the function whose parameters or return type name it",
+  signature: "Point the arrow at the function whose parameters or return type name it "
+    + "(a constructor or a method is that function, drawn as a box of its own)",
   result: "Start the arrow at the function that produces the value",
   fields: "Anchor that end at the type that has the field",
   bases: "Start the arrow at the type that declares the base",
