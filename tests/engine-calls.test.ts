@@ -1340,4 +1340,44 @@ describe("a call that lands in the head's file on something the head cannot be (
       expect(verdictOf(python("class Result:\n    def __init__(self):\n        self.hook = \"find_best\"\n"))).not.toBe("refuted");
     });
   });
+
+  /*
+   * Rust writes a tuple struct's or a tuple variant's constructor as a call,
+   * `PatternType::DynamicSet(set, data)`, and it runs no function: it builds
+   * the value from its arguments (#460). Placed in the head's file -- the
+   * enum is declared beside the method the arrow names, as in actix's
+   * `resource.rs` -- it named no routine, and the body stayed open.
+   */
+  describe("a Rust tuple variant or tuple struct built by a call runs nothing (#460)", () => {
+    const far = "pub enum Kind {\n    Dynamic(u32),\n    Static,\n}\n\npub struct Wrap(pub u32);\n\npub struct Def {\n    k: Kind,\n}\n\n"
+      + "impl Def {\n    pub fn prefix(&self) -> u32 { 1 }\n}\n";
+    const lineOf = (source: string, word: string) => source.split("\n").findIndex((line) => line.includes(word)) + 1;
+    const rust = (body: string, head: string, farSource = far) => ask({
+      "src/a.rs": {
+        source: `use crate::b::{Kind, Wrap};\n\nfn construct() -> Kind {\n${body}\n}\n`,
+        language: "rust",
+        imports: [["crate::b::Kind", "src/b.rs"], ["crate::b::Wrap", "src/b.rs"]],
+        // The compiler's "go to definition", as the live check asks it for `Kind::Dynamic`.
+        declarationAt: () => ({ file: "src/b.rs", line: lineOf(farSource, "Dynamic("), concrete: true }),
+      },
+      "src/b.rs": { source: farSource, language: "rust" },
+    }, { file: "src/a.rs", routine: "construct" }, { file: "src/b.rs", names: [head] });
+
+    it("refutes when the body builds a tuple variant declared beside the head", () => {
+      expect(verdictOf(rust("    Kind::Dynamic(1)", "prefix"))).toBe("refuted");
+    });
+
+    it("refutes when the body builds a tuple struct declared beside the head", () => {
+      expect(verdictOf(rust("    let _ = Wrap(1);\n    Kind::Static", "prefix"))).toBe("refuted");
+    });
+
+    it("stays quiet when the arrow's head is the variant itself", () => {
+      expect(verdictOf(rust("    Kind::Dynamic(1)", "Dynamic"))).not.toBe("refuted");
+    });
+
+    it("stays quiet when the head's file also declares a function under the variant's name", () => {
+      const twice = `${far}\n#[allow(non_snake_case)]\npub fn Dynamic(n: u32) -> Kind { Kind::Static }\n`;
+      expect(verdictOf(rust("    Kind::Dynamic(1)", "prefix", twice))).not.toBe("refuted");
+    });
+  });
 });

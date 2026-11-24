@@ -3208,6 +3208,18 @@ function textClosed(
           sites += 1;
           continue;
         }
+        /*
+         * Rust's `PatternType::DynamicSet(set, data)` builds a value of a
+         * tuple variant, or of a tuple struct, and runs no function (#460):
+         * declared beside the head -- actix's `resource.rs` -- it named no
+         * routine, and the reading stopped there.
+         */
+        if (site.declaredAs === undefined && site.name && !to.names.includes(site.name)
+          && buildsAValueOnly(to.source, to.language, site.name)) {
+          elsewhere.push({ name: site.name, line: site.line });
+          sites += 1;
+          continue;
+        }
         if (site.declaredAs === undefined || to.names.includes(site.declaredAs)) {
           const stopped = stop("reaches-the-file");
           if (stopped) return stopped;
@@ -4030,6 +4042,28 @@ function writtenInside(source: string, language: Language, type: string, name: s
   const word = wholeName(name);
   return typeSpans(source, language, type)
     .some(([first, last]) => word.test(lines.slice(first - 1, last).join("\n")));
+}
+
+/**
+ * Whether every declaration of `name` in a Rust file is an enum variant or a
+ * struct, so a call of it builds a value and runs no function (#460). Any
+ * other item of that name -- a function, a constant, a macro, an import --
+ * and it may be what runs.
+ */
+function buildsAValueOnly(source: string, language: Language, name: string): boolean {
+  if (language !== "rust") return false;
+  const tree = parseSource(source, language);
+  if (!tree) return false;
+  let values = 0;
+  let other = false;
+  each(tree.rootNode, (node) => {
+    if (other) return;
+    if (node.type === "use_declaration" && wholeName(name).test(node.text)) { other = true; return; }
+    if (declarationName(node)?.text !== name) return;
+    if (node.type === "enum_variant" || node.type === "struct_item") values += 1;
+    else other = true;
+  });
+  return values > 0 && !other;
 }
 
 const code_ = new WeakMap<Tree, string>();
