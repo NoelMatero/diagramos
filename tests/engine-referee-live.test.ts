@@ -73,29 +73,31 @@ afterEach(() => {
  * whatever `make()` returns and nothing in `a.py` says what that is, so the
  * body never closes and the arrow goes quiet whether it is right or wrong.
  *
- * The far end shares the name the call is spelt with (`greet`, Rust's
- * `load`): a far end of any other name is ruled out by the name alone since
- * the untyped-value extension of #351, so only this one waits on a compiler.
+ * Since the untyped-value extension of #351 a far end of another name
+ * (`render`) is ruled out by the name alone, and the red asks the compiler.
+ * The fallback tests below draw the far end with the very name the call is
+ * spelt with (`greet`, Rust's `load`), which only a compiler can settle.
  */
 const PYTHON: Record<string, string> = {
   "thing.py": "class Thing:\n    def greet(self):\n        return \"hi\"\n",
   "make.py": "from thing import Thing\n\n\ndef make():\n    return Thing()\n",
   "a.py": "from make import make\n\n\ndef run():\n    thing = make()\n    return thing.greet()\n",
-  "b.py": "def greet(n):\n    return n\n",
+  "b.py": "def render(n):\n    return n\n\n\ndef greet(n):\n    return n\n",
 };
 
 describe("a Python call on a value whose type the text does not give", () => {
-  it("leaves the arrow unanswered with no referee, and calls it wrong with one", async () => {
+  it("calls the arrow wrong on the text alone, asks pyright, and still calls it wrong with it", async () => {
     for (const [file, contents] of Object.entries(PYTHON)) write(file, contents);
     const workspace = createWorkspace(repo);
-    // `run` never reaches `b.py`, so the arrow really is wrong -- the only
-    // thing in the way is that `thing`'s type is not written down.
-    const board = await boardOf("a.py#run", "b.py#greet");
+    // `run` never reaches `render`, so the arrow really is wrong. `thing`'s
+    // type is not written down, but `thing.greet()` can only run a method
+    // named `greet`, so the text alone rules `render` out -- and the red asks
+    // where the call goes, which is what starts pyright.
+    const board = await boardOf("a.py#run", "b.py#render");
 
-    const quiet = checkDrift(board, workspace, { edges: true });
-    expect(quiet.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
-    // A call of the far end's own name on a value nothing typed: withheld until a compiler says whose.
-    expect(quiet.claims.callsWithheld.receiver).toBe(1);
+    const text = checkDrift(board, workspace, { edges: true });
+    expect(text.edges.filter((finding) => finding.kind === "calls-refuted")).toHaveLength(1);
+    expect(text.gated.map((one) => one.asked)).toEqual([true]);
 
     const live = await refereedCheckLive(repo, (referee) =>
       checkDrift(board, workspace, { edges: true, ...(referee ? { closedBodyReferee: referee } : {}) }));
