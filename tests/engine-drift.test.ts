@@ -1287,11 +1287,11 @@ describe("state: what the diagram claims about time", () => {
 
   /*
    * This one was skipped too until #435: a ref recording which file an
-   * outside thing corresponds to. A file is never a door, so the arrow is
-   * now read as code -- and it may only confirm, since "Browser" may stand
-   * for more than `src/b.ts` shows.
+   * outside thing corresponds to. #435 read it and only confirmed, since
+   * "Browser" may stand for more than `src/b.ts` shows. Since 2026-11-24 a
+   * ref into the repo is code whatever the box is marked, so the arrow is red.
    */
-  it("reads an arrow onto an external node anchored at a file here, and never calls it wrong", async () => {
+  it("reads an arrow onto an external node anchored at a file here, and calls it wrong", async () => {
     const board = await stateBoard(
       [
         { id: "a", label: "A", ref: "src/a.ts" },
@@ -1301,8 +1301,8 @@ describe("state: what the diagram claims about time", () => {
     );
     const report = checkDrift(board, fakeWorkspace({ "src/a.ts": "export const a = 1;", "src/b.ts": "export const b = 2;" }));
     expect(report.edgesSkipped).toBe(0);
-    expect(report.edges).toHaveLength(0);
-    expect(report.unconfirmedEdges.map((arrow) => arrow.reason)).toEqual(["end-marked-external"]);
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
+    expect(report.edges[0]!.detail).toContain("marked external");
   });
 });
 
@@ -1667,8 +1667,8 @@ describe("an arrow onto something outside the repository (#272)", () => {
    * with an ordinary `path#symbol` ref, and the arrow becomes a question about
    * code again: does the near end reach the door?
    *
-   * Confirm-only. Failing to find a route stays silent, exactly as before, and
-   * an external box with no ref is skipped exactly as before.
+   * An arrow with no word on it only confirms. Failing to find a route stays
+   * silent, and an external box with no ref is skipped exactly as before.
    */
   async function boardOf(
     nodes: Array<{ id: string; label: string; ref?: string; state?: NodeState }>,
@@ -1725,11 +1725,13 @@ describe("an arrow onto something outside the repository (#272)", () => {
     expect(report.clean).toBe(true);
   });
 
-  it("still skips one whose ref is not a door, so an old ref is not repurposed", async () => {
+  it("reads one whose ref is not a door as code, and says the mark is wrong", async () => {
     /*
-     * An external box has always been allowed a ref that merely records what it
-     * corresponds to. Reading one of those as a door anchor would change what
-     * boards already on disk mean, and could confirm an arrow off it.
+     * An external box was allowed a ref that merely records what it
+     * corresponds to, and #272 kept such a ref skipped so old boards kept
+     * their meaning. Since 2026-11-24 a ref that names code declared here is
+     * code, whatever the box is marked: the arrow is read, and its sentence
+     * tells the author to drop the mark.
      */
     const board = await boardOf(
       [
@@ -1739,8 +1741,8 @@ describe("an arrow onto something outside the repository (#272)", () => {
       [{ from: "caller", to: "browser", label: "renders" }],
     );
     const report = checkDrift(board, fakeWorkspace(tree));
-    expect(report.unreadEdges).toHaveLength(1);
-    expect(report.unreadEdges[0]?.reason).toBe("endpoint-external");
+    expect(report.unreadEdges).toEqual([]);
+    expect(report.edgesChecked).toBe(1);
   });
 
   it("does not guess which door an unanchored box means", async () => {
