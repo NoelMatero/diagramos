@@ -1306,7 +1306,11 @@ function calleeOfNode(written: Node): Callee {
 const lineOf = (source: string, offset: number) => source.slice(0, offset).split("\n").length;
 
 /** A name a local can be found to hold: the function it stands for, and where that is written. */
-type Chosen = { name: string; at: { start: number; end: number } };
+type Chosen = {
+  name: string; at: { start: number; end: number };
+  /** A method read off a value (#460): the call runs what `obj.m(..)` would. */
+  callee?: Callee;
+};
 
 /**
  * Every function a routine's own local can hold when `call` calls it, or
@@ -1325,7 +1329,7 @@ type Chosen = { name: string; at: { start: number; end: number } };
  * Read as fields, the way `names.ts` reads bindings. Any one binding
  * this cannot follow is the old doubt: a parameter (the caller chooses), a
  * loop or `catch`, a destructuring, `+=`, a `global`, a value that is
- * computed (`table[k]`, `make()`, `obj.fn`). Only the routine's own
+ * computed (`table[k]`, `make()`; in Rust `obj.fn`, a field). Only the routine's own
  * bindings, and in TypeScript and Rust only one declared in a block the call
  * is inside: a name declared anywhere else can be set from anywhere else.
  */
@@ -1388,6 +1392,21 @@ function chosenCallees(routine: Node, name: string, call: Node, language: Langua
     if (opens === "(" && inside.length === 1) return follow(inside[0]!);
     if (language === "rust" && (opens === "{" || opens === "else") && inside.length > 0) {
       return follow(inside[inside.length - 1]!);
+    }
+    /*
+     * `append = parts.append`, `const run = this.run`: in Python and
+     * JavaScript reading a method off a value hands back that method, and
+     * calling the local runs what `parts.append(..)` would (#460) -- placed
+     * as that call is, at the spot it was read. Not in Rust, where `obj.f`
+     * is a field and calling what it holds runs whatever was stored there.
+     */
+    if (language !== "rust" && value.childForFieldName("object")
+      && (value.childForFieldName("property") ?? value.childForFieldName("attribute"))) {
+      const read = calleeOfNode(value);
+      if (read.kind === "computed") return false;
+      const at = read.kind === "through" ? read.memberAt : read.nameAt;
+      chosen.push({ name: read.name, at, callee: read });
+      return true;
     }
     return false;
   };
@@ -5595,7 +5614,7 @@ export function callSitesIn(
         : undefined;
       if (chosen) {
         for (const choice of chosen) {
-          const held: Callee = { kind: "bare", name: choice.name, nameAt: choice.at };
+          const held: Callee = choice.callee ?? { kind: "bare", name: choice.name, nameAt: choice.at };
           body.sites.push(siteOf(held, side.source, inner, placeOf(held, side, bindings, inner, holder)));
         }
         return;

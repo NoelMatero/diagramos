@@ -123,6 +123,56 @@ describe("a star import over a module with a literal __all__ brings only those n
   });
 });
 
+/*
+ * `append = output.append`, then `append(text)`: in Python and JavaScript
+ * reading a method off a value hands back that method, so calling the local
+ * runs what `output.append(text)` would (rich's `_render_buffer`, fastapi's
+ * `BodyFieldInfo = params.File`). Read as a value nobody can see into, it
+ * kept the body open.
+ */
+describe("a local holding a method read off a value runs that method", () => {
+  it("refutes past a local holding the routine's own method (Python)", () => {
+    expect(ask({
+      "app/a.py": { source: "class K:\n    def helper(self):\n        return 1\n\n    def run(self):\n        h = self.helper\n        return h()\n", language: "python" },
+      "app/b.py": { source: "def other():\n    return 1\n", language: "python" },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["other"] })).toBe("refuted");
+  });
+
+  it("refutes past a local holding the routine's own method, on either branch (TypeScript)", () => {
+    expect(ask({
+      "src/a.ts": { source: "export class K {\n  helper() { return 1; }\n  plain() { return 2; }\n  run(fast: boolean) {\n    const h = fast ? this.helper : this.plain;\n    return h();\n  }\n}\n", language: "ts" },
+      "src/b.ts": { source: "export function other() { return 1; }\n", language: "ts" },
+    }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["other"] })).toBe("refuted");
+  });
+
+  it("stays quiet when the local holds the head's own method", () => {
+    expect(ask({
+      "app/a.py": { source: "class K:\n    def helper(self):\n        return 1\n\n    def run(self):\n        h = self.helper\n        return h()\n", language: "python" },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/a.py", names: ["helper"] })).not.toBe("refuted");
+  });
+
+  it("stays quiet when the value the method is read off has no type in the text", () => {
+    expect(ask({
+      "app/a.py": { source: "def run(obj):\n    h = obj.render\n    return h()\n", language: "python" },
+      "app/b.py": { source: "def other():\n    return 1\n", language: "python" },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["other"] })).not.toBe("refuted");
+  });
+
+  it("stays quiet in Rust, where `self.f` is a field holding whatever was stored", () => {
+    expect(ask({
+      "src/a.rs": { source: "pub struct K { f: fn() -> u32 }\n\nimpl K {\n    fn helper(&self) -> u32 { 1 }\n    fn run(&self) -> u32 {\n        let h = self.f;\n        h()\n    }\n}\n", language: "rust" },
+      "src/b.rs": { source: "pub fn other() -> u32 { 1 }\n", language: "rust" },
+    }, { file: "src/a.rs", routine: "run" }, { file: "src/b.rs", names: ["other"] })).not.toBe("refuted");
+  });
+
+  it("stays quiet when the local is also given something else", () => {
+    expect(ask({
+      "app/a.py": { source: "class K:\n    def helper(self):\n        return 1\n\n    def run(self, cb):\n        h = self.helper\n        if cb:\n            h = cb\n        return h()\n", language: "python" },
+      "app/b.py": { source: "def other():\n    return 1\n", language: "python" },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["other"] })).not.toBe("refuted");
+  });
+});
+
 /** A scratch repository outside the worktree, for the import reader, which reads the tree. */
 describe("what an import names, read from the tree", () => {
   let repo: string;
