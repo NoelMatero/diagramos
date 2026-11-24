@@ -552,7 +552,7 @@ only hand-written part.** Nine lines, in `NEEDS` in `parts.ts`:
 | word | at the tail | at the head |
 |---|---|---|
 | `@needs` | nothing -- every declaration lives in a file, and a file has imports | nothing |
-| `@feeds` | a result | — |
+| `@feeds` | a result | parameters or a return type (missed map 2026-11b) |
 | `@calls` | a body of code that runs | something that can be called |
 | `@builds` | a body of code that runs | a type |
 | `@takes` | a type | parameters or a return type |
@@ -709,6 +709,64 @@ which rust-analyzer does not list; the referee's text reading learned `crate`
 and judged all 25. In the other four languages the row is the `type` row,
 number for number, because it is the same question there.
 
+
+### Three ends that run nothing, and were never asked (missed map 2026-11b)
+
+The November map traced every wrong arrow the benchmark still missed, and the
+largest family was an end of the wrong kind that this section did not ask
+about. Three of its parts are a fact about the language, readable from the
+text or settled by the compiler without guessing.
+
+**`@feeds` asks its head for parameters.** "`parse_long_arg` feeds
+`ArgMatcher`" hands parse_long_arg's result to `ArgMatcher`, a struct: a value
+is handed to a function, and the table above asked `@feeds` for a result at
+its tail and nothing at its head. With no flow found, such an arrow stayed
+"not sure" for ever -- 15 on the study sets, in 10 projects and all three
+languages. The head now needs what `@takes` asks of its function. A class made
+with the value is the one shape a person may mean by it, `Matcher(produce())`
+in Python or a Rust tuple struct, and that is a call `feeds.ts` confirms
+before this is ever asked; a value whose written type may be a function keeps
+its doubt, and a type alias is followed nowhere. The square is `signature`,
+measured at 0 wrong lacks in every language.
+
+**A TypeScript interface runs nothing.** It is a type and only a type, written
+out of the program when it compiles. `holdsCode` counted its method
+signatures and function-typed fields as code, because they carry parameters,
+so "`PackageManager` calls `latest`" was "not sure" -- 9 arrows in 5 projects.
+Told by the word the source opens it with, like `trait` for `@conforms`. An
+interface merged with a class, a function, a constant or a namespace of the
+same name is read through the other one, which may run (zod writes
+`interface $ZodType` beside `const $ZodType`), and one inside a `declare`
+block widens a declaration elsewhere and keeps its old reading. Measured with
+`measure:parts` over the five TypeScript corpus repositories and the ten
+holdout ones: the `body` square gained 660 agreed lacks in TypeScript and 50 in
+TSX, with 0 wrong and the unrefereed count unchanged (the referee is the
+TypeScript compiler's own tree, which files an interface as having no body).
+Abstract
+classes, Python protocols and Rust traits are untouched: a class may inherit
+code, and a Rust trait's code may sit in an `impl dyn` block in any file of
+the crate, which this file-at-a-time reader cannot rule out.
+
+**A program that renders nothing makes no component.** `@builds` into a
+function is accused only on the compiler's word that the function cannot be
+rendered (#363), and in tRPC, immer, drizzle and mobx the compiler was never
+able to say: classic JSX with no `React` in scope fails every element, a
+`.ts` file's `<T>x` cast does not parse as TSX, a function inside another is
+not in scope at the end of the file. In a program where no file writes JSX and
+no file it reads -- its libraries included -- declares a JSX namespace,
+nothing can render anything, which is the no-JSX-types reading #363 already
+made when its probe compiled as `any`. The compiler now answers there by what
+the function returns, without a probe; where the return type is unknown the
+probe still asks, since a string where the props go rules a function out
+anyway.
+
+Measured over the same fifteen TypeScript trees, read with no `@types` from
+outside each project: 6,404 functions newly answered "not a component", and a
+referee that shares nothing with the probe -- the TypeScript parser over every
+file of each repository, collecting every capitalised JSX tag and every name
+handed to `createElement`, `h`, `jsx`, `memo`, `forwardRef`, `lazy` or
+`render` -- finds none of them rendered anywhere. Its one hit by name was
+zod's `h(node, rewritten)`, a visitor callback and not a renderer.
 
 ### The measurement
 
@@ -5097,10 +5155,10 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     | the call is named like plumbing: `call`/`apply`/`bind`, any `__dunder__`, JavaScript's `default` | each runs whatever the value holds, or a module's default export under any name |
     | (narrowing) only files of the far end's language are asked | bat's benchmark jQuery wrote `run`, and kept every Rust arrow ending at a `run` quiet |
 
-    And one reading it extends: a local holding a method read off a value
-    (`append = parts.append`, then `append(x)`) is that call in two steps,
-    placed where the method is read (#417's `chosenCallees`). Rust's `let f =
-    x.f` stays a doubt: that is a field.
+    It meets #508's reading of a local holding a method read off a value
+    (`append = parts.append`, then `append(x)`, #460): that local is placed
+    as the member call it stands for, and when nothing can type the value,
+    this rule is what then reads it.
 
     **Such a red asks the compiler where the calls go** (`askUntyped` in
     `drift.ts`). It stands on the text whatever the answer, unless one of the
@@ -5108,6 +5166,9 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     compiler-less pass of a live check went red and no server was started,
     so the route check never saw the placements that show the hops: two
     main reds lost them (ripgrep `stops_at_git_dir`, vite `doTransform`).
+
+    Measured on the branch before #508 merged, with the local-alias reading
+    built here too (the same rule #508 merged; this branch now uses #508's):
 
     | `bench:planted`, wrong arrows caught (base 759703a) | before | after |
     |---|---:|---:|
@@ -5121,7 +5182,7 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     holdout's +10: fastapi `get_openapi_path` (two far ends) and npm-check-
     updates `runLocal` (two, red with their hops) by the rule; rich's
     `render` and `_render_buffer` (five) and fastapi `_get_body_field` by the
-    local-alias reading. holdout-b's +4: marshmallow `_invoke_field_validators`,
+    local-alias reading, which is #508's on main. holdout-b's +4: marshmallow `_invoke_field_validators`,
     bat `Controller::new`, `print_input` and `App::new` (with its hops). Two
     marshmallow targets stay "not sure" on a second wall that was already
     there: outside code may make a call on a value handed to it, and the
@@ -5135,7 +5196,7 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     stalled and not measured as in the base) has 0 new disagreements; the
     502 calls now read through a local alias are keyed anew and the census
     has no compiler answer for them (`no-name`), so it neither confirms nor
-    faults those placements.
+    faults those placements (that part is #508's now).
 
 ## Open, in the order worth doing
 

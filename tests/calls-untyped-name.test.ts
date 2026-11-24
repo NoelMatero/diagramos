@@ -402,8 +402,8 @@ describe("through the whole check, with no compiler", () => {
 /*
  * A method read off a value and kept in a local -- rich's `append =
  * output.append`, then `append(text)` -- is the call `output.append(text)`
- * written in two steps. Read as that call, it falls under the same rule; read
- * as "a local holding some function", it kept the whole routine a doubt.
+ * written in two steps (#508's reading, #460). Read as that call, it falls
+ * under this rule when nothing types the value; these pin the two together.
  */
 describe("a local that holds a method read off a value is read as that call", () => {
   async function kindsOf(files: Record<string, string>, from: string, to: string): Promise<string[]> {
