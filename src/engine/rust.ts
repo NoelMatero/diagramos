@@ -203,7 +203,8 @@ function readManifest(text: string): {
     const match = /^([A-Za-z0-9_.-]+)\s*=\s*(.+)$/.exec(line);
     if (!match) continue;
     const [, key, value] = match;
-    const text_ = /^"([^"]*)"/.exec(value!)?.[1];
+    // TOML writes a string in double quotes or, as a literal string, in single ones (#460).
+    const text_ = /^"([^"]*)"|^'([^']*)'/.exec(value!)?.slice(1).find((one) => one !== undefined);
     if (table === "package") {
       if (key === "name" && text_) out.name = text_;
       if (key === "edition" && text_) out.edition = Number(text_);

@@ -1038,7 +1038,7 @@ function judgeWildcard(specifier: string, name: string, tree: Tree, side: LookUp
  * Generous on purpose -- a name counted here that a wildcard would not
  * actually carry turns an answer into "not known", never into a wrong one.
  */
-type Top = { scope: Scope; inner: Scope[]; broken: boolean; unreadLines: string[] } | null;
+type Top = { scope: Scope; inner: Scope[]; broken: boolean; unreadLines: string[]; listed: string[] | undefined } | null;
 const TOPS_LIMIT = 512;
 /**
  * A file's top, by its text -- not by its tree, which the parse cache lets go
@@ -1060,6 +1060,12 @@ export function moduleScope(
   ambiguous: (name: string) => boolean;
   wildcards: string[];
   limited: boolean;
+  /**
+   * What a Python `__all__` written as one literal list lists (#460): then a
+   * wildcard over the module carries exactly these names, by the language's
+   * rule. `undefined` when there is no `__all__`, or one this cannot read.
+   */
+  listed: string[] | undefined;
   /**
    * The parser had to recover somewhere in this file, so its top may have
    * lost a declaration: mobx's `api/action.ts`, whose interface of generic
@@ -1091,7 +1097,10 @@ export function moduleScope(
         if (one) inner.push(one);
       });
     }
-    top = scope ? { scope, inner, broken: incomplete(tree.rootNode), unreadLines: unreadIn(tree).map((one) => one.lines) } : null;
+    top = scope ? {
+      scope, inner, broken: incomplete(tree.rootNode), unreadLines: unreadIn(tree).map((one) => one.lines),
+      listed: language === "python" ? literalAllIn(tree.rootNode) : undefined,
+    } : null;
     tops.set(key, top);
     if (tops.size > TOPS_LIMIT) tops.delete(tops.keys().next().value!);
   } else {
@@ -1099,7 +1108,7 @@ export function moduleScope(
     tops.set(key, top);
   }
   if (!top) return undefined;
-  const { scope, inner, broken, unreadLines } = top;
+  const { scope, inner, broken, unreadLines, listed } = top;
   const declaredInside = (name: string, space: Space) => inner.some((one) =>
     space === "type" ? one.types.has(name) : space === "macro" ? one.macros.has(name) : one.values.get(name)?.entry === "declared");
   return {
@@ -1116,7 +1125,50 @@ export function moduleScope(
     wildcards: scope.wildcards,
     // Python's `__all__` decides what a wildcard over the module carries.
     limited: language === "python" && scope.values.has("__all__"),
+    listed,
     broken,
     unread: (name) => unreadLines.some((lines) => wholeName(name).test(lines)),
   };
+}
+
+/**
+ * The names a Python module's `__all__` lists, when it is one literal list or
+ * tuple of strings assigned once at the top level and never touched again
+ * (#450, #460). A list built up -- `__all__ +=`, `.extend`, a second
+ * assignment, anything not a list or tuple of plain strings -- is not read.
+ */
+export function literalAll(source: string): string[] | undefined {
+  const tree = parseSource(source, "python");
+  return tree ? literalAllIn(tree.rootNode) : undefined;
+}
+
+function literalAllIn(root: Node): string[] | undefined {
+  const named = (node: Node): Node[] => {
+    const out: Node[] = [];
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child?.isNamed) out.push(child);
+    }
+    return out;
+  };
+  let listed: string[] | undefined;
+  let mentions = 0;
+  each(root, (node) => {
+    if (node.type === "identifier" && node.text === "__all__") mentions += 1;
+  });
+  for (const statement of named(root)) {
+    if (statement.type !== "expression_statement") continue;
+    const assignment = named(statement)[0];
+    if (assignment?.type !== "assignment") continue;
+    const left = assignment.childForFieldName("left");
+    const right = assignment.childForFieldName("right");
+    if (left?.type !== "identifier" || left.text !== "__all__" || !right) continue;
+    if (listed !== undefined) return undefined;
+    if (right.type !== "list" && right.type !== "tuple") return undefined;
+    const items = named(right).filter((item) => item.type !== "comment");
+    if (!items.every((item) => item.type === "string" && /^["'][A-Za-z_]\w*["']$/.test(item.text))) return undefined;
+    listed = items.map((item) => item.text.slice(1, -1));
+  }
+  // Any other mention -- `__all__ +=`, `__all__.extend(...)` -- may change it.
+  return listed !== undefined && mentions === 1 ? listed : undefined;
 }

@@ -49,6 +49,7 @@
 import { mayHideAnImport, readDependencies, readerCanPlace, type FileDependency } from "./deps";
 import { vouchedFor, type Ledger } from "./ledger";
 import { licenceFor, mayAccuse } from "./licence";
+import { literalAll } from "./names";
 import { each, languageOf, parseSource, type Node } from "./parse";
 import { declaredNames } from "./parts";
 import type { ConfigCache } from "./resolve";
@@ -550,35 +551,6 @@ function starsAreListed(file: string, source: string, workspace: Workspace): boo
     if (!listed || !names) return false;
     return listed.every((name) => names.defined.has(name) && !names.imported.has(name));
   });
-}
-
-/**
- * The names a Python module's `__all__` lists, when it is one literal list or
- * tuple of strings assigned once at the top level and never touched again.
- */
-function literalAll(source: string): string[] | undefined {
-  const tree = parseSource(source, "python");
-  if (!tree) return undefined;
-  let listed: string[] | undefined;
-  let mentions = 0;
-  each(tree.rootNode, (node) => {
-    if (node.type === "identifier" && node.text === "__all__") mentions += 1;
-  });
-  for (const statement of named(tree.rootNode)) {
-    if (statement.type !== "expression_statement") continue;
-    const assignment = named(statement)[0];
-    if (assignment?.type !== "assignment") continue;
-    const left = assignment.childForFieldName("left");
-    const right = assignment.childForFieldName("right");
-    if (left?.type !== "identifier" || left.text !== "__all__" || !right) continue;
-    if (listed !== undefined) return undefined;
-    if (right.type !== "list" && right.type !== "tuple") return undefined;
-    const items = named(right).filter((item) => item.type !== "comment");
-    if (!items.every((item) => item.type === "string" && /^["'][A-Za-z_]\w*["']$/.test(item.text))) return undefined;
-    listed = items.map((item) => item.text.slice(1, -1));
-  }
-  // Any other mention -- `__all__ +=`, `__all__.extend(...)` -- may change it.
-  return listed !== undefined && mentions === 1 ? listed : undefined;
 }
 
 /**

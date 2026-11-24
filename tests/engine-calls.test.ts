@@ -1055,6 +1055,50 @@ describe("a Python read or write by name that runs nothing (#431)", () => {
     expect(verdictOf(run("    return getattr(obj, name, None) is None\n", "__getattr__"))).not.toBe("refuted");
   });
 
+  /*
+   * A name written in the call is no name chosen at run time (#460):
+   * `getattr(x, "fields")` is `x.fields`, and `setattr(x, "fields", v)` is
+   * `x.fields = v`, by the language's own definition of both. Wherever the
+   * result goes, it goes as `x.fields` would -- marshmallow's `SchemaOpts`
+   * fills thirteen fields that way, pip hands `config_settings` to a call.
+   */
+  it("refutes when a read by a written name is put into a field", () => {
+    const verdict = run("    obj.fields = getattr(obj, \"fields\", ())\n    obj.many = getattr(obj, 'many', False)\n    return 1\n", "render");
+    expect(verdictOf(verdict)).toBe("refuted");
+  });
+
+  it("refutes when a read by a written name is handed to a call or returned", () => {
+    expect(verdictOf(run("    return dict(settings=getattr(obj, \"config_settings\", None))\n", "render"))).toBe("refuted");
+    expect(verdictOf(run("    return getattr(obj, \"config_settings\", None)\n", "render"))).toBe("refuted");
+  });
+
+  it("refutes when a set by a written name is returned", () => {
+    expect(verdictOf(run("    return setattr(obj, \"fields\", 1)\n", "render"))).toBe("refuted");
+  });
+
+  it("stays quiet when a read by a written name is called where it stands", () => {
+    // `obj.fields()`: a method of a value nothing types, which may be anything.
+    expect(verdictOf(run("    return getattr(obj, \"fields\")()\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when a read by a written name is kept and then called", () => {
+    // requests' `release_conn = getattr(self.raw, "release_conn", None)`, then `release_conn()`.
+    expect(verdictOf(run("    release = getattr(obj, \"release_conn\", None)\n    release()\n    return 1\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when the name is built, not written", () => {
+    expect(verdictOf(run("    obj.on = getattr(obj, f\"on_{name}\")\n    return 1\n", "render"))).not.toBe("refuted");
+    expect(verdictOf(run("    obj.on = getattr(obj, \"on_\" + name)\n    return 1\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when a written-name read hands on the head's own name", () => {
+    expect(verdictOf(run("    obj.on = getattr(obj, \"render\")\n    return 1\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when a written-name read is handed on and the head is a hook reads run", () => {
+    expect(verdictOf(run("    obj.on = getattr(obj, \"size\")\n    return 1\n", "__getattr__"))).not.toBe("refuted");
+  });
+
   it("reads the file's own `getattr` as the function it is, not the builtin (#470)", () => {
     // The repository's own `getattr` is a call to it: placed, so the body
     // closes, and a walk can follow it on. Read by its name alone it was a
@@ -1232,5 +1276,108 @@ describe("a call that lands in the head's file on something the head cannot be (
     }, { file: "src/a.rs", routine: "run" }, { file: "src/b.rs", names: ["drop"] });
 
     expect(verdictOf(verdict)).not.toBe("refuted");
+  });
+
+  /*
+   * Whether making the type can run the head is a question about its code
+   * (#460). pip's `BestCandidateResult` says in its docstring that it is
+   * "returned by `PackageFinder.find_best_candidate`", and that sentence kept
+   * `compute_best_candidate` open as though constructing it might run the
+   * routine it describes. A comment or a docstring runs nothing.
+   */
+  describe("a name in the made type's comments or docstring is not its code (#460)", () => {
+    const python = (made: string) => ask({
+      "app/a.py": {
+        source: "from app.b import Result\n\ndef run():\n    return Result()\n",
+        language: "python",
+        imports: [["app.b", "app/b.py"], ["app.b.Result", "app/b.py"]],
+      },
+      "app/b.py": { source: `${made}\nclass Finder:\n    def find_best(self):\n        return 1\n`, language: "python" },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["find_best"] });
+
+    it("refutes when only the docstring or a comment names the head (Python)", () => {
+      expect(verdictOf(python("class Result:\n    \"\"\"Returned by `Finder.find_best`.\"\"\"\n\n    def __init__(self):\n        # find_best fills it\n        self.x = 1\n"))).toBe("refuted");
+    });
+
+    it("refutes when only a comment names the head (TypeScript)", () => {
+      const verdict = ask({
+        "src/a.ts": {
+          source: 'import { Result } from "./b";\nexport function run() { return new Result(); }\n',
+          language: "ts",
+          imports: [["./b", "src/b.ts"]],
+        },
+        "src/b.ts": {
+          source: "export class Result {\n  /** Filled by find(). */\n  n = 1;\n  // find() reads it\n  constructor() { this.n = 2; }\n}\n"
+            + "export function find() { return 1; }\n",
+          language: "ts",
+        },
+      }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["find"] });
+      expect(verdictOf(verdict)).toBe("refuted");
+    });
+
+    it("refutes when only a doc comment names the head (Rust)", () => {
+      const verdict = ask({
+        "src/a.rs": {
+          source: "use crate::b::Guard;\n\nfn run() -> Guard { Guard(1) }\n",
+          language: "rust",
+          imports: [["crate::b::Guard", "src/b.rs"]],
+        },
+        "src/b.rs": {
+          source: "pub struct Guard(\n    /// set by `release`\n    pub u32,\n);\n\nimpl Guard {\n    /// See `release`.\n    pub fn get(&self) -> u32 { self.0 }\n}\n\n"
+            + "pub fn release(g: &mut Guard) { g.0 = 0; }\n",
+          language: "rust",
+        },
+      }, { file: "src/a.rs", routine: "run" }, { file: "src/b.rs", names: ["release"] });
+      expect(verdictOf(verdict)).toBe("refuted");
+    });
+
+    it("stays quiet when the type's code calls the head", () => {
+      expect(verdictOf(python("class Result:\n    \"\"\"Made here.\"\"\"\n\n    def __init__(self):\n        Finder().find_best()\n"))).not.toBe("refuted");
+    });
+
+    it("stays quiet when a string that is not a docstring names the head", () => {
+      // `getattr(self, "find_best")` is how a type runs a routine by a written name.
+      expect(verdictOf(python("class Result:\n    def __init__(self):\n        self.hook = \"find_best\"\n"))).not.toBe("refuted");
+    });
+  });
+
+  /*
+   * Rust writes a tuple struct's or a tuple variant's constructor as a call,
+   * `PatternType::DynamicSet(set, data)`, and it runs no function: it builds
+   * the value from its arguments (#460). Placed in the head's file -- the
+   * enum is declared beside the method the arrow names, as in actix's
+   * `resource.rs` -- it named no routine, and the body stayed open.
+   */
+  describe("a Rust tuple variant or tuple struct built by a call runs nothing (#460)", () => {
+    const far = "pub enum Kind {\n    Dynamic(u32),\n    Static,\n}\n\npub struct Wrap(pub u32);\n\npub struct Def {\n    k: Kind,\n}\n\n"
+      + "impl Def {\n    pub fn prefix(&self) -> u32 { 1 }\n}\n";
+    const lineOf = (source: string, word: string) => source.split("\n").findIndex((line) => line.includes(word)) + 1;
+    const rust = (body: string, head: string, farSource = far) => ask({
+      "src/a.rs": {
+        source: `use crate::b::{Kind, Wrap};\n\nfn construct() -> Kind {\n${body}\n}\n`,
+        language: "rust",
+        imports: [["crate::b::Kind", "src/b.rs"], ["crate::b::Wrap", "src/b.rs"]],
+        // The compiler's "go to definition", as the live check asks it for `Kind::Dynamic`.
+        declarationAt: () => ({ file: "src/b.rs", line: lineOf(farSource, "Dynamic("), concrete: true }),
+      },
+      "src/b.rs": { source: farSource, language: "rust" },
+    }, { file: "src/a.rs", routine: "construct" }, { file: "src/b.rs", names: [head] });
+
+    it("refutes when the body builds a tuple variant declared beside the head", () => {
+      expect(verdictOf(rust("    Kind::Dynamic(1)", "prefix"))).toBe("refuted");
+    });
+
+    it("refutes when the body builds a tuple struct declared beside the head", () => {
+      expect(verdictOf(rust("    let _ = Wrap(1);\n    Kind::Static", "prefix"))).toBe("refuted");
+    });
+
+    it("stays quiet when the arrow's head is the variant itself", () => {
+      expect(verdictOf(rust("    Kind::Dynamic(1)", "Dynamic"))).not.toBe("refuted");
+    });
+
+    it("stays quiet when the head's file also declares a function under the variant's name", () => {
+      const twice = `${far}\n#[allow(non_snake_case)]\npub fn Dynamic(n: u32) -> Kind { Kind::Static }\n`;
+      expect(verdictOf(rust("    Kind::Dynamic(1)", "prefix", twice))).not.toBe("refuted");
+    });
   });
 });

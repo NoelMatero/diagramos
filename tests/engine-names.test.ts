@@ -97,7 +97,7 @@ describe("refusals: the answer stays not sure", () => {
     const imports = [{ specifier: ".shims", file: "shims.py" }];
     expect(named("from .shims import *\n\n\ndef f(v):\n    helper(v)\n    return list(v)\n", "f", "python", { ...python, imports }))
       .toEqual({ helper: "shims.py", list: "?unbound" });
-    // Python's `__all__` decides what a wildcard carries; this reader does not read it.
+    // Python's `__all__` decides what a wildcard carries (#460): only `other`, so `helper` comes from nowhere in sight.
     const limited = repo({ "shims.py": "__all__ = ['other']\n\n\ndef helper(v):\n    return v\n" }, "python");
     expect(placed("from .shims import *\n\n\ndef f(v):\n    return helper(v)\n", "f", "python", { ...limited, imports }))
       .toEqual(["?unbound"]);

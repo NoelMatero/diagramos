@@ -1101,8 +1101,22 @@ function calleeOf(node: Node): Callee | undefined {
    * written `(await g)()`, and the parentheses keep that one computed.
    */
   if (called?.type === "await_expression") called = firstNamed(called) ?? called;
+  /*
+   * A function written and called on the spot -- `((t) => ..)(x)`,
+   * `(function* (d) { .. })(x)`, `(lambda y: ..)(x)`, `(|y| ..)(x)` -- runs
+   * the body written right there (#460), and that body's calls are already
+   * read as the routine's own. Read as a call of a value, it stopped the
+   * body as though it could run anything: drizzle's `buildSelectQuery`, zx's
+   * `retry`.
+   */
+  if (called && writtenOnTheSpot(unwrapped(called))) return undefined;
   const callee = called ?? node.childForFieldName("macro");
   return callee ? calleeOfNode(callee) : undefined;
+}
+
+/** Whether a node is a function written out where it stands: an arrow, a function expression, a lambda, a closure. */
+function writtenOnTheSpot(node: Node): boolean {
+  return node.childForFieldName("body") !== null && (parametersOf(node) !== null || node.type === "lambda");
 }
 
 /** A node's first named child that is not a comment. */
@@ -1292,7 +1306,11 @@ function calleeOfNode(written: Node): Callee {
 const lineOf = (source: string, offset: number) => source.slice(0, offset).split("\n").length;
 
 /** A name a local can be found to hold: the function it stands for, and where that is written. */
-type Chosen = { name: string; at: { start: number; end: number } };
+type Chosen = {
+  name: string; at: { start: number; end: number };
+  /** A method read off a value (#460): the call runs what `obj.m(..)` would. */
+  callee?: Callee;
+};
 
 /**
  * Every function a routine's own local can hold when `call` calls it, or
@@ -1311,7 +1329,7 @@ type Chosen = { name: string; at: { start: number; end: number } };
  * Read as fields, the way `names.ts` reads bindings. Any one binding
  * this cannot follow is the old doubt: a parameter (the caller chooses), a
  * loop or `catch`, a destructuring, `+=`, a `global`, a value that is
- * computed (`table[k]`, `make()`, `obj.fn`). Only the routine's own
+ * computed (`table[k]`, `make()`; in Rust `obj.fn`, a field). Only the routine's own
  * bindings, and in TypeScript and Rust only one declared in a block the call
  * is inside: a name declared anywhere else can be set from anywhere else.
  */
@@ -1374,6 +1392,21 @@ function chosenCallees(routine: Node, name: string, call: Node, language: Langua
     if (opens === "(" && inside.length === 1) return follow(inside[0]!);
     if (language === "rust" && (opens === "{" || opens === "else") && inside.length > 0) {
       return follow(inside[inside.length - 1]!);
+    }
+    /*
+     * `append = parts.append`, `const run = this.run`: in Python and
+     * JavaScript reading a method off a value hands back that method, and
+     * calling the local runs what `parts.append(..)` would (#460) -- placed
+     * as that call is, at the spot it was read. Not in Rust, where `obj.f`
+     * is a field and calling what it holds runs whatever was stored there.
+     */
+    if (language !== "rust" && value.childForFieldName("object")
+      && (value.childForFieldName("property") ?? value.childForFieldName("attribute"))) {
+      const read = calleeOfNode(value);
+      if (read.kind === "computed") return false;
+      const at = read.kind === "through" ? read.memberAt : read.nameAt;
+      chosen.push({ name: read.name, at, callee: read });
+      return true;
     }
     return false;
   };
@@ -1565,6 +1598,8 @@ function quietReads(routine: Node, bindings: Bindings, side: CallSide): Set<numb
    * answers it as it does for every other call (#468).
    */
   const builtin = (name: string, at: Node) => meaningOf(name, side, bindings, at, "value").at === "outside";
+  /** Calls whose result is called where it stands: `getattr(x, "m")()`. */
+  const calledHere = new Set<number>();
   const visit = (node: Node, handed: boolean): void => {
     const each_ = (child: Node | null, onward: boolean) => { if (child) visit(child, onward); };
     const rest = (onward: boolean, skip?: Node | null) => {
@@ -1577,7 +1612,19 @@ function quietReads(routine: Node, bindings: Bindings, side: CallSide): Set<numb
       case "call": {
         const callee = node.childForFieldName("function");
         const name = callee?.type === "identifier" && builtin(callee.text, node) ? callee.text : undefined;
-        if (name !== undefined && READS_BY_NAME.has(name) && !handed) quiet.add(node.id);
+        /*
+         * A name written in the call reads or sets that attribute and nothing
+         * else (#460): wherever its result goes, it goes as `x.name` would,
+         * and `x.name` handed on is no call. Called where it stands it is
+         * `x.name()`, a method of a value, which stays a doubt.
+         */
+        const written = name !== undefined && READS_BY_NAME.has(name) && !calledHere.has(node.id) && writtenAttribute(node);
+        if (name !== undefined && READS_BY_NAME.has(name) && (!handed || written)) quiet.add(node.id);
+        if (callee) {
+          let inner: Node = callee;
+          while (inner.type === "parenthesized_expression" && firstNamed(inner)) inner = firstNamed(inner)!;
+          if (inner.type === "call") calledHere.add(inner.id);
+        }
         each_(callee, true);
         // `getattr(x, n, default)` hands back `default` itself; what `isinstance` is given goes nowhere.
         const onward = name !== undefined && INSPECTS.has(name) ? false : name === "getattr" ? handed : true;
@@ -1609,6 +1656,23 @@ function quietReads(routine: Node, bindings: Bindings, side: CallSide): Set<numb
   };
   visit(routine, false);
   return quiet;
+}
+
+/**
+ * Whether a Python `getattr` or `setattr` names the attribute in the call
+ * itself: its second argument is one plain string literal -- not an
+ * f-string, not a sum, not a name. Then `getattr(x, "fields", d)` is
+ * `x.fields` and `setattr(x, "fields", v)` is `x.fields = v`, which is how
+ * the language defines the two (#460).
+ */
+function writtenAttribute(call: Node): boolean {
+  const list = call.childForFieldName("arguments");
+  const args = list ? children(list).filter((one) => one.isNamed && !/comment/.test(one.type)) : [];
+  const name = args[1];
+  if (!name || name.type !== "string" || args.some((one) => /splat|keyword_argument/.test(one.type))) return false;
+  const start = children(name)[0];
+  if (!start || start.type !== "string_start" || /[fFbB]/.test(start.text)) return false;
+  return children(name).every((part) => /^(string_start|string_content|string_end)$/.test(part.type));
 }
 
 const DUNDER = /^__\w+__$/;
@@ -3177,6 +3241,18 @@ function textClosed(
           sites += 1;
           continue;
         }
+        /*
+         * Rust's `PatternType::DynamicSet(set, data)` builds a value of a
+         * tuple variant, or of a tuple struct, and runs no function (#460):
+         * declared beside the head -- actix's `resource.rs` -- it named no
+         * routine, and the reading stopped there.
+         */
+        if (site.declaredAs === undefined && site.name && !to.names.includes(site.name)
+          && buildsAValueOnly(to.source, to.language, site.name)) {
+          elsewhere.push({ name: site.name, line: site.line });
+          sites += 1;
+          continue;
+        }
         if (site.declaredAs === undefined || to.names.includes(site.declaredAs)) {
           const stopped = stop("reaches-the-file");
           if (stopped) return stopped;
@@ -3987,12 +4063,67 @@ function runWhenMade(to: CallSide, type: string, routine: string): boolean {
     .some((one) => one.dispatched || (one.name !== undefined && lineage.has(one.name)));
 }
 
-/** Whether `name` is written anywhere in a type's own code in this file. */
+/**
+ * Whether `name` is written anywhere in a type's own code in this file: its
+ * code, and not what is said about it (#460). pip's `BestCandidateResult`
+ * names `find_best_candidate` in its docstring, and that sentence read as
+ * code kept a body open on the chance that making one ran the routine it
+ * describes.
+ */
 function writtenInside(source: string, language: Language, type: string, name: string): boolean {
-  const lines = source.split("\n");
+  const lines = codeOnly(source, language).split("\n");
   const word = wholeName(name);
   return typeSpans(source, language, type)
     .some(([first, last]) => word.test(lines.slice(first - 1, last).join("\n")));
+}
+
+/**
+ * Whether every declaration of `name` in a Rust file is an enum variant or a
+ * struct, so a call of it builds a value and runs no function (#460). Any
+ * other item of that name -- a function, a constant, a macro, an import --
+ * and it may be what runs.
+ */
+function buildsAValueOnly(source: string, language: Language, name: string): boolean {
+  if (language !== "rust") return false;
+  const tree = parseSource(source, language);
+  if (!tree) return false;
+  let values = 0;
+  let other = false;
+  each(tree.rootNode, (node) => {
+    if (other) return;
+    if (node.type === "use_declaration" && wholeName(name).test(node.text)) { other = true; return; }
+    if (declarationName(node)?.text !== name) return;
+    if (node.type === "enum_variant" || node.type === "struct_item") values += 1;
+    else other = true;
+  });
+  return values > 0 && !other;
+}
+
+const code_ = new WeakMap<Tree, string>();
+
+/**
+ * The source with every comment, and every string standing alone as a
+ * statement -- a docstring, `"use strict"` -- blanked to spaces (#460).
+ * Neither runs anything. Every other character keeps its place, so a line
+ * is still the line it was.
+ */
+function codeOnly(source: string, language: Language): string {
+  const tree = parseSource(source, language);
+  if (!tree) return source;
+  const known = code_.get(tree);
+  if (known !== undefined) return known;
+  const blank: Array<[number, number]> = [];
+  each(tree.rootNode, (node) => {
+    if (/comment$/.test(node.type)) blank.push([node.startIndex, node.endIndex]);
+    else if (node.type === "expression_statement") {
+      const parts = children(node).filter((one) => one.isNamed);
+      if (parts.length === 1 && /^(string|concatenated_string)$/.test(parts[0]!.type)) blank.push([node.startIndex, node.endIndex]);
+    }
+  });
+  let out = source;
+  for (const [start, end] of blank) out = out.slice(0, start) + out.slice(start, end).replace(/[^\n]/g, " ") + out.slice(end);
+  code_.set(tree, out);
+  return out;
 }
 
 /** A type and every base it names that this file declares, followed up the chain. */
@@ -5217,7 +5348,16 @@ function exportsName(name: string, space: Space, file: string, side: CallSide, s
   const opened = side.open?.(file);
   if (!opened) return "unknown";
   const top = moduleScope(opened.source, opened.language);
-  if (!top || top.limited) return "unknown";
+  if (!top) return "unknown";
+  /*
+   * A Python `__all__` is the whole of what a star import over the module
+   * brings (#460): a name it does not list is not carried, whatever the
+   * module declares. One this cannot read leaves every name unknown.
+   */
+  if (top.limited) {
+    if (!top.listed) return "unknown";
+    if (!top.listed.includes(name)) return "lacks";
+  }
   const has = top.has(name, space);
   if (has) return { has: has === "declared" ? file : undefined };
   if (top.unread(name)) return "unknown";
@@ -5474,7 +5614,7 @@ export function callSitesIn(
         : undefined;
       if (chosen) {
         for (const choice of chosen) {
-          const held: Callee = { kind: "bare", name: choice.name, nameAt: choice.at };
+          const held: Callee = choice.callee ?? { kind: "bare", name: choice.name, nameAt: choice.at };
           body.sites.push(siteOf(held, side.source, inner, placeOf(held, side, bindings, inner, holder)));
         }
         return;
