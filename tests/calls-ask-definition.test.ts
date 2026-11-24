@@ -115,7 +115,7 @@ describe("TypeScript: a call through an optional field", () => {
     // this file binds, so the text reading stops there -- when the far end has
     // the name the call is spelt with. A far end of another name is ruled out
     // by the name alone (#351's rule, for any value nothing could type).
-    expect((await textOnly("run.ts#run", "fire.ts#fire")).claims.callsNotClosed.receiver).toBe(1);
+    expect((await textOnly("run.ts#run", "fire.ts#fire")).claims.callsWithheld.receiver).toBe(1);
     expect(accusations(await textOnly("run.ts#run", "render.ts#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
 
     const report = await checked("run.ts#run", "fire.ts#fire");

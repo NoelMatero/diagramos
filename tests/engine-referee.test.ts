@@ -86,7 +86,8 @@ describe("a call on a value whose type the text does not give", () => {
 
     const quiet = checkDrift(board, workspace, { edges: true });
     expect(quiet.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
-    expect(quiet.claims.callsNotClosed.receiver).toBe(1);
+    // A call of the far end's own name on a value nothing typed: withheld until a compiler says whose.
+    expect(quiet.claims.callsWithheld.receiver).toBe(1);
 
     const referee = createClosedBodyReferee(repo);
     expect(referee).toBeDefined();
