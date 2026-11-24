@@ -73,17 +73,19 @@ describe("a call on a value whose type the text does not give", () => {
     "src/b.ts": "export function render(n: number) { return n; }\n",
   };
 
-  it("leaves the arrow unanswered with no referee, and calls it wrong with one", async () => {
+  it("calls the arrow wrong on the text alone, asks the compiler, and still calls it wrong with one", async () => {
     for (const [file, contents] of Object.entries(SOURCES)) write(file, contents);
     const workspace = createWorkspace(repo);
-    // `run` never reaches `src/b.ts`, so the arrow really is wrong -- the only
-    // thing in the way is that `thing`'s type is not written down anywhere the
-    // reader looks.
+    // `run` never reaches `src/b.ts`, so the arrow really is wrong. `thing`'s
+    // type is not written down anywhere the reader looks, but `thing.greet()`
+    // can only run a method named `greet` (#351's rule, for any value nothing
+    // could type), so the text alone rules `render` out -- and the red asks
+    // the compiler where the call goes, which is what starts one.
     const board = await boardOf("src/a.ts#run", "src/b.ts#render");
 
-    const quiet = checkDrift(board, workspace, { edges: true });
-    expect(quiet.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
-    expect(quiet.claims.callsNotClosed.receiver).toBe(1);
+    const text = checkDrift(board, workspace, { edges: true });
+    expect(text.edges.filter((finding) => finding.kind === "calls-refuted")).toHaveLength(1);
+    expect(text.gated.map((one) => one.asked)).toEqual([true]);
 
     const referee = createClosedBodyReferee(repo);
     expect(referee).toBeDefined();

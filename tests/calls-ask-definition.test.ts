@@ -110,8 +110,13 @@ describe("TypeScript: a call through an optional field", () => {
   it("calls the wrong arrow wrong", async () => {
     write(FILES);
     // `ctx.signal`'s type prints as `Signal | undefined`, which names nothing
-    // this file binds, so the text reading stops there.
-    expect((await textOnly("run.ts#run", "render.ts#render")).claims.callsNotClosed.receiver).toBe(1);
+    // this file binds, so the text reading cannot place the call. It can only
+    // run a method named `fire`, though, so the text alone already rules
+    // `render` out (#351's rule, for any value nothing could type), and the
+    // red asks the compiler where the call goes.
+    const text = await textOnly("run.ts#run", "render.ts#render");
+    expect(accusations(text).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
+    expect(text.gated.map((one) => one.asked)).toEqual([true]);
 
     const report = await checked("run.ts#run", "render.ts#render");
     expect(accusations(report).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
@@ -197,8 +202,12 @@ describe("Rust: a call on a type's name", () => {
   it.skipIf(!hasRustAnalyzer)("calls the wrong arrow wrong", async () => {
     write(FILES);
     // `Box::new` has a type's name where a value would be, so asking what the
-    // value is has nothing to ask about.
-    expect((await textOnly("src/run.rs#run", "src/render.rs#render")).claims.callsNotClosed.receiver).toBe(1);
+    // value is has nothing to ask about. It can only run a function named
+    // `new`, though, so the text alone already rules `render` out (#351's
+    // rule, for any call nothing could place), and the red asks the compiler.
+    const text = await textOnly("src/run.rs#run", "src/render.rs#render");
+    expect(accusations(text).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
+    expect(text.gated.map((one) => one.asked)).toEqual([true]);
 
     const report = await checked("src/run.rs#run", "src/render.rs#render");
     expect(accusations(report).map((finding) => finding.kind)).toEqual(["calls-refuted"]);

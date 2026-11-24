@@ -31,6 +31,19 @@
  * for a method (`member`) a bare name is not counted -- except in a Python
  * class body, where `save = _save_impl` reads the method declared above it.
  *
+ * Two more ways a routine is handed on without its name being written as a
+ * value (the untyped-value extension, `runsItsOwnName` in `calls.ts`):
+ *
+ *   `@app.route("/") def handle()`, `@Get() handle()`             a decorator is handed the routine itself, and
+ *                                                               may keep it under any name it likes
+ *   a JavaScript file in a Rust repository naming `run`         a file of another language cannot hold this
+ *                                                               one's routines, so it is not asked (`language`)
+ *
+ * A decorator the language itself gives -- Python's `@staticmethod`,
+ * `@classmethod`, `@property` and its setters, `@abstractmethod`,
+ * `@override`, `@overload`, `@final` -- only changes how the routine is bound
+ * and keeps it under its own name, so it is not counted.
+ *
  * What it leaves out on purpose: a *named* routine that calls the head and is
  * itself what runs (`save() { this.handleFailed() }`, a blanket `impl<F: Fn>`
  * whose `handle` calls `self()`). That is a call to a routine of the
@@ -48,7 +61,7 @@ export interface StoredSource {
 
 /** One place the text writes a routine's name in a way that can make it run under another. */
 export interface StoredFinding {
-  how: "value" | "by-name" | "renamed" | "wrapped" | "unread";
+  how: "value" | "by-name" | "renamed" | "wrapped" | "decorated" | "unread";
   file: string;
   line: number;
   /** For `wrapped`: the function with no name is written as a call's argument, not stored. */
@@ -61,8 +74,12 @@ export interface Stored {
    * another name. `member`: the routine is a method, so a bare name is not it.
    * A walk that gave up answers with an `unread` finding: "cannot tell" is
    * never "nothing".
+   *
+   * `language`: the routine's own. Only files that can hold one of its
+   * routines are read -- TypeScript and JavaScript for each other, Python for
+   * Python, Rust for Rust. Absent, every file is.
    */
-  findings(name: string, member: boolean): StoredFinding[];
+  findings(name: string, member: boolean, language?: Language): StoredFinding[];
 }
 
 /** A function written with no name of its own: what runs is whatever it was stored as. */
@@ -98,9 +115,10 @@ export function storedIn(sources: () => readonly StoredSource[] | undefined): St
   let files: readonly StoredSource[] | undefined | null = null;
   const known = new Map<string, StoredFinding[]>();
 
-  const findings = (name: string, member: boolean): StoredFinding[] => {
+  const findings = (name: string, member: boolean, language?: Language): StoredFinding[] => {
     const plain = name.replace(/^(#|r#)/, "");
-    const key = `${member ? "m" : "f"} ${plain}`;
+    const family = language ? familyOf(language) : "";
+    const key = `${member ? "m" : "f"} ${family} ${plain}`;
     const cached = known.get(key);
     if (cached) return cached;
     if (files === null) files = sources();
@@ -111,6 +129,7 @@ export function storedIn(sources: () => readonly StoredSource[] | undefined): St
       found = [];
       const word = wholeName(plain);
       for (const file of files) {
+        if (family && familyOf(file.language) !== family) continue;
         if (!word.test(file.source)) continue;
         const here = withParsed(file.source, file.language, (tree) => findingsIn(tree.rootNode, plain, member, file));
         // A file with a grammar that would not parse could write it any way at all.
@@ -121,6 +140,65 @@ export function storedIn(sources: () => readonly StoredSource[] | undefined): St
     return found;
   };
   return { findings };
+}
+
+/** Languages whose files can hold each other's routines. */
+function familyOf(language: Language): string {
+  return language === "python" || language === "rust" ? language : "javascript";
+}
+
+/**
+ * Python's own decorators: each keeps the routine under its own name and only
+ * changes how it is bound or checked. `x.setter`, `x.getter` and `x.deleter`
+ * are a property's.
+ */
+const BINDS_ONLY = new Set([
+  "staticmethod", "classmethod", "property", "setter", "getter", "deleter",
+  "abstractmethod", "abstractproperty", "override", "overload", "final",
+]);
+
+/**
+ * The routines named `name` this tree declares under a decorator that may
+ * keep them (`decorated`): Python's `decorated_definition`, and TypeScript's
+ * decorators, which its grammar writes just before the member they decorate.
+ */
+function decoratedIn(root: Node, name: string): Node[] {
+  const out: Node[] = [];
+  const judge = (decorators: Node[], target: Node | null, python: boolean): void => {
+    if (!target || target.childForFieldName("name")?.text !== name) return;
+    for (const decorator of decorators) {
+      let written: Node | null = null;
+      for (let index = 0; index < decorator.childCount && !written; index += 1) {
+        const child = decorator.child(index);
+        if (child?.isNamed && !/comment/.test(child.type)) written = child;
+      }
+      const callee = written && /^call(_expression)?$/.test(written.type) ? written.childForFieldName("function") : written;
+      if (python && BINDS_ONLY.has(lastName(callee))) continue;
+      out.push(decorator);
+    }
+  };
+  each(root, (node) => {
+    const kids: Node[] = [];
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child) kids.push(child);
+    }
+    if (node.type === "decorated_definition") {
+      judge(kids.filter((one) => one.type === "decorator"), node.childForFieldName("definition"), true);
+      return;
+    }
+    // TypeScript: a member's decorators are written inside it, or just before it in the class body.
+    const inside = kids.filter((one) => one.type === "decorator");
+    if (inside.length > 0 && node.childForFieldName("name")) judge(inside, node, false);
+    let pending: Node[] = [];
+    for (const child of kids) {
+      if (!child.isNamed || /comment/.test(child.type)) continue;
+      if (child.type === "decorator") { pending.push(child); continue; }
+      if (pending.length > 0) judge(pending, child, false);
+      pending = [];
+    }
+  });
+  return out;
 }
 
 interface Context {
@@ -239,6 +317,7 @@ function findingsIn(root: Node, name: string, member: boolean, file: StoredSourc
   };
   mark(root);
   visit(root, { quiet: false, byName: false, memberPart: false, classBody: false });
+  for (const decorator of decoratedIn(root, name)) found.push({ how: "decorated", file: file.file, line: line(decorator.startIndex) });
   return found;
 }
 

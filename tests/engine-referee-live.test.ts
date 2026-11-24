@@ -72,25 +72,32 @@ afterEach(() => {
  * misses stop at a call on a value whose type is not written down. `thing` is
  * whatever `make()` returns and nothing in `a.py` says what that is, so the
  * body never closes and the arrow goes quiet whether it is right or wrong.
+ *
+ * Since the untyped-value extension of #351 a far end of another name
+ * (`render`) is ruled out by the name alone, and the red asks the compiler.
+ * The fallback tests below draw the far end with the very name the call is
+ * spelt with (`greet`, Rust's `load`), which only a compiler can settle.
  */
 const PYTHON: Record<string, string> = {
   "thing.py": "class Thing:\n    def greet(self):\n        return \"hi\"\n",
   "make.py": "from thing import Thing\n\n\ndef make():\n    return Thing()\n",
   "a.py": "from make import make\n\n\ndef run():\n    thing = make()\n    return thing.greet()\n",
-  "b.py": "def render(n):\n    return n\n",
+  "b.py": "def render(n):\n    return n\n\n\ndef greet(n):\n    return n\n",
 };
 
 describe("a Python call on a value whose type the text does not give", () => {
-  it("leaves the arrow unanswered with no referee, and calls it wrong with one", async () => {
+  it("calls the arrow wrong on the text alone, asks pyright, and still calls it wrong with it", async () => {
     for (const [file, contents] of Object.entries(PYTHON)) write(file, contents);
     const workspace = createWorkspace(repo);
-    // `run` never reaches `b.py`, so the arrow really is wrong -- the only
-    // thing in the way is that `thing`'s type is not written down.
+    // `run` never reaches `render`, so the arrow really is wrong. `thing`'s
+    // type is not written down, but `thing.greet()` can only run a method
+    // named `greet`, so the text alone rules `render` out -- and the red asks
+    // where the call goes, which is what starts pyright.
     const board = await boardOf("a.py#run", "b.py#render");
 
-    const quiet = checkDrift(board, workspace, { edges: true });
-    expect(quiet.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
-    expect(quiet.claims.callsNotClosed.receiver).toBe(1);
+    const text = checkDrift(board, workspace, { edges: true });
+    expect(text.edges.filter((finding) => finding.kind === "calls-refuted")).toHaveLength(1);
+    expect(text.gated.map((one) => one.asked)).toEqual([true]);
 
     const live = await refereedCheckLive(repo, (referee) =>
       checkDrift(board, workspace, { edges: true, ...(referee ? { closedBodyReferee: referee } : {}) }));
@@ -161,7 +168,7 @@ describe("what a board pays", () => {
      */
     for (const [file, contents] of Object.entries(PYTHON)) write(file, contents);
     const workspace = createWorkspace(repo);
-    const board = await boardOf("a.py#run", "b.py#render");
+    const board = await boardOf("a.py#run", "b.py#greet");
 
     const live = await refereedCheckLive(repo, (referee) =>
       checkDrift(board, workspace, { edges: true, ...(referee ? { closedBodyReferee: referee } : {}) }), { budgetMs: 0 });
@@ -200,11 +207,12 @@ describe("a Rust call on a value whose type the text does not give", () => {
     const workspace = createWorkspace(repo);
 
     const wrong = await boardOf("src/a.rs#run", "src/b.rs#render");
-    // Quiet on the text alone, so what changes below is rust-analyzer's answer
-    // and not something the reader could already see.
+    // Red on the text alone since the untyped-value extension of #351:
+    // `c.load()` can only run a method named `load`. The red asks where that
+    // call goes, so the live check below still starts rust-analyzer.
     const quiet = checkDrift(wrong, workspace, { edges: true });
-    expect(quiet.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);
-    expect(quiet.claims.callsNotClosed.receiver).toBe(1);
+    expect(quiet.edges.filter((finding) => finding.kind === "calls-refuted")).toHaveLength(1);
+    expect(quiet.gated.map((one) => one.asked)).toEqual([true]);
 
     const accused = await refereedCheckLive(repo, (referee) =>
       checkDrift(wrong, workspace, { edges: true, ...(referee ? { closedBodyReferee: referee } : {}) }));
@@ -259,13 +267,13 @@ describe("a machine with Rust but no rust-analyzer", () => {
       + "impl Config {\n    pub fn load(&self) -> u32 { 7 }\n}\n"
       + "pub fn make() -> Config { Config { name: String::new() } }\n");
     write("src/a.rs", "use crate::decl::make;\n\npub fn run() -> u32 {\n    let c = make();\n    c.load()\n}\n");
-    write("src/b.rs", "pub fn render(n: u32) -> u32 { n }\n");
+    write("src/b.rs", "pub fn load(n: u32) -> u32 { n }\n");
     const workspace = createWorkspace(repo);
-    const board = await boardOf("src/a.rs#run", "src/b.rs#render");
+    const board = await boardOf("src/a.rs#run", "src/b.rs#load");
 
     /*
      * The text reading alone, which is what this is about. `run` never calls
-     * `render`, and since #357 the Rust compiler's own call list says so
+     * `load` in `b.rs`, and since #357 the Rust compiler's own call list says so
      * whether or not rust-analyzer answers -- a correct red, and a different
      * test (`calls-compiled-rust.test.ts`).
      */

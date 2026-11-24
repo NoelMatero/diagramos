@@ -50,7 +50,7 @@ import type { BindingFault } from "./damage";
 import { partsInclude, type DeclaredAt, type ImportTarget, type MemberTarget, type TypeParts } from "./compiler-questions";
 import {
   askFits, askHasMember, askMember, askTypeParts, declaredIn, declaresAlias, gateRed, unwrittenNames, WRITTEN,
-  type GateWithdrawn, type RedRests, type Site,
+  type CompilerSaid, type GateWithdrawn, type RedRests, type Site,
 } from "./gate";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
@@ -64,7 +64,7 @@ import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
   callImports, type CallSide, type CallSitePlaced, type CallsNotClosed, type CallsRefutedEvidence, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER,
   type ReceiverResolution, bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
-  spelledLikeARunner,
+  routineDeclaredOn, spelledLikeARunner,
 } from "./calls";
 import type { CompiledCrate } from "./compiled-calls";
 import { newReachCache, reachBetween, type ReachCache, type ReachHop } from "./reach";
@@ -2500,7 +2500,7 @@ function callSide(
       ...(closedBodyReferee ? { resolveReceiver: (at) => closedBodyReferee.resolveReceiver(target, at) } : {}),
       ...(declarationAt ? { declarationAt: (at) => declarationAt(target, at) } : {}),
       ...(overrides ? { overridden: (holder, member) => overrides.below(holder, member) } : {}),
-      ...(stored ? { runsUnderAnotherName: (name, member) => stored.findings(name, member).length > 0 } : {}),
+      ...(stored ? { runsUnderAnotherName: (name, member, language) => stored.findings(name, member, language).length > 0 } : {}),
       ...(askDefinition && closedBodyReferee?.compiledCrateOf
         ? { compiled: () => closedBodyReferee.compiledCrateOf!(target) }
         : {}),
@@ -3249,15 +3249,20 @@ function notDirectSentence(word: "calls" | "needs", route: readonly string[], ar
  * there, or the ones that were landed on something the head cannot be (#430).
  */
 /**
- * The calls through an interface, a trait or an override a red counted as
- * read (#351), said so: each runs a routine of the name it calls, and that is
- * the whole of why it is not the head.
+ * The calls through an interface, a trait or an override (#351), and those on
+ * a value nothing could type, that a red counted as read, said so: each runs
+ * a routine of the name it calls, and that is the whole of why it is not the
+ * head.
  */
-function throughDispatch(dispatched: number | undefined): string {
-  if (!dispatched) return "";
-  return dispatched === 1
-    ? " (one through an interface or an override, which runs a method of the name it calls)"
-    : ` (${dispatched} through an interface or an override, each running a method of the name it calls)`;
+function throughDispatch(dispatched: number | undefined, untyped?: number): string {
+  const parts: string[] = [];
+  if (dispatched) {
+    parts.push(dispatched === 1 ? "one through an interface or an override" : `${dispatched} through an interface or an override`);
+  }
+  if (untyped) parts.push(untyped === 1 ? "one on a value nothing could type" : `${untyped} on values nothing could type`);
+  if (parts.length === 0) return "";
+  const one = (dispatched ?? 0) + (untyped ?? 0) === 1;
+  return ` (${parts.join(", ")}, ${one ? "which runs" : "each running"} a method of the name it calls)`;
 }
 
 function landedBeside(elsewhere: ReadonlyArray<{ name: string; line: number }> | undefined, toPath: string, head: readonly string[]): string {
@@ -6482,7 +6487,26 @@ export function checkDrift(
              * What a `calls-refuted` rests on (#393): every call written was
              * read, and a call the language or outside code makes without it
              * being written is the one thing a compiler is asked about.
+             *
+             * A red that read calls on values nothing could type by their
+             * names alone asks too: where each of them goes. It stands on
+             * what is written whatever the answer, unless the compiler puts
+             * one of them on the far end itself -- and asking is what has a
+             * live check start a compiler at all, whose placements let the
+             * route check find the hops a red then shows.
              */
+            const askUntyped = (untypedAt: ReadonlyArray<{ start: number; end: number }>) =>
+              (referee: ClosedBodyReferee): CompilerSaid => {
+                for (const at of untypedAt) {
+                  const placed = referee.declarationAt?.(fromPath, at);
+                  if (!placed || placed === "outside" || placed.file !== toPath) continue;
+                  const landed = routineDeclaredOn(head.source, head.language, placed.line);
+                  if (landed && toEnd.symbols.includes(landed.name)) {
+                    return { does: true, said: `the compiler places a call on an untyped value at ${landed.name}, ${toPath} line ${placed.line}` };
+                  }
+                }
+                return { does: undefined, said: "the compiler places none of the calls on untyped values at the far end" };
+              };
             const refutedRests = (evidence: CallsRefutedEvidence): RedRests => ({
               written: !evidence.implicit,
               unwritten: evidence.implicit?.outside
@@ -6495,7 +6519,7 @@ export function checkDrift(
                   evidence.implicit!.name,
                   declaredIn(workspace.read(toFile), languageOf(toFile) ?? "python", toPath, evidence.implicit!.name),
                 ),
-              } : {}),
+              } : evidence.untypedAt ? { ask: askUntyped(evidence.untypedAt) } : {}),
             });
             /**
              * Whether the tail's own body rules out a direct call, asked when
@@ -6712,7 +6736,10 @@ export function checkDrift(
                   + `${toEnd.symbols.join(" or ")} -- ${where}. Point the arrow at `
                   + `${near[0]!.name}, or call ${toEnd.symbols[0]!} from `
                   + `${verdict.evidence.routine}.`,
-              }, rests: WRITTEN /* a call found landing on another routine */ });
+              }, rests: verdict.evidence.untypedAt
+                /* a call found landing on another routine, with calls on untyped values read by name: asks, as `refutedRests` does */
+                ? { written: true, ask: askUntyped(verdict.evidence.untypedAt) }
+                : WRITTEN /* a call found landing on another routine */ });
               continue;
             }
             if (verdict.verdict === "refuted" && edge.state !== "planned") {
@@ -6750,7 +6777,7 @@ export function checkDrift(
                   + `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
                   + `${oneLine(toNode.label) || toPath}, and every call `
                   + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
-                  + `them${throughDispatch(verdict.evidence.dispatched)}, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `
+                  + `them${throughDispatch(verdict.evidence.dispatched, verdict.evidence.untyped)}, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `
                   + `${fromPath} line ${verdict.evidence.line} is where ${verdict.evidence.routine} is declared.`,
               }, rests: refutedRests(verdict.evidence) }); };
               if (verdict.evidence.elsewhere) besideTheHead = refute;
