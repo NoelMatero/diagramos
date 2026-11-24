@@ -27,6 +27,7 @@ import { createDiagram } from "../src/engine/diagram";
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace } from "../src/engine/drift";
 import { callsBetween, type CallSide, type CallsVerdict } from "../src/engine/calls";
 import { initEngine, languageOf, type Language } from "../src/engine/parse";
+import { wouldHelp } from "../src/engine/referee";
 import { storedIn } from "../src/engine/stored";
 import { installExcalifontMeasurer } from "./helpers/excalifont";
 
@@ -309,8 +310,111 @@ describe("through the whole check, with no compiler", () => {
     expect(await reds({ ...FILES, "wire.py": "from openapi import get_fields_from_routes\n\nHOOKS = [get_fields_from_routes]\n" })).toEqual([]);
   }, 60_000);
 
+  it("asks a compiler where those calls go, so a live check still starts one", async () => {
+    const repo = mkdtempSync(path.join(tmpdir(), "calls-untyped-ask-"));
+    try {
+      for (const [file, source] of Object.entries(FILES)) writeFileSync(path.join(repo, file), source);
+      const { board } = await createDiagram(emptyBoard(), {
+        name: "arch",
+        nodes: [
+          { id: "a", label: "get_openapi_path", ref: "openapi.py#get_openapi_path" },
+          { id: "b", label: "get_fields_from_routes", ref: "openapi.py#get_fields_from_routes" },
+        ],
+        edges: [{ from: "a", to: "b", claim: "calls" }],
+      });
+      const blind = checkDrift(board as BoardFile, createWorkspace(repo), { edges: true });
+      expect(blind.gated.map((one) => [one.kind, one.outcome, one.asked, one.referee])).toEqual([["calls-refuted", "stands", true, false]]);
+      expect(wouldHelp(blind)).toBe(true);
+      // A compiler that cannot say either: the red stands on what is written.
+      const silent = checkDrift(board as BoardFile, createWorkspace(repo), {
+        edges: true,
+        closedBodyReferee: { resolveReceiver: () => undefined, declarationAt: () => undefined },
+      });
+      expect(silent.edges.filter((one) => ACCUSING.has(one.kind)).map((one) => one.kind)).toEqual(["calls-refuted"]);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  }, 60_000);
+
   it("leaves it alone when the head is decorated", async () => {
     const decorated = FILES["openapi.py"].replace("def get_fields_from_routes", "@register\ndef get_fields_from_routes");
     expect(await reds({ "openapi.py": decorated })).toEqual([]);
+  }, 60_000);
+});
+
+/*
+ * A method read off a value and kept in a local -- rich's `append =
+ * output.append`, then `append(text)` -- is the call `output.append(text)`
+ * written in two steps. Read as that call, it falls under the same rule; read
+ * as "a local holding some function", it kept the whole routine a doubt.
+ */
+describe("a local that holds a method read off a value is read as that call", () => {
+  async function kindsOf(files: Record<string, string>, from: string, to: string): Promise<string[]> {
+    const repo = mkdtempSync(path.join(tmpdir(), "calls-untyped-local-"));
+    try {
+      for (const [file, source] of Object.entries(files)) {
+        const at = path.join(repo, file);
+        if (path.dirname(file) !== ".") (await import("node:fs")).mkdirSync(path.dirname(at), { recursive: true });
+        writeFileSync(at, source);
+      }
+      const { board } = await createDiagram(emptyBoard(), {
+        name: "arch",
+        nodes: [{ id: "a", label: "from", ref: from }, { id: "b", label: "to", ref: to }],
+        edges: [{ from: "a", to: "b", claim: "calls" }],
+      });
+      const report = checkDrift(board as BoardFile, createWorkspace(repo), { edges: true });
+      return report.edges.filter((one) => ACCUSING.has(one.kind)).map((one) => one.kind);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  }
+
+  const PY_RENDER = (body: string) =>
+    "def escape(t):\n    return t\n\n\n"
+    + `def render(parts, text):\n${body}\n    return parts\n`;
+
+  it("calls a wrong arrow wrong in Python: append = parts.append", async () => {
+    const files = { "markup.py": PY_RENDER("    append = parts.append\n    append(text)\n    pop = parts.pop\n    pop()") };
+    expect(await kindsOf(files, "markup.py#render", "markup.py#escape")).toEqual(["calls-refuted"]);
+  }, 60_000);
+
+  it("calls a wrong arrow wrong in TypeScript: const push = parts.push", async () => {
+    const files = {
+      "markup.ts": "export function escape(t: string) { return t; }\n"
+        + "export function render(parts: any, text: string) {\n  const push = parts.push;\n  push(text);\n  return parts;\n}\n",
+    };
+    expect(await kindsOf(files, "markup.ts#render", "markup.ts#escape")).toEqual(["calls-refuted"]);
+  }, 60_000);
+
+  /* The doubts it keeps. */
+  it("stays quiet when the method read has the head's name", async () => {
+    const files = { "markup.py": PY_RENDER("    run = parts.escape\n    run(text)") };
+    expect(await kindsOf(files, "markup.py#render", "markup.py#escape")).toEqual([]);
+  }, 60_000);
+
+  it("stays quiet when the local is also assigned from a parameter", async () => {
+    const files = {
+      "markup.py": "def escape(t):\n    return t\n\n\n"
+        + "def render(parts, text, given):\n    append = parts.append\n    if text:\n        append = given\n    append(text)\n    return parts\n",
+    };
+    expect(await kindsOf(files, "markup.py#render", "markup.py#escape")).toEqual([]);
+  }, 60_000);
+
+  it("stays quiet when the head is kept on the value under the method's name", async () => {
+    const files = {
+      "markup.py": PY_RENDER("    append = parts.append\n    append(text)"),
+      "wire.py": "from markup import escape\n\n\nclass Parts:\n    append = escape\n",
+    };
+    expect(await kindsOf(files, "markup.py#render", "markup.py#escape")).toEqual([]);
+  }, 60_000);
+
+  it("stays quiet on a Rust field read into a local, which holds whatever was stored", async () => {
+    const files = {
+      "Cargo.toml": "[package]\nname = \"m\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+      "src/lib.rs": "pub struct P { pub hook: fn(u32) -> u32 }\n\n"
+        + "pub fn escape(t: u32) -> u32 {\n    t\n}\n\n"
+        + "pub fn render(p: &P, t: u32) -> u32 {\n    let f = p.hook;\n    f(t)\n}\n",
+    };
+    expect(await kindsOf(files, "src/lib.rs#render", "src/lib.rs#escape")).toEqual([]);
   }, 60_000);
 });
