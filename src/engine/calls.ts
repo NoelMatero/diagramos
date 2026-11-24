@@ -1565,6 +1565,8 @@ function quietReads(routine: Node, bindings: Bindings, side: CallSide): Set<numb
    * answers it as it does for every other call (#468).
    */
   const builtin = (name: string, at: Node) => meaningOf(name, side, bindings, at, "value").at === "outside";
+  /** Calls whose result is called where it stands: `getattr(x, "m")()`. */
+  const calledHere = new Set<number>();
   const visit = (node: Node, handed: boolean): void => {
     const each_ = (child: Node | null, onward: boolean) => { if (child) visit(child, onward); };
     const rest = (onward: boolean, skip?: Node | null) => {
@@ -1577,7 +1579,19 @@ function quietReads(routine: Node, bindings: Bindings, side: CallSide): Set<numb
       case "call": {
         const callee = node.childForFieldName("function");
         const name = callee?.type === "identifier" && builtin(callee.text, node) ? callee.text : undefined;
-        if (name !== undefined && READS_BY_NAME.has(name) && !handed) quiet.add(node.id);
+        /*
+         * A name written in the call reads or sets that attribute and nothing
+         * else (#460): wherever its result goes, it goes as `x.name` would,
+         * and `x.name` handed on is no call. Called where it stands it is
+         * `x.name()`, a method of a value, which stays a doubt.
+         */
+        const written = name !== undefined && READS_BY_NAME.has(name) && !calledHere.has(node.id) && writtenAttribute(node);
+        if (name !== undefined && READS_BY_NAME.has(name) && (!handed || written)) quiet.add(node.id);
+        if (callee) {
+          let inner: Node = callee;
+          while (inner.type === "parenthesized_expression" && firstNamed(inner)) inner = firstNamed(inner)!;
+          if (inner.type === "call") calledHere.add(inner.id);
+        }
         each_(callee, true);
         // `getattr(x, n, default)` hands back `default` itself; what `isinstance` is given goes nowhere.
         const onward = name !== undefined && INSPECTS.has(name) ? false : name === "getattr" ? handed : true;
@@ -1609,6 +1623,23 @@ function quietReads(routine: Node, bindings: Bindings, side: CallSide): Set<numb
   };
   visit(routine, false);
   return quiet;
+}
+
+/**
+ * Whether a Python `getattr` or `setattr` names the attribute in the call
+ * itself: its second argument is one plain string literal -- not an
+ * f-string, not a sum, not a name. Then `getattr(x, "fields", d)` is
+ * `x.fields` and `setattr(x, "fields", v)` is `x.fields = v`, which is how
+ * the language defines the two (#460).
+ */
+function writtenAttribute(call: Node): boolean {
+  const list = call.childForFieldName("arguments");
+  const args = list ? children(list).filter((one) => one.isNamed && !/comment/.test(one.type)) : [];
+  const name = args[1];
+  if (!name || name.type !== "string" || args.some((one) => /splat|keyword_argument/.test(one.type))) return false;
+  const start = children(name)[0];
+  if (!start || start.type !== "string_start" || /[fFbB]/.test(start.text)) return false;
+  return children(name).every((part) => /^(string_start|string_content|string_end)$/.test(part.type));
 }
 
 const DUNDER = /^__\w+__$/;

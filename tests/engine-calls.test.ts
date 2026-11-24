@@ -1055,6 +1055,50 @@ describe("a Python read or write by name that runs nothing (#431)", () => {
     expect(verdictOf(run("    return getattr(obj, name, None) is None\n", "__getattr__"))).not.toBe("refuted");
   });
 
+  /*
+   * A name written in the call is no name chosen at run time (#460):
+   * `getattr(x, "fields")` is `x.fields`, and `setattr(x, "fields", v)` is
+   * `x.fields = v`, by the language's own definition of both. Wherever the
+   * result goes, it goes as `x.fields` would -- marshmallow's `SchemaOpts`
+   * fills thirteen fields that way, pip hands `config_settings` to a call.
+   */
+  it("refutes when a read by a written name is put into a field", () => {
+    const verdict = run("    obj.fields = getattr(obj, \"fields\", ())\n    obj.many = getattr(obj, 'many', False)\n    return 1\n", "render");
+    expect(verdictOf(verdict)).toBe("refuted");
+  });
+
+  it("refutes when a read by a written name is handed to a call or returned", () => {
+    expect(verdictOf(run("    return dict(settings=getattr(obj, \"config_settings\", None))\n", "render"))).toBe("refuted");
+    expect(verdictOf(run("    return getattr(obj, \"config_settings\", None)\n", "render"))).toBe("refuted");
+  });
+
+  it("refutes when a set by a written name is returned", () => {
+    expect(verdictOf(run("    return setattr(obj, \"fields\", 1)\n", "render"))).toBe("refuted");
+  });
+
+  it("stays quiet when a read by a written name is called where it stands", () => {
+    // `obj.fields()`: a method of a value nothing types, which may be anything.
+    expect(verdictOf(run("    return getattr(obj, \"fields\")()\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when a read by a written name is kept and then called", () => {
+    // requests' `release_conn = getattr(self.raw, "release_conn", None)`, then `release_conn()`.
+    expect(verdictOf(run("    release = getattr(obj, \"release_conn\", None)\n    release()\n    return 1\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when the name is built, not written", () => {
+    expect(verdictOf(run("    obj.on = getattr(obj, f\"on_{name}\")\n    return 1\n", "render"))).not.toBe("refuted");
+    expect(verdictOf(run("    obj.on = getattr(obj, \"on_\" + name)\n    return 1\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when a written-name read hands on the head's own name", () => {
+    expect(verdictOf(run("    obj.on = getattr(obj, \"render\")\n    return 1\n", "render"))).not.toBe("refuted");
+  });
+
+  it("stays quiet when a written-name read is handed on and the head is a hook reads run", () => {
+    expect(verdictOf(run("    obj.on = getattr(obj, \"size\")\n    return 1\n", "__getattr__"))).not.toBe("refuted");
+  });
+
   it("reads the file's own `getattr` as the function it is, not the builtin (#470)", () => {
     // The repository's own `getattr` is a call to it: placed, so the body
     // closes, and a walk can follow it on. Read by its name alone it was a
