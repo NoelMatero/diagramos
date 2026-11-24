@@ -82,12 +82,20 @@ export type PartReading = "has" | "lacks" | "unsure";
  * second line: calling a class is how Python and a Rust tuple struct construct
  * one, so a type at its head is not a wrong kind, and a constant there may hold
  * a function.
+ *
+ * `feeds` asks its head for parameters, as `takes` asks of its function (missed
+ * map 2026-11b): "A feeds B" hands A's result to B, and what is handed a value
+ * is a function. A struct, a class, an interface, an enum or a constant holding
+ * a number takes none -- 15 wrong arrows on the study sets stayed "not sure"
+ * for want of this line. A class made with the value, `B(A(x))` in Python or a
+ * Rust tuple struct, is what `feeds.ts` confirms before this is ever asked, and
+ * a value whose type may be a function keeps its doubt (`couldBeCalled`).
  */
 export const NEEDS: Record<ArrowClaim, { from?: Part; to?: Part }> = {
   needs: {},
   // Same as `needs`: every declaration lives in a file, and a file has imports.
   depends: {},
-  feeds: { from: "result" },
+  feeds: { from: "result", to: "signature" },
   calls: { from: "body", to: "callable" },
   builds: { from: "body", to: "type" },
   takes: { from: "type", to: "signature" },
@@ -454,6 +462,50 @@ export function onlyTypes(source: string, name: string, language: Language): boo
 }
 
 /**
+ * Whether a container is erased when the language compiles it, so that nothing
+ * in it ever runs: a TypeScript `interface` (missed map 2026-11b, pattern 1a).
+ *
+ * `holdsCode` counts anything with parameters as code, and an interface's
+ * method signatures and function-typed fields all have them -- so
+ * npm-check-updates' `PackageManager`, a list of `latest?: GetVersion` and
+ * `spawn?: (args) => Promise<..>`, read as a body that might call anything,
+ * and "`PackageManager` calls `latest`" stayed "not sure". The language says
+ * otherwise: an interface is a type and only a type, written out of the
+ * program when it compiles. Told by the word the source opens it with, which
+ * is an anonymous token and so its own type -- the reading `implementable`
+ * makes for `trait`. No other grammar here spells a declaration that way.
+ *
+ * Two shapes keep the old reading. A name declared again as a class, a
+ * function, a constant or a namespace is merged with the interface, and a box
+ * at it means all of them. `partsOf` reads each declaration it indexes and
+ * lacks only where every one does, but a namespace is not one it indexes, so
+ * any other node in the file that names the same name and has a body of its
+ * own -- a namespace, a class, a function -- keeps this one out too. And an
+ * interface inside a `declare` block (`declare module "./client" { interface
+ * Client {..} }`) widens a declaration written somewhere else, which a box
+ * drawn at it may well mean: any ancestor opened by `declare` keeps it out.
+ */
+function erasedWhenCompiled(node: Node): boolean {
+  const name = node.childForFieldName("name");
+  if (!name || keywordOf(node, name) !== "interface") return false;
+  let kept = false;
+  each(node.tree.rootNode, (other) => {
+    if (kept || other.id === node.id) return;
+    // An ancestor -- a node spanning this one -- opened by `declare`.
+    if (other.startIndex <= node.startIndex && node.endIndex <= other.endIndex) {
+      for (let index = 0; index < other.childCount; index += 1) {
+        const child = other.child(index);
+        if (child && !child.isNamed && child.type === "declare") kept = true;
+      }
+    }
+    // The same name declared again with a body of its own.
+    if (other.childForFieldName("name")?.text === name.text && has(other, "body")
+      && keywordOf(other, other.childForFieldName("name")!) !== "interface") kept = true;
+  });
+  return !kept;
+}
+
+/**
  * A container is a declaration with a `body` field and none of `parameters`,
  * `value`, `right` or `type`: a struct, a class, an interface, an enum, a
  * trait, a module.
@@ -486,7 +538,7 @@ function readShape(node: Node, language: Language): Shape {
      * code doing exactly what the arrow says, so `holdsCode` keeps them all
      * out of it.
      */
-    const runs = holdsCode(node.childForFieldName("body")!);
+    const runs = !erasedWhenCompiled(node) && holdsCode(node.childForFieldName("body")!);
     return {
       body: runs ? "unsure" : "lacks",
       signature: "lacks", result: "lacks", fields: "unsure", bases: "unsure", type: "has",

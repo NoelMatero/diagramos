@@ -251,3 +251,87 @@ describe("a project that makes an unused name an error", () => {
     expect(wrongKind(refereed(board))?.detail).toBeUndefined();
   });
 });
+
+describe("a program that renders nothing", () => {
+  /*
+   * tRPC's server and client packages, immer, drizzle and mobx: no JSX is
+   * written anywhere in the program and no library it reads declares a JSX
+   * namespace, so nothing can render a function as a component. The probe
+   * above could not even ask -- classic JSX with no `React` in scope fails
+   * every element, a `.ts` file's `<T>x` cast does not parse as TSX, a
+   * function inside another is not in scope at the end of the file -- and
+   * "App makes chain" stayed "not sure" for ever (missed map 2026-11b, 1c).
+   */
+  beforeEach(() => {
+    rmSync(path.join(repo, "node_modules/@types/react"));
+    // `types: []` keeps out whatever `@types` sit above the scratch directory.
+    write("tsconfig.json", JSON.stringify({
+      compilerOptions: {
+        target: "ES2022", module: "ESNext", moduleResolution: "bundler", strict: true, jsx: "react", types: [],
+      },
+    }));
+    write("src/app.ts", "import { chain, Store } from \"./chain\";\n"
+      + "export function App() {\n  return chain([1]).length + new Store().size;\n}\n");
+  });
+
+  const CHAIN = "export function chain(links: number[]): number[] {\n  return links.slice();\n}\n";
+
+  it("calls a plain function wrong", async () => {
+    write("src/chain.ts", `${CHAIN}export class Store { size = 0; }\n`);
+    const board = await boardOf("src/app.ts#App", "src/chain.ts#chain");
+    expect(wrongKind(refereed(board))?.detail).toContain("is not a type");
+  });
+
+  it("calls a function written inside another wrong", async () => {
+    // immer's `enableMapSet() { function proxyMap_(..) {..} }`
+    write("src/chain.ts", `${CHAIN}export class Store { size = 0; }\n`
+      + "export function enable() {\n  function proxyMap_(target: Map<string, number>): Map<string, number> {\n"
+      + "    return new Map(target);\n  }\n  return proxyMap_;\n}\n");
+    const board = await boardOf("src/app.ts#App", "src/chain.ts#proxyMap_");
+    expect(wrongKind(refereed(board))?.detail).toContain("is not a type");
+  });
+
+  it("calls a method wrong in a file with an angle-bracket cast", async () => {
+    // drizzle's `session.ts`: `<pg.Pool>client` does not parse as TSX.
+    write("src/chain.ts", `${CHAIN}export class Store {\n  size = 0;\n`
+      + "  all(rows: unknown): number[] {\n    return <number[]>rows;\n  }\n}\n");
+    const board = await boardOf("src/app.ts#App", "src/chain.ts#all");
+    expect(wrongKind(refereed(board))?.detail).toContain("is not a type");
+  });
+
+  it("leaves a function that returns `any` alone", async () => {
+    write("src/chain.ts", "// eslint-disable-next-line\nexport function chain(links: any): any {\n  return links;\n}\n"
+      + "export class Store { size = 0; }\n");
+    const board = await boardOf("src/app.ts#App", "src/chain.ts#chain");
+    expect(wrongKind(refereed(board))).toBeUndefined();
+  });
+
+  it("leaves it alone once one file writes JSX", async () => {
+    write("src/chain.ts", `${CHAIN}export class Store { size = 0; }\n`);
+    write("src/view.tsx", "export const view = <div />;\n");
+    const board = await boardOf("src/app.ts#App", "src/chain.ts#chain");
+    expect(wrongKind(refereed(board))).toBeUndefined();
+  });
+
+  it("leaves it alone when a JavaScript file writes JSX", async () => {
+    write("tsconfig.json", JSON.stringify({
+      compilerOptions: {
+        target: "ES2022", module: "ESNext", moduleResolution: "bundler", strict: true, jsx: "react", types: [],
+        allowJs: true,
+      },
+    }));
+    write("src/chain.ts", `${CHAIN}export class Store { size = 0; }\n`);
+    write("src/view.js", "export const view = <div />;\n");
+    const board = await boardOf("src/app.ts#App", "src/chain.ts#chain");
+    expect(wrongKind(refereed(board))).toBeUndefined();
+  });
+
+  it("leaves it alone when the program declares a JSX namespace of its own", async () => {
+    // hono writes its own JSX: a runtime of that shape may render anything.
+    write("src/chain.ts", `${CHAIN}export class Store { size = 0; }\n`);
+    write("src/jsx.ts", "declare global {\n  namespace JSX {\n    interface IntrinsicElements { [name: string]: unknown }\n  }\n}\n"
+      + "export {};\n");
+    const board = await boardOf("src/app.ts#App", "src/chain.ts#chain");
+    expect(wrongKind(refereed(board))).toBeUndefined();
+  });
+});
