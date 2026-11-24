@@ -5075,6 +5075,68 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     Python 3 of 2,528 calls "not sure" where main said green, 0 new reds in
     any language.
 
+55. **A method called on a value nothing could type runs its own name
+    (#351's rule, every value; map 2026-11b pattern 4).**
+
+    `x.save()` looks `save` up on `x`: a method declared `save`, or a
+    function somebody put there under `save`. That is the language, whatever
+    `x` turns out to be, and it is #351's rule for interfaces without the
+    interface. So a `receiver` call -- the text and the compiler both unable
+    to say what `x` is -- no longer keeps a routine's whole call list open:
+    it is read like a dispatched call (`runsItsOwnName`), and cannot be a far
+    end of another name that `stored.ts` finds nowhere stored under one. In
+    Rust a method call only ever runs a method of that name; a function kept
+    in a field is called `(x.f)()`, which is not this call.
+
+    The wider population needed four refusals `#351` did not:
+
+    | refusal | why |
+    |---|---|
+    | the far end is decorated (`@app.route`, `@Get()`), Python's own binders excepted | a decorator is handed the routine itself and can keep it under any name; its name is never written as a value (`stored.ts`, `decorated`) |
+    | the call is handed a function of the repository's (`xs.map(helper)`) | whatever method it is may run what it is handed; #469's `arr.map` refusal went red on the text alone without this |
+    | the call is named like plumbing: `call`/`apply`/`bind`, any `__dunder__`, JavaScript's `default` | each runs whatever the value holds, or a module's default export under any name |
+    | (narrowing) only files of the far end's language are asked | bat's benchmark jQuery wrote `run`, and kept every Rust arrow ending at a `run` quiet |
+
+    And one reading it extends: a local holding a method read off a value
+    (`append = parts.append`, then `append(x)`) is that call in two steps,
+    placed where the method is read (#417's `chosenCallees`). Rust's `let f =
+    x.f` stays a doubt: that is a field.
+
+    **Such a red asks the compiler where the calls go** (`askUntyped` in
+    `drift.ts`). It stands on the text whatever the answer, unless one of the
+    calls lands on the far end itself. Without the question the first,
+    compiler-less pass of a live check went red and no server was started,
+    so the route check never saw the placements that show the hops: two
+    main reds lost them (ripgrep `stops_at_git_dir`, vite `doTransform`).
+
+    | `bench:planted`, wrong arrows caught (base 759703a) | before | after |
+    |---|---:|---:|
+    | main | 706 | 706 |
+    | holdout | 485 | 495 |
+    | holdout-b | 437 | 441 |
+    | holdout-c (score only) | 511 | 512 |
+    | correct claims changed, any set | | 0 |
+    | wrong greens (holdout-c) | 10 | 10 |
+
+    holdout's +10: fastapi `get_openapi_path` (two far ends) and npm-check-
+    updates `runLocal` (two, red with their hops) by the rule; rich's
+    `render` and `_render_buffer` (five) and fastapi `_get_body_field` by the
+    local-alias reading. holdout-b's +4: marshmallow `_invoke_field_validators`,
+    bat `Controller::new`, `print_input` and `App::new` (with its hops). Two
+    marshmallow targets stay "not sure" on a second wall that was already
+    there: outside code may make a call on a value handed to it, and the
+    compiler cannot say.
+
+    `measure:compiler-true --words=calls` (correct code only): TypeScript
+    5,407 arrows, 0 red live or off, greens 5,351 as on main; Python 2,529,
+    0 red, greens 2,407 (main 2,406 of 2,528: the referee drew one more
+    pair); Rust 4,282, 1 red, the same ripgrep `is_tty_stdout` red main has,
+    greens 4,090 as on main. The call census (`--reuse` of base-759703a, axum
+    stalled and not measured as in the base) has 0 new disagreements; the
+    502 calls now read through a local alias are keyed anew and the census
+    has no compiler answer for them (`no-name`), so it neither confirms nor
+    faults those placements.
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is
