@@ -88,6 +88,41 @@ describe("a function written and called on the spot runs what is written there",
   });
 });
 
+/*
+ * Python's `from m import *` brings exactly the names m's `__all__` lists,
+ * when m writes one (the language reference, "The import statement"). trio's
+ * `_run.py` star-imports five generated modules, each with a literal
+ * `__all__`, and every `len`, `id` and `RuntimeError` in the file was read as
+ * possibly theirs.
+ */
+describe("a star import over a module with a literal __all__ brings only those names", () => {
+  const run = (generated: string) => ask({
+    "pkg/_run.py": {
+      source: "from ._gen import *\n\ndef setup(xs):\n    if len(xs) > 1:\n        raise RuntimeError(id(xs))\n    return current_time()\n",
+      language: "python",
+      imports: [["._gen", "pkg/_gen.py"]],
+    },
+    "pkg/_gen.py": { source: generated, language: "python" },
+    "pkg/_other.py": { source: "def unrelated():\n    return 1\n", language: "python" },
+  }, { file: "pkg/_run.py", routine: "setup" }, { file: "pkg/_other.py", names: ["unrelated"] });
+
+  it("refutes when the built-ins the body calls are not in the list", () => {
+    expect(run("__all__ = [\"current_time\"]\n\ndef current_time():\n    return 0\n")).toBe("refuted");
+  });
+
+  it("stays quiet when the module lists a name the language provides too", () => {
+    expect(run("__all__ = [\"current_time\", \"len\"]\n\ndef current_time():\n    return 0\n\ndef len(x):\n    return 0\n")).not.toBe("refuted");
+  });
+
+  it("stays quiet when __all__ is built up rather than written once", () => {
+    expect(run("__all__ = [\"current_time\"]\n__all__ += [\"len\"]\n\ndef current_time():\n    return 0\n\ndef len(x):\n    return 0\n")).not.toBe("refuted");
+  });
+
+  it("stays quiet when the module has no __all__ and declares the name", () => {
+    expect(run("def current_time():\n    return 0\n\ndef len(x):\n    return 0\n")).not.toBe("refuted");
+  });
+});
+
 /** A scratch repository outside the worktree, for the import reader, which reads the tree. */
 describe("what an import names, read from the tree", () => {
   let repo: string;

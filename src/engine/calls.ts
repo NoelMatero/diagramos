@@ -5329,7 +5329,16 @@ function exportsName(name: string, space: Space, file: string, side: CallSide, s
   const opened = side.open?.(file);
   if (!opened) return "unknown";
   const top = moduleScope(opened.source, opened.language);
-  if (!top || top.limited) return "unknown";
+  if (!top) return "unknown";
+  /*
+   * A Python `__all__` is the whole of what a star import over the module
+   * brings (#460): a name it does not list is not carried, whatever the
+   * module declares. One this cannot read leaves every name unknown.
+   */
+  if (top.limited) {
+    if (!top.listed) return "unknown";
+    if (!top.listed.includes(name)) return "lacks";
+  }
   const has = top.has(name, space);
   if (has) return { has: has === "declared" ? file : undefined };
   if (top.unread(name)) return "unknown";
