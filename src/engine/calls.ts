@@ -1101,8 +1101,22 @@ function calleeOf(node: Node): Callee | undefined {
    * written `(await g)()`, and the parentheses keep that one computed.
    */
   if (called?.type === "await_expression") called = firstNamed(called) ?? called;
+  /*
+   * A function written and called on the spot -- `((t) => ..)(x)`,
+   * `(function* (d) { .. })(x)`, `(lambda y: ..)(x)`, `(|y| ..)(x)` -- runs
+   * the body written right there (#460), and that body's calls are already
+   * read as the routine's own. Read as a call of a value, it stopped the
+   * body as though it could run anything: drizzle's `buildSelectQuery`, zx's
+   * `retry`.
+   */
+  if (called && writtenOnTheSpot(unwrapped(called))) return undefined;
   const callee = called ?? node.childForFieldName("macro");
   return callee ? calleeOfNode(callee) : undefined;
+}
+
+/** Whether a node is a function written out where it stands: an arrow, a function expression, a lambda, a closure. */
+function writtenOnTheSpot(node: Node): boolean {
+  return node.childForFieldName("body") !== null && (parametersOf(node) !== null || node.type === "lambda");
 }
 
 /** A node's first named child that is not a comment. */
