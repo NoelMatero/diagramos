@@ -488,19 +488,21 @@ export function onlyTypes(source: string, name: string, language: Language): boo
 function erasedWhenCompiled(node: Node): boolean {
   const name = node.childForFieldName("name");
   if (!name || keywordOf(node, name) !== "interface") return false;
-  for (let above = node.parent; above; above = above.parent) {
-    for (let index = 0; index < above.childCount; index += 1) {
-      const child = above.child(index);
-      if (child && !child.isNamed && child.type === "declare") return false;
-    }
-  }
-  let merged = false;
+  let kept = false;
   each(node.tree.rootNode, (other) => {
-    if (merged || other.id === node.id) return;
+    if (kept || other.id === node.id) return;
+    // An ancestor -- a node spanning this one -- opened by `declare`.
+    if (other.startIndex <= node.startIndex && node.endIndex <= other.endIndex) {
+      for (let index = 0; index < other.childCount; index += 1) {
+        const child = other.child(index);
+        if (child && !child.isNamed && child.type === "declare") kept = true;
+      }
+    }
+    // The same name declared again with a body of its own.
     if (other.childForFieldName("name")?.text === name.text && has(other, "body")
-      && keywordOf(other, other.childForFieldName("name")!) !== "interface") merged = true;
+      && keywordOf(other, other.childForFieldName("name")!) !== "interface") kept = true;
   });
-  return !merged;
+  return !kept;
 }
 
 /**
