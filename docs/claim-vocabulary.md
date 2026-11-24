@@ -3789,6 +3789,23 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     name the file does not declare, a Rust unit struct and a type alias stay
     skipped, which is the quiet direction.
 
+    **2026-11-24: any ref into the repository is code, whatever the box is
+    marked.** #435 had added a whole-file ref, read but never accusing, in
+    case "Browser" against `src/client.ts` stood for more than the file shows;
+    a function, method or value ref was still skipped as a possible door. The
+    missed map (2026-11b, pattern X) found 22 wrong arrows unread behind that
+    rule on the planted bench, in nine projects and all three languages
+    (drizzle's `session.ts`, httpx's `HTTPTransport.handle_request`, trio's
+    `_abc.py` members), and the user decided the external label is obsolete
+    for a ref into the repo. So a box marked external is read like a built one
+    whenever its file is here and declares the name (`declaredShapes`, never a
+    mention), or its ref is a whole file here; a file ref may now be red, and
+    the `end-marked-external` reason is gone. A door stays what #272 made it,
+    a routine read as code; it is the one read end that does not get the
+    "marked external, drop the state" sentence. No ref, a ref outside the
+    repo, a missing file, a directory, a pattern, a name the file does not
+    declare or an owner it lacks stay skipped.
+
 26. **#206's demand number came back at 7 arrows of 162 and did not decide the
     issue, because the corpus it counts was drawn to test the tool. Built
     anyway, on the code-side argument the issue itself made. Licensed in

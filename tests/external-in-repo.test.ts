@@ -1,6 +1,11 @@
 /**
- * A box marked `external` whose ref names a class declared in this repository
- * (#366, section 1).
+ * A box marked `external` whose ref points at code in this repository is read
+ * as code, whatever it is marked (2026-11-24). A class since #366, a whole file
+ * since #435, and now a function, a method or a value too -- and a file may be
+ * called wrong now, not only confirmed.
+ *
+ * The history, for the record: a box marked `external` whose ref names a class
+ * declared in this repository (#366, section 1).
  *
  * `external` means "real, but not code in this repo": a browser, a database.
  * Its ref, if any, is the routine here that talks to it -- its door (#272). A
@@ -10,11 +15,10 @@
  * that nothing read: Haiku drew httpx's `BaseTransport` and `ByteStream`
  * external although both are declared in httpx.
  *
- * Such a box is now read like a built one, and the report says it is marked
- * wrongly. A ref that names a routine keeps its door meaning, and a ref to a
- * name the file does not declare, or to somewhere outside the repository, is
- * skipped as before. A ref to a whole file here is read and never accuses
- * (#435, at the bottom).
+ * Such a box is read like a built one, and the report says it is marked
+ * wrongly. What stays skipped is what is not code here: no ref, a ref outside
+ * the repository, a missing file, a directory, a pattern, and a name the file
+ * does not declare.
  */
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -64,6 +68,12 @@ const ts = {
   "src/client.ts": "export function send() {\n  return 2;\n}\n",
   "src/user.ts": 'import { BaseTransport } from "./transport";\nexport function user() {\n  return new BaseTransport();\n}\n',
   "src/plain.ts": "export function plain() {\n  return 1;\n}\n",
+  "src/caller.ts": 'import { plain } from "./plain";\nexport function caller() {\n  return plain();\n}\n',
+  "src/limits.ts": "export const LIMIT = 5;\n",
+  "src/uses-limit.ts": 'import { LIMIT } from "./limits";\nexport function bounded() {\n  return LIMIT;\n}\n',
+  "src/fetcher.ts": "export function get() {\n  return fetch(\"https://example.com\");\n}\n",
+  "src/service.ts": "export class Service {\n  run() {\n    return 1;\n  }\n}\n",
+  "src/runner.ts": 'import { Service } from "./service";\nexport function runner(s: Service) {\n  return s.run();\n}\n',
 };
 
 /** Rust builds its module tree from the `Cargo.toml` files, so this one can list. */
@@ -96,13 +106,21 @@ function treeWorkspace(files: Record<string, string>): Workspace {
 const rust = {
   "Cargo.toml": '[package]\nname = "demo"\nversion = "0.1.0"\n',
   "src/lib.rs": "pub mod transport;\npub mod client;\n",
-  "src/transport.rs": "pub struct Transport {\n    pub open: bool,\n}\npub struct Marker;\n",
+  "src/transport.rs": "pub struct Transport {\n    pub open: bool,\n}\npub struct Marker;\npub fn plain() -> u32 {\n    1\n}\npub const LIMIT: u32 = 5;\n",
   "src/client.rs": "pub fn send() -> u32 {\n    2\n}\n",
 };
 
+/** The same crate with a caller of `plain`, for the confirming direction. */
+const rustWithCaller = {
+  ...rust,
+  "src/lib.rs": "pub mod transport;\npub mod client;\npub mod caller;\n",
+  "src/caller.rs": "use crate::transport::plain;\npub fn caller() -> u32 {\n    plain()\n}\n",
+};
+
 const python = {
-  "pkg/transport.py": "class BaseTransport:\n    def send(self):\n        return 1\n",
+  "pkg/transport.py": "class BaseTransport:\n    def send(self):\n        return 1\n\ndef plain():\n    return 1\n\nLIMIT = 5\n",
   "pkg/client.py": "def send():\n    return 2\n",
+  "pkg/caller.py": "from pkg.transport import plain\n\ndef caller():\n    return plain()\n",
 };
 
 describe("an external box anchored at a class in this repository", () => {
@@ -169,33 +187,98 @@ describe("an external box anchored at a class in this repository", () => {
   });
 });
 
-describe("an external box that still means something outside", () => {
-  const skipped = async (ref: string) => {
-    const board = await boardOf({ ref: "src/client.ts#send" }, { ref, state: "external" });
+describe("an external box anchored at a function, a method or a value in this repository", () => {
+  it("calls a wrong arrow onto a TypeScript function wrong, and says the mark is wrong", async () => {
+    const board = await boardOf({ ref: "src/client.ts#send" }, { ref: "src/plain.ts#plain", state: "external" }, "calls");
     const report = checkDrift(board, fakeWorkspace(ts));
+    expect(report.unreadEdges).toEqual([]);
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["calls-refuted"]);
+    expect(report.edges[0]!.detail).toContain("is marked external, but src/plain.ts#plain is declared in this repository");
+  });
+
+  it("confirms a correct arrow onto a TypeScript function", async () => {
+    const board = await boardOf({ ref: "src/caller.ts#caller" }, { ref: "src/plain.ts#plain", state: "external" }, "calls");
+    const report = checkDrift(board, fakeWorkspace(ts));
+    expect(report.unreadEdges).toEqual([]);
+    expect(report.edgesChecked).toBe(1);
+    expect(report.edges).toEqual([]);
+    expect(report.unconfirmedEdges).toEqual([]);
+  });
+
+  it("does the same when the function is the tail", async () => {
+    const board = await boardOf({ ref: "src/caller.ts#caller", state: "external" }, { ref: "src/client.ts#send" }, "calls");
+    const report = checkDrift(board, fakeWorkspace(ts));
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["calls-refuted"]);
+    expect(report.edges[0]!.detail).toContain("marked external");
+  });
+
+  it("reads a method written with its class", async () => {
+    const wrong = await boardOf({ ref: "src/client.ts#send" }, { ref: "src/service.ts#Service.run", state: "external" }, "needs");
+    expect(checkDrift(wrong, fakeWorkspace(ts)).edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
+    const right = await boardOf({ ref: "src/runner.ts#runner" }, { ref: "src/service.ts#Service.run", state: "external" }, "needs");
+    const report = checkDrift(right, fakeWorkspace(ts));
+    expect(report.unreadEdges).toEqual([]);
+    expect(report.edges).toEqual([]);
+  });
+
+  it("reads a TypeScript value", async () => {
+    const wrong = await boardOf({ ref: "src/client.ts#send" }, { ref: "src/limits.ts#LIMIT", state: "external" });
+    expect(checkDrift(wrong, fakeWorkspace(ts)).edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
+    const right = await boardOf({ ref: "src/uses-limit.ts#bounded" }, { ref: "src/limits.ts#LIMIT", state: "external" });
+    const report = checkDrift(right, fakeWorkspace(ts));
+    expect(report.unreadEdges).toEqual([]);
+    expect(report.edges).toEqual([]);
+  });
+
+  it("does the same in Python: a function and a value", async () => {
+    const wrong = await boardOf({ ref: "pkg/client.py#send" }, { ref: "pkg/transport.py#plain", state: "external" }, "calls");
+    const report = checkDrift(wrong, fakeWorkspace(python));
+    expect(report.unreadEdges).toEqual([]);
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["calls-refuted"]);
+    const right = await boardOf({ ref: "pkg/caller.py#caller" }, { ref: "pkg/transport.py#plain", state: "external" }, "calls");
+    expect(checkDrift(right, fakeWorkspace(python)).edges).toEqual([]);
+    const value = await boardOf({ ref: "pkg/client.py#send" }, { ref: "pkg/transport.py#LIMIT", state: "external" });
+    expect(checkDrift(value, fakeWorkspace(python)).edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
+  });
+
+  it("does the same in Rust: a function, a value and a unit struct", async () => {
+    const wrong = await boardOf({ ref: "src/client.rs#send" }, { ref: "src/transport.rs#plain", state: "external" }, "calls");
+    const report = checkDrift(wrong, treeWorkspace(rust));
+    expect(report.unreadEdges).toEqual([]);
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["calls-refuted"]);
+    const right = await boardOf({ ref: "src/caller.rs#caller" }, { ref: "src/transport.rs#plain", state: "external" }, "calls");
+    expect(checkDrift(right, treeWorkspace(rustWithCaller)).edges).toEqual([]);
+    for (const name of ["LIMIT", "Marker"]) {
+      const board = await boardOf({ ref: "src/client.rs#send" }, { ref: `src/transport.rs#${name}`, state: "external" });
+      expect(checkDrift(board, treeWorkspace(rust)).edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
+    }
+  });
+});
+
+describe("an external box that still means something outside", () => {
+  const skipped = async (ref: string, files: Record<string, string> = ts) => {
+    const board = await boardOf({ ref: "src/client.ts#send" }, { ref, state: "external" });
+    const report = checkDrift(board, fakeWorkspace(files));
     expect(report.edges).toEqual([]);
     expect(report.unreadEdges.map((entry) => entry.reason)).toEqual(["endpoint-external"]);
   };
-
-  it("skips one anchored at a routine, which is the door it talks through", async () => {
-    await skipped("src/plain.ts#plain");
-  });
 
   it("skips one whose name the file does not declare", async () => {
     await skipped("src/transport.ts#Elsewhere");
   });
 
-  it("skips a Rust unit struct, whose declaration has no body to tell it from a value", async () => {
-    const board = await boardOf(
-      { ref: "src/client.rs#send" },
-      { ref: "src/transport.rs#Marker", state: "external" },
-    );
-    const report = checkDrift(board, treeWorkspace(rust));
-    expect(report.unreadEdges.map((entry) => entry.reason)).toEqual(["endpoint-external"]);
+  it("skips one whose name the file only uses, as a door's outside call does", async () => {
+    // `fetch` is what the box stands for, not something declared here.
+    await skipped("src/fetcher.ts#fetch");
+  });
+
+  it("skips one written with an owner the file does not have", async () => {
+    await skipped("src/transport.ts#Wallet.send");
   });
 
   it("skips one whose file is not in the repository", async () => {
     await skipped("pydantic_core#SchemaValidator");
+    await skipped("../outside/lib.ts#thing");
   });
 
   it("skips one anchored at a whole file that is not there, a directory or a pattern", async () => {
@@ -203,16 +286,23 @@ describe("an external box that still means something outside", () => {
     await skipped("src");
     await skipped("src/*.ts");
   });
+
+  it("skips a name Python and Rust files do not declare", async () => {
+    const py = await boardOf({ ref: "pkg/client.py#send" }, { ref: "pkg/transport.py#Elsewhere", state: "external" });
+    expect(checkDrift(py, fakeWorkspace(python)).unreadEdges.map((entry) => entry.reason)).toEqual(["endpoint-external"]);
+    const rs = await boardOf({ ref: "src/client.rs#send" }, { ref: "src/transport.rs#Elsewhere", state: "external" });
+    expect(checkDrift(rs, treeWorkspace(rust)).unreadEdges.map((entry) => entry.reason)).toEqual(["endpoint-external"]);
+  });
 });
 
 /**
  * An external box anchored at a whole file in this repository (#435).
  *
  * httpx's `_urls.py` and `_transports/default.py` were drawn external, and
- * every correct `@needs` arrow touching them went unread. A file is no more a
- * door than a class is, so the box is read as code -- but it may also be an
- * author pointing loosely at the code that talks to the outside thing, so the
- * read may confirm and never accuses.
+ * every correct `@needs` arrow touching them went unread. #435 read the file
+ * but never accused, in case "Browser" against `src/client.ts` stood for more
+ * than the file shows. Since the external mark stopped counting for a ref into
+ * the repo, the file is code like any other file ref, and a wrong arrow is red.
  */
 describe("an external box anchored at a whole file in this repository", () => {
   it("confirms a correct arrow onto it", async () => {
@@ -233,23 +323,19 @@ describe("an external box anchored at a whole file in this repository", () => {
     expect(report.unconfirmedEdges).toEqual([]);
   });
 
-  it("never calls a wrong arrow onto it wrong, and says the mark is wrong", async () => {
+  it("calls a wrong arrow onto it wrong, and says the mark is wrong", async () => {
     const board = await boardOf({ ref: "src/client.ts#send" }, { ref: "src/transport.ts", state: "external" });
     const report = checkDrift(board, fakeWorkspace(ts));
     expect(report.unreadEdges).toEqual([]);
-    expect(report.edges).toEqual([]);
-    expect(report.clean).toBe(true);
-    expect(report.unconfirmedEdges.map((arrow) => arrow.reason)).toEqual(["end-marked-external"]);
-    expect(report.unconfirmedEdges[0]!.detail).toContain("is marked external, but src/transport.ts is a file in this repository");
+    expect(report.edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
+    expect(report.edges[0]!.detail).toContain("is marked external, but src/transport.ts is a file in this repository");
+    expect(report.clean).toBe(false);
   });
 
   it("does the same in Python and Rust", async () => {
     const py = await boardOf({ ref: "pkg/client.py#send" }, { ref: "pkg/transport.py", state: "external" });
-    expect(checkDrift(py, fakeWorkspace(python)).unconfirmedEdges.map((arrow) => arrow.reason))
-      .toEqual(["end-marked-external"]);
+    expect(checkDrift(py, fakeWorkspace(python)).edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
     const rs = await boardOf({ ref: "src/client.rs#send" }, { ref: "src/transport.rs", state: "external" });
-    const report = checkDrift(rs, treeWorkspace(rust));
-    expect(report.edges).toEqual([]);
-    expect(report.unconfirmedEdges.map((arrow) => arrow.reason)).toEqual(["end-marked-external"]);
+    expect(checkDrift(rs, treeWorkspace(rust)).edges.map((finding) => finding.kind)).toEqual(["needs-absent"]);
   });
 });
