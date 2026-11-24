@@ -650,7 +650,7 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
   function renderableAt(file: string, start: number, end: number): boolean | undefined {
     const configPath = configOf.get(file);
     if (configPath === undefined) return undefined;
-    const { program } = programFor(configPath);
+    const { program, checker } = programFor(configPath);
     const sourceFile = program.getSourceFile(file);
     if (!sourceFile) return undefined;
     const name = findNodeAt(ts, sourceFile, start, end);
@@ -659,15 +659,84 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     const known = rendered.get(program) ?? new Map<string, boolean | undefined>();
     rendered.set(program, known);
     if (known.has(key)) return known.get(key);
-    const reach = reachOf(name);
     let answer: boolean | undefined;
     try {
-      answer = reach === undefined ? undefined : probeRenderable(program, sourceFile, reach);
+      if (rendersNothing(program)) {
+        answer = returnsKnown(checker, name) ? false : undefined;
+      } else {
+        const reach = reachOf(name);
+        answer = reach === undefined ? undefined : probeRenderable(program, sourceFile, reach);
+      }
     } catch {
       answer = undefined;
     }
     known.set(key, answer);
     return answer;
+  }
+
+  /** `rendersNothing`'s answer per program, which goes stale with it. */
+  const jsxFreePrograms = new WeakMap<TS.Program, boolean>();
+
+  /**
+   * Whether nothing in this program can render a function as a component
+   * (missed map 2026-11b, pattern 1c): no JSX is written in any of its own
+   * files, and no file it reads -- its libraries included -- declares a JSX
+   * namespace for any JSX to be typed by.
+   *
+   * A function is made as a component only by rendering it, and rendering is
+   * JSX or a call typed by a JSX library. A program with neither renders
+   * nothing, which is the no-JSX-types reading `probeRenderable` already
+   * makes when its control compiles as `any`. That reading was reached only
+   * where the probe could write JSX into the file at all, and in immer, tRPC,
+   * drizzle and mobx it could not: classic JSX with no `React` in scope fails
+   * every element, a `.ts` file's `<T>x` casts do not parse as TSX, and a
+   * function inside another is not in scope at the end of the file. Each of
+   * those is the probe unable to ask, in a program where there was nothing to
+   * ask about. So here it is answered without a probe, by what the function
+   * returns, exactly as that branch answers it.
+   *
+   * "No JSX written" is read off the compiler's own trees, not file names:
+   * TypeScript parses JSX in `.tsx`, `.jsx` and `.js` files, and a `.js` file
+   * with an element in it counts. A file the program reads from a library is
+   * never searched for elements, only for a JSX namespace, matched in its
+   * text -- a namespace mentioned in a comment keeps this `false`, which only
+   * costs an answer.
+   */
+  function rendersNothing(program: TS.Program): boolean {
+    const known = jsxFreePrograms.get(program);
+    if (known !== undefined) return known;
+    let free = true;
+    for (const one of program.getSourceFiles()) {
+      if (/\b(?:namespace|module)\s+JSX\b/.test(one.text)) { free = false; break; }
+      if (one.isDeclarationFile || program.isSourceFileFromExternalLibrary(one)) continue;
+      if (one.languageVariant === ts.LanguageVariant.JSX && writesJsx(one)) { free = false; break; }
+    }
+    jsxFreePrograms.set(program, free);
+    return free;
+  }
+
+  /** Whether this file writes a JSX element or fragment anywhere. */
+  function writesJsx(file: TS.SourceFile): boolean {
+    let found = false;
+    const visit = (node: TS.Node): void => {
+      if (found) return;
+      if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node) || ts.isJsxFragment(node)) { found = true; return; }
+      ts.forEachChild(node, visit);
+    };
+    visit(file);
+    return found;
+  }
+
+  /**
+   * Whether the compiler knows what the function named here returns, under
+   * every signature it has: the condition `probeRenderable`'s no-JSX branch
+   * puts on "false". An `any` or `unknown` return -- an untyped `.js` file --
+   * is no answer.
+   */
+  function returnsKnown(checker: TS.TypeChecker, name: TS.Identifier): boolean {
+    const signatures = checker.getTypeAtLocation(name).getCallSignatures();
+    const vague = (type: TS.Type) => (type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) !== 0;
+    return signatures.length > 0 && signatures.every((one) => !vague(one.getReturnType()));
   }
 
   /**
