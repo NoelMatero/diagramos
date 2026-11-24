@@ -201,13 +201,24 @@ function resolveAbsolute(parts: string[], roots: string[], workspace: Workspace)
 
 /**
  * Whether an absolute module path whose first segment resolves at no import
- * root is a library's (#469): the standard library's, unless a file at one of
- * the roots shadows it, or a name no file or directory in the repository goes
- * by -- the roots are a guess at `sys.path`, and a package under a directory
- * they miss is still this repository's.
+ * root is a library's (#469): the standard library's, unless a file at a root
+ * the program is run from shadows it, or a name no file or directory in the
+ * repository goes by -- the roots are a guess at `sys.path`, and a package
+ * under a directory they miss is still this repository's.
+ *
+ * Only the repository root and `src` can shadow the standard library (#460).
+ * The importing file's own directory and its ancestors are the fallback for
+ * an import nothing else resolves, and the standard library always resolves:
+ * Python 3 has no implicit relative imports (PEP 328), so `from abc import
+ * abstractmethod` in `trio/_abc.py` is the standard library's whatever
+ * `trio/abc.py` beside it holds, and pydantic's `from typing import cast`
+ * is not `pydantic/typing.py`.
  */
 function isLibrary(first: string, roots: string[], workspace: Workspace): boolean {
-  if (STANDARD_LIBRARY.has(first)) return roots.every((root) => fileForModule([first], root, workspace) === undefined);
+  if (STANDARD_LIBRARY.has(first)) {
+    return roots.filter((root) => root === "" || root === "src")
+      .every((root) => fileForModule([first], root, workspace) === undefined);
+  }
   return namesNothingHere(first, workspace);
 }
 

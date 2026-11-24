@@ -7,9 +7,15 @@
  * the call is. Each block here is one such language fact, with the shapes
  * that must stay a doubt beside it.
  */
-import { beforeAll, describe, expect, it } from "vitest";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { callsBetween, type CallSide, type CallsVerdict } from "../src/engine/calls";
+import { readDependencies } from "../src/engine/deps";
+import { createWorkspace } from "../src/engine/drift";
 import { initEngine, type Language } from "../src/engine/parse";
 
 beforeAll(async () => { await initEngine(); }, 120_000);
@@ -82,3 +88,56 @@ describe("a function written and called on the spot runs what is written there",
   });
 });
 
+/** A scratch repository outside the worktree, for the import reader, which reads the tree. */
+describe("what an import names, read from the tree", () => {
+  let repo: string;
+  beforeEach(() => { repo = mkdtempSync(path.join(tmpdir(), "reading-gaps-")); });
+  afterEach(() => { rmSync(repo, { recursive: true, force: true }); });
+  const write = (files: Record<string, string>) => {
+    for (const [relative, contents] of Object.entries(files)) {
+      mkdirSync(path.dirname(path.join(repo, relative)), { recursive: true });
+      writeFileSync(path.join(repo, relative), contents);
+    }
+  };
+  const dependency = (file: string, specifier: string) => {
+    const read = readDependencies(file, String(files_[file]), createWorkspace(repo))!;
+    return read.dependencies.filter((one) => one.specifier === specifier).map((one) => ({ file: one.file, library: one.library === true }));
+  };
+  let files_: Record<string, string> = {};
+
+  /*
+   * Python 3 has no implicit relative imports (PEP 328): `from abc import
+   * abstractmethod` inside `trio/_abc.py` is the standard library's `abc`,
+   * whatever `trio/abc.py` beside it holds. Only a module at a root the
+   * program is run from could stand in its place.
+   */
+  describe("a standard-library module is not shadowed by a module beside the importing file", () => {
+    it("reads `abc` as the standard library's beside a package's own `abc.py`", () => {
+      files_ = {
+        "src/trio/__init__.py": "",
+        "src/trio/abc.py": "from ._abc import Clock\n",
+        "src/trio/_abc.py": "from abc import ABC, abstractmethod\n\nclass Clock(ABC):\n    @abstractmethod\n    def now(self):\n        ...\n",
+      };
+      write(files_);
+      expect(dependency("src/trio/_abc.py", "abc")).toEqual([{ file: undefined, library: true }]);
+    });
+
+    it("reads `typing` as the standard library's beside a package's own `typing.py`", () => {
+      files_ = {
+        "pydantic/__init__.py": "",
+        "pydantic/typing.py": "x = 1\n",
+        "pydantic/_internal/__init__.py": "",
+        "pydantic/_internal/_dataclasses.py": "from typing import cast\n\ndef f(x):\n    return cast(int, x)\n",
+      };
+      write(files_);
+      expect(dependency("pydantic/_internal/_dataclasses.py", "typing")).toEqual([{ file: undefined, library: true }]);
+    });
+
+    it("still reads a module at the repository root as standing in for the standard library's", () => {
+      files_ = { "abc.py": "def thing():\n    return 1\n", "app.py": "from abc import thing\n\ndef f():\n    return thing()\n" };
+      write(files_);
+      expect(dependency("app.py", "abc")).toEqual([{ file: undefined, library: false }]);
+    });
+  });
+
+});
