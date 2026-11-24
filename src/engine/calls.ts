@@ -222,6 +222,12 @@ export interface CallsRefutedEvidence {
    */
   dispatched?: number;
   /**
+   * How many of `sites` call a method on a value nothing could type -- no
+   * compiler, no declaration (`receiver`) -- each read, like `dispatched`, as
+   * running a routine of the name it calls.
+   */
+  untyped?: number;
+  /**
    * The head is a method the language runs without it being written (#384):
    * a Python `__dunder__` an operator or builtin calls, or TypeScript's
    * `toString`, `valueOf`, `toJSON`, `then`. No written call is then no
@@ -549,12 +555,15 @@ export interface CallSide {
    * does not reach.
    *
    * Asked of a call through an interface, a trait or an override, which runs
-   * a routine of the name it calls: when this says no for every name the head
-   * has, that call is not the head. Absent, nobody asked, and such a call
-   * keeps the arrow a doubt as it always did. `drift.ts` hands it to `@calls`'
-   * tail.
+   * a routine of the name it calls, and of a call on a value nothing could
+   * type, which does too: when this says no for every name the head has, that
+   * call is not the head. Absent, nobody asked, and such a call keeps the
+   * arrow a doubt as it always did. `drift.ts` hands it to `@calls`' tail.
+   *
+   * `language`: the head's, so that only files that can hold one of its
+   * routines are asked (`stored.ts`).
    */
-  runsUnderAnotherName?: (name: string, member: boolean) => boolean;
+  runsUnderAnotherName?: (name: string, member: boolean, language: Language) => boolean;
   /**
    * The crate the Rust compiler built this file into, when it has (#357) --
    * every body after macro expansion, with every call it makes.
@@ -3049,15 +3058,27 @@ function listedCall(
 const RUNS_WHAT_IT_HOLDS = new Set(["call", "apply", "bind", "call_mut", "call_once", "__call__"]);
 
 /**
- * Whether a call through an interface, a trait or an override (#351) is
- * certainly not the head: it runs a routine of the name it calls, the head
- * has none of that name, and nothing in the repository stores the head
- * where a call of another name would find it (`stored.ts`).
+ * Whether a call through an interface, a trait or an override (#351), or a
+ * call on a value nothing could type, is certainly not the head: it runs a
+ * routine of the name it calls, the head has none of that name, and nothing
+ * in the repository stores the head where a call of another name would find
+ * it (`stored.ts`).
+ *
+ * The rule is the language's, whatever the value turns out to be.
+ * `x.save()` looks up `save` on `x`: a method declared `save`, or a function
+ * somebody put there under `save` -- `{ save: persist }`, `self.save =
+ * persist`, a decorator keeping `persist` -- and every way of putting one
+ * there writes `persist` somewhere `stored.ts` reads. In Rust a method call
+ * only ever runs a method of that name; a function kept in a field is
+ * called as `(x.save)()`, which is not this call.
  *
  * The head has to be routines and nothing else -- a class runs its methods
  * under their own names -- and none of them one the language runs by a name
  * nobody writes: a constructor runs when its class is made, and a Python
- * `__dunder__` when an operator or a builtin wants it.
+ * `__dunder__` when an operator or a builtin wants it. A call *named* like a
+ * dunder (`f.__wrapped__()`, `d.__get__(o)`) is the language's own plumbing
+ * and can reach anything, and JavaScript's `m.default()` runs whatever a
+ * module exported as its default, under any name.
  */
 function runsItsOwnName(
   site: CallSitePlaced,
@@ -3067,14 +3088,15 @@ function runsItsOwnName(
   if (!from.runsUnderAnotherName || !site.name) return false;
   const plain = (name: string) => name.replace(/^(#|r#)/, "");
   const called = plain(site.name);
-  if (RUNS_WHAT_IT_HOLDS.has(called)) return false;
+  if (RUNS_WHAT_IT_HOLDS.has(called) || /^__\w+__$/.test(called)) return false;
+  if (called === "default" && JAVASCRIPT.has(from.language)) return false;
   const runsAs = [called, ...(site.declaredAs ? [plain(site.declaredAs)] : [])];
   if (to.names.length === 0) return false;
   for (const name of to.names) {
     const head = plain(name);
     if (runsAs.includes(head) || head === "constructor" || /^__\w+__$/.test(head)) return false;
     if (!isRoutine(to.source, name, to.language)) return false;
-    if (from.runsUnderAnotherName(head, onlyAMethod(to.source, to.language, name))) return false;
+    if (from.runsUnderAnotherName(head, onlyAMethod(to.source, to.language, name), to.language)) return false;
   }
   return true;
 }
@@ -3121,6 +3143,7 @@ function textClosed(
 
   let sites = 0;
   let dispatched = 0;
+  let untyped = 0;
   const reached: Array<{ name: string; line: number }> = [];
   let hooked: boolean | undefined;
   const elsewhere: Array<{ name: string; line: number }> = [];
@@ -3128,6 +3151,16 @@ function textClosed(
     for (const site of body.sites) {
       // Open: something unplaced, and the site says what stopped it.
       if (site.file === undefined) {
+        /*
+         * A method called on a value nothing could type still runs a routine
+         * of the name it calls, as a call through an interface does: read
+         * by the same rule (`runsItsOwnName`).
+         */
+        if (site.why === "receiver" && runsItsOwnName(site, from, to)) {
+          untyped += 1;
+          sites += 1;
+          continue;
+        }
         const stopped = stop(site.why ?? "unplaced");
         if (stopped) return stopped;
         continue;
@@ -3230,6 +3263,7 @@ function textClosed(
       routine: from.routine, line, sites,
       ...(elsewhere.length > 0 ? { elsewhere } : {}),
       ...(dispatched > 0 ? { dispatched } : {}),
+      ...(untyped > 0 ? { untyped } : {}),
     }, ...readMacros };
   }
   /*

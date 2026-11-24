@@ -2500,7 +2500,7 @@ function callSide(
       ...(closedBodyReferee ? { resolveReceiver: (at) => closedBodyReferee.resolveReceiver(target, at) } : {}),
       ...(declarationAt ? { declarationAt: (at) => declarationAt(target, at) } : {}),
       ...(overrides ? { overridden: (holder, member) => overrides.below(holder, member) } : {}),
-      ...(stored ? { runsUnderAnotherName: (name, member) => stored.findings(name, member).length > 0 } : {}),
+      ...(stored ? { runsUnderAnotherName: (name, member, language) => stored.findings(name, member, language).length > 0 } : {}),
       ...(askDefinition && closedBodyReferee?.compiledCrateOf
         ? { compiled: () => closedBodyReferee.compiledCrateOf!(target) }
         : {}),
@@ -3249,15 +3249,20 @@ function notDirectSentence(word: "calls" | "needs", route: readonly string[], ar
  * there, or the ones that were landed on something the head cannot be (#430).
  */
 /**
- * The calls through an interface, a trait or an override a red counted as
- * read (#351), said so: each runs a routine of the name it calls, and that is
- * the whole of why it is not the head.
+ * The calls through an interface, a trait or an override (#351), and those on
+ * a value nothing could type, that a red counted as read, said so: each runs
+ * a routine of the name it calls, and that is the whole of why it is not the
+ * head.
  */
-function throughDispatch(dispatched: number | undefined): string {
-  if (!dispatched) return "";
-  return dispatched === 1
-    ? " (one through an interface or an override, which runs a method of the name it calls)"
-    : ` (${dispatched} through an interface or an override, each running a method of the name it calls)`;
+function throughDispatch(dispatched: number | undefined, untyped?: number): string {
+  const parts: string[] = [];
+  if (dispatched) {
+    parts.push(dispatched === 1 ? "one through an interface or an override" : `${dispatched} through an interface or an override`);
+  }
+  if (untyped) parts.push(untyped === 1 ? "one on a value nothing could type" : `${untyped} on values nothing could type`);
+  if (parts.length === 0) return "";
+  const one = (dispatched ?? 0) + (untyped ?? 0) === 1;
+  return ` (${parts.join(", ")}, ${one ? "which runs" : "each running"} a method of the name it calls)`;
 }
 
 function landedBeside(elsewhere: ReadonlyArray<{ name: string; line: number }> | undefined, toPath: string, head: readonly string[]): string {
@@ -6750,7 +6755,7 @@ export function checkDrift(
                   + `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
                   + `${oneLine(toNode.label) || toPath}, and every call `
                   + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
-                  + `them${throughDispatch(verdict.evidence.dispatched)}, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `
+                  + `them${throughDispatch(verdict.evidence.dispatched, verdict.evidence.untyped)}, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `
                   + `${fromPath} line ${verdict.evidence.line} is where ${verdict.evidence.routine} is declared.`,
               }, rests: refutedRests(verdict.evidence) }); };
               if (verdict.evidence.elsewhere) besideTheHead = refute;
