@@ -661,8 +661,13 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     if (known.has(key)) return known.get(key);
     let answer: boolean | undefined;
     try {
-      if (rendersNothing(program)) {
-        answer = returnsKnown(checker, name) ? false : undefined;
+      /*
+       * Where the return type is not known the probe still has its say: a
+       * string where the props go rules a function out whatever it returns,
+       * and in an untyped program that line is most of what it can tell.
+       */
+      if (rendersNothing(program) && returnsKnown(checker, name)) {
+        answer = false;
       } else {
         const reach = reachOf(name);
         answer = reach === undefined ? undefined : probeRenderable(program, sourceFile, reach);
