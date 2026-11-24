@@ -50,7 +50,7 @@ import type { BindingFault } from "./damage";
 import { partsInclude, type DeclaredAt, type ImportTarget, type MemberTarget, type TypeParts } from "./compiler-questions";
 import {
   askFits, askHasMember, askMember, askTypeParts, declaredIn, declaresAlias, gateRed, unwrittenNames, WRITTEN,
-  type GateWithdrawn, type RedRests, type Site,
+  type CompilerSaid, type GateWithdrawn, type RedRests, type Site,
 } from "./gate";
 import { generatedRef, NEVER_WALK } from "./generated";
 import { readGraph, type Provenance, type RecoveredGraph, type RecoveredNode } from "./graph";
@@ -64,7 +64,7 @@ import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
   callImports, type CallSide, type CallSitePlaced, type CallsNotClosed, type CallsRefutedEvidence, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER,
   type ReceiverResolution, bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
-  spelledLikeARunner,
+  routineDeclaredOn, spelledLikeARunner,
 } from "./calls";
 import type { CompiledCrate } from "./compiled-calls";
 import { newReachCache, reachBetween, type ReachCache, type ReachHop } from "./reach";
@@ -6487,6 +6487,13 @@ export function checkDrift(
              * What a `calls-refuted` rests on (#393): every call written was
              * read, and a call the language or outside code makes without it
              * being written is the one thing a compiler is asked about.
+             *
+             * A red that read calls on values nothing could type by their
+             * names alone asks too: where each of them goes. It stands on
+             * what is written whatever the answer, unless the compiler puts
+             * one of them on the far end itself -- and asking is what has a
+             * live check start a compiler at all, whose placements let the
+             * route check find the hops a red then shows.
              */
             const refutedRests = (evidence: CallsRefutedEvidence): RedRests => ({
               written: !evidence.implicit,
@@ -6500,6 +6507,18 @@ export function checkDrift(
                   evidence.implicit!.name,
                   declaredIn(workspace.read(toFile), languageOf(toFile) ?? "python", toPath, evidence.implicit!.name),
                 ),
+              } : evidence.untypedAt ? {
+                ask: (referee: ClosedBodyReferee): CompilerSaid => {
+                  for (const at of evidence.untypedAt!) {
+                    const placed = referee.declarationAt?.(fromPath, at);
+                    if (!placed || placed === "outside" || placed.file !== toPath) continue;
+                    const landed = routineDeclaredOn(head.source, head.language, placed.line);
+                    if (landed && toEnd.symbols.includes(landed.name)) {
+                      return { does: true, said: `the compiler places a call on an untyped value at ${landed.name}, ${toPath} line ${placed.line}` };
+                    }
+                  }
+                  return { does: undefined, said: "the compiler places none of the calls on untyped values at the far end" };
+                },
               } : {}),
             });
             /**

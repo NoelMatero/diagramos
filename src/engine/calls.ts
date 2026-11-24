@@ -228,6 +228,12 @@ export interface CallsRefutedEvidence {
    */
   untyped?: number;
   /**
+   * Where each of those calls writes its name, in the tail's file: the
+   * places a compiler is asked about when one is there (`drift.ts`), so a
+   * red that rests on the rule still starts one.
+   */
+  untypedAt?: Array<{ start: number; end: number }>;
+  /**
    * The head is a method the language runs without it being written (#384):
    * a Python `__dunder__` an operator or builtin calls, or TypeScript's
    * `toString`, `valueOf`, `toJSON`, `then`. No written call is then no
@@ -1301,7 +1307,16 @@ function calleeOfNode(written: Node): Callee {
 const lineOf = (source: string, offset: number) => source.slice(0, offset).split("\n").length;
 
 /** A name a local can be found to hold: the function it stands for, and where that is written. */
-type Chosen = { name: string; at: { start: number; end: number } };
+type Chosen = {
+  name: string;
+  at: { start: number; end: number };
+  /**
+   * A method read off a value and kept in the local -- `append =
+   * parts.append` -- which calling the local runs as `parts.append(..)`
+   * would: the callee, and the node it is written at, for placing it there.
+   */
+  read?: { callee: Extract<Callee, { kind: "through" | "own" }>; node: Node };
+};
 
 /**
  * Every function a routine's own local can hold when `call` calls it, or
@@ -1320,9 +1335,13 @@ type Chosen = { name: string; at: { start: number; end: number } };
  * Read as fields, the way `names.ts` reads bindings. Any one binding
  * this cannot follow is the old doubt: a parameter (the caller chooses), a
  * loop or `catch`, a destructuring, `+=`, a `global`, a value that is
- * computed (`table[k]`, `make()`, `obj.fn`). Only the routine's own
- * bindings, and in TypeScript and Rust only one declared in a block the call
- * is inside: a name declared anywhere else can be set from anywhere else.
+ * computed (`table[k]`, `make()`, Rust's field `obj.fn`). Only the routine's
+ * own bindings, and in TypeScript and Rust only one declared in a block the
+ * call is inside: a name declared anywhere else can be set from anywhere else.
+ *
+ * A method read off a value -- rich's `append = output.append`, then
+ * `append(text)` -- is the call `output.append(text)` written in two steps,
+ * and is placed as that call, where the method is read.
  */
 function chosenCallees(routine: Node, name: string, call: Node, language: Language): Chosen[] | undefined {
   const named = (node: Node) => children(node).filter((child) => child.isNamed);
@@ -1352,6 +1371,20 @@ function chosenCallees(routine: Node, name: string, call: Node, language: Langua
     }
     // A function written out: its calls are the routine's own and already read.
     if (parametersOf(value) || token(value, (text) => text === "lambda")) return true;
+    /*
+     * A method read off a value, `append = parts.append`, or a path, `let f =
+     * Type::make`: calling the local runs what `parts.append(..)` would, so it
+     * is that call, placed where it is written. Not Rust's `x.f`, which reads
+     * a field: what a field holds is a value nobody wrote down here.
+     */
+    if ((MEMBER_READ.has(value.type) && !(language === "rust" && value.type === "field_expression"))
+      || (language === "rust" && value.type === "scoped_identifier")) {
+      const read = calleeOfNode(value);
+      if (read.kind !== "through" && read.kind !== "own") return false;
+      const at = read.kind === "through" ? read.memberAt : read.nameAt;
+      chosen.push({ name: read.name, at, read: { callee: read, node: value } });
+      return true;
+    }
     // Python's `f if c else g`: no fields, and the condition between the two words.
     const ifWord = token(value, (text) => text === "if");
     const elseWord = token(value, (text) => text === "else");
@@ -3144,6 +3177,7 @@ function textClosed(
   let sites = 0;
   let dispatched = 0;
   let untyped = 0;
+  const untypedAt: Array<{ start: number; end: number }> = [];
   const reached: Array<{ name: string; line: number }> = [];
   let hooked: boolean | undefined;
   const elsewhere: Array<{ name: string; line: number }> = [];
@@ -3158,6 +3192,7 @@ function textClosed(
          */
         if (site.why === "receiver" && runsItsOwnName(site, from, to)) {
           untyped += 1;
+          if (site.nameAt) untypedAt.push(site.nameAt);
           sites += 1;
           continue;
         }
@@ -3263,7 +3298,7 @@ function textClosed(
       routine: from.routine, line, sites,
       ...(elsewhere.length > 0 ? { elsewhere } : {}),
       ...(dispatched > 0 ? { dispatched } : {}),
-      ...(untyped > 0 ? { untyped } : {}),
+      ...(untyped > 0 ? { untyped, untypedAt } : {}),
     }, ...readMacros };
   }
   /*
@@ -5508,8 +5543,8 @@ export function callSitesIn(
         : undefined;
       if (chosen) {
         for (const choice of chosen) {
-          const held: Callee = { kind: "bare", name: choice.name, nameAt: choice.at };
-          body.sites.push(siteOf(held, side.source, inner, placeOf(held, side, bindings, inner, holder)));
+          const held: Callee = choice.read?.callee ?? { kind: "bare", name: choice.name, nameAt: choice.at };
+          body.sites.push(siteOf(held, side.source, inner, placeOf(held, side, bindings, choice.read?.node ?? inner, holder)));
         }
         return;
       }
