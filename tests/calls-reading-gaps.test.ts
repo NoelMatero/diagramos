@@ -175,4 +175,32 @@ describe("what an import names, read from the tree", () => {
     });
   });
 
+  /*
+   * TOML writes a string in single quotes too (a literal string). bat's
+   * manifest says `edition = '2021'`, read as no edition at all -- 2015,
+   * where a bare `use bytesize::ByteSize` is a path from the crate root, so
+   * the crate `bytesize` was placed at bat's own `lib.rs`.
+   */
+  describe("a single-quoted TOML string is a string", () => {
+    it("reads `edition = '2021'`, so a bare `use` path names a crate", () => {
+      files_ = {
+        "Cargo.toml": "[package]\nname = 'bat'\nedition = '2021'\n\n[dependencies]\nbytesize = { version = \"2.3.1\" }\n",
+        "src/lib.rs": "pub mod printer;\n",
+        "src/printer.rs": "use bytesize::ByteSize;\n\npub fn size(s: u64) -> String { format!(\"{}\", ByteSize(s)) }\n",
+      };
+      write(files_);
+      expect(dependency("src/printer.rs", "bytesize::ByteSize")).toEqual([{ file: undefined, library: true }]);
+    });
+
+    it("still reads an edition-2015 manifest's bare path from the crate root", () => {
+      files_ = {
+        "Cargo.toml": "[package]\nname = 'old'\n",
+        "src/lib.rs": "pub mod printer;\npub mod sizes;\n",
+        "src/sizes.rs": "pub struct ByteSize(pub u64);\n",
+        "src/printer.rs": "use sizes::ByteSize;\n\npub fn size(s: u64) -> ByteSize { ByteSize(s) }\n",
+      };
+      write(files_);
+      expect(dependency("src/printer.rs", "sizes::ByteSize").map((one) => one.file)).toContain("src/sizes.rs");
+    });
+  });
 });
