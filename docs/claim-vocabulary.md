@@ -737,7 +737,12 @@ Told by the word the source opens it with, like `trait` for `@conforms`. An
 interface merged with a class, a function, a constant or a namespace of the
 same name is read through the other one, which may run (zod writes
 `interface $ZodType` beside `const $ZodType`), and one inside a `declare`
-block widens a declaration elsewhere and keeps its old reading. Abstract
+block widens a declaration elsewhere and keeps its old reading. Measured with
+`measure:parts` over the five TypeScript corpus repositories and the ten
+holdout ones: the `body` square gained 660 agreed lacks in TypeScript and 50 in
+TSX, with 0 wrong and the unrefereed count unchanged (the referee is the
+TypeScript compiler's own tree, which files an interface as having no body).
+Abstract
 classes, Python protocols and Rust traits are untouched: a class may inherit
 code, and a Rust trait's code may sit in an `impl dyn` block in any file of
 the crate, which this file-at-a-time reader cannot rule out.
@@ -751,7 +756,17 @@ not in scope at the end of the file. In a program where no file writes JSX and
 no file it reads -- its libraries included -- declares a JSX namespace,
 nothing can render anything, which is the no-JSX-types reading #363 already
 made when its probe compiled as `any`. The compiler now answers there by what
-the function returns, without a probe.
+the function returns, without a probe; where the return type is unknown the
+probe still asks, since a string where the props go rules a function out
+anyway.
+
+Measured over the same fifteen TypeScript trees, read with no `@types` from
+outside each project: 6,404 functions newly answered "not a component", and a
+referee that shares nothing with the probe -- the TypeScript parser over every
+file of each repository, collecting every capitalised JSX tag and every name
+handed to `createElement`, `h`, `jsx`, `memo`, `forwardRef`, `lazy` or
+`render` -- finds none of them rendered anywhere. Its one hit by name was
+zod's `h(node, rewritten)`, a visitor callback and not a renderer.
 
 ### The measurement
 
