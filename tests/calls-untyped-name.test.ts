@@ -201,6 +201,38 @@ describe("the head kept where a call of another name finds it stays a doubt: Pyt
   });
 });
 
+describe("a call on a value nothing could type, handed a function of the repository's, stays a doubt", () => {
+  /*
+   * `xs.map(helper)`: whatever `map` is, it may run `helper`, and `helper`
+   * may reach the head. The name `map` settles nothing about that.
+   */
+  it("in TypeScript: xs.map(helper)", () => {
+    const files = { ...TS, "run.ts": "function helper(e: Error) {\n  return e;\n}\n\nexport function run(xs: any, e: Error) {\n  return xs.map(helper);\n}\n" };
+    const one = verdict(files, TS_FREE.from, TS_FREE.to);
+    expect(refuted(one)).toBe(false);
+    expect(notClosed(one)).toBe("receiver");
+  });
+
+  it("in Python: pool.submit(self.work)", () => {
+    const files = {
+      ...PY,
+      "run.py": "class Run:\n    def work(self, e):\n        return e\n\n    def run(self, pool, e):\n        pool.submit(self.work)\n",
+    };
+    const one = verdict(files, { file: "run.py", routine: "run" }, PY_FREE.to);
+    expect(refuted(one)).toBe(false);
+  });
+
+  it("in Rust: xs.for_each(helper)", () => {
+    const files = { ...RS, "src/run.rs": "fn helper(e: u32) {}\n\npub fn run(xs: &Thing, e: u32) {\n    xs.for_each(helper);\n}\n" };
+    expect(refuted(verdict(files, RS_FREE.from, RS_FREE.to))).toBe(false);
+  });
+
+  it("but not when what it is handed is plain data", () => {
+    const files = { ...TS, "run.ts": "export function run(xs: any, e: Error) {\n  return xs.push(e, 1, \"x\");\n}\n" };
+    expect(verdict(files, TS_FREE.from, TS_FREE.to).verdict).toBe("refuted");
+  });
+});
+
 describe("the head kept where a call of another name finds it stays a doubt: Rust", () => {
   const shapes: Record<string, [Record<string, string>, "free" | "method", string]> = {
     "a method handed by its path": [{ "src/wire.rs": "use crate::worker::Worker;\n\npub fn wire() {\n    register(Worker::handle_completed);\n}\n" }, "method", "value"],

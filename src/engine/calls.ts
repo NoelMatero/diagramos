@@ -3190,7 +3190,7 @@ function textClosed(
          * of the name it calls, as a call through an interface does: read
          * by the same rule (`runsItsOwnName`).
          */
-        if (site.why === "receiver" && runsItsOwnName(site, from, to)) {
+        if (site.why === "receiver" && !site.handsOn && runsItsOwnName(site, from, to)) {
           untyped += 1;
           if (site.nameAt) untypedAt.push(site.nameAt);
           sites += 1;
@@ -4358,6 +4358,12 @@ export interface CallSitePlaced {
    * is not one the list must hold before it is trusted.
    */
   inMacro?: true;
+  /**
+   * A call nobody could place (`receiver`) that is handed a function of this
+   * repository's: what it runs may be that function, whatever the name it
+   * calls, so the name alone never rules it out.
+   */
+  handsOn?: true;
 }
 
 /** Every call site in one routine, placed or refused. */
@@ -5548,7 +5554,15 @@ export function callSitesIn(
         }
         return;
       }
-      body.sites.push(siteOf(callee, side.source, inner, where));
+      /*
+       * A call on a value nothing could type, handed a function of this
+       * repository's -- `xs.map(helper)`, `pool.submit(self.run)`: whatever
+       * method it turns out to be may run what it is handed, so the name it
+       * calls does not settle what it reaches (`runsItsOwnName`).
+       */
+      const handed = "why" in where && where.why === "receiver" ? inner.childForFieldName("arguments") : null;
+      const handsOn = handed !== null && handsAFunction(handed, side, bindings, holder, node);
+      body.sites.push({ ...siteOf(callee, side.source, inner, where), ...(handsOn ? { handsOn: true as const } : {}) });
     };
     each(node, visit);
     bodies.push(body);

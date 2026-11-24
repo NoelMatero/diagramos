@@ -70,7 +70,10 @@ describe("a call on a value whose type the text does not give", () => {
     "src/thing.ts": "export class Thing { greet(): string { return \"hi\"; } }\n",
     "src/make.ts": "import { Thing } from \"./thing\";\nexport function make() { return new Thing(); }\n",
     "src/a.ts": "import { make } from \"./make\";\nexport function run() {\n  const thing = make();\n  return thing.greet();\n}\n",
-    "src/b.ts": "export function render(n: number) { return n; }\n",
+    // A far end with the very name `thing.greet()` calls: a far end of any
+    // other name is ruled out by the name alone (#351's rule, for any value
+    // nothing could type), so only this one waits on what `thing` is.
+    "src/b.ts": "export function greet(n: number) { return n; }\n",
   };
 
   it("leaves the arrow unanswered with no referee, and calls it wrong with one", async () => {
@@ -79,7 +82,7 @@ describe("a call on a value whose type the text does not give", () => {
     // `run` never reaches `src/b.ts`, so the arrow really is wrong -- the only
     // thing in the way is that `thing`'s type is not written down anywhere the
     // reader looks.
-    const board = await boardOf("src/a.ts#run", "src/b.ts#render");
+    const board = await boardOf("src/a.ts#run", "src/b.ts#greet");
 
     const quiet = checkDrift(board, workspace, { edges: true });
     expect(quiet.edges.filter((finding) => finding.kind === "calls-refuted")).toEqual([]);

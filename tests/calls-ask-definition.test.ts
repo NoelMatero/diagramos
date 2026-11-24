@@ -105,15 +105,20 @@ describe("TypeScript: a call through an optional field", () => {
       + "export function run(ctx: Context): void {\n  ctx.signal?.fire();\n}\n"
       + "export function report(ctx: Context): void {\n  ctx.logger.warn(\"x\");\n}\n",
     "render.ts": "export function render(n: number): number {\n  return n;\n}\n",
+    // A free function with the very name `ctx.signal?.fire()` calls.
+    "fire.ts": "export function fire(): void {}\n",
   };
 
   it("calls the wrong arrow wrong", async () => {
     write(FILES);
     // `ctx.signal`'s type prints as `Signal | undefined`, which names nothing
-    // this file binds, so the text reading stops there.
-    expect((await textOnly("run.ts#run", "render.ts#render")).claims.callsNotClosed.receiver).toBe(1);
+    // this file binds, so the text reading stops there -- when the far end has
+    // the name the call is spelt with. A far end of another name is ruled out
+    // by the name alone (#351's rule, for any value nothing could type).
+    expect((await textOnly("run.ts#run", "fire.ts#fire")).claims.callsNotClosed.receiver).toBe(1);
+    expect(accusations(await textOnly("run.ts#run", "render.ts#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
 
-    const report = await checked("run.ts#run", "render.ts#render");
+    const report = await checked("run.ts#run", "fire.ts#fire");
     expect(accusations(report).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
   }, 120_000);
 
@@ -197,8 +202,12 @@ describe("Rust: a call on a type's name", () => {
   it.skipIf(!hasRustAnalyzer)("calls the wrong arrow wrong", async () => {
     write(FILES);
     // `Box::new` has a type's name where a value would be, so asking what the
-    // value is has nothing to ask about.
-    expect((await textOnly("src/run.rs#run", "src/render.rs#render")).claims.callsNotClosed.receiver).toBe(1);
+    // value is has nothing to ask about. It can only run a function named
+    // `new`, though, so the text alone already rules `render` out (#351's
+    // rule, for any call nothing could place), and the red asks the compiler.
+    const text = await textOnly("src/run.rs#run", "src/render.rs#render");
+    expect(accusations(text).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
+    expect(text.gated.map((one) => one.asked)).toEqual([true]);
 
     const report = await checked("src/run.rs#run", "src/render.rs#render");
     expect(accusations(report).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
