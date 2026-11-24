@@ -1277,4 +1277,67 @@ describe("a call that lands in the head's file on something the head cannot be (
 
     expect(verdictOf(verdict)).not.toBe("refuted");
   });
+
+  /*
+   * Whether making the type can run the head is a question about its code
+   * (#460). pip's `BestCandidateResult` says in its docstring that it is
+   * "returned by `PackageFinder.find_best_candidate`", and that sentence kept
+   * `compute_best_candidate` open as though constructing it might run the
+   * routine it describes. A comment or a docstring runs nothing.
+   */
+  describe("a name in the made type's comments or docstring is not its code (#460)", () => {
+    const python = (made: string) => ask({
+      "app/a.py": {
+        source: "from app.b import Result\n\ndef run():\n    return Result()\n",
+        language: "python",
+        imports: [["app.b", "app/b.py"], ["app.b.Result", "app/b.py"]],
+      },
+      "app/b.py": { source: `${made}\nclass Finder:\n    def find_best(self):\n        return 1\n`, language: "python" },
+    }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["find_best"] });
+
+    it("refutes when only the docstring or a comment names the head (Python)", () => {
+      expect(verdictOf(python("class Result:\n    \"\"\"Returned by `Finder.find_best`.\"\"\"\n\n    def __init__(self):\n        # find_best fills it\n        self.x = 1\n"))).toBe("refuted");
+    });
+
+    it("refutes when only a comment names the head (TypeScript)", () => {
+      const verdict = ask({
+        "src/a.ts": {
+          source: 'import { Result } from "./b";\nexport function run() { return new Result(); }\n',
+          language: "ts",
+          imports: [["./b", "src/b.ts"]],
+        },
+        "src/b.ts": {
+          source: "export class Result {\n  /** Filled by find(). */\n  n = 1;\n  // find() reads it\n  constructor() { this.n = 2; }\n}\n"
+            + "export function find() { return 1; }\n",
+          language: "ts",
+        },
+      }, { file: "src/a.ts", routine: "run" }, { file: "src/b.ts", names: ["find"] });
+      expect(verdictOf(verdict)).toBe("refuted");
+    });
+
+    it("refutes when only a doc comment names the head (Rust)", () => {
+      const verdict = ask({
+        "src/a.rs": {
+          source: "use crate::b::Guard;\n\nfn run() -> Guard { Guard(1) }\n",
+          language: "rust",
+          imports: [["crate::b::Guard", "src/b.rs"]],
+        },
+        "src/b.rs": {
+          source: "pub struct Guard(\n    /// set by `release`\n    pub u32,\n);\n\nimpl Guard {\n    /// See `release`.\n    pub fn get(&self) -> u32 { self.0 }\n}\n\n"
+            + "pub fn release(g: &mut Guard) { g.0 = 0; }\n",
+          language: "rust",
+        },
+      }, { file: "src/a.rs", routine: "run" }, { file: "src/b.rs", names: ["release"] });
+      expect(verdictOf(verdict)).toBe("refuted");
+    });
+
+    it("stays quiet when the type's code calls the head", () => {
+      expect(verdictOf(python("class Result:\n    \"\"\"Made here.\"\"\"\n\n    def __init__(self):\n        Finder().find_best()\n"))).not.toBe("refuted");
+    });
+
+    it("stays quiet when a string that is not a docstring names the head", () => {
+      // `getattr(self, "find_best")` is how a type runs a routine by a written name.
+      expect(verdictOf(python("class Result:\n    def __init__(self):\n        self.hook = \"find_best\"\n"))).not.toBe("refuted");
+    });
+  });
 });

@@ -4018,12 +4018,45 @@ function runWhenMade(to: CallSide, type: string, routine: string): boolean {
     .some((one) => one.dispatched || (one.name !== undefined && lineage.has(one.name)));
 }
 
-/** Whether `name` is written anywhere in a type's own code in this file. */
+/**
+ * Whether `name` is written anywhere in a type's own code in this file: its
+ * code, and not what is said about it (#460). pip's `BestCandidateResult`
+ * names `find_best_candidate` in its docstring, and that sentence read as
+ * code kept a body open on the chance that making one ran the routine it
+ * describes.
+ */
 function writtenInside(source: string, language: Language, type: string, name: string): boolean {
-  const lines = source.split("\n");
+  const lines = codeOnly(source, language).split("\n");
   const word = wholeName(name);
   return typeSpans(source, language, type)
     .some(([first, last]) => word.test(lines.slice(first - 1, last).join("\n")));
+}
+
+const code_ = new WeakMap<Tree, string>();
+
+/**
+ * The source with every comment, and every string standing alone as a
+ * statement -- a docstring, `"use strict"` -- blanked to spaces (#460).
+ * Neither runs anything. Every other character keeps its place, so a line
+ * is still the line it was.
+ */
+function codeOnly(source: string, language: Language): string {
+  const tree = parseSource(source, language);
+  if (!tree) return source;
+  const known = code_.get(tree);
+  if (known !== undefined) return known;
+  const blank: Array<[number, number]> = [];
+  each(tree.rootNode, (node) => {
+    if (/comment$/.test(node.type)) blank.push([node.startIndex, node.endIndex]);
+    else if (node.type === "expression_statement") {
+      const parts = children(node).filter((one) => one.isNamed);
+      if (parts.length === 1 && /^(string|concatenated_string)$/.test(parts[0]!.type)) blank.push([node.startIndex, node.endIndex]);
+    }
+  });
+  let out = source;
+  for (const [start, end] of blank) out = out.slice(0, start) + out.slice(start, end).replace(/[^\n]/g, " ") + out.slice(end);
+  code_.set(tree, out);
+  return out;
 }
 
 /** A type and every base it names that this file declares, followed up the chain. */
