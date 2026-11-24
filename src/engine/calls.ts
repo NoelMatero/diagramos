@@ -274,6 +274,8 @@ export interface CallsWrongRoutineEvidence {
    * Never empty, or this verdict would be `refuted` instead.
    */
   reached: Array<{ name: string; line: number }>;
+  /** As `CallsRefutedEvidence.untypedAt`: calls on untyped values read by their names alone. */
+  untypedAt?: Array<{ start: number; end: number }>;
 }
 
 export type CallsVerdict =
@@ -3311,7 +3313,7 @@ function textClosed(
   if (!to.names.every((name) => isRoutine(to.source, name, to.language))) {
     return { why: "reaches-the-file" };
   }
-  return { reached: { routine: from.routine, line, sites, reached }, ...readMacros };
+  return { reached: { routine: from.routine, line, sites, reached, ...(untyped > 0 ? { untypedAt } : {}) }, ...readMacros };
 }
 
 /**

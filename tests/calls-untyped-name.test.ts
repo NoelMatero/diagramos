@@ -368,6 +368,31 @@ describe("through the whole check, with no compiler", () => {
     }
   }, 60_000);
 
+  it("asks the compiler too when the red is a call landing on another routine of the far end's file", async () => {
+    const repo = mkdtempSync(path.join(tmpdir(), "calls-untyped-near-"));
+    try {
+      writeFileSync(path.join(repo, "openapi.py"),
+        "def get_openapi_path(route, operation):\n"
+        + "    operation.setdefault(\"responses\", {})\n"
+        + "    return helper(route)\n\n\n"
+        + "def helper(route):\n    return route\n\n\n"
+        + "def get_fields_from_routes(routes):\n    return routes\n");
+      const { board } = await createDiagram(emptyBoard(), {
+        name: "arch",
+        nodes: [
+          { id: "a", label: "get_openapi_path", ref: "openapi.py#get_openapi_path" },
+          { id: "b", label: "get_fields_from_routes", ref: "openapi.py#get_fields_from_routes" },
+        ],
+        edges: [{ from: "a", to: "b", claim: "calls" }],
+      });
+      const report = checkDrift(board as BoardFile, createWorkspace(repo), { edges: true });
+      expect(report.gated.map((one) => [one.kind, one.outcome, one.asked])).toEqual([["calls-wrong-routine", "stands", true]]);
+      expect(wouldHelp(report)).toBe(true);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  }, 60_000);
+
   it("leaves it alone when the head is decorated", async () => {
     const decorated = FILES["openapi.py"].replace("def get_fields_from_routes", "@register\ndef get_fields_from_routes");
     expect(await reds({ "openapi.py": decorated })).toEqual([]);

@@ -6495,6 +6495,18 @@ export function checkDrift(
              * live check start a compiler at all, whose placements let the
              * route check find the hops a red then shows.
              */
+            const askUntyped = (untypedAt: ReadonlyArray<{ start: number; end: number }>) =>
+              (referee: ClosedBodyReferee): CompilerSaid => {
+                for (const at of untypedAt) {
+                  const placed = referee.declarationAt?.(fromPath, at);
+                  if (!placed || placed === "outside" || placed.file !== toPath) continue;
+                  const landed = routineDeclaredOn(head.source, head.language, placed.line);
+                  if (landed && toEnd.symbols.includes(landed.name)) {
+                    return { does: true, said: `the compiler places a call on an untyped value at ${landed.name}, ${toPath} line ${placed.line}` };
+                  }
+                }
+                return { does: undefined, said: "the compiler places none of the calls on untyped values at the far end" };
+              };
             const refutedRests = (evidence: CallsRefutedEvidence): RedRests => ({
               written: !evidence.implicit,
               unwritten: evidence.implicit?.outside
@@ -6507,19 +6519,7 @@ export function checkDrift(
                   evidence.implicit!.name,
                   declaredIn(workspace.read(toFile), languageOf(toFile) ?? "python", toPath, evidence.implicit!.name),
                 ),
-              } : evidence.untypedAt ? {
-                ask: (referee: ClosedBodyReferee): CompilerSaid => {
-                  for (const at of evidence.untypedAt!) {
-                    const placed = referee.declarationAt?.(fromPath, at);
-                    if (!placed || placed === "outside" || placed.file !== toPath) continue;
-                    const landed = routineDeclaredOn(head.source, head.language, placed.line);
-                    if (landed && toEnd.symbols.includes(landed.name)) {
-                      return { does: true, said: `the compiler places a call on an untyped value at ${landed.name}, ${toPath} line ${placed.line}` };
-                    }
-                  }
-                  return { does: undefined, said: "the compiler places none of the calls on untyped values at the far end" };
-                },
-              } : {}),
+              } : evidence.untypedAt ? { ask: askUntyped(evidence.untypedAt) } : {}),
             });
             /**
              * Whether the tail's own body rules out a direct call, asked when
@@ -6736,7 +6736,10 @@ export function checkDrift(
                   + `${toEnd.symbols.join(" or ")} -- ${where}. Point the arrow at `
                   + `${near[0]!.name}, or call ${toEnd.symbols[0]!} from `
                   + `${verdict.evidence.routine}.`,
-              }, rests: WRITTEN /* a call found landing on another routine */ });
+              }, rests: verdict.evidence.untypedAt
+                /* a call found landing on another routine, with calls on untyped values read by name: asks, as `refutedRests` does */
+                ? { written: true, ask: askUntyped(verdict.evidence.untypedAt) }
+                : WRITTEN /* a call found landing on another routine */ });
               continue;
             }
             if (verdict.verdict === "refuted" && edge.state !== "planned") {
