@@ -174,6 +174,7 @@ describe("refusals: what runs is not in the text, so the arrow stays unjudged", 
     ],
   });
 
+  // Each call below passes what `b(x)` takes: one that passed nothing could not be `b` (`calls-could-run.test.ts`).
   shapes("Python", {
     files: {
       "target.py": "def b(x):\n    return x\n\n\nclass Instruments:\n    def call(self, name):\n        return b(name)\n",
@@ -186,10 +187,10 @@ describe("refusals: what runs is not in the text, so the arrow stays unjudged", 
         "class Dependant:\n    def __init__(self, call):\n        self.call = call",
         "def run_endpoint(dependant: Dependant):\n    return dependant.call(1)",
         "def own_getattr(obj, name):\n    return own.getattr(obj, name)",
-        "def via_local(obj, name):\n    f = getattr(obj, name)\n    return f()",
-        "def via_local_call(obj, name):\n    call = getattr(obj, name)\n    return call()",
-        "def via_override(provider, orig):\n    call = getattr(provider, \"overrides\", {}).get(orig, orig)\n    return call()",
-        "def via_param(call):\n    return call()",
+        "def via_local(obj, name):\n    f = getattr(obj, name)\n    return f(1)",
+        "def via_local_call(obj, name):\n    call = getattr(obj, name)\n    return call(1)",
+        "def via_override(provider, orig):\n    call = getattr(provider, \"overrides\", {}).get(orig, orig)\n    return call(1)",
+        "def via_param(call):\n    return call(1)",
         "",
       ].join("\n\n\n"),
     },

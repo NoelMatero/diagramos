@@ -1194,8 +1194,8 @@ describe("a call that lands in the head's file on something the head cannot be (
     expect(verdictOf(verdict)).not.toBe("refuted");
   });
 
-  it("stays quiet when the head is held by a base the made class inherits here", () => {
-    // `Leaf()` runs `Base.__init__` through the class it derives from.
+  it("making a class is not a call of a plain method its base holds (calls research 2026-11)", () => {
+    // `Leaf()` runs `Base.__init__` through the class it derives from, and `setup` only if that calls it: a step.
     const verdict = ask({
       "app/a.py": {
         source: "from app.b import Leaf\n\ndef run():\n    return Leaf()\n",
@@ -1208,7 +1208,7 @@ describe("a call that lands in the head's file on something the head cannot be (
       },
     }, { file: "app/a.py", routine: "run" }, { file: "app/b.py", names: ["setup"] });
 
-    expect(verdictOf(verdict)).not.toBe("refuted");
+    expect(verdictOf(verdict)).toBe("refuted");
   });
 
   it("stays quiet when the head is the routine it landed on, under another name", () => {
@@ -1331,13 +1331,24 @@ describe("a call that lands in the head's file on something the head cannot be (
       expect(verdictOf(verdict)).toBe("refuted");
     });
 
-    it("stays quiet when the type's code calls the head", () => {
-      expect(verdictOf(python("class Result:\n    \"\"\"Made here.\"\"\"\n\n    def __init__(self):\n        Finder().find_best()\n"))).not.toBe("refuted");
+    /*
+     * Making one runs its constructor, and what the constructor calls is a
+     * step, not the call (calls research 2026-11, `madeNotCalled`): both of
+     * these kept the arrow quiet before. What still does is the class's code
+     * outside its routines, which runs when one is made and is in no routine.
+     */
+    it("the constructor calling the head is a step, not the call", () => {
+      expect(verdictOf(python("class Result:\n    \"\"\"Made here.\"\"\"\n\n    def __init__(self):\n        Finder().find_best()\n"))).toBe("refuted");
     });
 
-    it("stays quiet when a string that is not a docstring names the head", () => {
+    it("a string in the constructor naming the head is the constructor's doing too", () => {
       // `getattr(self, "find_best")` is how a type runs a routine by a written name.
-      expect(verdictOf(python("class Result:\n    def __init__(self):\n        self.hook = \"find_best\"\n"))).not.toBe("refuted");
+      expect(verdictOf(python("class Result:\n    def __init__(self):\n        self.hook = \"find_best\"\n"))).toBe("refuted");
+    });
+
+    it("stays quiet when the class's own code outside its routines names the head", () => {
+      expect(verdictOf(python("class Result:\n    hook = find_best\n"))).not.toBe("refuted");
+      expect(verdictOf(python("class Result:\n    hook = \"find_best\"\n"))).not.toBe("refuted");
     });
   });
 

@@ -225,12 +225,13 @@ describe("Rust: a call on a type's name", () => {
     expect(accusations(await checked("src/run.rs#through", "src/render.rs#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
   }, 180_000);
 
-  it.skipIf(!hasRustAnalyzer)("accuses nothing on a call through a trait when the head is wrapped in a closure", async () => {
+  // A method call runs a method of its own name in Rust, wherever a closure around the head is kept (calls research 2026-11).
+  it.skipIf(!hasRustAnalyzer)("still accuses on a call through a trait when the head is wrapped in a closure kept elsewhere", async () => {
     write({
       ...FILES,
       "src/lib.rs": "pub mod own;\npub mod store;\npub mod run;\npub mod render;\npub mod wire;\n",
       "src/wire.rs": "pub fn wire() -> Box<dyn Fn(u32) -> u32> {\n    Box::new(move |n| crate::render::render(n))\n}\n",
     });
-    expect(accusations(await checked("src/run.rs#through", "src/render.rs#render"))).toEqual([]);
+    expect(accusations(await checked("src/run.rs#through", "src/render.rs#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
   }, 180_000);
 });
