@@ -5283,7 +5283,7 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     stopped at a doubt, and its red is filed after `lackingEnd`, so "holds
     data, and cannot be called" is still what an arrow at `limit = 5` says.
     The prototype changed 88 such sentences to "every call was checked"; the
-    first bench of this build changed 7 by asking the value question first,
+    first bench of this build changed 11 by asking the value question first,
     and this one changes none. What does change is seven Rust reds on the
     main set that rustc's list used to make ("none reaching that file"):
     the text now closes on the first pass, so four say the wrong-kind
