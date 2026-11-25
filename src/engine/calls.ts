@@ -304,6 +304,8 @@ export interface CallsWrongRoutineEvidence {
   untypedAt?: Array<{ start: number; end: number }>;
   /** As `CallsRefutedEvidence.ruledOutAt`: the closed reading ruled a call out by a test of its own. */
   ruledOutAt?: Array<{ start: number; end: number }>;
+  /** As `CallsRefutedEvidence.inMacros`. */
+  inMacros?: number;
 }
 
 export type CallsVerdict =
@@ -2454,6 +2456,33 @@ function closedBodyRefutes(
   known?: CompiledTail,
   madeOnly = false,
 ): { evidence: CallsRefutedEvidence } | { reached: CallsWrongRoutineEvidence } | { why: CallsNotClosed } {
+  const closed = closedBodyRead(from, to, known, madeOnly);
+  /*
+   * The reading stopped at a call it could not account for. A value at the
+   * head that the tail never names is called by none of them, whatever each
+   * turns out to run (`valueNeverNamed`). Asked only here, after every
+   * reading that can close has had its turn, so a red that already stood
+   * keeps the sentence it had.
+   */
+  if (!("why" in closed) || !valueNeverNamed(from, to)) return closed;
+  const reading = ownBodies(from);
+  const bodies = reading.read ? reading.bodies : [];
+  if (bodies.length === 0) return closed;
+  return { evidence: {
+    routine: from.routine,
+    line: typeTailOf(from.source, from.language, from.routine)?.line ?? bodies[0]!.line,
+    sites: bodies.reduce((total, body) => total + body.sites.length, 0),
+    valueNeverNamed: true, ruledOutAt: [],
+  } };
+}
+
+/** `closedBodyRefutes` without the last question: the text reading, and for a Rust tail the compiler's list. */
+function closedBodyRead(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+  known?: CompiledTail,
+  madeOnly = false,
+): { evidence: CallsRefutedEvidence } | { reached: CallsWrongRoutineEvidence } | { why: CallsNotClosed } {
   const text = textClosed(from, to, madeOnly);
   /*
    * Closed, and still not the end of it: every call the text wrote was
@@ -4149,17 +4178,6 @@ function textClosed(
   const bodies = typeTail ? reading.bodies : reading.bodies.filter((body) => body.routine === from.routine);
   if (bodies.length === 0) return { why: "routine-not-found" };
   /*
-   * A value at the head that the tail never names (`valueNeverNamed`): no
-   * call in the tail is a call of it, whatever each of them turns out to run.
-   */
-  if (valueNeverNamed(from, to)) {
-    return { evidence: {
-      routine: from.routine, line: typeTail ? typeTail.line : bodies[0]!.line,
-      sites: bodies.reduce((total, body) => total + body.sites.length, 0), valueNeverNamed: true, ruledOutAt: [],
-    } };
-  }
-
-  /*
    * A routine stops at its first wall. A class tail (#459) reads every wall
    * and shows one a compiler can take down ahead of one it cannot: a live
    * check starts a compiler only for the reason it is shown, and a class has
@@ -4358,6 +4376,7 @@ function textClosed(
   return { reached: {
     routine: from.routine, line, sites, reached,
     ...(untyped > 0 ? { untypedAt } : {}),
+    ...(inMacros > 0 ? { inMacros } : {}),
     ...(ruledOutAt ? { ruledOutAt } : {}),
   }, ...readMacros };
 }

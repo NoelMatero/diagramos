@@ -135,6 +135,14 @@ describe("TypeScript: a value the tail never names", () => {
     expect(byName(verdict(files, arrow("retry", "fail")))).toBe(false);
   });
 
+  it("a tail whose every call was read keeps the red it already had, and its sentence", () => {
+    // Nothing here is a doubt: the closed reading refutes on its own, as it did before the rule.
+    const closed = { "mutation.ts": STATE.replace("  execute(cb: () => void) {\n    cb();", "  execute(cb: () => void) {\n    helper();") + "\nfunction helper() {}\n" };
+    const one = verdict(closed, arrow("retry"));
+    expect(one.verdict).toBe("refuted");
+    expect(byName(one)).toBe(false);
+  });
+
   const quiet: Record<string, [Files, Arrow]> = {
     "the tail reads it by destructuring": [
       { "mutation.ts": STATE.replace("    cb();\n    return 1;", "    const { retry } = this;\n    cb();\n    return 1;") }, arrow("retry"),

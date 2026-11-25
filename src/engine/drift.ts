@@ -6250,7 +6250,15 @@ export function checkDrift(
               );
               if (
                 claimed && tail.language === "rust" && !tail.compiled?.()
-                && (verdict.verdict === "withheld" || (verdict.verdict === "absent" && verdict.notClosed))
+                && (verdict.verdict === "withheld" || (verdict.verdict === "absent" && verdict.notClosed)
+                  /*
+                   * Or a red that passed a macro by reading its template
+                   * (`macroNeverRuns`): rustc's list of the body sees what
+                   * the expansion really calls, and judges it where there
+                   * is one (#471). Counting it is what has a live check
+                   * build the crate before the red is shown.
+                   */
+                  || ((verdict.verdict === "refuted" || verdict.verdict === "wrong-routine") && (verdict.evidence.inMacros ?? 0) > 0))
               ) {
                 if (counting) claims.callsCompilable += 1;
               }

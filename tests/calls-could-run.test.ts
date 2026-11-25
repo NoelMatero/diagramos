@@ -580,6 +580,8 @@ describe("through the whole check", () => {
     expect(reds.map((one) => one.kind)).toEqual(["calls-refuted"]);
     expect(reds[0]!.detail).toContain("one in a macro whose template never names it");
     expect(report.gated.map((one) => [one.outcome, one.asked])).toEqual([["stands", true]]);
+    // And it is counted as one the Rust compiler's own list of the body can judge, so a live check builds the crate (#471).
+    expect(report.claims.callsCompilable).toBe(1);
   }, 60_000);
 
   it("a backwards red that passed a ruled-out call asks too", async () => {
