@@ -198,6 +198,18 @@ export async function rustTruePairs(
     return undefined;
   };
 
+  /**
+   * The free function of the routine's own crate a printed callee names. The
+   * path rustc prints says whose function it is (`freeCallee`), and a
+   * namesake in another module is not it.
+   */
+  const freeTarget = (callee: string, manifest: string | undefined): Routine | undefined => {
+    const named = freeCallee(callee);
+    if (!named) return undefined;
+    return one((byFree.get(named.name) ?? []).filter((other) => manifestOf(other.file) === manifest
+      && (named.module === undefined || declaredInModule(other.file, sources.get(other.file) ?? "", named.module))));
+  };
+
   const pairs: TruePair[] = [];
   const seen = new Set<string>();
   const add = (pair: TruePair) => {
@@ -282,7 +294,7 @@ export async function rustTruePairs(
             // A free function only within the routine's own crate: another
             // crate's `next` is not this workspace's `next`.
             : callee.startsWith("<") ? undefined
-            : one((byFree.get(callee.split("::").pop()!) ?? []).filter((other) => manifestOf(other.file) === manifest));
+            : freeTarget(callee, manifest);
         if (target && target.ref !== routine.ref) {
           const spelled = routine.text.includes(`${target.name}(`) || routine.text.includes(`${target.name}::<`);
           add({ word: "calls", from: routine.ref, to: target.ref, how: spelled ? "written" : "other-name" });
@@ -291,6 +303,47 @@ export async function rustTruePairs(
     }
   }
   return pairs;
+}
+
+/**
+ * What a callee rustc printed without a type before it names, when that can
+ * be a free function of the crate being read: its name, and the module the
+ * path puts it in when the path says.
+ *
+ * The list names a function by its path, and the path was being thrown away:
+ * the last segment was matched against the one free function of that name a
+ * board can draw. So four arrows that are not true were held to be (calls
+ * research, 2026-11; each read in the source):
+ *
+ *   regex    `write_label -> utf8.rs#len`              the call is `core::str::<impl str>::len`, str's own
+ *   regex    `write_label_len -> utf8.rs#len`          the same
+ *   ripgrep  `is_tty_stdout -> wtr.rs#stdout`          the call is `std::io::stdout()`, std's
+ *   clap     `did_you_mean_flag -> format.rs#did_you_mean`
+ *                                                      the call is `suggestions::did_you_mean`, the two-argument
+ *                                                      one in its own file; `format.rs`'s is private and takes four
+ *
+ * Nothing for a method of a type in another crate (`<impl str>`) or a path
+ * into std. A bare name -- a call within one module -- says no module.
+ */
+export function freeCallee(callee: string): { name: string; module?: string } | undefined {
+  if (callee.startsWith("<") || callee.includes("<impl ") || /^(std|core|alloc)::/.test(callee)) return undefined;
+  const segments = callee.split("::");
+  const name = segments.pop()!;
+  const module = segments.pop();
+  return { name, ...(module !== undefined ? { module } : {}) };
+}
+
+/**
+ * Whether a file declares the module a path names: `suggestions.rs`,
+ * `suggestions/mod.rs`, or a `mod suggestions { .. }` written inside it. A
+ * crate's root file is every path's first segment, under the crate's own
+ * name, so it is never ruled out.
+ */
+export function declaredInModule(file: string, source: string, module: string): boolean {
+  const base = path.basename(file, ".rs");
+  if (base === "lib" || base === "main") return true;
+  if ((base === "mod" ? path.basename(path.dirname(file)) : base) === module) return true;
+  return new RegExp(`\\bmod\\s+${module}\\s*\\{`).test(source);
 }
 
 /** `Foo::<'_, P>::bar`, `Vec::<Ast>::new` -> `Foo::bar`, `Vec::new`; `<A<T> as B<U>>::m` -> `<A as B>::m`. */
