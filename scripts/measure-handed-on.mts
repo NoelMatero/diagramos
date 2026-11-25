@@ -8,6 +8,9 @@
  *   ... --projects=taskforcesh-bullmq,immerjs-immer   only these
  *   ... --out=<file.jsonl>   every arrow and its verdict, one line each, to compare two runs
  *
+ * Each set's projects are read where `bench:planted --set=<set>` reads them, so a
+ * worktree needs that set's folder (`bench-holdout-b/` is not on main: copy it in).
+ *
  * ## Why this referee
  *
  * `measure:compiler-true` takes its true arrows from the compilers' call
@@ -70,13 +73,19 @@ for (const [set, projects] of Object.entries(PROJECTS)) {
     });
     const line = run.stdout.split("\n").find((text) => text.startsWith("@@RESULT "));
     if (run.status !== 0 || !line) {
-      failed.push(`${project} (exit ${run.status}): ${(run.stderr || "").trim().split("\n").slice(-3).join(" | ")}`);
+      failed.push(`${project} (exit ${run.status}): ${whyItStopped(run.stderr)}`);
       continue;
     }
     results.push(JSON.parse(line.slice("@@RESULT ".length)) as ProjectResult);
   }
 }
 process.exit(report(results, failed) ? 0 : 1);
+
+/** The error a child stopped on: its first `Error` line, not the stack's tail. */
+function whyItStopped(stderr: string | null): string {
+  const lines = (stderr || "").trim().split("\n");
+  return lines.find((line) => /^\w*Error\b|^Error:/.test(line.trim()))?.trim() ?? lines.slice(-3).join(" | ");
+}
 
 function report(results: ProjectResult[], failed: string[]): boolean {
   const rows = results.flatMap((one) => one.rows.map((row) => ({ project: one.project, ...row })));
