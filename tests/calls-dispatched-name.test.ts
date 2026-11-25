@@ -182,7 +182,17 @@ describe("the head stored where a call of another name finds it stays a doubt: P
   });
 });
 
-describe("the head stored where a call of another name finds it stays a doubt: Rust", () => {
+/*
+ * Rust is the exception since the calls research of 2026-11: `h.on_error(e)`
+ * is method-call syntax, which runs a method declared `on_error` and nothing
+ * else. A function kept in a field is called `(h.on_error)(e)`, a closure in
+ * a `Box<dyn Fn>` as `f(e)`, and a `use .. as on_error` names a function a
+ * method call cannot reach. A blanket `impl<F: Fn(u32)> Handler for F` whose
+ * `on_error` calls `self(e)` is a step through a routine of that name. So
+ * each way of storing the head is still found, and none of them keeps the
+ * arrow a doubt.
+ */
+describe("Rust: the head stored anywhere is still not what a method call of another name runs", () => {
   const shapes: Record<string, [Record<string, string>, "free" | "method", string]> = {
     "handed as a function pointer": [{ "src/wire.rs": "use crate::worker::handle_failed;\n\npub fn wire() {\n    register(handle_failed);\n}\n" }, "free", "value"],
     "a method handed by its path": [{ "src/wire.rs": "use crate::worker::Worker;\n\npub fn wire() {\n    register(Worker::handle_completed);\n}\n" }, "method", "value"],
@@ -191,11 +201,11 @@ describe("the head stored where a call of another name finds it stays a doubt: R
     "renamed by a use": [{ "src/wire.rs": "pub use crate::worker::handle_failed as on_error;\n" }, "free", "renamed"],
   };
   for (const [shape, [extra, kind, how]] of Object.entries(shapes)) {
-    it(`withholds when the head is ${shape}`, () => {
+    it(`reads the dispatched call when the head is ${shape}`, () => {
       const files = { ...RS, ...extra };
       const arrow = kind === "free" ? RS_FREE : RS_METHOD;
       expect(found(files, arrow.to.names[0]!, kind === "method")).toContain(how);
-      expect(refuted(verdict(files, arrow.from, arrow.to, RS_IFACE))).toBe(false);
+      expect(refuted(verdict(files, arrow.from, arrow.to, RS_IFACE))).toBe(true);
     });
   }
 

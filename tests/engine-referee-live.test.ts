@@ -82,7 +82,8 @@ const PYTHON: Record<string, string> = {
   "thing.py": "class Thing:\n    def greet(self):\n        return \"hi\"\n",
   "make.py": "from thing import Thing\n\n\ndef make():\n    return Thing()\n",
   "a.py": "from make import make\n\n\ndef run():\n    thing = make()\n    return thing.greet()\n",
-  "b.py": "def render(n):\n    return n\n\n\ndef greet(n):\n    return n\n",
+  // `greet` takes what `thing.greet()` passes: a call with arguments it could not take is ruled out on the text alone.
+  "b.py": "def render(n):\n    return n\n\n\ndef greet():\n    return 1\n",
 };
 
 describe("a Python call on a value whose type the text does not give", () => {
@@ -267,7 +268,7 @@ describe("a machine with Rust but no rust-analyzer", () => {
       + "impl Config {\n    pub fn load(&self) -> u32 { 7 }\n}\n"
       + "pub fn make() -> Config { Config { name: String::new() } }\n");
     write("src/a.rs", "use crate::decl::make;\n\npub fn run() -> u32 {\n    let c = make();\n    c.load()\n}\n");
-    write("src/b.rs", "pub fn load(n: u32) -> u32 { n }\n");
+    write("src/b.rs", "pub fn load() -> u32 { 7 }\n");
     const workspace = createWorkspace(repo);
     const board = await boardOf("src/a.rs#run", "src/b.rs#load");
 
@@ -275,7 +276,9 @@ describe("a machine with Rust but no rust-analyzer", () => {
      * The text reading alone, which is what this is about. `run` never calls
      * `load` in `b.rs`, and since #357 the Rust compiler's own call list says so
      * whether or not rust-analyzer answers -- a correct red, and a different
-     * test (`calls-compiled-rust.test.ts`).
+     * test (`calls-compiled-rust.test.ts`). `load` takes what `c.load()`
+     * passes, or the text alone would rule the call out by its arguments
+     * (`calls-could-run.test.ts`).
      */
     const started = Date.now();
     const live = await refereedCheckLive(repo, (referee) =>
