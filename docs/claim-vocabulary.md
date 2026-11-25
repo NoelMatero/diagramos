@@ -4670,6 +4670,18 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     is missing -- fifteen repositories in one process ran out of both the
     JavaScript heap and tree-sitter's WebAssembly one, in that order.
 
+    **2026-11-25: the near miss asks the compiler when the head is run
+    unwritten.** `with console:` runs `Console.__enter__` and `__exit__`
+    beside the `console.print(..)` it writes, and the closed reading said
+    "calls `print`, not `__enter__`" without asking anybody (rich's
+    `FileProxy.write`, found by `measure:calls-at-run-time`, the calls the
+    project's own tests make). The plain absence has put a head the language
+    runs on the caller's behalf to `memberAt` since #384; the near miss, and
+    a route red standing on it, now carry the same `implicit` evidence and
+    rest on the same question. Only the language's own calls
+    (`runByTheLanguage`): #401's "a library handed the value may call it" is
+    still asked only where nothing reached the head's file.
+
 48. **A wrong `@calls` arrow stayed quiet whenever the routine called
     something through a value, because the compiler was asked the wrong
     question (#351).** The closed reading placed `x.foo()` by asking what

@@ -1393,3 +1393,29 @@ export function receiverResolutionFrom(
   }
   return { kind: "type", name: answer.head };
 }
+
+/**
+ * Each program the referee would build for `root`, one per `tsconfig.json`
+ * (see `createTsReferee`), handed to `visit` one at a time so only one is
+ * held. For a measurement that reads a tree with the compiler's own API and
+ * must see the files grouped as the checker's referee sees them
+ * (`measure:handed-on`). A program that will not build is skipped.
+ */
+export function eachTsProgram(
+  root: string,
+  visit: (program: TS.Program, checker: TS.TypeChecker, ts: typeof TS) => void,
+): void {
+  const ts = typescriptModule();
+  if (!ts) return;
+  const findConfig = configFinder(ts);
+  const filesByConfig = new Map<string, string[]>();
+  for (const file of sourceFiles(root)) {
+    const config = findConfig(file) ?? "";
+    filesByConfig.set(config, [...(filesByConfig.get(config) ?? []), file]);
+  }
+  for (const [config, files] of filesByConfig) {
+    let program: TS.Program;
+    try { program = programFrom(ts, config || undefined, files); } catch { continue; }
+    visit(program, program.getTypeChecker(), ts);
+  }
+}

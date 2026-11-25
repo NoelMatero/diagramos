@@ -219,6 +219,14 @@ beforeAll(() => {
     "def compare(a: Engine, b: Engine, w: Wheel) -> object:",
     "    return a == b, str(a), w == w",
     "",
+    "",
+    "import json  # noqa: E402",
+    "from . import parts as partsmod  # noqa: E402",
+    "",
+    "",
+    "def handed(u, d: Dog) -> object:",
+    "    return json, run, d.name, u, partsmod",
+    "",
   ].join("\n"));
   pool = refereePool();
 });
@@ -299,6 +307,22 @@ describe("memberAt, asked of pyright (#384)", () => {
     expect(found[0]).toEqual([{ file: PARTS, line: line(PARTS, "def __eq__") }]);
     expect(found[1]).toEqual([{ file: PARTS, line: line(PARTS, "def __str__") }]);
     expect(found[2]).toEqual(["outside"]);
+  }, 120_000);
+
+  /*
+   * A value whose type is not a class: pyright's "there is no such member" is
+   * an answer where the value is a library's module or a function (calls
+   * research 2026-11, step 0). marshmallow hands `json` to a library and pip
+   * hands `session.is_secure_origin`; neither can be running a method of the
+   * repository by that name. An untyped parameter, and a module of the
+   * repository, which may hold any of its routines, stay unanswered.
+   */
+  it("answers for a library's module and a function value, and not for an untyped value or a module here", async () => {
+    const value = (mark: string) => ({ file: CAR, at: at(CAR, "return json, run, d.name, u, partsmod", mark), extra: "name" });
+    const asked: QuestionQuery[] = [value("json"), value("run"), value("name"), value("u"), value("partsmod")];
+    const answers = await resolvePythonMembers(repo, asked, pool);
+    const found = asked.map((one) => answers.cache.get(one.file, one.at, one.extra));
+    expect(found).toEqual([["outside"], [], [], undefined, undefined]);
   }, 120_000);
 });
 

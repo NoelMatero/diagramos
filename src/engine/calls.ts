@@ -312,6 +312,12 @@ export interface CallsWrongRoutineEvidence {
   ruledOutAt?: Array<{ start: number; end: number }>;
   /** As `CallsRefutedEvidence.inMacros`. */
   inMacros?: number;
+  /**
+   * As `CallsRefutedEvidence.implicit`, for the language's own unwritten
+   * calls only: a written call landing on another routine of the head's file
+   * says nothing about the `__enter__` a `with` runs beside it.
+   */
+  implicit?: CallsRefutedEvidence["implicit"];
 }
 
 export type CallsVerdict =
@@ -2517,6 +2523,19 @@ function closedBodyRead(
     const unwritten = (from.language === "rust" ? calledImplicitly(from, to, known) : undefined)
       ?? (handsOnHead(from, to) ? "named" : undefined);
     if (unwritten) return { why: unwritten };
+    if ("reached" in text) {
+      /*
+       * A call that lands on another routine of the head's file is no more
+       * evidence than no call at all, when the head is one the language runs
+       * unwritten: `with console:` runs `__enter__` and `__exit__` beside the
+       * `console.print(..)` it wrote (rich's `FileProxy.write`, found by calls
+       * recorded while its tests ran). So the near miss asks the compiler the
+       * same question the plain absence does. Not `handedOutside`: a library
+       * handed a value is #401's question, asked where nothing reached the file.
+       */
+      const ran = runByTheLanguage(from, to);
+      return ran ? { ...text, reached: { ...text.reached, implicit: ran } } : text;
+    }
     const implicit = "evidence" in text ? runByTheLanguage(from, to) ?? handedOutside(from, to) : undefined;
     return implicit && "evidence" in text ? { evidence: { ...text.evidence, implicit } } : text;
   };
