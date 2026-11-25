@@ -135,6 +135,15 @@ describe("TypeScript: a value the tail never names", () => {
     expect(byName(verdict(files, arrow("retry", "fail")))).toBe(false);
   });
 
+  it("what a catch or a loop binds is a value too", () => {
+    const bound = {
+      "load.ts": "export function load(xs: any[]) {\n  try {\n    go();\n  } catch (e) {\n    report(e);\n  }\n  for (const item of xs) report(item);\n}\n\n"
+        + "export function run(cb: () => void) {\n  cb();\n}\n",
+    };
+    expect(byName(verdict(bound, { from: ["load.ts", "run"], to: ["load.ts", "e"] }))).toBe(true);
+    expect(byName(verdict(bound, { from: ["load.ts", "run"], to: ["load.ts", "item"] }))).toBe(true);
+  });
+
   it("a tail whose every call was read keeps the red it already had, and its sentence", () => {
     // Nothing here is a doubt: the closed reading refutes on its own, as it did before the rule.
     const closed = { "mutation.ts": STATE.replace("  execute(cb: () => void) {\n    cb();", "  execute(cb: () => void) {\n    helper();") + "\nfunction helper() {}\n" };

@@ -4030,8 +4030,8 @@ function valueOnly(to: { source: string; language: Language }, name: string): { 
     // Out of a macro's tokens, a routine, a macro: not a value, or nothing says.
     if (soup || parametersOf(node) || /variant|macro/.test(node.type)) return undefined;
     const value = node.childForFieldName("value") ?? node.childForFieldName("right");
-    // A container: a class, a struct, an enum, a trait, an interface, a module.
-    if (node.childForFieldName("body") && !value && !node.childForFieldName("type")) return undefined;
+    // A container: a class, a struct, an enum, a trait, an interface, a module. Not a `catch (e) {..}` or a loop, whose body is what runs with the binding.
+    if (node.childForFieldName("name")?.id === nameNode.id && node.childForFieldName("body") && !value && !node.childForFieldName("type")) return undefined;
     const keyword = keywordOf(node, nameNode);
     if (keyword !== undefined && !VALUE_KEYWORDS.has(keyword)) return undefined;
     if (to.language === "python" && /\bTypeAlias\b/.test(node.childForFieldName("type")?.text ?? "")) return undefined;
