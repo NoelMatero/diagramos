@@ -78,7 +78,7 @@ import { onlyATypeAlias, partsMayBe, standsFor } from "./alias";
 import { heldTypes, type HoldsWithheld } from "./holds";
 import { conformedTypes, declaredBases, type ConformsWithheld } from "./conforms";
 import { overridesIn, type Overrides } from "./overrides";
-import { storedIn, type Stored, type StoredSource } from "./stored";
+import { inProduct, isTestFile, storedIn, type Stored, type StoredSource } from "./stored";
 import { ownerView, pickingOwner } from "./owner";
 import { signatureNames, type SignatureWithheld } from "./signature";
 import { resolveDependency, type ConfigCache } from "./resolve";
@@ -2477,6 +2477,8 @@ function callSide(
     const source = workspace.read(absolute);
     const declared = readDependencies(target, source, workspace, configs)?.dependencies;
     if (!declared) return undefined;
+    const written = <T extends { how: string; test?: true }>(findings: readonly T[]): readonly T[] =>
+      isTestFile(target) ? findings : inProduct(findings);
     return {
       file: target,
       source,
@@ -2491,7 +2493,17 @@ function callSide(
       ...(closedBodyReferee ? { resolveReceiver: (at) => closedBodyReferee.resolveReceiver(target, at) } : {}),
       ...(declarationAt ? { declarationAt: (at) => declarationAt(target, at) } : {}),
       ...(overrides ? { overridden: (holder, member) => overrides.below(holder, member) } : {}),
-      ...(stored ? { runsUnderAnotherName: (name, member, language) => stored.findings(name, member, language).length > 0 } : {}),
+      /*
+       * What the product writes, and not what its tests do (owner decision,
+       * 2026-11-25): a test hands a routine around to drive it, which says
+       * nothing about how the code under test reaches it (`inProduct`).
+       * Unless the tail is itself a test: then what tests hand around is
+       * what it may be calling.
+       */
+      ...(stored ? {
+        runsUnderAnotherName: (name, member, language) => written(stored.findings(name, member, language)).length > 0,
+        storedFindings: (name, member, language) => written(stored.findings(name, member, language)),
+      } : {}),
       ...(askDefinition && closedBodyReferee?.compiledCrateOf
         ? { compiled: () => closedBodyReferee.compiledCrateOf!(target) }
         : {}),
@@ -3245,15 +3257,20 @@ function notDirectSentence(word: "calls" | "needs", route: readonly string[], ar
  * a routine of the name it calls, and that is the whole of why it is not the
  * head.
  */
-function throughDispatch(dispatched: number | undefined, untyped?: number): string {
+function throughDispatch(dispatched: number | undefined, untyped?: number, ruled?: { misfit?: number; inMacros?: number }): string {
   const parts: string[] = [];
   if (dispatched) {
     parts.push(dispatched === 1 ? "one through an interface or an override" : `${dispatched} through an interface or an override`);
   }
   if (untyped) parts.push(untyped === 1 ? "one on a value nothing could type" : `${untyped} on values nothing could type`);
-  if (parts.length === 0) return "";
   const one = (dispatched ?? 0) + (untyped ?? 0) === 1;
-  return ` (${parts.join(", ")}, ${one ? "which runs" : "each running"} a method of the name it calls)`;
+  const said = parts.length === 0 ? [] : [`${parts.join(", ")}, ${one ? "which runs" : "each running"} a method of the name it calls`];
+  // The calls ruled out by what they pass, or by what a macro's template writes (calls research 2026-11, `ruledOut`).
+  if (ruled?.misfit) said.push(ruled.misfit === 1 ? "one passing arguments it does not take" : `${ruled.misfit} passing arguments it does not take`);
+  if (ruled?.inMacros) {
+    said.push(ruled.inMacros === 1 ? "one in a macro whose template never names it" : `${ruled.inMacros} in macros whose templates never name it`);
+  }
+  return said.length === 0 ? "" : ` (${said.join("; ")})`;
 }
 
 function landedBeside(elsewhere: ReadonlyArray<{ name: string; line: number }> | undefined, toPath: string, head: readonly string[]): string {
@@ -6476,7 +6493,9 @@ export function checkDrift(
                   evidence.implicit!.name,
                   declaredIn(workspace.read(toFile), languageOf(toFile) ?? "python", toPath, evidence.implicit!.name),
                 ),
-              } : evidence.untypedAt ? { ask: askUntyped(evidence.untypedAt) } : {}),
+              } : evidence.untypedAt || evidence.ruledOutAt
+                ? { ask: askUntyped([...(evidence.untypedAt ?? []), ...(evidence.ruledOutAt ?? [])]) }
+                : {}),
             });
             /**
              * Whether the tail's own body rules out a direct call, asked when
@@ -6645,7 +6664,10 @@ export function checkDrift(
                   + `${oneLine(toNode.label) || toPath}, and it is the other way round -- `
                   + `${toPath} line ${verdict.evidence.line} writes `
                   + `\`${verdict.evidence.wrote}\`. Turn the arrow round.`,
-              }, rests: WRITTEN /* a call found running the other way */ });
+              }, rests: verdict.ruledOutAt
+                /* a call found running the other way, past a forward call ruled out by what it passes: asks, as `refutedRests` does */
+                ? { written: true, ask: askUntyped(verdict.ruledOutAt) }
+                : WRITTEN /* a call found running the other way */ });
               continue;
             }
             if (verdict.verdict === "wrong-routine" && edge.state !== "planned") {
@@ -6693,9 +6715,9 @@ export function checkDrift(
                   + `${toEnd.symbols.join(" or ")} -- ${where}. Point the arrow at `
                   + `${near[0]!.name}, or call ${toEnd.symbols[0]!} from `
                   + `${verdict.evidence.routine}.`,
-              }, rests: verdict.evidence.untypedAt
-                /* a call found landing on another routine, with calls on untyped values read by name: asks, as `refutedRests` does */
-                ? { written: true, ask: askUntyped(verdict.evidence.untypedAt) }
+              }, rests: verdict.evidence.untypedAt || verdict.evidence.ruledOutAt
+                /* a call found landing on another routine, with calls read by name or ruled out by what they pass: asks, as `refutedRests` does */
+                ? { written: true, ask: askUntyped([...(verdict.evidence.untypedAt ?? []), ...(verdict.evidence.ruledOutAt ?? [])]) }
                 : WRITTEN /* a call found landing on another routine */ });
               continue;
             }
@@ -6710,8 +6732,16 @@ export function checkDrift(
                * which is true and is not the whole truth when one of them
                * leads there.
                */
-              const throughAChain = reaching();
-              if (throughAChain.verdict === "reached") {
+              /*
+               * A value at the far end that the tail never names
+               * (`valueNeverNamed`) waits for the wrong-kind check below, as a
+               * call landing beside the head does: "that holds data, and
+               * cannot be called" is the better sentence wherever it can be
+               * said, and it was the one these arrows had. The route is asked
+               * only once that check has passed.
+               */
+              const throughAChain = verdict.evidence.valueNeverNamed ? undefined : reaching();
+              if (throughAChain?.verdict === "reached") {
                 edgesChecked += 1;
                 recordEdge(edge, fromNode, toNode, oneLevelUp(throughAChain.via, throughAChain.hops.length,
                   { rests: refutedRests(verdict.evidence), sites: verdict.evidence.sites, hops: throughAChain.hops }));
@@ -6732,12 +6762,24 @@ export function checkDrift(
                 detail:
                   (fresh ? "a claim written this turn is already wrong: " : "")
                   + `this arrow says ${oneLine(fromNode.label) || fromPath} calls `
-                  + `${oneLine(toNode.label) || toPath}, and every call `
-                  + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
-                  + `them${throughDispatch(verdict.evidence.dispatched, verdict.evidence.untyped)}, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `
+                  + `${oneLine(toNode.label) || toPath}, `
+                  + (verdict.evidence.valueNeverNamed
+                    ? `and \`${toEnd.symbols[0]!}\` in ${toPath} is a value, not a routine. Code calls what a value holds by `
+                      + `writing its name, and nothing in ${verdict.evidence.routine} writes \`${toEnd.symbols[0]!}\`. `
+                    : `and every call `
+                      + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
+                      + `them${throughDispatch(verdict.evidence.dispatched, verdict.evidence.untyped, verdict.evidence)}, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `)
                   + `${fromPath} line ${verdict.evidence.line} is where ${verdict.evidence.routine} is declared.`,
               }, rests: refutedRests(verdict.evidence) }); };
-              if (verdict.evidence.elsewhere) besideTheHead = refute;
+              if (verdict.evidence.valueNeverNamed) {
+                besideTheHead = () => {
+                  const route = reaching();
+                  if (route.verdict !== "reached") { refute(); return; }
+                  edgesChecked += 1;
+                  recordEdge(edge, fromNode, toNode, oneLevelUp(route.via, route.hops.length,
+                    { rests: refutedRests(verdict.evidence), sites: verdict.evidence.sites, hops: route.hops }));
+                };
+              } else if (verdict.evidence.elsewhere) besideTheHead = refute;
               else { refute(); continue; }
             }
             /*

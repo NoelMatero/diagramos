@@ -48,6 +48,19 @@
  * itself what runs (`save() { this.handleFailed() }`, a blanket `impl<F: Fn>`
  * whose `handle` calls `self()`). That is a call to a routine of the
  * dispatched name, a step and not the head, as an ordinary call to it is.
+ *
+ * Three things a finding says beyond "it is written here", for the question
+ * `calls.ts` asks of one call at a time -- could this call run the head at
+ * all (calls research, 2026-11):
+ *
+ *   `wrappers`   for a routine called from a function with no name: where each
+ *                such function is written, because it is what runs under the
+ *                other name and is put to the same test as the routine
+ *   `attached`   the routine is what a member, a key or a class-level name is
+ *                set to: found on a class, Python fills its first parameter
+ *   `test`       it is written in a test, which hands routines around to drive
+ *                them; `inProduct` leaves those out (owner decision,
+ *                2026-11-25: what a test hands in is not what the product calls)
  */
 import { calledNameAt, routinesNamed } from "./calls";
 import { wholeName } from "./declared";
@@ -66,6 +79,27 @@ export interface StoredFinding {
   line: number;
   /** For `wrapped`: the function with no name is written as a call's argument, not stored. */
   argument?: true;
+  /**
+   * For `wrapped`: every function with no name around the call, outermost
+   * first, up to the nearest named routine -- where each is written, in
+   * `file`. One of them is what runs under the other name, so a test of
+   * whether a call can run the routine is put to each of them too
+   * (`calls.ts`, "could this call run the far end?").
+   */
+  wrappers?: Array<{ start: number; end: number }>;
+  /**
+   * For `value`: the routine is written as what a member, a key or a name in
+   * a class body is set to -- `Cls.run = helper`, `{ run: helper }`, `run =
+   * helper` under `class`, `setattr(Cls, "run", helper)`. Found on a class,
+   * Python hands a function the instance as its first argument.
+   */
+  attached?: true;
+  /**
+   * Written in a test: a test file, or in Rust a `#[cfg(test)]` module or a
+   * `#[test]` function. What a test hands in is not what the product calls
+   * (`inProduct`).
+   */
+  test?: true;
 }
 
 export interface Stored {
@@ -133,13 +167,51 @@ export function storedIn(sources: () => readonly StoredSource[] | undefined): St
         if (!word.test(file.source)) continue;
         const here = withParsed(file.source, file.language, (tree) => findingsIn(tree.rootNode, plain, member, file));
         // A file with a grammar that would not parse could write it any way at all.
-        found.push(...(here ?? [{ how: "unread" as const, file: file.file, line: 0 }]));
+        const read = here ?? [{ how: "unread" as const, file: file.file, line: 0 }];
+        found.push(...(isTestFile(file.file) ? read.map((one) => ({ ...one, test: true as const })) : read));
       }
     }
     known.set(key, found);
     return found;
   };
   return { findings };
+}
+
+/**
+ * A test file, by each language's own conventions: a `test`, `tests`,
+ * `__tests__`, `__mocks__`, `spec`, `specs`, `e2e`, `fixtures`, `benches` or
+ * `benchmarks` directory (Cargo's `tests/` and `benches/` among them);
+ * `x.test.ts`, `x.spec.js`, `x.test-d.ts`, `x.e2e.ts`, `x.bench.ts`; pytest's
+ * `test_x.py`, `x_test.py` and `conftest.py`. And a bundle built out of the
+ * same code, `x.min.js` or `x.umd.js`, which says nothing its source does not.
+ *
+ * Examples, documentation and a package's own testing helpers (`trio.testing`)
+ * are not tests: they are written the way a user of the code writes.
+ */
+const TEST_FILE = new RegExp(
+  "(^|/)(tests?|__tests__|__mocks__|specs?|e2e|__fixtures__|fixtures?|benches|benchmarks?)(/|$)"
+  + "|\\.(test|spec|test-d|e2e|bench|min|umd)\\.[cm]?[jt]sx?$"
+  + "|(^|/)test_[^/]*\\.py$|_test\\.py$|(^|/)conftest\\.py$",
+);
+
+/** Whether a repo-relative file is a test, or a bundle of code written elsewhere. */
+export function isTestFile(file: string): boolean {
+  return TEST_FILE.test(file.split("\\").join("/"));
+}
+
+/**
+ * The findings the product itself writes (owner decision, 2026-11-25): what a
+ * test hands in is not what the product calls. `it("..", () => job.promote())`
+ * names `promote` from a function with no name, and a test's mock stores a
+ * routine wherever it likes; neither says how the code under test reaches it.
+ * A walk that gave up (`unread`) stays: "cannot tell" is never "nothing". A
+ * test file that would not parse is still a test, and is left out.
+ *
+ * The cost, on the record: a routine only a test swaps in is read as never
+ * swapped in.
+ */
+export function inProduct<T extends { how: string; test?: true }>(findings: readonly T[]): T[] {
+  return findings.filter((one) => !one.test);
 }
 
 /** Languages whose files can hold each other's routines. */
@@ -208,6 +280,12 @@ interface Context {
   imported?: "plain" | "renamed";
   /** The nearest function around this has no name: written as a call's argument, or anywhere else. */
   anonymous?: "argument" | "stored";
+  /** The functions with no name around this, outermost first, up to the nearest named routine. */
+  wrappers?: Array<{ start: number; end: number }>;
+  /** Inside a Rust `#[cfg(test)]` module or `#[test]` function. */
+  test?: true;
+  /** Under what a member, a key or a class-level name is set to (`StoredFinding.attached`). */
+  attaches?: true;
   /** For a function handed as an argument: the routine of this file it is handed to, and in which place. */
   handedTo?: { name: string; own: boolean; index: number };
   /** Inside a call's arguments: the routine called, when it is named plainly or as `this.f` / `self.f`. */
@@ -226,29 +304,36 @@ function findingsIn(root: Node, name: string, member: boolean, file: StoredSourc
   const found: StoredFinding[] = [];
   const line = (at: number) => file.source.slice(0, at).split("\n").length;
   const python = file.language === "python";
+  const rust = file.language === "rust";
+  /** A finding, marked as a test's when it is written in one. */
+  const note = (one: StoredFinding, context: Context): void => { found.push(context.test ? { ...one, test: true } : one); };
 
   const leaf = (node: Node, context: Context, callNext: boolean): void => {
     if (/string_content|string_fragment/.test(node.type)) {
-      if (context.byName && node.text === name) found.push({ how: "by-name", file: file.file, line: line(node.startIndex) });
+      if (context.byName && node.text === name) note({ how: "by-name", file: file.file, line: line(node.startIndex) }, context);
       return;
     }
     if (!spelt(node.text) || !/identifier$/.test(node.type) || node.type === "type_identifier") return;
     // A Rust field is never a function: `x.f` without a call reads data.
     if (node.type === "field_identifier" && file.language === "rust") return;
     if (context.imported) {
-      if (context.imported === "renamed") found.push({ how: "renamed", file: file.file, line: line(node.startIndex) });
+      if (context.imported === "renamed") note({ how: "renamed", file: file.file, line: line(node.startIndex) }, context);
       return;
     }
     if (called.has(node.startIndex) || callNext) {
       if (context.anonymous) {
         if (context.anonymous === "argument" && context.handedTo && runsOnTheSpot(context.handedTo, file, called)) return;
-        found.push({ how: "wrapped", file: file.file, line: line(node.startIndex), ...(context.anonymous === "argument" ? { argument: true as const } : {}) });
+        note({
+          how: "wrapped", file: file.file, line: line(node.startIndex),
+          ...(context.anonymous === "argument" ? { argument: true as const } : {}),
+          ...(context.wrappers ? { wrappers: context.wrappers } : {}),
+        }, context);
       }
       return;
     }
     if (context.quiet) return;
     if (member && !context.memberPart && node.type !== "private_property_identifier" && !(python && context.classBody)) return;
-    found.push({ how: "value", file: file.file, line: line(node.startIndex) });
+    note({ how: "value", file: file.file, line: line(node.startIndex), ...(context.attaches ? { attached: true as const } : {}) }, context);
   };
 
   const visit = (node: Node, context: Context): void => {
@@ -258,18 +343,31 @@ function findingsIn(root: Node, name: string, member: boolean, file: StoredSourc
     if (TYPE_OR_PATTERN.test(node.type)) here.quiet = true;
     if (node.childForFieldName("name") && node.childForFieldName("body") && !ANONYMOUS.has(node.type)) {
       // A named routine or a class: whatever is around it no longer decides.
-      here = { ...here, anonymous: undefined, classBody: python && node.type === "class_definition" };
+      here = { ...here, anonymous: undefined, wrappers: undefined, attaches: undefined, classBody: python && node.type === "class_definition" };
     }
+    // `x.m = ..`, `x[k] = ..`, and in a Python class body `m = ..`: the right side lands on something.
+    const target = node.childForFieldName("right") ? node.childForFieldName("left") : null;
+    const lands = target !== null && (target.childCount > 0 || (python && here.classBody));
+    const keyed = node.childForFieldName("key") !== null;
     const renames = Boolean(node.childForFieldName("alias")) && Boolean(here.imported);
     const byNameCall = Boolean(node.childForFieldName("arguments")) && BY_NAME.has(lastName(node.childForFieldName("function")));
     const path = node.type === "scoped_identifier";
     const calling = node.childForFieldName("arguments") ? plainCallee(node.childForFieldName("function")) : undefined;
     let position = 0;
+    // Rust writes a test where the product is: the item under `#[cfg(test)]` or `#[test]`.
+    let testNext = false;
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
       if (!child) continue;
       const field = node.fieldNameForChild(index);
       const inner: Context = { ...here };
+      if (rust) {
+        if (child.type === "attribute_item") { if (RUST_TEST_ATTRIBUTE.test(child.text)) testNext = true; }
+        else if (child.isNamed && !/comment/.test(child.type)) {
+          if (testNext) inner.test = true;
+          testNext = false;
+        }
+      }
       if (renames) inner.imported = field === "alias" ? "plain" : "renamed";
       if (field && NOT_A_VALUE.has(field) && !(path && field === "name")) inner.quiet = true;
       else if (field && A_VALUE.has(field)) inner.quiet = false;
@@ -277,11 +375,13 @@ function findingsIn(root: Node, name: string, member: boolean, file: StoredSourc
       inner.memberPart = (field !== null && MEMBER_FIELD.has(field)) || (path && field === "name");
       inner.byName = field === "index" || field === "subscript" || (byNameCall && field === "arguments")
         || (here.byName && /argument|string/.test(node.type));
+      if ((field === "right" && lands) || (field === "value" && keyed) || (field === "arguments" && byNameCall)) inner.attaches = true;
       inner.calling = field === "arguments" ? calling : undefined;
       const listed = /^(arguments|argument_list)$/.test(node.type);
       if (ANONYMOUS.has(child.type)) {
         const handed = listed || (node.type === "keyword_argument" && field === "value");
         inner.anonymous = handed ? "argument" : "stored";
+        inner.wrappers = [...(here.wrappers ?? []), { start: child.startIndex, end: child.endIndex }];
         inner.handedTo = listed && here.calling ? { ...here.calling, index: position } : undefined;
         inner.classBody = false;
       }
@@ -320,6 +420,13 @@ function findingsIn(root: Node, name: string, member: boolean, file: StoredSourc
   for (const decorator of decoratedIn(root, name)) found.push({ how: "decorated", file: file.file, line: line(decorator.startIndex) });
   return found;
 }
+
+/**
+ * Rust's own marks for a test: `#[cfg(test)]` on a module or an item, `#[test]`
+ * on a function, and a test harness's attribute of that last name
+ * (`#[tokio::test]`, `#[rstest]` is not one and is left alone).
+ */
+const RUST_TEST_ATTRIBUTE = /^#\[\s*(cfg\s*\(\s*test\s*\)|(\w+\s*::\s*)*test\b)/;
 
 /** `f` in `f(..)`, `this.f(..)`, `self.f(..)`: a callee this file may declare. */
 function plainCallee(written: Node | null): { name: string; own: boolean } | undefined {

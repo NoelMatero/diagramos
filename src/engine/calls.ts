@@ -71,13 +71,15 @@ import { providedByLanguage } from "./builtins";
 import {
   compiledBodiesOf, compiledRefutes, ownCallIn, traitImplsOf, type CompiledBody, type CompiledCrate,
 } from "./compiled-calls";
+import { declaredShapes } from "./body";
 import { declaredBases } from "./conforms";
 import { declarationName, escapeName, NAME_END, NAME_START, wholeName } from "./declared";
 import { mayAccuse } from "./licence";
 import { macroArguments } from "./macro-args";
 import { enclosing, lookUp, moduleScope, type Meaning, type Space, type WildcardAnswer } from "./names";
 import { declaresMember, holdersIn } from "./overrides";
-import { each, incomplete, parametersOf, parseSource, type Language, type Node, type Tree } from "./parse";
+import { each, incomplete, keywordOf, parametersOf, parseSource, type Language, type Node, type Tree } from "./parse";
+import type { StoredFinding } from "./stored";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -234,6 +236,30 @@ export interface CallsRefutedEvidence {
    */
   untypedAt?: Array<{ start: number; end: number }>;
   /**
+   * How many of `sites` nobody could place, and that pass arguments the head
+   * cannot take (`misfits`): not a call of it, whatever value is called.
+   */
+  misfit?: number;
+  /**
+   * How many of `sites` are macro calls of the repository's own whose
+   * templates never write the head's name (`macroNeverRuns`).
+   */
+  inMacros?: number;
+  /**
+   * Present when the red rests on a call ruled out by what it passes, by a
+   * macro's template, or by "making one is not calling it" (`ruledOut`):
+   * where each such call writes its name, for those that write one. Like
+   * `untypedAt`, the places a compiler is asked about, so the red waits for
+   * the compilers instead of standing on the first pass.
+   */
+  ruledOutAt?: Array<{ start: number; end: number }>;
+  /**
+   * The head is a value -- a field, a variable, a key -- and the tail never
+   * writes its name (`valueNeverNamed`). The wrong-kind check has the first
+   * word on such an arrow, where it can say the value cannot be called.
+   */
+  valueNeverNamed?: true;
+  /**
    * The head is a method the language runs without it being written (#384):
    * a Python `__dunder__` an operator or builtin calls, or TypeScript's
    * `toString`, `valueOf`, `toJSON`, `then`. No written call is then no
@@ -276,6 +302,8 @@ export interface CallsWrongRoutineEvidence {
   reached: Array<{ name: string; line: number }>;
   /** As `CallsRefutedEvidence.untypedAt`: calls on untyped values read by their names alone. */
   untypedAt?: Array<{ start: number; end: number }>;
+  /** As `CallsRefutedEvidence.ruledOutAt`: the closed reading ruled a call out by a test of its own. */
+  ruledOutAt?: Array<{ start: number; end: number }>;
 }
 
 export type CallsVerdict =
@@ -284,8 +312,12 @@ export type CallsVerdict =
   /**
    * The call runs the other way, and only the other way: the head calls the
    * tail. The arrow is backwards.
+   *
+   * `ruledOutAt`: the forward reading met a call that might have been the
+   * head and ruled it out (`ruledOut`); where each is written, so the red
+   * asks the compilers as a `refuted` resting on the same test does.
    */
-  | { verdict: "backwards"; evidence: CallsEvidence }
+  | { verdict: "backwards"; evidence: CallsEvidence; ruledOutAt?: Array<{ start: number; end: number }> }
   /**
    * Every call the tail's routine makes was enumerated, resolved, and none of
    * them reaches the head -- a closed-body absence (#233), licensed
@@ -572,6 +604,17 @@ export interface CallSide {
    * routines are asked (`stored.ts`).
    */
   runsUnderAnotherName?: (name: string, member: boolean, language: Language) => boolean;
+  /**
+   * The findings behind `runsUnderAnotherName`, one per place the repository
+   * writes the routine so that it can run under another name (`stored.ts`).
+   *
+   * Read where one answer is not enough: a call is tested against each
+   * function with no name that calls the head (`wrapped`), a decorated head
+   * may have any shape, and an import that renames a value is the same value
+   * (`ruledOut`, `valueNeverNamed`). Absent, nobody asked, and none of those
+   * tests speaks. `drift.ts` hands both to `@calls`' tail, from one index.
+   */
+  storedFindings?: (name: string, member: boolean, language: Language) => readonly StoredFinding[];
   /**
    * The crate the Rust compiler built this file into, when it has (#357) --
    * every body after macro expansion, with every call it makes.
@@ -2116,10 +2159,12 @@ function callsTo(
     hooked?: boolean;
     /** Only a call reaching the head's own declaration counts (`callsBetween`'s `ownerOnly`). */
     ownerOnly?: boolean;
+    /** The head's own side, when a doubt is to be asked whether it can be the head at all (`ruledOut`). */
+    head?: CallSide & { names: string[] };
   },
   /** The nodes to read instead of the routines of that name: a class or struct tail's own code (#459). */
   own?: Node[],
-): { evidence?: CallsEvidence; why?: CallsWithheld } {
+): { evidence?: CallsEvidence; why?: CallsWithheld; ruledOutAt?: Array<{ start: number; end: number }> } {
   // A class read through its bases: a base's `self.x()` runs this class's `x` where it declares one.
   if (own && target.ownerOnly) target = { ...target, readFor: routine } as typeof target;
   const bindings = bindingsIn(side.source, side.language);
@@ -2134,6 +2179,7 @@ function callsTo(
   const holders = tree ? holdersIn(tree.rootNode) : new Map<number, Node>();
 
   let why: CallsWithheld | undefined;
+  let ruledOutAt: Array<{ start: number; end: number }> | undefined;
   for (const body of routines) {
     if (incomplete(body)) { why ??= "incomplete"; continue; }
     let found: CallsEvidence | undefined;
@@ -2167,6 +2213,23 @@ function callsTo(
       if (answer === undefined) return;
       // Read or set by name, and the result runs nowhere: no call to the head (#431).
       if (answer === "dynamic" && quiet?.has(node.id)) return;
+      /*
+       * A call that might be the head, and cannot be: it passes arguments
+       * the head does not take. The same question the closed reading puts to
+       * the same call (`ruledOut`), so the two agree on what is a doubt.
+       */
+      if (target.head && (answer === "computed" || answer === "local-callee" || answer === "receiver")) {
+        const handed = answer === "receiver" ? node.childForFieldName("arguments") : null;
+        const site = {
+          ...siteOf(callee, side, node, { why: answer }),
+          ...(handed !== null && handsAFunction(handed, side, bindings, holder, body) ? { handsOn: true as const } : {}),
+        };
+        if (ruledOut(site, { ...side, routine }, target.head)) {
+          ruledOutAt ??= [];
+          if (site.nameAt) ruledOutAt.push(site.nameAt);
+          return;
+        }
+      }
       if (answer === "yes") {
         found = {
           name: callee.kind === "computed" ? "" : callee.name,
@@ -2181,7 +2244,7 @@ function callsTo(
     each(body, visit);
     if (found) return { evidence: found };
   }
-  return why ? { why } : {};
+  return { ...(why ? { why } : {}), ...(ruledOutAt ? { ruledOutAt } : {}) };
 }
 
 /**
@@ -2244,7 +2307,7 @@ export function callsBetween(
    */
   const typeTail = typeTailOf(from.source, from.language, from.routine);
   const forward = callsTo(from, from.routine, {
-    file: to.file, names: wanted, hooked: runsOnRead(to, to.names), ...(to.ownerOnly ? { ownerOnly: true } : {}),
+    file: to.file, names: wanted, hooked: runsOnRead(to, to.names), ...(to.ownerOnly ? { ownerOnly: true } : {}), head: to,
   }, typeTail?.nodes);
   if (forward.evidence) return { verdict: "confirmed", evidence: forward.evidence };
   /*
@@ -2254,7 +2317,14 @@ export function callsBetween(
    * the question goes on to the closed reading, which asks the compiler.
    */
   const compiled = forward.why ? compiledBodiesFor(from, to.names) : undefined;
-  if (forward.why && !compiled) return { verdict: "withheld", why: forward.why };
+  /*
+   * Unless the head is a value the tail never names (`valueNeverNamed`): a
+   * doubt about some call in the tail is then not a doubt about this arrow,
+   * and the closed reading below says so. Not past a tail that was not read
+   * to the end.
+   */
+  const unread = forward.why === "unreadable" || forward.why === "incomplete" || forward.why === "no-body" || forward.why === "not-declared";
+  if (forward.why && !compiled && (unread || !valueNeverNamed(from, to))) return { verdict: "withheld", why: forward.why };
 
   /*
    * And the compiler's list may show the call the text could only doubt
@@ -2306,7 +2376,9 @@ export function callsBetween(
      * change what the head's code calls, and the first class-tail prototype
      * lost true reds by letting the new reading replace old answers.
      */
-    if (typeTail || !runsGiven()) return { verdict: "backwards", evidence: reverse.evidence };
+    if (typeTail || !runsGiven()) {
+      return { verdict: "backwards", evidence: reverse.evidence, ...(forward.ruledOutAt ? { ruledOutAt: forward.ruledOutAt } : {}) };
+    }
     break;
   }
 
@@ -3168,9 +3240,35 @@ function runsItsOwnName(
     const head = plain(name);
     if (runsAs.includes(head) || head === "constructor" || /^__\w+__$/.test(head)) return false;
     if (!isRoutine(to.source, name, to.language)) return false;
+    if (rustNamesWhatRuns(site, from, to, called)) continue;
     if (from.runsUnderAnotherName(head, onlyAMethod(to.source, to.language, name), to.language)) return false;
   }
   return true;
+}
+
+/**
+ * Whether a Rust call's own name is the name of what it runs, wherever the
+ * head is written as a value (calls research, 2026-11).
+ *
+ * In every language here a function can be stored under another name, and
+ * `x.save()` then runs it. Not in Rust: `value.save(..)` is method-call
+ * syntax and runs a method declared `save`, inherent or a trait's; a function
+ * kept in a field is called `(value.save)(..)`, and a closure in a variable
+ * `f(..)`, neither of which is this call. So a head named as a value all over
+ * the repository -- handed to `map`, kept in a table -- is still not what
+ * `x.search()` runs, and one such mention used to keep every method call in
+ * the tail a doubt.
+ *
+ * `Type::save(..)` runs a function declared `save` too, with two ways round
+ * it that keep the old question: a `use .. as save` somewhere, and a constant
+ * holding a function, which is written like one (`HANDLER(..)`).
+ */
+function rustNamesWhatRuns(site: CallSitePlaced, from: CallSide, to: CallSide & { names: string[] }, called: string): boolean {
+  if (from.language !== "rust" || to.language !== "rust" || !site.passes) return false;
+  if (site.passes.written === "dot") return true;
+  if (site.passes.written !== "path" || CONSTANT_NAME.test(called)) return false;
+  const stored = storedFor(from, to);
+  return stored !== undefined && !stored.some((one) => one.how === "renamed" || one.how === "unread");
 }
 
 /** Whether every routine of this name in the file is a method of a class, an `impl` or a trait. */
@@ -3186,6 +3284,859 @@ function onlyAMethod(source: string, language: Language, name: string): boolean 
   });
 }
 
+/* ------------------------------------------ could this call run the head? */
+
+/*
+ * A call nobody can place used to keep the whole arrow quiet (#324's walls).
+ * The question a wrong arrow needs answered is smaller than "where does this
+ * call go?": only whether it can be the head at all. The language answers
+ * that far more often, and none of its answers depends on how the head
+ * travelled through the program (calls research, 2026-11):
+ *
+ *   name    `x.save()` runs something called `save`, or something stored
+ *           under that name (#351, #507: `runsItsOwnName`); in Rust nothing
+ *           is stored under a method's name at all
+ *   shape   a call that passes arguments the head cannot take is not a call
+ *           of it: Python raises, Rust does not compile (`misfits`)
+ *   made    `new Session()` runs Session's constructor, and a plain method
+ *           of Session only if the constructor calls it, which is a step
+ *           (`madeNotCalled`)
+ *   macro   a `macro_rules!` of the repository runs what its template and
+ *           its arguments write (`macroNeverRuns`)
+ *
+ * `ruledOut` is where they are asked, of one call at a time, by the forward
+ * reading, the closed reading and a class tail's alike. A red that rests on
+ * one waits for the compilers like any other (`ruledOutAt`, `drift.ts`).
+ *
+ * What stays a doubt, on purpose: a call that fits the head, a function with
+ * no name that calls the head and fits the call (it is what runs under the
+ * other name, so it is put to the same test), a decorated head, `*args`, and
+ * every call in a language whose calls take any number of arguments.
+ */
+
+/**
+ * What one call passes, read where the call is read (`callSitesIn`).
+ *
+ * The count is the text's own: a spread, a tagged template or a `.call` /
+ * `.apply` hides it, and `open` says so rather than guessing.
+ */
+export interface CallPasses {
+  /** Positional arguments written. */
+  count: number;
+  /** Keyword arguments written, by name: Python's `f(key=1)`. */
+  keywords: string[];
+  /** The count is not in the text: `f(*xs)`, `f(**kw)`, `f(...xs)`, a tagged template, `f.call(self, x)`. */
+  open: boolean;
+  /** Written with `new`. */
+  made: boolean;
+  /** How the callee is written: `x.m(..)`, `T::m(..)`, or anything else -- a bare name, a value. */
+  written: "dot" | "path" | "other";
+  /**
+   * The call is written among another call's arguments, or inside a JSX tag:
+   * what it hands back goes straight to code that may run anything on it.
+   */
+  handed: boolean;
+}
+
+/** Tokens a grammar writes in front of an argument that stands for any number of them. */
+const SPREADS = new Set(["*", "**", "..."]);
+
+function passesOf(call: Node, side: { source: string; language: Language }): CallPasses | undefined {
+  const made = call.childForFieldName("constructor");
+  const written = made ?? (call.childForFieldName("arguments") ? call.childForFieldName("function") : null);
+  if (!written) return undefined;
+  let callee = unwrapped(written.type === "await_expression" ? firstNamed(written) ?? written : written);
+  // Rust's `f::<T>(..)`: the callee is under the type arguments.
+  for (let inner = callee.childForFieldName("function"); inner && !callee.childForFieldName("arguments"); inner = callee.childForFieldName("function")) {
+    callee = inner;
+  }
+  let how: CallPasses["written"] = "other";
+  for (const part of children(callee)) {
+    if (part.isNamed) continue;
+    if (part.type === "." || part.type === "?.") how = "dot";
+    else if (part.type === "::") how = "path";
+  }
+  // Up to the function the call is written in: is it an argument of another call on the way?
+  let handed = false;
+  let below = call;
+  for (const above of enclosing(side.source, side.language, call)) {
+    if (writtenOnTheSpot(above) || (parametersOf(above) && above.childForFieldName("body"))) break;
+    if (above.childForFieldName("arguments")?.id === below.id || /^jsx_/.test(above.type)) { handed = true; break; }
+    below = above;
+  }
+  const passes: CallPasses = { count: 0, keywords: [], open: false, made: made !== null, written: how, handed };
+  /*
+   * `f.call(self, a)`, `f.apply(self, args)`, Rust's `f.call((a,))`: what runs
+   * is `f`, with arguments that are not the ones written here.
+   */
+  const member = callee.childForFieldName("property") ?? callee.childForFieldName("field") ?? callee.childForFieldName("attribute");
+  if (member && RUNS_WHAT_IT_HOLDS.has(member.text)) {
+    passes.open = true;
+    return passes;
+  }
+  const list = call.childForFieldName("arguments");
+  if (!list) return passes;
+  // A tagged template, a macro's tokens: no list of arguments to count.
+  if (list.child(0)?.type !== "(") { passes.open = true; return passes; }
+  // Python's `f(x for x in xs)`: one argument, the generator.
+  if (list.childForFieldName("body")) { passes.count = 1; return passes; }
+  for (const one of namedKids(list)) {
+    if (/comment/.test(one.type)) continue;
+    const name = one.childForFieldName("name");
+    if (name && one.childForFieldName("value")) passes.keywords.push(name.text);
+    else if (SPREADS.has(one.child(0)?.type ?? "") || one.type === "attribute_item") passes.open = true;
+    else passes.count += 1;
+  }
+  return passes;
+}
+
+/** What a routine's parameter list takes. */
+interface Takes {
+  /** The parameters a positional argument fills, in order, without the receiver; the first `required` have no default. */
+  names: string[];
+  required: number;
+  /** Any number more: Python's `*args`, a C variadic. */
+  rest: boolean;
+  /** Python's keyword-only parameters, and those among them with no default. */
+  keywordOnly: string[];
+  keywordRequired: string[];
+  /** Python's `**kwargs`. */
+  anyKeyword: boolean;
+  /**
+   * The routine is a method: Rust's `self`, which is one more argument when
+   * it is called by its path (`Type::run(value, ..)`); in Python a routine
+   * written in a class, or whose first parameter is named `self` or `cls`,
+   * which is filled by the instance it is reached through.
+   */
+  receiver: boolean;
+}
+
+/**
+ * A parameter list, read by its fields. `undefined` for any shape this does
+ * not recognise -- a pattern in place of a name -- so that an unread list is
+ * never a reason to rule a call out (docs/reading-a-grammar.md).
+ *
+ * `list` is `null` for a Python `lambda: ..`, which takes nothing.
+ */
+function takesOf(list: Node | null, language: Language): Takes | undefined {
+  const takes: Takes = { names: [], required: 0, rest: false, keywordOnly: [], keywordRequired: [], anyKeyword: false, receiver: false };
+  if (!list) return takes;
+  // One name, no brackets: a JavaScript arrow's `x => ..`, which is not asked here.
+  if (list.childCount === 0) return undefined;
+  if (language === "rust") {
+    /*
+     * Counted by the commas, not by the nodes between them: a closure's `|_|`
+     * writes its one parameter as a token the grammar does not name.
+     */
+    let written = false;
+    const close = () => {
+      if (written) { takes.names.push(""); takes.required += 1; }
+      written = false;
+    };
+    for (const one of children(list)) {
+      if (one.type === ",") { close(); continue; }
+      if (/^[(|)]$/.test(one.type) || /comment/.test(one.type) || one.type === "attribute_item") continue;
+      if (one.type === "self_parameter" || one.childForFieldName("pattern")?.type === "self") { takes.receiver = true; continue; }
+      if (one.type === "variadic_parameter" || one.type === "...") { takes.rest = true; continue; }
+      written = true;
+    }
+    close();
+    return takes;
+  }
+  if (language !== "python") return undefined;
+  let keywordOnly = false;
+  for (const one of namedKids(list)) {
+    if (/comment/.test(one.type)) continue;
+    // `*` and `/` on their own: what follows is keyword-only, what came before positional-only.
+    if (one.text === "*") { keywordOnly = true; continue; }
+    if (one.text === "/") continue;
+    // `a: int` holds the name, or the splat, as its first child; a default holds it on `name`.
+    const typed = one.childForFieldName("type") !== null && one.childForFieldName("name") === null;
+    const inner = typed ? firstNamed(one) : one;
+    const star = inner?.child(0)?.type;
+    if (star === "*") { takes.rest = true; keywordOnly = true; continue; }
+    if (star === "**") { takes.anyKeyword = true; continue; }
+    const name = one.childForFieldName("name") ?? (inner && inner.childCount === 0 ? inner : null);
+    if (!name || name.childCount !== 0) return undefined;
+    const optional = one.childForFieldName("value") !== null;
+    if (keywordOnly) {
+      takes.keywordOnly.push(name.text);
+      if (!optional) takes.keywordRequired.push(name.text);
+      continue;
+    }
+    // A parameter without a default after one with: not Python, so not read.
+    if (!optional && takes.required !== takes.names.length) return undefined;
+    takes.names.push(name.text);
+    if (!optional) takes.required += 1;
+  }
+  return takes;
+}
+
+/** Whether Python accepts these arguments for these positional parameters, by its own binding rules. */
+function bindsInPython(passes: CallPasses, names: readonly string[], required: number, takes: Takes): boolean {
+  if (!takes.rest && passes.count > names.length) return false;
+  for (const missing of names.slice(passes.count, required)) if (!passes.keywords.includes(missing)) return false;
+  for (const needed of takes.keywordRequired) if (!passes.keywords.includes(needed)) return false;
+  if (takes.anyKeyword) return true;
+  const byKeyword = new Set([...names.slice(passes.count), ...takes.keywordOnly]);
+  return passes.keywords.every((given) => byKeyword.has(given));
+}
+
+/**
+ * Whether a routine that takes `takes` can be what this call runs.
+ *
+ * Python: every parameter filled by the call -- or, for a method, all but
+ * the first, which the instance fills. A function is a method when it is
+ * found on a class: written in one, or put on one (`Cls.run = helper`, `run
+ * = helper` in a class body, `setattr`), which is what `bound` says of a
+ * function written at the top of its file.
+ *
+ * Rust: exactly the parameters written, and for a method one more when the
+ * call is not written `value.method(..)` -- `Type::method(value, ..)`, or the
+ * method handed on as a value.
+ */
+function canTake(passes: CallPasses, takes: Takes, language: Language, bound: boolean): boolean {
+  if (language === "rust") {
+    if (takes.rest) return true;
+    return passes.count === takes.names.length || (takes.receiver && passes.count === takes.names.length + 1);
+  }
+  if (bindsInPython(passes, takes.names, takes.required, takes)) return true;
+  return (takes.receiver || bound) && takes.names.length > 0
+    && bindsInPython(passes, takes.names.slice(1), Math.max(0, takes.required - 1), takes);
+}
+
+/** What Python programmers call the parameter an instance, or its class, fills. */
+const RECEIVER_NAME = /^(self|cls|mcs|mcls|this)$/;
+
+/** Python decorators that only change how a routine is bound, or mark it: it keeps its own parameters. */
+const KEEPS_ITS_PARAMETERS = /^@\s*(staticmethod|classmethod|(abc\.)?abstractmethod|(typing\.|typing_extensions\.)?(override|final|overload))\s*$/;
+
+/**
+ * What every declaration of `name` in a file takes, or `undefined` when the
+ * text does not say: something else is declared under the name (a class, a
+ * value, an alias of another routine), a decorator or a Rust attribute macro
+ * may have put a routine of another shape in its place, or a parameter list
+ * this cannot read.
+ */
+function signaturesOf(side: { source: string; language: Language }, name: string): Takes[] | undefined {
+  const tree = parseSource(side.source, side.language);
+  if (!tree) return undefined;
+  // Asked once per call nobody could place, of the same few names: read once per tree.
+  const known = signatures_.get(tree) ?? new Map<string, Takes[] | null>();
+  signatures_.set(tree, known);
+  if (!known.has(name)) known.set(name, readSignatures(tree, side, name) ?? null);
+  return known.get(name) ?? undefined;
+}
+
+const signatures_ = new WeakMap<Tree, Map<string, Takes[] | null>>();
+
+function readSignatures(tree: Tree, side: { source: string; language: Language }, name: string): Takes[] | undefined {
+  const found: Takes[] = [];
+  const holders = side.language === "python" ? holdersIn(tree.rootNode) : undefined;
+  // The declaration index's own list (`body.ts`): a path that ends in the name (`Other::two(..)`) declares nothing.
+  for (const { node, soup } of declaredShapes(side.source, side.language)?.get(name) ?? []) {
+    // Out of a macro's tokens: nothing says what it takes.
+    if (soup) return undefined;
+    const value = node.childForFieldName("value") ?? node.childForFieldName("right");
+    const routine = parametersOf(node) ? node : value && writtenOnTheSpot(value) ? value : undefined;
+    if (!routine) return undefined;
+    if (side.language === "python") {
+      const holder = enclosing(side.source, side.language, node)[0];
+      if (holder?.type === "decorated_definition"
+        && namedKids(holder).some((one) => one.type === "decorator" && !KEEPS_ITS_PARAMETERS.test(one.text.trim()))) return undefined;
+    } else if (side.language === "rust" && !inertAttributes(node)) return undefined;
+    const takes = takesOf(parametersOf(routine), side.language);
+    if (!takes) return undefined;
+    if (holders && (holders.has(node.id) || RECEIVER_NAME.test(takes.names[0] ?? ""))) takes.receiver = true;
+    found.push(takes);
+  }
+  return found.length === 0 ? undefined : found;
+}
+
+/** Where the head is written so that it can run under another name, for every name it has -- or `undefined` with no index to ask. */
+function storedFor(from: CallSide, to: CallSide & { names: string[] }): StoredFinding[] | undefined {
+  if (!from.storedFindings) return undefined;
+  return to.names.flatMap((name) => [
+    ...from.storedFindings!(name.replace(/^(#|r#)/, ""), onlyAMethod(to.source, to.language, name), to.language),
+  ]);
+}
+
+/**
+ * Whether the call passes arguments no declaration of the head can take
+ * (Python, Rust), and none of the functions with no name that call the head
+ * can either.
+ *
+ * The language refuses such a call whatever value is called and however the
+ * head got there. `handler(req)` cannot be running `connect(self, req,
+ * traces, timeout)`; if `handler` is `partial(connect, traces=..)` built
+ * somewhere else, the tail calls the adapter it was given, and the adapter
+ * calls `connect` -- a step, as any call through a named helper is (owner
+ * decision, 2026-11-25).
+ *
+ * A function with no name is different: `{ on_error: lambda e: handle(e) }`
+ * is `handle` under another name as far as this reading goes (#351), so each
+ * one around a call of the head is put to the same test, and one that fits
+ * keeps the arrow a doubt.
+ *
+ * Never for a routine the language calls with arguments of its own -- a
+ * Python `__dunder__` other than `__call__` -- nor a decorated one, whose
+ * decorator may answer with any shape.
+ */
+function misfits(passes: CallPasses | undefined, from: CallSide, to: CallSide & { names: string[] }): boolean {
+  if (!passes || passes.open || passes.made || to.names.length === 0) return false;
+  if ((to.language !== "python" && to.language !== "rust") || from.language !== to.language) return false;
+  const stored = storedFor(from, to);
+  if (!stored || stored.some((one) => one.how === "unread" || one.how === "decorated")) return false;
+  const bound = stored.some((one) => one.attached === true);
+  for (const name of to.names) {
+    if (to.language === "python" && DUNDER.test(name) && name !== "__call__") return false;
+    const signatures = signaturesOf(to, name);
+    if (!signatures || signatures.some((takes) => canTake(passes, takes, to.language, bound))) return false;
+  }
+  for (const one of stored) {
+    if (one.how !== "wrapped") continue;
+    if (!one.wrappers || one.wrappers.length === 0) return false;
+    const written = one.file === from.file ? from : one.file === to.file ? to : from.open?.(one.file);
+    const tree = written && written.language === to.language ? parseSource(written.source, written.language) : undefined;
+    if (!tree) return false;
+    for (const at of one.wrappers) {
+      const wrapper = nodeSpanning(tree, at, writtenOnTheSpot);
+      // A function with no name may sit on a class too (`run = lambda self, x: ..`): either reading counts.
+      const takes = wrapper ? takesOf(parametersOf(wrapper), to.language) : undefined;
+      if (!takes || canTake(passes, takes, to.language, true)) return false;
+    }
+  }
+  return true;
+}
+
+const spans_ = new WeakMap<Tree, Map<string, Node[]>>();
+
+/** The node written at exactly this range that passes `test`: found by position, since a site keeps ranges and not nodes. */
+function nodeSpanning(tree: Tree, at: { start: number; end: number }, test: (node: Node) => boolean): Node | undefined {
+  let index = spans_.get(tree);
+  if (!index) {
+    index = new Map<string, Node[]>();
+    const all = index;
+    each(tree.rootNode, (node) => {
+      if (node.childCount === 0) return;
+      const key = `${node.startIndex}:${node.endIndex}`;
+      const list = all.get(key);
+      if (list) list.push(node); else all.set(key, [node]);
+    });
+    spans_.set(tree, index);
+  }
+  return index.get(`${at.start}:${at.end}`)?.find(test);
+}
+
+/** Routines a language runs when a value of their class is made, by name. */
+const RUN_WHEN_MADE = /^(constructor|new|__\w+__|drop|default)$/;
+
+/** Python decorators that leave a method a plain method of its class. */
+const STILL_A_METHOD = /^@\s*(staticmethod|classmethod|property|\w+\.(setter|getter|deleter)|(functools\.)?cached_property|(abc\.)?abstractmethod|(typing\.|typing_extensions\.)?(overload|override|final))\s*$/;
+
+/**
+ * Whether a call that came to rest on a class of the head's file made one
+ * and so cannot be the head: every head is a plain routine, which making a
+ * class does not run.
+ *
+ * `new Session()` and Python's `Session()` run the constructor, and whatever
+ * else of Session runs then is called by the constructor: a step, which the
+ * route check shows (`connect -> Connection -> .. -> expired`). Before, a
+ * method of the class kept the arrow quiet because its name is written
+ * inside the class it is declared in (`runWhenMade`).
+ *
+ * Kept a doubt: a constructor or a dunder, which making one does run; a
+ * decorated routine (a validator, a hook, a framework's handler), which the
+ * decorator may run then; a name the class's own code writes outside its
+ * routines -- a field's initializer, `field(default_factory=make)`, a class
+ * attribute -- because that code runs when one is made and is in no routine
+ * a route could show; the head under another name. Not Rust: `Type::new()`
+ * is a function like any other.
+ */
+function madeNotCalled(to: CallSide & { names: string[] }, landed: string): boolean {
+  if (to.language === "rust") return false;
+  if (!isTypeName(to.source, landed, to.language) || isRoutine(to.source, landed, to.language)) return false;
+  const tree = parseSource(to.source, to.language);
+  const type = typeDeclarationsOf(to.source, to.language, landed);
+  if (!tree || type.length === 0) return false;
+  for (const head of to.names) {
+    if (RUN_WHEN_MADE.test(head) || RUN_BY_JAVASCRIPT.has(head) || head.startsWith("[") || aliases(to.source, head, landed)) return false;
+    let routines = 0;
+    let other = false;
+    for (const { node, soup } of declaredShapes(to.source, to.language)?.get(head) ?? []) {
+      const value = node.childForFieldName("value") ?? node.childForFieldName("right");
+      if (soup || (!parametersOf(node) && !(value && writtenOnTheSpot(value)))) { other = true; break; }
+      routines += 1;
+      // A decorator -- on the routine, or just before it in the class body -- may be what making one runs.
+      const holder = enclosing(to.source, to.language, node)[0];
+      const decorators = [
+        ...namedKids(node).filter((one) => one.type === "decorator"),
+        ...(holder?.type === "decorated_definition" ? namedKids(holder).filter((one) => one.type === "decorator") : []),
+        ...decoratorsBefore(holder, node),
+      ];
+      if (decorators.some((one) => !(to.language === "python" && STILL_A_METHOD.test(one.text.trim())))) other = true;
+    }
+    if (other || routines === 0) return false;
+    // The class's own code outside its routines names the head: it runs when one is made.
+    const word = wholeName(head);
+    for (const declaration of type) {
+      let text = declaration.text;
+      const inside: Array<[number, number]> = [];
+      each(declaration, (node) => {
+        if (node.id === declaration.id) return;
+        const value = node.childForFieldName("value") ?? node.childForFieldName("right");
+        const body = parametersOf(node) ? node : value && parametersOf(value) ? value : undefined;
+        if (body && body.childForFieldName("body") && declarationName(node)) inside.push([node.startIndex, node.endIndex]);
+      });
+      for (const [start, end] of inside) {
+        const first = start - declaration.startIndex;
+        text = text.slice(0, first) + " ".repeat(end - start) + text.slice(first + (end - start));
+      }
+      if (word.test(text)) return false;
+    }
+  }
+  return true;
+}
+
+/** Every declaration of a class named `name` in a file. */
+function typeDeclarationsOf(source: string, language: Language, name: string): Node[] {
+  const tree = parseSource(source, language);
+  const found: Node[] = [];
+  if (!tree) return found;
+  each(tree.rootNode, (node) => {
+    if (declarationName(node)?.text === name && node.childForFieldName("body") && !parametersOf(node)) found.push(node);
+  });
+  return found;
+}
+
+/** TypeScript's decorators written just before a member in its class body, which the grammar lists beside it. */
+function decoratorsBefore(holder: Node | undefined, member: Node): Node[] {
+  if (!holder) return [];
+  const siblings = namedKids(holder);
+  const out: Node[] = [];
+  for (let at = siblings.findIndex((one) => one.id === member.id) - 1; at >= 0; at -= 1) {
+    const before = siblings[at]!;
+    if (before.type === "decorator") out.push(before);
+    else if (!/comment/.test(before.type)) break;
+  }
+  return out;
+}
+
+/** Macros that build a name out of pieces: what their expansion calls is not written anywhere. */
+const PASTES_NAMES = /\b(paste|concat_idents|seq|duplicate|duplicate_item|interpolate_idents)\s*!/;
+
+/** A name written the way a constant is: a `const` or `static` may hold a function under any name. */
+const CONSTANT_NAME = /^[A-Z0-9_]+$/;
+
+/**
+ * Whether a macro call nobody could read to the end -- a `macro_rules!` of
+ * the repository whose expansion makes calls of its own -- cannot run the
+ * head (Rust).
+ *
+ * `macro_rules!` has no way to build a name, and Rust none to look a
+ * function up by one while the program runs. So an expansion calls what its
+ * template writes and what its arguments write, and nothing else. The
+ * arguments were read as code already (`readMacro`), each call in them a
+ * site of its own; what is left is the template, all the way down through
+ * the macros it calls. clap's `debug!("..")` builds a string and prints it,
+ * and before, one of those kept every arrow out of a parser routine quiet.
+ *
+ * Not the head when no template writes the head's name, and every call a
+ * template makes is one whose name says what it runs:
+ *
+ *   `.name(..)`            a method named so
+ *   `a::b::name(..)`       a function named so, unless the name is spelt
+ *                          like a constant, which may hold any function
+ *   `name(..)`             a function this file or the macro's declares, a
+ *                          type's constructor, or std's (`Ok`, `Some`)
+ *   `name!(..)`            another `macro_rules!` of the repository, read
+ *                          the same way, or std's
+ *
+ * Refused: a callee that is an argument (`$f(..)`), since the argument may
+ * be a value holding any function; a callee in brackets (`($x.f)(..)`); a
+ * bare name nothing declares -- a function or a macro -- which may be a local
+ * the template bound to an argument, or a library's; a macro of this crate
+ * written by its path, which is not followed; anything that pastes names
+ * together; a head the repository renames on import (`use a::head as
+ * other`), which a template may call as `other`.
+ */
+function macroNeverRuns(site: CallSitePlaced, from: CallSide, to: CallSide & { names: string[] }): boolean {
+  if (from.language !== "rust" || to.language !== "rust" || !site.macro?.read || to.names.length === 0) return false;
+  if (!to.names.every((name) => isRoutine(to.source, name, to.language))) return false;
+  const stored = storedFor(from, to);
+  if (!stored || stored.some((one) => one.how === "unread" || one.how === "renamed")) return false;
+  const tree = parseSource(from.source, "rust");
+  const bindings = bindingsIn(from.source, "rust");
+  if (!tree || !bindings) return false;
+  const invocation = nodeSpanning(tree, site.macro.at, (node) => node.type === "macro_invocation");
+  if (!invocation) return false;
+  const heads = to.names.map((name) => wholeName(name.replace(/^r#/, "")));
+  if (heads.some((word) => word.test(invocation.text)) || PASTES_NAMES.test(invocation.text)) return false;
+  const origin = macroOrigin(invocation, from, bindings);
+  if (origin.kind !== "repo") return false;
+  return templatesNeverRun(origin.definitions, from, heads, 0, new Set());
+}
+
+function templatesNeverRun(definitions: MacroDefinition[], side: CallSide, heads: RegExp[], depth: number, seen: Set<string>): boolean {
+  if (depth > 6) return false;
+  for (const definition of definitions) {
+    const key = `${definition.file}:${definition.node.startIndex}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const text = definition.node.text;
+    if (heads.some((word) => word.test(text)) || PASTES_NAMES.test(text)) return false;
+    for (const rule of children(definition.node)) {
+      if (rule.type !== "macro_rule") continue;
+      const right = rule.childForFieldName("right");
+      if (right && !templateNeverRuns(right, definition, side, heads, depth, seen)) return false;
+    }
+  }
+  return true;
+}
+
+function templateNeverRuns(tokens: Node, definition: MacroDefinition, side: CallSide, heads: RegExp[], depth: number, seen: Set<string>): boolean {
+  for (let at = 0; at < tokens.childCount; at += 1) {
+    const token = tokens.child(at)!;
+    if (token.type === "token_tree" || token.type === "token_repetition") {
+      // `#[cfg(feature = "x")]` written in the template is an attribute, not a call.
+      const attribute = tokens.child(at - 1)?.type === "#" || (tokens.child(at - 1)?.type === "!" && tokens.child(at - 2)?.type === "#");
+      if (attribute) continue;
+      // `(..)(..)`, `xs[i](..)`, `$($arg)*(..)`: a call of whatever the brackets, or the arguments, hold.
+      const before = tokens.child(at - 1)?.type;
+      if (token.type === "token_tree" && token.text.startsWith("(") && (before === "token_tree" || before === "token_repetition")) return false;
+      if (!templateNeverRuns(token, definition, side, heads, depth, seen)) return false;
+      continue;
+    }
+    if (token.type !== "identifier" && token.type !== "metavariable") continue;
+    const next = tokens.child(at + 1);
+    const call = next?.type === "token_tree" && next.text.startsWith("(");
+    const macro = next?.type === "!" && tokens.child(at + 2)?.type === "token_tree";
+    if (!call && !macro) continue;
+    // The path written before the name: `a::b::name(..)`, `$crate::x(..)`.
+    const steps = [token.text];
+    let before = at - 1;
+    while (before >= 1 && tokens.child(before)?.type === "::" && /^(identifier|metavariable|crate|self|super)$/.test(tokens.child(before - 1)?.type ?? "")) {
+      steps.unshift(tokens.child(before - 1)!.text);
+      before -= 2;
+    }
+    const leading = before >= 0 && tokens.child(before)?.type === "::";
+    const method = !leading && before >= 0 && tokens.child(before)?.type === ".";
+    // The callee is an argument: whatever the caller wrote there, a value holding any function included.
+    if (token.type === "metavariable") return false;
+    if (macro) {
+      if (steps.length > 1 || leading) {
+        // A path into this crate is not followed; a library's macro reaches its own crate and what it is handed (#471).
+        if (/^(\$?crate|self|super)$/.test(steps[0]!)) return false;
+        continue;
+      }
+      const source = sourceOf(definition, side) ?? "";
+      const inner = macroRulesIn(definition.file, source, token.text);
+      const found = inner.length > 0 ? inner : crateMacros(token.text, definition.file, side.open);
+      if (found) {
+        if (!templatesNeverRun(found, side, heads, depth + 1, seen)) return false;
+        continue;
+      }
+      if (providedByLanguage(token.text, "rust") && !UNREAD_STD_MACROS.has(token.text)) continue;
+      return false;
+    }
+    if (method) continue;
+    if (steps.length > 1 || leading) {
+      if (CONSTANT_NAME.test(token.text)) return false;
+      continue;
+    }
+    if (STD_CALLS.has(token.text) || /^[A-Z]\w*[a-z]/.test(token.text)) continue;
+    const declares = new RegExp(`\\bfn\\s+${escapeName(token.text)}${NAME_END}`, "u");
+    if (declares.test(sourceOf(definition, side) ?? "") || declares.test(side.source)) continue;
+    return false;
+  }
+  return true;
+}
+
+/** Why a call cannot be the head: the test that said so. The name test is `runsItsOwnName`'s, asked just before this. */
+type RuledOut = "shape" | "made" | "macro";
+
+/**
+ * The one place a call nobody could place is asked whether it can run the
+ * head at all, whichever reading met it. `undefined` is "it could".
+ *
+ *   unplaced, in a macro                       the macro's template
+ *   unplaced: a method on an untyped value,    what it passes
+ *     a function value, a computed callee
+ *   placed through an interface or an override what it passes
+ *   placed on a class of the head's file       making one is not calling a method of it
+ *   placed on a value of the head's file       a function value like any other: what it passes
+ *
+ * Each caller asks the name first (`runsItsOwnName`), which has its own
+ * count in the red's sentence. A compiler's answer about the value called
+ * belongs here too, as one more test beside `misfits`.
+ */
+function ruledOut(site: CallSitePlaced, from: CallSide & { routine: string }, to: CallSide & { names: string[] }): RuledOut | undefined {
+  if (site.file === undefined) {
+    if (site.why === "macro") return macroNeverRuns(site, from, to) ? "macro" : undefined;
+    // Handed a function of this repository's: what it runs may be that function (`handsOn`).
+    if (site.handsOn) return undefined;
+    if (site.why !== "receiver" && site.why !== "computed" && site.why !== "local-callee") return undefined;
+    return misfits(site.passes, from, to) ? "shape" : undefined;
+  }
+  if (site.concrete === false || site.overridden) return misfits(site.passes, from, to) ? "shape" : undefined;
+  if (site.file !== to.file || site.declaredAs === undefined || to.names.includes(site.declaredAs)) return undefined;
+  // Made and handed straight on -- `serve(new Handler())`, `<Widget />` -- is run by whoever was handed it.
+  if (site.passes && !site.passes.handed && madeNotCalled(to, site.declaredAs)) return "made";
+  // A field or a variable of the head's file: `self.callback(job)` runs whatever function was put there.
+  if (!isRoutine(to.source, site.declaredAs, to.language) && !isTypeName(to.source, site.declaredAs, to.language)
+    && misfits(site.passes, from, to)) return "shape";
+  return undefined;
+}
+
+/* --------------------------------------------- a value is called by its name */
+
+/** The words a declaration of a value opens with, in the three grammars; any other word declares something else. */
+const VALUE_KEYWORDS = new Set([
+  "const", "let", "var", "static", "readonly", "declare", "public", "private", "protected", "abstract", "override",
+  "accessor", "mut", "pub", "ref", "for", "as", "with", "catch", "except",
+]);
+
+/** Names every language here writes for a value that is not a name: `true`, `None`, `undefined`. */
+const LITERAL_NAMES = /^(true|false|null|undefined|NaN|Infinity|None|True|False)$/;
+
+/** Whether a value is written out in full and holds nothing that runs: no call, no function, no name. */
+function plainData(value: Node): boolean {
+  let plain = true;
+  const keys = new Set<number>();
+  each(value, (node) => {
+    if (!plain) return;
+    const key = node.childForFieldName("key");
+    if (key && node.childForFieldName("value")) keys.add(key.id);
+    if (node.childForFieldName("function") || node.childForFieldName("arguments") || node.childForFieldName("constructor")
+      || node.childForFieldName("macro") || node.childForFieldName("body") || parametersOf(node)) { plain = false; return; }
+    if (node.childCount === 0 && node.isNamed && NAME_LEAF.test(node.type) && !keys.has(node.id) && !LITERAL_NAMES.test(node.text)) plain = false;
+  });
+  return plain;
+}
+
+/** The last name a node writes: `name` in `self.x.name`, in `"name"`, in `name`. */
+function lastNameOf(node: Node): string | undefined {
+  if (node.childCount === 0) return node.isNamed ? node.text : undefined;
+  if (/^string/.test(node.type)) return node.text.replace(/^[a-zA-Z]*['"`]+|['"`]+$/g, "");
+  for (let index = node.childCount - 1; index >= 0; index -= 1) {
+    const child = node.child(index);
+    if (child?.isNamed && !/comment/.test(child.type)) return lastNameOf(child);
+  }
+  return undefined;
+}
+
+/**
+ * Whether everything the head's file writes under `name` is a value -- a
+ * field, a variable, a constant, an object's key, a local, an attribute set
+ * in a method -- and nothing that runs: no routine, no class, no type, no
+ * alias, no function or class written out and given the name anywhere
+ * (`x.name = function () {}`, `{ name: () => .. }`).
+ *
+ * `plain`: each time it is written with what it holds, that is data written
+ * out in full (`limit = 3`, `unit: "ms"`), which no reading of it could call.
+ *
+ * A name nothing declares has to be written in the file and not brought in
+ * from another, where it could be a routine. Not Rust for those: a name a
+ * Rust file writes and does not declare may be a function a macro wrote.
+ */
+function valueOnly(to: { source: string; language: Language }, name: string): { plain: boolean; keyed: boolean; standsFor: string[] } | undefined {
+  if (/^(constructor|__\w+__)$/.test(name)) return undefined;
+  const tree = parseSource(to.source, to.language);
+  if (!tree) return undefined;
+  const bare = name.replace(/^(#|r#)/, "");
+  let declared = 0;
+  let held = 0;
+  let other = false;
+  let plain = true;
+  let keyed = false;
+  let counted = false;
+  const standsFor = new Set<string>();
+  each(tree.rootNode, (node) => {
+    if (other) return;
+    // `export { get as fetch }`: the name is another's, given on the way out.
+    if (node.childForFieldName("alias")?.text === bare) { other = true; return; }
+    /*
+     * A member of a TypeScript `enum` is a number or a string and nothing
+     * else, whether or not one is written beside it (`enum Kind { A, B = 2 }`).
+     */
+    const body = node.childForFieldName("body");
+    const holder = body ? node.childForFieldName("name") : null;
+    if (body && holder && to.language !== "rust" && keywordOf(node, holder) === "enum") {
+      for (const member of namedKids(body)) {
+        if ((member.childForFieldName("name") ?? member).text === bare) counted = true;
+      }
+    }
+    const value = node.childForFieldName("value") ?? node.childForFieldName("right");
+    const target = node.childForFieldName("left") ?? node.childForFieldName("key") ?? node.childForFieldName("name");
+    if (value && target && lastNameOf(target)?.replace(/^(#|r#)/, "") === bare) {
+      // A function or a class written out and put under the name is a routine, wherever that is.
+      if (parametersOf(value) || value.childForFieldName("body")) { other = true; return; }
+      held += 1;
+      if (!plainData(value)) plain = false;
+      // Kept under a key: `{ "unit": f }`, `table["unit"] = f`, `dict(unit=f)`.
+      if (node.childForFieldName("key") || /^string/.test(lastLeafType(target)) || node.childForFieldName("left") === null && node.childForFieldName("name") !== null && /argument/.test(node.type)) keyed = true;
+      /*
+       * `fetch = get`, `{ error: log }`, `self.send = send or default_send`:
+       * the value is another name's, and a body that writes that name may be
+       * calling this very thing (`aliases`, #430). Only a name standing on
+       * its own: what a call hands back is its own, and `action.error` reads
+       * a member of something else.
+       */
+      const names = (inner: Node): void => {
+        if (inner.childForFieldName("arguments") || inner.childForFieldName("constructor") || MEMBER_READ.has(inner.type)
+          || inner.type === "scoped_identifier") return;
+        if (inner.childCount === 0) {
+          if (inner.isNamed && NAME_LEAF.test(inner.type)) standsFor.add(inner.text.replace(/^(#|r#)/, ""));
+          return;
+        }
+        for (const child of children(inner)) names(child);
+      };
+      names(value);
+    }
+  });
+  if (other) return undefined;
+  // What the file declares under the name, by the declaration index's own list (`body.ts`).
+  for (const { node, nameNode, soup } of declaredShapes(to.source, to.language)?.get(name) ?? []) {
+    declared += 1;
+    // Out of a macro's tokens, a routine, a macro: not a value, or nothing says.
+    if (soup || parametersOf(node) || /variant|macro/.test(node.type)) return undefined;
+    const value = node.childForFieldName("value") ?? node.childForFieldName("right");
+    // A container: a class, a struct, an enum, a trait, an interface, a module.
+    if (node.childForFieldName("body") && !value && !node.childForFieldName("type")) return undefined;
+    const keyword = keywordOf(node, nameNode);
+    if (keyword !== undefined && !VALUE_KEYWORDS.has(keyword)) return undefined;
+    if (to.language === "python" && /\bTypeAlias\b/.test(node.childForFieldName("type")?.text ?? "")) return undefined;
+    if (!value) plain = false;
+  }
+  // A name brought in from another file is whatever it is there.
+  const bindings = bindingsIn(to.source, to.language);
+  if (!bindings || bindings.imported.has(bare) || bindings.shadowed.has(bare) || bindings.forwarded.has(bare)) return undefined;
+  if (isRoutine(to.source, name, to.language) || isTypeName(to.source, name, to.language) || typeTailOf(to.source, to.language, name)) return undefined;
+  if (declared === 0) {
+    if (to.language === "rust" || bindings.wildcard || !wholeName(bare).test(codeOnly(to.source, to.language))) return undefined;
+  }
+  return {
+    plain: counted || (plain && held > 0), keyed,
+    standsFor: [...standsFor].filter((one) => !LITERAL_NAMES.test(one) && !OWN.has(one)),
+  };
+}
+
+/** The type of the last leaf a node writes: a string's, for `table["unit"]`. */
+function lastLeafType(node: Node): string {
+  let at = node;
+  for (;;) {
+    if (/^string/.test(at.type)) return at.type;
+    let next: Node | undefined;
+    for (let index = at.childCount - 1; index >= 0 && !next; index -= 1) {
+      const child = at.child(index);
+      if (child?.isNamed && !/comment/.test(child.type)) next = child;
+    }
+    if (!next) return at.type;
+    at = next;
+  }
+}
+
+/**
+ * Ways a body reads a member, or a name, it does not write: any of them may
+ * be the value. A JavaScript property is read by a computed key
+ * (`readsByAComputedKey`) or through `Object.values` and its kin; a Python
+ * attribute or variable through `getattr`, `vars`, `__dict__`, `globals`.
+ */
+const READS_ANY_NAME: Partial<Record<Language, RegExp>> = (() => {
+  const javascript = /\beval\b|\bFunction\s*\(|\bReflect\b|\bObject\s*\.\s*(values|entries|getOwnPropertyDescriptors?)\b/;
+  return {
+    python: /\b(getattr|eval|exec|vars|globals|locals|dir|__dict__|__getattribute__|methodcaller|attrgetter|inspect)\b/,
+    ts: javascript, tsx: javascript, js: javascript,
+  };
+})();
+
+/** And the ways Python reads what a dictionary keeps under a key, for a value that is kept under one. */
+const READS_ANY_KEY = /\.\s*(values|items|get|pop|setdefault)\s*\(/;
+
+/** Whether a body reads a member by a key that is not written out: `table[kind]`, `handlers[i]`. A type's `T[K]` is not one. */
+function readsByAComputedKey(body: Node): boolean {
+  let computed = false;
+  const visit = (node: Node, inType: boolean): void => {
+    if (computed) return;
+    const index = inType ? null : node.childForFieldName("index") ?? node.childForFieldName("subscript");
+    if (index && !plainData(index)) { computed = true; return; }
+    for (let at = 0; at < node.childCount; at += 1) {
+      const child = node.child(at);
+      if (!child) continue;
+      const field = node.fieldNameForChild(at);
+      visit(child, inType || field === "type" || field === "return_type" || field === "type_arguments" || /^type(_|$)|_type$/.test(child.type));
+    }
+  };
+  visit(body, false);
+  return computed;
+}
+
+/**
+ * Whether the head is a value and the tail's own code never writes its name
+ * (owner decision, 2026-11-25: a value is called by its name).
+ *
+ * "`execute` calls `failureReason`", a field: to call what a field, a
+ * variable or a key holds, code has to read it, and reading it writes its
+ * name -- `this.failureReason()`, `const { failureReason } = state`,
+ * `table["unit"]`. A routine that never does may still be handed, through a
+ * parameter, the function that slot once held; then it calls its parameter,
+ * and the arrow belongs at whoever read the slot. Before, such an arrow was
+ * "not sure" whenever the routine made one call nobody could place.
+ *
+ * The name is the head's own, or the one an import of the tail's file gives
+ * it (`import { table as t }`, a default import of the head's file), or one
+ * the value is written as standing for (`fetch = get`: a tail that calls
+ * `get` may be calling what `fetch` holds). Kept a doubt:
+ *
+ *   a read by a key that is not written out   `table[kind]`, `getattr(x, k)`,
+ *                                             `Object.values(x)`, and for a
+ *                                             value kept under a key `d.get(k)`,
+ *                                             `d.items()` -- unless the value is
+ *                                             plainly data, which nothing can call
+ *   the value renamed in some other file      `export { table as t }`, which
+ *                                             the tail may import as `t`
+ *   a class tail with code it did not write   a base elsewhere, a decorator
+ *   a parse that recovered inside the tail
+ *
+ * Rust needs none of the first: it has no way to read a member by a computed
+ * name.
+ */
+function valueNeverNamed(from: CallSide & { routine: string }, to: CallSide & { names: string[] }): boolean {
+  if (to.names.length === 0) return false;
+  let plain = true;
+  let keyed = false;
+  const known = new Set(to.names.map((name) => name.replace(/^(#|r#)/, "")));
+  for (const name of to.names) {
+    const value = valueOnly(to, name);
+    if (!value) return false;
+    plain &&= value.plain;
+    keyed ||= value.keyed;
+    // What the value stands for: a tail that writes that name may be calling the same thing.
+    for (const other of value.standsFor) known.add(other);
+  }
+  const stored = storedFor(from, to);
+  if (!stored || stored.some((one) => one.how === "unread" || (one.how === "renamed" && one.file !== from.file))) return false;
+  for (const [local, binding] of bindingsIn(from.source, from.language)?.imported ?? []) {
+    if (binding.name !== undefined ? known.has(binding.name) : !binding.namespace
+      && from.imports.some((one) => one.specifier === binding.specifier && one.file === to.file)) known.add(local);
+  }
+  const typeTail = typeTailOf(from.source, from.language, from.routine);
+  if (typeTail && (typeTail.notWhole ?? (from.language === "rust" ? crateNotWhole(from, typeTail) : undefined))) return false;
+  const nodes = ownNodes(from);
+  if (nodes.length === 0) return false;
+  const code = codeOnly(from.source, from.language);
+  const readsAny = plain ? undefined : READS_ANY_NAME[from.language];
+  for (const node of nodes) {
+    if (incomplete(node)) return false;
+    const text = code.slice(node.startIndex, node.endIndex);
+    for (const name of known) if (wholeName(name).test(text)) return false;
+    if (plain || from.language === "rust") continue;
+    if (readsAny?.test(text) || readsByAComputedKey(node)) return false;
+    if (keyed && from.language === "python" && READS_ANY_KEY.test(text)) return false;
+  }
+  return true;
+}
+
 /** `closedBodyRefutes` as it was before #357: the text reading alone. */
 function textClosed(
   from: CallSide & { routine: string },
@@ -3197,7 +4148,16 @@ function textClosed(
   if (!reading.read) return { why: "unreadable" };
   const bodies = typeTail ? reading.bodies : reading.bodies.filter((body) => body.routine === from.routine);
   if (bodies.length === 0) return { why: "routine-not-found" };
-  const readMacros = bodies.some((body) => body.readMacros) ? { readMacros: true as const } : {};
+  /*
+   * A value at the head that the tail never names (`valueNeverNamed`): no
+   * call in the tail is a call of it, whatever each of them turns out to run.
+   */
+  if (valueNeverNamed(from, to)) {
+    return { evidence: {
+      routine: from.routine, line: typeTail ? typeTail.line : bodies[0]!.line,
+      sites: bodies.reduce((total, body) => total + body.sites.length, 0), valueNeverNamed: true, ruledOutAt: [],
+    } };
+  }
 
   /*
    * A routine stops at its first wall. A class tail (#459) reads every wall
@@ -3217,6 +4177,17 @@ function textClosed(
   let dispatched = 0;
   let untyped = 0;
   const untypedAt: Array<{ start: number; end: number }> = [];
+  let misfit = 0;
+  let inMacros = 0;
+  let ruledOutAt: Array<{ start: number; end: number }> | undefined;
+  /** A call ruled out by a test other than its name: counted, and kept for the compilers to be asked about. */
+  const rule = (site: CallSitePlaced, by: RuledOut): void => {
+    if (by === "shape") misfit += 1;
+    if (by === "macro") inMacros += 1;
+    ruledOutAt ??= [];
+    if (site.nameAt) ruledOutAt.push(site.nameAt);
+    sites += 1;
+  };
   const reached: Array<{ name: string; line: number }> = [];
   let hooked: boolean | undefined;
   const elsewhere: Array<{ name: string; line: number }> = [];
@@ -3235,6 +4206,9 @@ function textClosed(
           sites += 1;
           continue;
         }
+        // Or it is a call that cannot run the head at all, whatever it does run (`ruledOut`).
+        const cannot = ruledOut(site, from, to);
+        if (cannot) { rule(site, cannot); continue; }
         const stopped = stop(site.why ?? "unplaced");
         if (stopped) return stopped;
         continue;
@@ -3261,6 +4235,9 @@ function textClosed(
           sites += 1;
           continue;
         }
+        // Or it passes what the head cannot take, whatever implements it (`ruledOut`).
+        const cannot = ruledOut(site, from, to);
+        if (cannot) { rule(site, cannot); continue; }
         const stopped = stop(site.concrete === false ? "abstract-receiver" : "overridden");
         if (stopped) return stopped;
         continue;
@@ -3307,6 +4284,17 @@ function textClosed(
           continue;
         }
         /*
+         * It made one of a class there, which runs its constructor and not
+         * the head; or it called a value kept there with arguments the head
+         * does not take (`ruledOut`).
+         */
+        const cannot = ruledOut(site, from, to);
+        if (cannot) {
+          if (cannot === "made") elsewhere.push({ name: site.declaredAs, line: site.line });
+          rule(site, cannot);
+          continue;
+        }
+        /*
          * And the head's file has to actually declare a routine by that name
          * (#329's measurement). `measure:wrong-routine` put every placed name
          * to a real compiler over `.corpus`: the *name* was never wrong, and
@@ -3344,12 +4332,17 @@ function textClosed(
     : undefined;
   if (notWhole) return { why: notWhole };
   const line = typeTail ? typeTail.line : bodies[0]!.line;
+  // A macro ruled out by its template is a macro read: where rustc built the tail, its list still judges (#471).
+  const readMacros = inMacros > 0 || bodies.some((body) => body.readMacros) ? { readMacros: true as const } : {};
   if (reached.length === 0) {
     return { evidence: {
       routine: from.routine, line, sites,
       ...(elsewhere.length > 0 ? { elsewhere } : {}),
       ...(dispatched > 0 ? { dispatched } : {}),
       ...(untyped > 0 ? { untyped, untypedAt } : {}),
+      ...(misfit > 0 ? { misfit } : {}),
+      ...(inMacros > 0 ? { inMacros } : {}),
+      ...(ruledOutAt ? { ruledOutAt } : {}),
     }, ...readMacros };
   }
   /*
@@ -3362,7 +4355,11 @@ function textClosed(
   if (!to.names.every((name) => isRoutine(to.source, name, to.language))) {
     return { why: "reaches-the-file" };
   }
-  return { reached: { routine: from.routine, line, sites, reached, ...(untyped > 0 ? { untypedAt } : {}) }, ...readMacros };
+  return { reached: {
+    routine: from.routine, line, sites, reached,
+    ...(untyped > 0 ? { untypedAt } : {}),
+    ...(ruledOutAt ? { ruledOutAt } : {}),
+  }, ...readMacros };
 }
 
 /**
@@ -3929,7 +4926,7 @@ function typeLevelBody(side: CallSide & { routine: string }, tail: TypeTail): Bo
   const routines = new Set(tail.routines.map((one) => one.id));
   const place = (callee: Callee, at: Node, holder: Node) => {
     const called = valueCalled(callee, side, bindings, at, holder);
-    body.sites.push(siteOf(called, side.source, at, placeOf(called, side, bindings, at, holder)));
+    body.sites.push(siteOf(called, side, at, placeOf(called, side, bindings, at, holder)));
   };
   for (const holder of tail.nodes) {
     const visit = (node: Node): void => {
@@ -4470,6 +5467,14 @@ export interface CallSitePlaced {
    * calls, so the name alone never rules it out.
    */
   handsOn?: true;
+  /** What the call passes, and how its callee is written, where the node is a call written with arguments (`passesOf`). */
+  passes?: CallPasses;
+  /**
+   * For a `macro` site: where the macro call is written, and whether its
+   * arguments were read as code (`readMacro`), each call in them a site of
+   * its own. What `macroNeverRuns` reads the template of.
+   */
+  macro?: { at: { start: number; end: number }; read: boolean };
 }
 
 /** Every call site in one routine, placed or refused. */
@@ -5517,11 +6522,13 @@ function functionsInReach(side: CallSide): Set<string> | undefined {
 }
 
 /** One call site as `callSitesIn` lists it, placed or refused. */
-function siteOf(callee: Callee, source: string, at: Node, where: Placement | { why: SiteUnresolved }): CallSitePlaced {
+function siteOf(callee: Callee, side: { source: string; language: Language }, at: Node, where: Placement | { why: SiteUnresolved }): CallSitePlaced {
+  const passes = passesOf(at, side);
   return {
     name: callee.kind === "computed" ? "" : callee.name,
-    line: lineOf(source, at.startIndex),
+    line: lineOf(side.source, at.startIndex),
     receiver: callee.kind === "through",
+    ...(passes ? { passes } : {}),
     ...(callee.kind === "through" ? { memberAt: callee.memberAt } : {}),
     ...(callee.kind === "computed" ? {} : { nameAt: callee.kind === "through" ? callee.memberAt : callee.nameAt }),
     ...("file" in where
@@ -5634,11 +6641,15 @@ export function callSitesIn(
         const macro = readMacro(inner, side, bindings);
         if (!macro.open) body.readMacros = true;
         if (macro.open) {
+          const invocation = enclosing(side.source, side.language, inner)[0];
           body.sites.push({
             name: "",
             line: lineOf(side.source, inner.startIndex),
             why: "macro",
             receiver: false,
+            ...(invocation?.type === "macro_invocation"
+              ? { macro: { at: { start: invocation.startIndex, end: invocation.endIndex }, read: macro.tops !== undefined } }
+              : {}),
           });
         }
         const before = body.sites.length;
@@ -5651,7 +6662,7 @@ export function callSitesIn(
       const callee = valueCalled(written, side, bindings, inner, holder);
       const where = placeOf(callee, side, bindings, inner, holder);
       if ("why" in where && where.why === "dynamic" && quiet?.has(inner.id)) {
-        body.sites.push({ ...siteOf(callee, side.source, inner, { file: EXTERNAL_RECEIVER }), byName: true });
+        body.sites.push({ ...siteOf(callee, side, inner, { file: EXTERNAL_RECEIVER }), byName: true });
         return;
       }
       /*
@@ -5665,7 +6676,7 @@ export function callSitesIn(
       if (chosen) {
         for (const choice of chosen) {
           const held: Callee = choice.callee ?? { kind: "bare", name: choice.name, nameAt: choice.at };
-          body.sites.push(siteOf(held, side.source, inner, placeOf(held, side, bindings, inner, holder)));
+          body.sites.push(siteOf(held, side, inner, placeOf(held, side, bindings, inner, holder)));
         }
         return;
       }
@@ -5677,7 +6688,7 @@ export function callSitesIn(
        */
       const handed = "why" in where && where.why === "receiver" ? inner.childForFieldName("arguments") : null;
       const handsOn = handed !== null && handsAFunction(handed, side, bindings, holder, node);
-      body.sites.push({ ...siteOf(callee, side.source, inner, where), ...(handsOn ? { handsOn: true as const } : {}) });
+      body.sites.push({ ...siteOf(callee, side, inner, where), ...(handsOn ? { handsOn: true as const } : {}) });
     };
     each(node, visit);
     bodies.push(body);
@@ -5884,10 +6895,15 @@ function expansionOpen(definitions: MacroDefinition[], side: CallSide, depth: nu
 function templateOpen(tokens: Node, definition: MacroDefinition, side: CallSide, depth: number, seen: Set<string>): boolean {
   for (let at = 0; at < tokens.childCount; at += 1) {
     const token = tokens.child(at)!;
-    if (token.type === "token_tree") {
+    // A repetition, `$( .. )*`, holds tokens like any bracket: a call written inside one is a call.
+    if (token.type === "token_tree" || token.type === "token_repetition") {
       // `#[cfg(feature = "x")]` written in the template is an attribute, not a call of `cfg`.
       const attribute = tokens.child(at - 1)?.type === "#" || (tokens.child(at - 1)?.type === "!" && tokens.child(at - 2)?.type === "#");
-      if (!attribute && templateOpen(token, definition, side, depth, seen)) return true;
+      if (attribute) continue;
+      // `(..)(..)`, `xs[i](..)`, `$($arg)*(..)`: a call of whatever the brackets, or the arguments, hold.
+      const before = tokens.child(at - 1)?.type;
+      if (token.type === "token_tree" && token.text.startsWith("(") && (before === "token_tree" || before === "token_repetition")) return true;
+      if (templateOpen(token, definition, side, depth, seen)) return true;
       continue;
     }
     if (token.type !== "identifier" && token.type !== "metavariable") continue;
