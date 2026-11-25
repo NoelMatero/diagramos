@@ -6489,7 +6489,12 @@ export function checkDrift(
                 }
                 return { does: undefined, said: "the compiler places none of the calls on untyped values at the far end" };
               };
-            const refutedRests = (evidence: CallsRefutedEvidence): RedRests => ({
+            /*
+             * The same for a near miss (`wrong-routine`) whose head the
+             * language runs unwritten: a call landing on another routine of
+             * the far end's file rules out nothing a `with` runs beside it.
+             */
+            const refutedRests = (evidence: Pick<CallsRefutedEvidence, "implicit" | "untypedAt" | "ruledOutAt">): RedRests => ({
               written: !evidence.implicit,
               unwritten: evidence.implicit?.outside
                 ? `a call code outside the repository may make on a value handed to it (\`${evidence.implicit.name}\`)`
@@ -6517,7 +6522,9 @@ export function checkDrift(
               if (toEnd.symbols.some((name) => isTypeName(head.source, name, head.language)
                 || onlyATypeAlias(head.source, name, head.language))) return undefined;
               const forward = callsBetween({ ...tail, routine: fromEnd.symbols[0]! }, { ...head, names: toEnd.symbols }, false);
-              if (forward.verdict === "wrong-routine") return { rests: WRITTEN, sites: forward.evidence.sites, hops };
+              if (forward.verdict === "wrong-routine") {
+                return { rests: forward.evidence.implicit ? refutedRests(forward.evidence) : WRITTEN, sites: forward.evidence.sites, hops };
+              }
               if (forward.verdict === "refuted") return { rests: refutedRests(forward.evidence), sites: forward.evidence.sites, hops };
               return undefined;
             };
@@ -6692,7 +6699,7 @@ export function checkDrift(
               if (throughAChain.verdict === "reached") {
                 edgesChecked += 1;
                 recordEdge(edge, fromNode, toNode, oneLevelUp(throughAChain.via, throughAChain.hops.length,
-                  { rests: WRITTEN, sites: verdict.evidence.sites, hops: throughAChain.hops }));
+                  { rests: verdict.evidence.implicit ? refutedRests(verdict.evidence) : WRITTEN, sites: verdict.evidence.sites, hops: throughAChain.hops }));
                 continue;
               }
               edgesChecked += 1;
@@ -6723,7 +6730,10 @@ export function checkDrift(
                   + `${toEnd.symbols.join(" or ")} -- ${where}. Point the arrow at `
                   + `${near[0]!.name}, or call ${toEnd.symbols[0]!} from `
                   + `${verdict.evidence.routine}.`,
-              }, rests: verdict.evidence.untypedAt || verdict.evidence.ruledOutAt
+              }, rests: verdict.evidence.implicit
+                /* the head is a method the language runs unwritten: asks, as `refutedRests` does */
+                ? refutedRests(verdict.evidence)
+                : verdict.evidence.untypedAt || verdict.evidence.ruledOutAt
                 /* a call found landing on another routine, with calls read by name or ruled out by what they pass: asks, as `refutedRests` does */
                 ? { written: true, ask: askUntyped([...(verdict.evidence.untypedAt ?? []), ...(verdict.evidence.ruledOutAt ?? [])]) }
                 : WRITTEN /* a call found landing on another routine */ });
