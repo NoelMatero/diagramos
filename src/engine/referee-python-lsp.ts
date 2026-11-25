@@ -1155,8 +1155,9 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     file: string, source: string, start: number, end: number, name: string,
   ): Promise<Array<{ file: string; line: number }> | undefined> {
     const anchor = typeAnchorFor(source, start, end) ?? { start, end };
-    const classes = classesAt(await askLocations("typeDefinition", file, source, anchor.start));
-    if (!classes) return undefined;
+    const locations = await askLocations("typeDefinition", file, source, anchor.start);
+    const classes = classesAt(locations);
+    if (!classes) return notAClass(file, source, anchor.start, locations);
     const found: Array<{ file: string; line: number }> = [];
     for (const klass of classes) {
       // A library's class runs a library's member, whatever it is called.
@@ -1172,6 +1173,33 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       if (landed) found.push(...landed);
     }
     return found;
+  }
+
+  /**
+   * `memberAt` for a value whose type pyright does not point at a class
+   * (calls research 2026-11, step 0). Two shapes still have an answer on
+   * pyright's word, which is "there is no such member here":
+   *
+   * - **A library's module** (`json`): pyright points at the module itself,
+   *   line 0 of a file outside the tree. Its attributes are the library's, so
+   *   whatever `name` is there runs no routine of the repository -- the
+   *   answer a library's class already gets.
+   * - **A function or a method** (`run`, `session.is_secure_origin`): the
+   *   hover opens `(function)` or `(method)`. A function's attributes are the
+   *   language's (`__call__`, `__name__`), never a routine declared here.
+   *
+   * Everything else stays no answer: an untyped parameter (pyright points at
+   * its own declaration), a module of the repository (which may hold any of
+   * its routines), a value typed by a `Callable` alias (any callable object,
+   * with any methods, may be it).
+   */
+  async function notAClass(
+    file: string, source: string, start: number, locations: Array<{ file: string; line: number }> | undefined,
+  ): Promise<Array<{ file: string; line: number }> | undefined> {
+    if (!locations || locations.length === 0) return undefined;
+    if (locations.every((one) => one.line === 0 && isOutsideTree(one.file, root))) return locations;
+    const kind = /^\(([a-z ]+)\)/.exec(((await hoverTextAt(file, source, start)) ?? "").trim())?.[1];
+    return kind === "function" || kind === "method" ? [] : undefined;
   }
 
   async function valueKindAt(file: string, source: string, start: number): Promise<ValueKind | undefined> {
