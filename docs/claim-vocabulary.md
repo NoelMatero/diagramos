@@ -5215,6 +5215,181 @@ duplicate from conflitcts, requires reading prs "An arrow can be three calls lon
     has no compiler answer for them (`no-name`), so it neither confirms nor
     faults those placements (that part is #508's now).
 
+56. **A call nobody can place is asked whether it could be the far end at
+    all (calls research 2026-11, step 1).**
+
+    To say "A does not call B" the closed reading has to account for every
+    call A makes, and one it could not follow -- a callback, a method on an
+    untyped value, a macro -- kept the arrow "not sure". 166 of the 263 wrong
+    `@calls` arrows missed on the three study sets stopped there
+    (`~/bench-queue/calls-research-2026-11.md`). *Where does this call go?*
+    is often unanswerable. *Could it be B?* is smaller, and the language
+    answers it without knowing how B travelled through the program. #55 did
+    this for the name; `ruledOut` in `calls.ts` is now where the rest is
+    asked, of one call at a time, by the forward reading, the closed reading
+    and a class tail's alike:
+
+    | test | the fact about the language | languages |
+    |---|---|---|
+    | shape (`misfits`) | a call that passes arguments B cannot take is not a call of B: Python raises, Rust does not compile | Python, Rust |
+    | name, Rust (`rustNamesWhatRuns`) | `x.search()` runs a method declared `search`; a function kept in a field is called `(x.search)()` | Rust |
+    | made (`madeNotCalled`) | `new Session()` runs Session's constructor; a plain method runs only if the constructor calls it, a step | TypeScript, Python |
+    | macro (`macroNeverRuns`) | a `macro_rules!` of the repository runs what its template and its arguments write | Rust |
+    | a value is called by its name (`valueNeverNamed`) | to call what a field, a variable or a key holds, code reads it, and reading writes its name | all |
+
+    Three of these rest on decisions the owner made on 2026-11-25, and each
+    is how the answer key already scored:
+
+    1. *An adapter built somewhere else is not a direct call.* `handler(req)`
+       where `handler` is `partial(connect, traces=..)` built in another
+       function calls the adapter. So a head named as a value elsewhere does
+       not stop the shape test. Built inside the tail, the tail names the
+       head and the arrow stays a doubt (`handsOnHead`).
+    2. *What a test hands in is not what the product calls.* `stored.ts`
+       marks a finding written in a test (`isTestFile`, and in Rust a
+       `#[cfg(test)]` module or `#[test]` function) and `drift.ts` leaves
+       those out of both `runsUnderAnotherName` and `storedFindings`
+       (`inProduct`). Examples, docs and a package's own `testing` helpers
+       are not tests. The cost: a routine only a test swaps in.
+    3. *A value is called by its name.* A routine handed the function a
+       field once held calls its parameter; the arrow belongs at whoever
+       read the field.
+
+    **A function with no name counts as the far end**, as #351 has it:
+    `{ on_error: lambda e: handle(e) }` is `handle` under another name. So
+    `stored.ts` records where each such function is written (`wrappers`),
+    and the shape test is put to every one; one that fits keeps the doubt.
+
+    The refusals, which are most of the code:
+
+    | test | stays "not sure" when |
+    |---|---|
+    | shape | the call spreads (`*args`, `**kw`) or goes through `.call`; the head takes `*args`; the head is decorated, or under a Rust attribute macro; the head's name is also a value in its file; a Python `__dunder__` other than `__call__`; the head is a method and the call fits it bound or unbound; the head is put on a class (`Cls.run = helper`, `StoredFinding.attached`) and fits with its first parameter filled; a nameless function calling the head fits; TypeScript and JavaScript always (any count is legal) |
+    | name, Rust | a path call (`T::f(x)`) when the head is renamed on import anywhere, or the name is spelt like a constant; `.call`; every other language (a function can be stored under a method's name) |
+    | made | the head is a constructor or a dunder, `toString`/`then`; it is decorated; the class's own code outside its routines names it (a field initializer, `default_factory=`); the object is handed straight to another call or rendered as JSX; Rust |
+    | macro | the arguments were not read as code; a template writes the head's name, calls an argument (`$f(..)`), a bracket (`(x.f)(..)`), a bare name nothing declares, a crate macro by path, or pastes names; the head is renamed on import; a library's macro at the call site |
+    | value | the tail calls something it took out of a container, or hands one on whole (`callsWhatItTookOut`: a loop's variable, a callback's parameter, a local the body set, `cbs[k](x)`, `pick()(x)`, `x.call(..)`, `run(**opts)`, `{ ...obj }`, Rust's `S { ..base }`), since a container may hold the value; the tail reads a member by a computed key or through `getattr`, `vars`, `__dict__`, `Object.values`; the value is kept under a key and the tail calls `.get(k)`, `.items()` (none of these when the value is plain data); an import renames it in the tail or anywhere else; it stands for another name the tail writes (`fetch = get`); a function is written into it anywhere in its file; it is imported there; a class tail has code it did not write; an undeclared name in Rust. Calling its own parameter is not one: that is "a function it was handed" |
+
+    **Every such red waits for the compilers.** A `refuted`, `wrong-routine`
+    or `backwards` that passed a ruled-out call carries `ruledOutAt`, which
+    gives it a question (`askUntyped`), which is what starts the language
+    servers on a live check; a compiler that places one of those calls on
+    the far end withdraws the red. The prototype's first arm made four reds
+    a compiler took back (flask `push -> wsgi_app`). A Rust red that passed
+    a macro by its template is also counted in `callsCompilable`, which is
+    what builds the crate: where rustc has a list of the body, the list
+    still judges (#471). **And the wrong-kind check keeps the first
+    word.** `valueNeverNamed` is asked last, only where the closed reading
+    stopped at a doubt, and its red is filed after `lackingEnd`, so "holds
+    data, and cannot be called" is still what an arrow at `limit = 5` says.
+    The prototype changed 88 such sentences to "every call was checked"; the
+    first bench of this build changed 7 by asking the value question first,
+    and this one changes none. What does change is seven Rust reds on the
+    main set that rustc's list used to make ("none reaching that file"):
+    the text now closes on the first pass, so four say the wrong-kind
+    check's sentence and three name the routine the call really lands on.
+
+    Building it found three things the research had not:
+
+    - `declarationName` over a whole tree calls every Rust path a
+      declaration of its last segment (`Other::skip()`), which `body.ts`
+      says in so many words. The value test read a name written only as
+      `Type::NAME` as declared; all three new readers use `declaredShapes`.
+    - The macro reader of #471 (`templateOpen`) did not look inside a
+      repetition, `$( $f(1); )*`, nor at a bracket being called,
+      `(TABLE[0])(x)`: both read as a template that calls nothing, on main.
+      Fixed where it was found, in the direction of fewer reds.
+    - `.pop(` and `.get(` are everywhere: as a refusal for every value end
+      they silenced flask's `wsgi_app -> default` over `ctx.pop(error)`. A
+      dictionary method reads a key, so they refuse only for a value kept
+      under one.
+
+    **The Rust referee of `measure:compiler-true` was wrong about four
+    pairs**, and they would have shown as reds on correct code the moment a
+    Rust body could be read to its end without a compiler. Each was read in
+    the source and against rustc's own call line:
+
+    | pair held true | what the tail calls |
+    |---|---|
+    | regex `write_label -> utf8.rs#len` | `core::str::<impl str>::len` |
+    | regex `write_label_len -> utf8.rs#len` | the same |
+    | clap `did_you_mean_flag -> format.rs#did_you_mean` | `suggestions::did_you_mean`, the two-argument one in its own file |
+    | ripgrep `is_tty_stdout -> wtr.rs#stdout` (red on main since #357) | `std::io::stdout()` |
+
+    `compiler-true-rust.ts` matched a free function by the last segment of
+    the path rustc printed. It now reads the path (`freeCallee`): nothing for
+    `<impl ..>` or a path into std, and a module segment has to be the
+    target file's module.
+
+    Measured on dd8e0fd against the shared base run of 76cc7e4, the machine
+    alone for every arm:
+
+    | `bench:planted`, wrong `@calls` arrows caught | before | after |
+    |---|---:|---:|
+    | main (228) | 161 | 169 |
+    | holdout (289) | 200 | 207 |
+    | holdout-b (310) | 205 | 213 |
+    | correct claims called wrong, any set (1,237) | 0 | 0 |
+    | wrong claims confirmed (main / holdout / holdout-b) | 0 / 4 / 3 | 0 / 4 / 3 |
+    | correct claims confirmed | 489 / 369 / 311 | 489 / 369 / 311 |
+    | holdout-c, score only (302) | 164 | 174 |
+    | holdout-d, score only (518) | 343 | 360 |
+    | holdout-c: false reds, wrong greens | 1, 10 | the same lines |
+    | holdout-d: false reds, wrong greens | 0, 6 | the same lines |
+
+    The two sets nobody looks at moved more than the three this was built
+    on: +10 and +17 against +8, +7 and +8 (TypeScript +5 and +4, Python +2
+    and +6, Rust +3 and +7). The prediction filed before any run was +4 to
+    +11 and +3 to +11.
+
+    The 23 newly caught are in 20 projects, TypeScript 12, Python 6, Rust 5:
+    13 value ends, and 10 where a call was ruled out -- by what it passes
+    (flask `wsgi_app -> __call__`, drawn backwards; pip `install_given_reqs
+    -> install_wheel`; rayon `StackJob -> join_context`; actix `recognize_fn
+    -> prefix_empty`), by a Rust method's name (regex `search_with -> new`,
+    bat `run_with_error_handler -> print_file_ranges`), by a macro's
+    template and a Rust method's name (clap `get_matches_with ->
+    parse_short_arg`, past its own `debug!`), by making a class (rich
+    `render -> set_length`, aiohttp `connect -> expired`), and by tests no
+    longer counting (bullmq `waitForJob -> moveToActive`). Eight of the ten
+    show the route or the routine really called. The research's trace
+    priced the prototype's same rules at 29. This build has 20 of those and
+    three it had not; the nine it lacks are four value ends whose tail calls
+    something taken out of a container (httpx, flask, rich, bullmq), a class
+    tail with a base elsewhere (rich `Progress`), marshmallow's two
+    (`_do_load` reads `self._hooks[PRE_LOAD]`; the prototype let them
+    through by counting a value never seen assigned as plain data),
+    TanStack's `useBaseQuery`, which #484's guard still holds, and immer's
+    `proxySet_ -> values`, which still stops at the file.
+
+    The first build of the value rule spoke for any tail that did not write
+    the name. The coordinator's requirement narrowed it (the container row
+    above): four of seventeen value catches on the study sets went back to
+    "not sure", which is the price of a tail that runs `for h in
+    self.handlers: h()` saying nothing about a field it never names.
+
+    Correct code, which is the number the licence rests on:
+
+    | referee | arrows | red before | red after |
+    |---|---:|---:|---:|
+    | calls recorded while real tests ran (Python, `sys.monitoring`) | 896 | 4 | 4, the same four |
+    | functions handed on one step (TypeScript, the compiler's symbols) | 133 | 0 | 0 |
+    | `measure:compiler-true --words=calls`, TypeScript | 5,407 | 0 | 0 (5,354 confirmed, as before) |
+    | the same, Python | 2,528 | 0 | 0 (2,406 confirmed, as before) |
+    | the same, Rust, compilers running | 4,292 | 1 | 0 (4,114 confirmed; 4,090 of 4,282 before) |
+    | the same, Rust, no compiler | 4,292 | 0 | 0 |
+
+    The four are on main today and none is this change's: rich
+    `FileProxy.write -> Console.__enter__` and `__exit__` (a `with`; step 0
+    of the same research fixes it) and two `__init__` name clashes. Rust's
+    one red before was ripgrep's `is_tty_stdout`, one of the four pairs the
+    referee no longer makes. Reading the path also tells two namesakes in
+    one crate apart, where the referee had to pass before, so it draws more
+    pairs than it drops (4,292 against 4,282; the new ones were not read
+    one by one, and none is red). The other five words are number for number the
+    same in all three languages (TypeScript's one `conforms` red is the
+    known nestjs one).
+
 ## Open, in the order worth doing
 
 1. ~~**The licence grid.**~~ Built at #207 and shipped at #209. `@accesses` is
