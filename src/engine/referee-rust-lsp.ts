@@ -125,10 +125,19 @@ export async function connectTo(child: ChildProcessWithoutNullStreams): Promise<
   const toServer = new PassThrough();
   child.stdin.on("error", () => { /* the caller's exit race is the report */ });
   toServer.pipe(child.stdin);
-  return createMessageConnection(
-    new StreamMessageReader(child.stdout),
-    new StreamMessageWriter(toServer),
-  );
+  /*
+   * No partial-message timer. When the server is stopped halfway through
+   * writing a message, the reader keeps the half it got and arms a 10 s
+   * timer that re-arms itself for as long as nothing more arrives -- which,
+   * from a dead server, is forever -- and `dispose()` does not clear it. The
+   * timer is ref'd, so the process that asked could never exit: the bench
+   * printed its whole report and sat there until killed (2026-11-25,
+   * `~/bench-491/bench.sh`'s 180 s kill; a run without one hung 35 min). The
+   * timer only fires `onPartialMessage`, which nothing here listens to.
+   */
+  const reader = new StreamMessageReader(child.stdout);
+  reader.partialMessageTimeout = 0;
+  return createMessageConnection(reader, new StreamMessageWriter(toServer));
 }
 
 /**
