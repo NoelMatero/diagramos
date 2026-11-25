@@ -28,6 +28,14 @@ if (named !== undefined && named !== "main" && !/^holdout(-[a-z])?$/.test(named)
 /** The holdout set's name, or undefined on the main set. */
 export const SET = named === undefined || named === "main" ? undefined : named;
 export const HOLDOUT = SET !== undefined;
+/**
+ * The sets whose arrows may be read and studied: main, and since 2026-10-07
+ * holdout and holdout-b, which every batch measurement has compared arrow by
+ * arrow since. Every other holdout -- holdout-c, holdout-d -- is score only:
+ * its arrows are never printed, never written out, never tuned against.
+ */
+export const STUDY_SETS: readonly string[] = ["main", "holdout", "holdout-b"];
+export const SCORE_ONLY = !STUDY_SETS.includes(SET ?? "main");
 /** The folder under the repository holding the set's scopes, boards, keys and library pins. */
 export const BENCH_DIR = SET ? `bench-${SET}` : "bench";
 /** Where the set's pinned clones are. */

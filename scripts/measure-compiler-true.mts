@@ -10,6 +10,8 @@
  *   ... --words=holds,takes  only these words
  *   ... --projects=a,b     only these projects
  *   ... --one=<project>    one project, in this process (prints raw JSON)
+ *   ... --jobs=<n>         projects at once, each in its own process (default: BOARD_AI_JOBS,
+ *                          else sized to the machine); --jobs=1 is one after another
  *   ... --names=plain      Rust: draw a method as `file#new`, not `file#Money::new`
  *                          (#382). TypeScript and Python always draw `Class.method`.
  *   ... --dispatched       TypeScript, only `@calls` arrows through a call the compiler
@@ -85,7 +87,7 @@
  * a red is always one arrow's. Each project runs in a process of its own, and
  * a project that fails is named, never dropped.
  */
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -95,6 +97,9 @@ import type { CrateOutcome } from "../src/engine/referee-rustc";
 import type { TruePair, TrueWord } from "./lib/compiler-true-ts";
 import { pausesLine, readPowerLogSleeps, watchPauses, type Pause } from "./lib/run-pauses";
 import { CompilerTally, judgeCompilerTrue, type TallyData } from "./lib/run-validity";
+import { projectTimes } from "./lib/bench-jobs";
+import { rustCrateKey, sharingSlots, withSlot } from "./lib/slots";
+import { inPool, jobsFrom } from "./lib/workers";
 
 const args = process.argv.slice(2);
 const flag = (name: string) => args.find((one) => one.startsWith(`--${name}=`))?.split("=")[1];
@@ -167,11 +172,29 @@ const failed: string[] = [];
 const runStarted = Date.now();
 const self = fileURLToPath(import.meta.url);
 const projects = flag("projects")?.split(",") ?? Object.keys(trees);
-for (const project of projects) {
+/*
+ * Up to `--jobs` projects at once (`scripts/lib/workers.ts`; `--jobs=1` is
+ * one after another, as it was), each in its process of its own as before,
+ * and read back in the order above whichever finished first.
+ */
+const childArgs = args.filter((one) => !one.startsWith("--jobs="));
+/* Longest first, by the last run's times; inside `measure:batch`, sharing its worker slots (`slots.ts`). */
+const times = projectTimes(`compiler-true-${language}${words ? `-${words.join("+")}` : ""}`);
+const order = [...projects].sort((a, b) => times.of(b) - times.of(a));
+/* A Rust project shares its crate with the bench's main set: never two rust-analyzers on it at once (`workers.ts`). */
+const apart = (project: string) => (language === "rust" ? rustCrateKey(path.join(CORPUS, project)) : undefined);
+const ran = await inPool(order, sharingSlots() ? order.length : jobsFrom(args), (project) => withSlot(times.of(project), async () => {
   process.stderr.write(`${project}...\n`);
-  const run = spawnSync(process.execPath, [...process.execArgv, self, ...args, `--one=${project}`], {
-    encoding: "utf8", maxBuffer: 1 << 28, env: { ...process.env },
-  });
+  const began = Date.now();
+  const run = await runChild(project);
+  if (run.status === 0) times.record(project, Date.now() - began);
+  process.stderr.write(`${project}: exit ${run.status} in ${((Date.now() - began) / 1000).toFixed(0)}s\n`);
+  return run;
+}, apart(project)), apart);
+times.save();
+const runs = projects.map((project) => ran[order.indexOf(project)]!);
+for (const [index, project] of projects.entries()) {
+  const run = runs[index]!;
   const line = run.stdout.split("\n").find((one) => one.startsWith("@@RESULT "));
   if (run.status !== 0 || !line) {
     failed.push(`${project} (exit ${run.status}): ${(run.stderr || "").trim().split("\n").slice(-3).join(" | ")}`);
@@ -185,6 +208,29 @@ for (const project of projects) {
 }
 const valid = report(results, failed);
 process.exit(valid ? 0 : 1);
+
+/** One project's child, with everything it printed. Killed with this process, however that ends. */
+function runChild(project: string): Promise<{ status: number | null; stdout: string; stderr: string }> {
+  const child = spawn(process.execPath, [...process.execArgv, self, ...childArgs, `--one=${project}`], {
+    env: { ...process.env }, stdio: ["ignore", "pipe", "pipe"],
+  });
+  const kill = () => { try { child.kill("SIGKILL"); } catch { /* gone */ } };
+  process.once("exit", kill);
+  const out: Buffer[] = [];
+  const err: Buffer[] = [];
+  child.stdout.on("data", (chunk: Buffer) => out.push(chunk));
+  child.stderr.on("data", (chunk: Buffer) => err.push(chunk));
+  return new Promise((resolve) => {
+    child.once("error", (error) => {
+      process.removeListener("exit", kill);
+      resolve({ status: null, stdout: "", stderr: error.message });
+    });
+    child.once("close", (status) => {
+      process.removeListener("exit", kill);
+      resolve({ status, stdout: Buffer.concat(out).toString("utf8"), stderr: Buffer.concat(err).toString("utf8") });
+    });
+  });
+}
 
 /** Prints the run, and says whether it measured anything. */
 function report(results: ProjectResult[], failed: string[]): boolean {

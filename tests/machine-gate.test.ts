@@ -34,7 +34,8 @@ beforeEach(() => {
   // What counts as a run here, and nowhere else: a script by this name.
   const name = `gate-fake-run-${path.basename(scratch).replace(/[^a-zA-Z0-9]/g, "")}`;
   const { BOARD_AI_RUN: _drop, ...rest } = process.env;
-  env = { ...rest, BOARD_AI_GATE_DIR: path.join(scratch, "gate"), BOARD_AI_GATE_RUNS: `${name}\\.mts` };
+  // One lane unless a test says otherwise: these are the one-at-a-time rules.
+  env = { ...rest, BOARD_AI_GATE_DIR: path.join(scratch, "gate"), BOARD_AI_GATE_RUNS: `${name}\\.mts`, BOARD_AI_GATE_LANES: "1" };
   /*
    * A bench in miniature: waits for a quiet machine and records itself the
    * way bench:planted does, then works for `HOLD_MS`, notes when it started
@@ -189,6 +190,68 @@ describe.skipIf(process.platform === "win32")("the machine gate", () => {
     const ended = await gate(sh("exit 3")).done;
     expect(ended.code).toBe(3);
     expect(existsSync(lockDir())).toBe(false);
+  }, 60_000);
+
+  it("lets two measurements one gated command starts side by side both run, and neither calls the other sharing", async () => {
+    // measure:batch: several benches under one lock. Each waiting for the others to finish would wait for ever.
+    const both = `'${TSX}' '${fake}' sib-a & '${TSX}' '${fake}' sib-b & wait`;
+    const ended = await gate(sh(both), { HOLD_MS: "2000" }).done;
+    expect(ended.code).toBe(0);
+    expect(lines().slice(0, 2).sort()).toEqual(["start sib-a", "start sib-b"]);
+    expect(ended.stderr).not.toContain("machine: SHARED");
+    expect(ended.stderr.match(/machine: no other measurement ran during this one/g)?.length).toBe(3);
+  }, 60_000);
+
+  it("with two lanes, runs two gated measurements side by side, and neither calls the other sharing", async () => {
+    const two = { BOARD_AI_GATE_LANES: "2", HOLD_MS: "2500" };
+    const first = gate(fakeRun("lane-a"), two);
+    await pause(300);
+    const second = gate(fakeRun("lane-b"), two);
+    const ended = await Promise.all([first.done, second.done]);
+    expect(ended.map((one) => one.code)).toEqual([0, 0]);
+    // Both started before either ended.
+    expect(lines().slice(0, 2).sort()).toEqual(["start lane-a", "start lane-b"]);
+    for (const one of ended) {
+      expect(one.stderr).not.toContain("machine: SHARED");
+      expect(one.stderr).toMatch(/machine: no ungated measurement ran during this one; beside it in other gate lanes \(2 lanes\)/);
+    }
+    expect(existsSync(lockDir())).toBe(false);
+    expect(existsSync(path.join(env.BOARD_AI_GATE_DIR!, "lock-1"))).toBe(false);
+  }, 60_000);
+
+  it("with two lanes, a third gated command waits for one to come free", async () => {
+    const two = { BOARD_AI_GATE_LANES: "2" };
+    const runs = ["a", "b", "c"].map((tag) => gate(sh(`echo start ${tag} >> '${events}'; sleep 1.5; echo end ${tag} >> '${events}'`), two));
+    const ended = await Promise.all(runs.map((one) => one.done));
+    expect(ended.map((one) => one.code)).toEqual([0, 0, 0]);
+    let going = 0;
+    let most = 0;
+    for (const line of lines()) {
+      going += line.startsWith("start") ? 1 : -1;
+      most = Math.max(most, going);
+    }
+    expect(most).toBe(2);
+  }, 60_000);
+
+  it("with two lanes, still calls a run started without the gate sharing", async () => {
+    const gated = gate(sh("sleep 3"), { BOARD_AI_GATE_LANES: "2" });
+    await pause(1_500);
+    const beside = start(fakeRun("loose"), { NO_WAIT: "1", HOLD_MS: "500", BOARD_AI_GATE_LANES: "2" });
+    const [shared] = await Promise.all([gated.done, beside.done]);
+    expect(shared.stderr).toMatch(/machine: SHARED -- 1 other run used this machine/);
+  }, 60_000);
+
+  it("--whole waits for every lane and holds them all", async () => {
+    const two = { BOARD_AI_GATE_LANES: "2" };
+    const first = gate(sh(`echo start a >> '${events}'; sleep 1.5; echo end a >> '${events}'`), two);
+    await pause(300);
+    const whole = start([TSX, GATE, "--", "--whole", ...sh(`echo start w >> '${events}'; sleep 1.5; echo end w >> '${events}'`)], two);
+    await pause(300);
+    const after = gate(sh(`echo start b >> '${events}'; echo end b >> '${events}'`), two);
+    const ended = await Promise.all([first.done, whole.done, after.done]);
+    expect(ended.map((one) => one.code)).toEqual([0, 0, 0]);
+    // The whole run starts only once a has ended, and nothing starts while it holds the machine.
+    expect(lines()).toEqual(["start a", "end a", "start w", "end w", "start b", "end b"]);
   }, 60_000);
 
   it("passes a signal to the command and lets go only once the command has ended", async () => {

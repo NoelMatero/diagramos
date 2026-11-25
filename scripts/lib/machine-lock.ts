@@ -37,6 +37,18 @@
  *   to `runs.jsonl`, so a run can say afterwards whether another one shared
  *   the machine with it, gated or not.
  *
+ * - **Lanes (2026-11-25).** The machine can take more than one run at a
+ *   time: `lanes` of them, each holding a lock of its own (`lock` is lane 0,
+ *   the one every older gate knows; `lock-1`, `lock-2` ... the rest). Three
+ *   study sets run side by side gave the same answer on every one of 3,344
+ *   arrows as each run alone (`~/bench-parallel`, 2026-11-25), and the
+ *   heavy pair re-tested for this change is in its PR. How many: the
+ *   `BOARD_AI_GATE_LANES` variable, else the number in `<gate dir>/lanes`,
+ *   else sized to the machine (`machineLanes`). A waiter takes the first
+ *   free lane when its ticket is among the first in the queue; `whole`
+ *   waits for every lane and holds them all -- a batch measurement that runs
+ *   its own workers does that.
+ *
  * The directory is `~/.board-ai-gate`, one per machine and shared by every
  * worktree and session; `BOARD_AI_GATE_DIR` moves it (the tests do).
  *
@@ -56,8 +68,31 @@ const UNWRITTEN_MS = 30_000;
 export function gateDir(): string {
   return process.env.BOARD_AI_GATE_DIR ?? path.join(os.homedir(), ".board-ai-gate");
 }
-const lockPath = () => path.join(gateDir(), "lock");
-const takeoverPath = () => path.join(gateDir(), "takeover");
+
+/**
+ * Lanes for this machine when nothing says otherwise: one per 12 GB of
+ * memory, at most one per four cores, never fewer than one or more than
+ * three. A run in a lane starts its own workers (`workers.ts`), and those
+ * are divided between the lanes, so more lanes never means more processes.
+ * A 10-core, 24 GB machine gets 2.
+ */
+export function machineLanes(): number {
+  const cores = typeof os.availableParallelism === "function" ? os.availableParallelism() : os.cpus().length;
+  return Math.max(1, Math.min(3, Math.floor(os.totalmem() / (12 * 1024 ** 3)), Math.floor(cores / 4)));
+}
+
+/** How many runs may hold the machine at once: `BOARD_AI_GATE_LANES`, `<gate dir>/lanes`, or `machineLanes()`. */
+export function laneCount(): number {
+  const given = process.env.BOARD_AI_GATE_LANES ?? (() => {
+    try { return readFileSync(path.join(gateDir(), "lanes"), "utf8").trim(); } catch { return undefined; }
+  })();
+  const n = Number(given);
+  return given !== undefined && given !== "" && Number.isInteger(n) && n >= 1 ? n : machineLanes();
+}
+
+/** Lane 0 is `lock`, the one every gate before lanes knows. */
+const lockPath = (lane = 0) => path.join(gateDir(), lane === 0 ? "lock" : `lock-${lane}`);
+const takeoverPath = (lane = 0) => path.join(gateDir(), lane === 0 ? "takeover" : `takeover-${lane}`);
 const waitingPath = () => path.join(gateDir(), "waiting");
 export const runsLogPath = () => path.join(gateDir(), "runs.jsonl");
 
@@ -98,11 +133,11 @@ export function runId(): string {
   return process.env.BOARD_AI_RUN;
 }
 
-export interface Owner { pid: number; started: string; run: string; command: string; since: number }
+export interface Owner { pid: number; started: string; run: string; command: string; since: number; lane?: number }
 
-function readOwner(): Owner | undefined {
+function readOwner(lane = 0): Owner | undefined {
   try {
-    return JSON.parse(readFileSync(path.join(lockPath(), "owner.json"), "utf8")) as Owner;
+    return JSON.parse(readFileSync(path.join(lockPath(lane), "owner.json"), "utf8")) as Owner;
   } catch {
     return undefined;
   }
@@ -116,49 +151,57 @@ function ageMs(dir: string): number | undefined {
   }
 }
 
-/** Who holds the machine: `undefined` when nobody does, or the holder is dead. */
-export function holder(all: Proc[] = processes()): Owner | "being written" | undefined {
-  const owner = readOwner();
-  if (owner) return alive(all, owner.pid, owner.started) ? owner : undefined;
-  const age = ageMs(lockPath());
+/** Who holds a lane: `undefined` when nobody does, or the holder is dead. */
+export function holder(all: Proc[] = processes(), lane = 0): Owner | "being written" | undefined {
+  const owner = readOwner(lane);
+  if (owner) return alive(all, owner.pid, owner.started) ? { ...owner, lane } : undefined;
+  const age = ageMs(lockPath(lane));
   if (age === undefined) return undefined;
   return age < UNWRITTEN_MS ? "being written" : undefined;
 }
 
+/** The live holder of every lane that has one, lane by lane. */
+export function laneHolders(all: Proc[] = processes(), lanes = laneCount()): Owner[] {
+  const out: Owner[] = [];
+  for (let lane = 0; lane < lanes; lane++) {
+    const held = holder(all, lane);
+    if (held && held !== "being written") out.push(held);
+  }
+  return out;
+}
+
 /** Remove a lock whose holder is dead, unless somebody else is doing so or it changed hands meanwhile. */
-function takeOver(seen: Owner | undefined): void {
+function takeOver(seen: Owner | undefined, lane = 0): void {
   try {
-    mkdirSync(takeoverPath());
+    mkdirSync(takeoverPath(lane));
   } catch {
     // Another taker is in the middle of it. One that died there is cleared after a while.
-    if ((ageMs(takeoverPath()) ?? 0) > UNWRITTEN_MS) rmSync(takeoverPath(), { recursive: true, force: true });
+    if ((ageMs(takeoverPath(lane)) ?? 0) > UNWRITTEN_MS) rmSync(takeoverPath(lane), { recursive: true, force: true });
     return;
   }
   try {
-    const now = readOwner();
+    const now = readOwner(lane);
     const same = now === undefined
-      ? seen === undefined && (ageMs(lockPath()) ?? 0) >= UNWRITTEN_MS
+      ? seen === undefined && (ageMs(lockPath(lane)) ?? 0) >= UNWRITTEN_MS
       : seen !== undefined && now.pid === seen.pid && now.started === seen.started && now.run === seen.run;
-    if (same && holder() === undefined) rmSync(lockPath(), { recursive: true, force: true });
+    if (same && holder(undefined, lane) === undefined) rmSync(lockPath(lane), { recursive: true, force: true });
   } finally {
-    rmSync(takeoverPath(), { recursive: true, force: true });
+    rmSync(takeoverPath(lane), { recursive: true, force: true });
   }
 }
 
 let releaseHooked = false;
 
-/** Take the lock if it is free or its holder is dead. True when this process now holds it. */
-function tryLock(all: Proc[], command: string, onSignal: boolean): boolean {
-  const me = self(all);
-  if (!me) return false;
-  if (holder(all) === undefined && ageMs(lockPath()) !== undefined) takeOver(readOwner());
+/** Take one lane if it is free or its holder is dead. True when this process now holds it. */
+function tryLane(all: Proc[], me: Proc, lane: number, command: string, onSignal: boolean): boolean {
+  if (holder(all, lane) === undefined && ageMs(lockPath(lane)) !== undefined) takeOver(readOwner(lane), lane);
   try {
-    mkdirSync(lockPath());
+    mkdirSync(lockPath(lane));
   } catch {
     return false;
   }
-  const owner: Owner = { pid: process.pid, started: me.started, run: runId(), command, since: Date.now() };
-  const file = path.join(lockPath(), "owner.json");
+  const owner: Owner = { pid: process.pid, started: me.started, run: runId(), command, since: Date.now(), lane };
+  const file = path.join(lockPath(lane), "owner.json");
   writeFileSync(`${file}.${process.pid}`, JSON.stringify(owner));
   renameSync(`${file}.${process.pid}`, file);
   if (!releaseHooked) {
@@ -174,16 +217,63 @@ function tryLock(all: Proc[], command: string, onSignal: boolean): boolean {
   return true;
 }
 
-/** Let go of the lock, if this process holds it. Safe to call twice. */
-export function releaseLock(): void {
-  const owner = readOwner();
-  if (owner && owner.pid === process.pid) rmSync(lockPath(), { recursive: true, force: true });
+/**
+ * Take the first free lane, or with `whole` every lane at once. True when
+ * this process now holds what it asked for; a `whole` that got only some
+ * lets them go again.
+ */
+function tryLock(all: Proc[], command: string, onSignal: boolean, whole = false): boolean {
+  const me = self(all);
+  if (!me) return false;
+  const lanes = laneCount();
+  if (!whole) {
+    for (let lane = 0; lane < lanes; lane++) if (tryLane(all, me, lane, command, onSignal)) return true;
+    return false;
+  }
+  const taken: number[] = [];
+  for (let lane = 0; lane < lanes; lane++) {
+    if (!tryLane(all, me, lane, command, onSignal)) {
+      for (const one of taken) releaseLane(one);
+      return false;
+    }
+    taken.push(lane);
+  }
+  return true;
 }
 
-/** Whether this process's run holds the machine: it took the lock, or something above it did. */
+function releaseLane(lane: number): void {
+  const owner = readOwner(lane);
+  if (owner && owner.pid === process.pid) rmSync(lockPath(lane), { recursive: true, force: true });
+}
+
+/** Let go of every lane this process holds. Safe to call twice. */
+export function releaseLock(): void {
+  // Lanes beyond today's count too: the count may have been lowered while this run held one.
+  for (let lane = 0; lane < Math.max(laneCount(), 8); lane++) releaseLane(lane);
+}
+
+/** The lane this process's run holds, if it holds one: it took it, or something above it did. */
+export function heldLane(): number | undefined {
+  const run = process.env.BOARD_AI_RUN;
+  if (run === undefined) return undefined;
+  for (let lane = 0; lane < laneCount(); lane++) {
+    if (readOwner(lane)?.run === run) return lane;
+  }
+  return undefined;
+}
+
+/** How many lanes this process's run holds: 0, 1, or every lane for a `whole` run. */
+export function heldLaneCount(): number {
+  const run = process.env.BOARD_AI_RUN;
+  if (run === undefined) return 0;
+  let held = 0;
+  for (let lane = 0; lane < laneCount(); lane++) if (readOwner(lane)?.run === run) held += 1;
+  return held;
+}
+
+/** Whether this process's run holds the machine: it took a lane, or something above it did. */
 export function runHoldsLock(): boolean {
-  const owner = readOwner();
-  return owner !== undefined && owner.run === process.env.BOARD_AI_RUN;
+  return heldLane() !== undefined;
 }
 
 interface Ticket { pid: number; started: string; file: string }
@@ -216,14 +306,21 @@ export function waitingPids(all: Proc[]): Set<number> {
 }
 
 /**
- * Wait for the lock, in order of arrival, and keep it until this process
- * exits. Returns at once when this process's run already holds it.
+ * Wait for a lane, in order of arrival, and keep it until this process
+ * exits. Returns at once when this process's run already holds one.
  * `say` hears who is ahead, once per change. `onSignal: false` is for a
  * caller that handles signals itself and lets go on its own "exit" (the
- * gate, which must outlive its child).
+ * gate, which must outlive its child). `whole` waits until every lane is
+ * free and takes them all.
+ *
+ * A ticket tries for a lane when it is among the first as many tickets as
+ * there are free lanes, so nobody behind jumps a queue that has room for
+ * them both. One that is not first tries the lanes from the last down,
+ * leaving lane 0 -- the only one a gate from before lanes can take -- to
+ * whoever is first.
  */
 export async function takeMachine(command: string, say: (line: string) => void,
-  { pollMs = 1_000, onSignal = true }: { pollMs?: number; onSignal?: boolean } = {}): Promise<void> {
+  { pollMs = 1_000, onSignal = true, whole = false }: { pollMs?: number; onSignal?: boolean; whole?: boolean } = {}): Promise<void> {
   if (runHoldsLock()) return;
   runId();
   const all = processes();
@@ -240,12 +337,17 @@ export async function takeMachine(command: string, say: (line: string) => void,
     for (;;) {
       const now = processes();
       const queue = tickets(now);
-      const first = queue[0]?.file === mine;
-      if (first && tryLock(now, command, onSignal)) return;
-      const held = holder(now);
-      const line = held === "being written" ? "waiting: the machine is being taken by another run"
-        : held ? `waiting: the machine is held by pid ${held.pid} since ${new Date(held.since).toLocaleTimeString("sv-SE")}: ${held.command.slice(0, 100)}`
-        : first ? "waiting: the machine is being let go" : `waiting: ${queue.findIndex((one) => one.file === mine)} ahead in the queue`;
+      const position = queue.findIndex((one) => one.file === mine);
+      const lanes = laneCount();
+      const states = Array.from({ length: lanes }, (_, lane) => holder(now, lane));
+      const free = states.filter((one) => one === undefined).length;
+      const mayTry = whole ? position === 0 && free === lanes : position >= 0 && position < free;
+      if (mayTry && (whole || position === 0 ? tryLock(now, command, onSignal, whole) : tryLastFirst(now, command, onSignal, lanes))) return;
+      const held = states.filter((one): one is Owner => one !== undefined && one !== "being written");
+      const line = states.some((one) => one === "being written") && held.length === 0 ? "waiting: the machine is being taken by another run"
+        : held.length > 0 && (whole || free === 0)
+          ? `waiting: the machine is held by ${held.map((one) => `pid ${one.pid} since ${new Date(one.since).toLocaleTimeString("sv-SE")}: ${one.command.slice(0, 100)}`).join("; and by ")}`
+          : position === 0 ? "waiting: the machine is being let go" : `waiting: ${position} ahead in the queue`;
       if (line !== last) say(line);
       last = line;
       await new Promise((resolve) => { setTimeout(resolve, pollMs); });
@@ -256,8 +358,20 @@ export async function takeMachine(command: string, say: (line: string) => void,
   }
 }
 
+/** A waiter that is not first takes the highest free lane, so lane 0 stays for whoever is. */
+function tryLastFirst(all: Proc[], command: string, onSignal: boolean, lanes: number): boolean {
+  const me = self(all);
+  if (!me) return false;
+  for (let lane = lanes - 1; lane >= 0; lane--) if (tryLane(all, me, lane, command, onSignal)) return true;
+  return false;
+}
+
 /** One measurement, as the shared log has it. */
-export interface LoggedRun { id: string; run: string; pid: number; ppid: number; started: string; command: string; at: number; end?: number }
+export interface LoggedRun {
+  id: string; run: string; pid: number; ppid: number; started: string; command: string; at: number; end?: number;
+  /** The lane its run held when it started; absent for a run started without the gate, or by a gate from before lanes. */
+  lane?: number;
+}
 
 function appendLog(entry: object): void {
   try {
@@ -271,7 +385,9 @@ export function logStart(command: string, all: Proc[]): { id: string; at: number
   const id = randomBytes(6).toString("hex");
   const me = self(all);
   const at = Date.now();
-  appendLog({ kind: "start", id, run: runId(), pid: process.pid, ppid: process.ppid, started: me?.started ?? "", command, at });
+  const lane = heldLane();
+  appendLog({ kind: "start", id, run: runId(), pid: process.pid, ppid: process.ppid, started: me?.started ?? "", command, at,
+    ...(lane === undefined ? {} : { lane }) });
   let ended = false;
   const end = () => {
     if (ended) return;

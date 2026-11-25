@@ -64,19 +64,24 @@
  *   score still prints, so it can be read, under a line that says it must
  *   not be compared. An empty run (no answer keys) exits 1.
  */
+import { renameSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { ACCUSING_EDGE_KINDS, checkDrift, createWorkspace, newCheckCache, type CheckCache } from "../src/engine/drift";
 import { liveRefereePool, refereedCheckLive, type LiveRefereePool, type RefereeNote } from "../src/engine/referee-live";
 import { initEngine } from "../src/engine/parse";
 import { recordRun, waitForQuiet } from "./lib/bench-busy";
 import { librariesLine, useLibraries } from "./lib/bench-libraries";
-import { BENCH_DIR, HOLDOUT, SET } from "./lib/bench-set";
+import { JobTimes, type ProjectJob } from "./lib/bench-jobs";
+import { BENCH_DIR, CORPUS, HOLDOUT, SCORE_ONLY, SET } from "./lib/bench-set";
 import { plantedBoard, plantedKeys, type Key, type KeyClaim } from "./lib/planted-keys";
 import { pausesLine, readPowerLogSleeps, watchPauses } from "./lib/run-pauses";
-import { CompilerTally, judgeCanaries, languageGroup, loadCanaries, type CanaryAnswer } from "./lib/run-validity";
-import { stallWindowMs, watchForStall } from "./lib/stall-watchdog";
+import { CompilerTally, judgeCanaries, languageGroup, loadCanaries, type CanaryAnswer, type TallyData } from "./lib/run-validity";
+import { descendantsOf, processRows, stallWindowMs, watchForStall } from "./lib/stall-watchdog";
 import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
+import { rustCrateKey, sharingSlots, withSlot } from "./lib/slots";
+import { exitWithParent, inPool, jobsFrom, runWorker, sendResult } from "./lib/workers";
 
 const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const ACCUSES = new Set<string>(ACCUSING_EDGE_KINDS);
@@ -93,12 +98,22 @@ const wantSource = flag("source");
 const details = argv.includes("--details");
 /** Start at once even while another bench, measure script or vitest is running (#403). */
 const noWait = argv.includes("--no-wait");
+/**
+ * Every scored claim, one JSON line each, written to this file when the run
+ * ends: what a batch measurement compares arrow by arrow. Refused on a
+ * score-only set, whose arrows nobody reads.
+ */
+const dumpTo = flag("dump");
+if (dumpTo !== undefined && SCORE_ONLY) {
+  console.error(`--dump: ${SET} is score only; its arrows are never written out.`);
+  process.exit(2);
+}
 /** Skip the canaries (`bench/canaries.json`); the header says so. */
 const noCanary = argv.includes("--no-canary");
 /** Exit code of a run that could not check what it scored. */
 const NOT_VALID_EXIT = 3;
 /**
- * The holdout set is read for its score and nothing else (bench-holdout/README.md).
+ * A score-only set is read for its score and nothing else (`bench-set.ts`).
  * Its arrows are never printed, except the two kinds that are safety failures
  * -- a correct arrow called wrong, a wrong one confirmed -- which have to be
  * read to tell a broken key from a broken checker. The per-reason tables and
@@ -108,7 +123,7 @@ const NOT_VALID_EXIT = 3;
 const safetyOnly = (outcome: Outcome, truth: string) =>
   (outcome === "red" && truth === "true") || (outcome === "green" && truth === "false");
 /** Prints a reason-by-reason line: on the main set only. */
-const listed = HOLDOUT ? (..._: unknown[]) => undefined : console.log;
+const listed = SCORE_ONLY ? (..._: unknown[]) => undefined : console.log;
 
 /**
  * One workspace and one cache per project, for the whole run (#311).
@@ -309,6 +324,131 @@ function table(title: string, note: string, rows: Map<string, Row>, caught: (row
 }
 
 /*
+ * The stall watchdog, for the process that asks (#486).
+ *
+ * A language server that stops answering held one run 23 hours and every run
+ * queued behind it. The watchdog kills the servers once nothing has moved for
+ * `--stall-min` minutes of awake time, and the project they served is left
+ * out of every count and named in the header: a score with a hole in it is
+ * not comparable with one without.
+ *
+ * It sees no answers from here -- the servers are behind `refereedCheckLive`
+ * -- so the bench's sign of life is CPU alone: a healthy run keeps a core
+ * busy, and a server waiting out one timeout after another uses almost none.
+ * Each worker watches its own servers, so one project's stall stops only it.
+ *
+ * Every claim is asked first and tallied after, so a project that stalls
+ * part-way contributes nothing.
+ */
+const stallMs = stallWindowMs(argv);
+const STALLED = Symbol("stalled");
+let stalled: ((reason: string) => void) | undefined;
+let stallReason = "";
+const newStall = () => new Promise<typeof STALLED>((resolve) => {
+  stalled = (reason) => { stallReason = reason; resolve(STALLED); };
+});
+type Asked = Awaited<ReturnType<typeof ask>> & { asked: typeof lastAsked };
+
+/*
+ * ## Who asks: workers, one project each
+ *
+ * Every arrow is asked in a worker process that holds one project (or, with
+ * `--split`, one share of a project's arrows): its own workspace, cache and
+ * language servers, as the one-process run gave each project in turn (#311,
+ * #337). Up to `--jobs` of them run at once (default sized to the machine,
+ * `scripts/lib/workers.ts`); `--jobs=1` is the old run, one project at a time.
+ * Answers come back to this process, which tallies and prints them in the
+ * same order as ever, so the report does not depend on which worker finished
+ * first.
+ */
+interface CanaryJob { kind: "canaries"; project: string; canaries: number[] }
+type Job = ProjectJob | CanaryJob;
+interface ProjectAnswers {
+  answers: Array<[key: number, claim: number, asked: Asked]>; tally: TallyData; failed?: string;
+  /**
+   * The worker's own wall and CPU time and its language servers' CPU, for the
+   * cost lines on stderr: wall well above both is time nobody computed --
+   * retry sleeps and warm-up ladders.
+   */
+  wallMs: number; cpuMs: number; serverCpuMs: number;
+}
+interface CanaryAnswers { answers: Array<[canary: number, outcome: string, detail: string]>; tally: TallyData }
+
+const allKeys = plantedKeys(REPO);
+const allCanaries = loadCanaries(REPO, BENCH_DIR);
+const wanted = (claim: KeyClaim): boolean => (!wantWord || claim.word === wantWord)
+  && (!wantLanguage || claim.language === wantLanguage) && (!wantSource || claim.source === wantSource);
+
+const workerJob = process.env.BENCH_PLANTED_JOB;
+if (workerJob !== undefined) await askJob(JSON.parse(workerJob) as Job);
+
+/** A worker's whole life: ask one job's arrows, hand the answers back, exit. */
+async function askJob(job: Job): Promise<never> {
+  exitWithParent();
+  await initEngine();
+  watchForStall({
+    windowMs: stallMs,
+    say: (line) => console.error(`  ${line}`),
+    onStall: ({ reason }) => {
+      if (stalled) stalled(reason);
+      // After the last arrow: a server that will not exit, and nothing left to ask.
+      else console.error("  after the run: the servers above were stopped so the run can exit");
+    },
+  });
+  let stall = newStall();
+  const tally = new CompilerTally();
+  if (job.kind === "canaries") {
+    const answers: CanaryAnswers["answers"] = [];
+    for (const index of job.canaries) {
+      const canary = allCanaries[index]!;
+      const key = allKeys.find((one) => one.project === canary.project && one.claims.some((claim) => claim.id === canary.claim))!;
+      const claim = key.claims.find((one) => one.id === canary.claim)!;
+      lastNote = { answered: [], silent: [], nothingToAsk: true };
+      const got = await Promise.race([ask(key, claim), stall]);
+      if (got === STALLED) {
+        answers.push([index, "stalled", stallReason]);
+        closePools();
+        stall = newStall();
+        continue;
+      }
+      tally.add(canary.project, lastNote);
+      answers.push([index, got.outcome, got.detail]);
+    }
+    stalled = undefined;
+    closePools();
+    return sendResult({ answers, tally: tally.toJSON() } satisfies CanaryAnswers);
+  }
+  const answers: ProjectAnswers["answers"] = [];
+  let failed: string | undefined;
+  for (const [index, at] of job.claims) {
+    const key = allKeys[index]!;
+    const claim = key.claims[at]!;
+    const asking = ask(key, claim);
+    const got = await Promise.race([asking, stall]);
+    if (got !== STALLED) {
+      answers.push([index, at, { ...got, asked: lastAsked }]);
+      tally.add(key.project, lastNote);
+      continue;
+    }
+    failed = stallReason;
+    // The killed servers fail what was pending, so this ends soon; the pool goes after it.
+    let waited: ReturnType<typeof setTimeout> | undefined;
+    await Promise.race([asking.catch(() => undefined), new Promise((resolve) => { waited = setTimeout(resolve, stallMs); })]);
+    clearTimeout(waited);
+    break;
+  }
+  stalled = undefined;
+  // Read before the servers go: a process that has exited has no CPU time to read.
+  const serverCpuMs = descendantsOf(processRows(), process.pid).reduce((sum, row) => sum + row.cpuMs, 0);
+  closePools();
+  const used = process.cpuUsage();
+  return sendResult({
+    answers, tally: tally.toJSON(), ...(failed === undefined ? {} : { failed }),
+    wallMs: Math.round(performance.now()), cpuMs: Math.round((used.user + used.system) / 1000), serverCpuMs,
+  } satisfies ProjectAnswers);
+}
+
+/*
  * One of these at a time on a machine (#403). Two benches, or a bench beside
  * a test run, starve the language servers: the score still comes out, slower
  * and with reds that have nothing to do with the code. On stderr, so a saved
@@ -321,9 +461,7 @@ const machine = recordRun(`bench-planted ${argv.join(" ")}`);
 const pauses = watchPauses();
 const runStarted = Date.now();
 
-await initEngine();
-
-const loaded = plantedKeys(REPO).filter((k) => !wantProject || k.project === wantProject);
+const loaded = allKeys.filter((k) => !wantProject || k.project === wantProject);
 if (loaded.length === 0) {
   // Nothing scored is not a score: a run that read no keys must not pass as one.
   console.log(`No answer keys under ${BENCH_DIR}/boards${wantProject ? ` for --project=${wantProject}` : ""}.`
@@ -371,81 +509,126 @@ let claimsScored = 0;
 let undecidableCount = 0;
 const started = Date.now();
 
-const wanted = (claim: KeyClaim): boolean => (!wantWord || claim.word === wantWord)
-  && (!wantLanguage || claim.language === wantLanguage) && (!wantSource || claim.source === wantSource);
-
-/*
- * A language server that stops answering held one run 23 hours and every run
- * queued behind it (#486). The watchdog kills the servers once nothing has
- * moved for `--stall-min` minutes of awake time, and the project they served
- * is left out of every count and named in the header: a score with a hole in
- * it is not comparable with one without.
- *
- * It sees no answers from here -- the servers are behind `refereedCheckLive`
- * -- so the bench's sign of life is CPU alone: a healthy run keeps a core
- * busy, and a server waiting out one timeout after another uses almost none.
- *
- * Every claim is asked first and tallied after, so a project that stalls
- * part-way contributes nothing. Nothing is printed while asking, so a run
- * with no stall prints exactly what it did before.
- */
-const stallMs = stallWindowMs(argv);
-const STALLED = Symbol("stalled");
-let stalled: ((reason: string) => void) | undefined;
-let stallReason = "";
-const newStall = () => new Promise<typeof STALLED>((resolve) => {
-  stalled = (reason) => { stallReason = reason; resolve(STALLED); };
-});
-watchForStall({
-  windowMs: stallMs,
-  say: (line) => console.error(`  ${line}`),
-  onStall: ({ reason }) => {
-    if (stalled) stalled(reason);
-    // After the last project: a server that will not exit, and nothing left to score.
-    else console.error("  after the run: the servers above were stopped so the run can exit");
-  },
-});
 const failedProjects = new Map<string, string>();
-type Asked = Awaited<ReturnType<typeof ask>> & { asked: typeof lastAsked };
 /*
  * The canaries, before anything is scored. Only the languages this run
  * scores are asked; a set with no canaries file has none, and its header
- * says the compiler counts are its only check.
+ * says the compiler counts are its only check. They are the first jobs in
+ * the queue, each project's in a worker of its own with its own caches and
+ * servers, and nothing scored is printed until they have all gone red.
  */
 const scoredLanguages = new Set(loaded.flatMap((key) => key.claims)
   .filter((claim) => wanted(claim) && claim.truth !== "undecidable").map((claim) => languageGroup(claim.language)));
-const canaries = noCanary ? [] : loadCanaries(REPO, BENCH_DIR).filter((one) => scoredLanguages.has(languageGroup(one.language)));
+const canaryIndices = noCanary ? [] : allCanaries.map((one, index) => ({ one, index }))
+  .filter(({ one }) => scoredLanguages.has(languageGroup(one.language))).map(({ index }) => index);
 const canaryTally = new CompilerTally();
-const canaryAnswers: CanaryAnswer[] = [];
-let stall = newStall();
-const allKeys = canaries.length > 0 ? plantedKeys(REPO) : [];
-for (const canary of canaries) {
+const canarySaid = new Map<number, { outcome: string; detail: string }>();
+const canaryJobs = new Map<string, CanaryJob>();
+for (const index of canaryIndices) {
+  const canary = allCanaries[index]!;
   const key = allKeys.find((one) => one.project === canary.project && one.claims.some((claim) => claim.id === canary.claim));
-  const claim = key?.claims.find((one) => one.id === canary.claim);
-  if (!key || !claim) {
-    canaryAnswers.push({ canary, outcome: "missing", detail: `claim ${canary.claim} is not in ${canary.project}'s answer keys` });
+  if (!key) {
+    canarySaid.set(index, { outcome: "missing", detail: `claim ${canary.claim} is not in ${canary.project}'s answer keys` });
     continue;
   }
-  lastNote = { answered: [], silent: [], nothingToAsk: true };
-  const asking = ask(key, claim);
-  const got = await Promise.race([asking, stall]);
-  if (got === STALLED) {
-    canaryAnswers.push({ canary, outcome: "stalled", detail: stallReason });
-    closePools();
-    stall = newStall();
-    continue;
-  }
-  canaryTally.add(canary.project, lastNote);
-  canaryAnswers.push({ canary, outcome: got.outcome, detail: got.detail });
+  const job = canaryJobs.get(canary.project) ?? { kind: "canaries", project: canary.project, canaries: [] };
+  job.canaries.push(index);
+  canaryJobs.set(canary.project, job);
 }
-/* The scored run starts from what it would have started from with no canaries. */
-closePools();
-held.clear();
-current = undefined;
+
+/** Each project's arrows, by their index among all the keys, in the order the report reads them. */
+const projectJobs: ProjectJob[] = [];
+for (const key of loaded) {
+  const index = allKeys.indexOf(key);
+  const claims = [...key.claims.entries()]
+    .filter(([, claim]) => wanted(claim) && claim.truth !== "undecidable").map(([at]): [number, number] => [index, at]);
+  if (claims.length === 0) continue;
+  const last = projectJobs.at(-1);
+  if (last?.project === key.project) last.claims.push(...claims);
+  else projectJobs.push({ kind: "project", project: key.project, share: 0, shares: 1, claims });
+}
+const jobs = jobsFrom(argv);
+/** A canary job's place in a shared queue: ahead of every scored job. */
+const CANARIES_FIRST = 1e11;
+const times = new JobTimes(SET ?? "main", allKeys);
+const rustProjects = new Set(allKeys.filter((key) => key.language === "rust").map((key) => key.project));
+const queue: Job[] = [...canaryJobs.values(), ...times.plan(projectJobs, jobs, argv, {
+  splittable: (job) => !rustProjects.has(job.project),
+  ...(sharingSlots() ? { minFairMs: 10 * 60_000 } : {}),
+})];
+
+/** Per board, per claim: what the checker said. */
+const answers = new Map<Key, Map<KeyClaim, Asked>>();
+/** One line per worker: arrows, wall time, and how much of it the checker itself was running. */
+const costs: string[] = [];
+/** Each project's tallies, by share, merged in report order once every worker is back. */
+const projectTallies = new Map<string, Array<{ share: number; data: TallyData }>>();
+const self = fileURLToPath(import.meta.url);
+const workerArgs = argv.filter((one) => !one.startsWith("--jobs=") && !one.startsWith("--dump="));
+let canariesLeft = canaryJobs.size;
+let canariesDone: () => void = () => {};
+const canariesBack = new Promise<void>((resolve) => { canariesDone = resolve; if (canariesLeft === 0) resolve(); });
+/*
+ * Inside `measure:batch`, several runs share the machine's worker slots
+ * (`slots.ts`): every job waits for one, the longest first across all of
+ * them, and the canaries before anything.
+ */
+/*
+ * A Rust project's jobs never run at once -- its canaries, its shares, and
+ * (sharing slots) the same crate in another run: two rust-analyzers on one
+ * crate contend for its `target/` (`workers.ts`).
+ */
+const apart = (job: Job) => (rustProjects.has(job.project) ? rustCrateKey(path.join(CORPUS, job.project)) : undefined);
+const asking = inPool(queue, sharingSlots() ? queue.length : jobs, async (job) => {
+  const outcome = await withSlot(job.kind === "canaries" ? CANARIES_FIRST : times.expect(job), () =>
+    runWorker<ProjectAnswers | CanaryAnswers>(self, workerArgs, {
+      env: { ...process.env, BENCH_PLANTED_JOB: JSON.stringify(job) },
+    }), apart(job));
+  if (job.kind === "canaries") {
+    for (const index of job.canaries) {
+      const said = outcome.ok ? (outcome.value as CanaryAnswers).answers.find(([at]) => at === index) : undefined;
+      canarySaid.set(index, said ? { outcome: said[1], detail: said[2] } : { outcome: "stalled", detail: outcome.ok ? "no answer" : outcome.why });
+    }
+    if (outcome.ok) canaryTally.merge((outcome.value as CanaryAnswers).tally);
+    canariesLeft -= 1;
+    if (canariesLeft === 0) canariesDone();
+    return;
+  }
+  if (!outcome.ok) {
+    failedProjects.set(job.project, `its worker ${outcome.why}`);
+    console.error(`  ${job.project}: not measured, left out of every count`);
+    return;
+  }
+  const value = outcome.value as ProjectAnswers;
+  costs.push(`${job.project}${job.shares > 1 ? ` ${job.share + 1}/${job.shares}` : ""}: ${job.claims.length} claims,`
+    + ` ${(value.wallMs / 1000).toFixed(0)}s wall, ${(value.cpuMs / 1000).toFixed(0)}s CPU in the checker`
+    + ` (${value.wallMs > 0 ? Math.round((100 * value.cpuMs) / value.wallMs) : 0}%), ${(value.serverCpuMs / 1000).toFixed(0)}s in its servers`
+    // Questions per compiler, answered of asked: a count that moves while every answer stays is a compiler that answered differently.
+    + Object.entries(value.tally.questions).map(([referee, byProject]) => {
+      const row = byProject[job.project] ?? { asked: 0, answered: 0 };
+      return `; ${referee} ${row.answered}/${row.asked}`;
+    }).join(""));
+  if (value.failed !== undefined) {
+    if (!failedProjects.has(job.project)) console.error(`  ${job.project}: not measured, left out of every count`);
+    failedProjects.set(job.project, value.failed);
+    return;
+  }
+  for (const [index, at, said] of value.answers) {
+    const key = allKeys[index]!;
+    times.record(key, key.claims[at]!, said.asked.ms);
+    const byClaim = answers.get(key) ?? new Map<KeyClaim, Asked>();
+    byClaim.set(key.claims[at]!, said);
+    answers.set(key, byClaim);
+  }
+  projectTallies.set(job.project, [...(projectTallies.get(job.project) ?? []), { share: job.share, data: value.tally }]);
+}, apart);
+
+await canariesBack;
+const canaryAnswers: CanaryAnswer[] = canaryIndices.map((index) => ({ canary: allCanaries[index]!, ...canarySaid.get(index)! }));
 const canaryVerdict = judgeCanaries(canaryAnswers, canaryTally);
 const canaryLines = noCanary
   ? ["canaries: skipped (--no-canary); nothing in this run showed its compilers can catch a mistake"]
-  : canaries.length === 0
+  : canaryIndices.length === 0
     ? [`canaries: none for this set (${BENCH_DIR}/canaries.json); the compiler counts above are its only check`]
     : ["canaries -- wrong on purpose, only a compiler catches them, asked first:", ...canaryVerdict.lines.map((line) => `  ${line}`)];
 if (canaryVerdict.failed.length > 0) {
@@ -459,40 +642,28 @@ if (canaryVerdict.failed.length > 0) {
   ];
   for (const line of lines) console.log(line);
   for (const line of lines) console.error(line);
-  process.exit(NOT_VALID_EXIT);
+  await exitWhenWritten(NOT_VALID_EXIT);
 }
+await asking;
+times.save();
+/* What each worker cost, on stderr so a saved report holds only the run. */
+console.error(`  workers: ${jobs} at once${sharingSlots() ? " (sharing slots)" : ""}, ${queue.length} jobs, in ${((Date.now() - started) / 1000).toFixed(0)}s`);
+for (const line of costs.sort()) console.error(`    ${line}`);
 
-/* Which compilers answered the scored checks, per project (`run-validity.ts`). */
+/* Which compilers answered the scored checks, per project (`run-validity.ts`), merged in report order. */
 const tally = new CompilerTally();
-/** Per board, per claim: what the checker said. */
-const answers = new Map<Key, Map<KeyClaim, Asked>>();
-for (const key of loaded) {
-  if (failedProjects.has(key.project)) continue;
-  const said = new Map<KeyClaim, Asked>();
-  answers.set(key, said);
-  for (const claim of key.claims) {
-    if (!wanted(claim) || claim.truth === "undecidable") continue;
-    const asking = ask(key, claim);
-    const got = await Promise.race([asking, stall]);
-    if (got !== STALLED) {
-      said.set(claim, { ...got, asked: lastAsked });
-      tally.add(key.project, lastNote);
-      continue;
-    }
-    failedProjects.set(key.project, stallReason);
-    console.error(`  ${key.project}: not measured, left out of every count`);
-    // The killed servers fail what was pending, so this ends soon; the pool goes after it.
-    let waited: ReturnType<typeof setTimeout> | undefined;
-    await Promise.race([asking.catch(() => undefined), new Promise((resolve) => { waited = setTimeout(resolve, stallMs); })]);
-    clearTimeout(waited);
-    pools?.pool.close();
-    pools = undefined;
-    stall = newStall();
-    break;
-  }
+for (const job of projectJobs) {
+  if (failedProjects.has(job.project)) continue;
+  for (const { data } of (projectTallies.get(job.project) ?? []).sort((a, b) => a.share - b.share)) tally.merge(data);
 }
-stalled = undefined;
+/* A project left out is named in report order, whichever worker came back first. */
+const failedInOrder = new Map([...new Set(loaded.map((key) => key.project))]
+  .filter((project) => failedProjects.has(project)).map((project) => [project, failedProjects.get(project)!]));
+failedProjects.clear();
+for (const [project, reason] of failedInOrder) failedProjects.set(project, reason);
 
+/** The `--dump` lines, written when the run ends. */
+const dumped: string[] = [];
 /** The project whose `--details` lines are being printed; each gets a header (#403). */
 let printedProject: string | undefined;
 for (const key of loaded) {
@@ -529,7 +700,14 @@ for (const key of loaded) {
           + `\n      checker: ${detail}\n      tooling: ${claim.why}`);
       }
     }
-    const shown = details && (!HOLDOUT || safetyOnly(outcome, claim.truth));
+    const shown = details && (!SCORE_ONLY || safetyOnly(outcome, claim.truth));
+    if (dumpTo !== undefined) {
+      dumped.push(JSON.stringify({
+        set: SET ?? "main", project: key.project, topic: key.topic, cid: claim.id, word: claim.word, from: claim.from,
+        to: claim.to, member: claim.member, truth: claim.truth, source: claim.source, language: claim.language,
+        outcome, reason, detail, why: claim.why, gate: asked.gate, ms: Math.round(asked.ms),
+      }));
+    }
     if (shown && key.project !== printedProject) {
       // Where each project starts, so a saved run can be compared arrow for arrow.
       console.log(`  == ${key.project}`);
@@ -731,12 +909,31 @@ for (const { reason, label, claims } of work) {
 }
 listed();
 
-/*
- * The last project's servers, which nothing else will close. A live language
- * server is an open child-process handle and Node will not reach its own
- * natural exit while one is alive -- `check-drift.mjs` found that live, as the
- * script hanging after printing its whole report.
- */
-pools?.pool.close();
+if (dumpTo !== undefined) {
+  // Whole or not at all: a reader never sees half a run under the final name.
+  writeFileSync(`${dumpTo}.${process.pid}`, dumped.map((line) => `${line}\n`).join(""));
+  renameSync(`${dumpTo}.${process.pid}`, dumpTo);
+}
 pauses.stop();
-if (problems.length > 0) process.exitCode = NOT_VALID_EXIT;
+machine.end();
+await exitWhenWritten(problems.length > 0 ? NOT_VALID_EXIT : 0);
+
+/*
+ * The run ends here, on purpose, once the report is written. It used to end
+ * by itself when nothing was left open, and often something was: the report
+ * was printed and the process sat there until `~/bench-491/bench.sh` killed
+ * it 180 s later or, without that, for 35 min (2026-11-25). The inspector on
+ * one such process found a single thing holding it: the JSON-RPC reader's
+ * partial-message timer, re-arming itself after a rust-analyzer stopped
+ * halfway through a message -- fixed where the connection is made
+ * (`referee-rust-lsp.ts` `connectTo`). Every language server lives in a
+ * worker now, a worker that has answered is stopped (`workers.ts`), and this
+ * exit is the last guard for anything else. The servers' own exit hook
+ * (`server-process.ts`) still runs.
+ */
+async function exitWhenWritten(code: number): Promise<never> {
+  // A pipe on macOS is written asynchronously; exiting first cuts the report short.
+  await new Promise<void>((resolve) => { process.stdout.write("", () => resolve()); });
+  await new Promise<void>((resolve) => { process.stderr.write("", () => resolve()); });
+  process.exit(code);
+}
