@@ -18,7 +18,7 @@
  *                          that implements it, or an object literal typed by the
  *                          interface naming a routine or wrapping one in an arrow.
  *   ... --handed-on        TypeScript, only `@calls` arrows to a routine handed on one
- *                          step (`npm run measure:handed-on`): `run(fits)` where `run`
+ *                          step (`npm run measure:compiler-true-handed-on`): `run(fits)` where `run`
  *                          calls that parameter, an option's member, or a field set
  *                          to the routine -- followed with the compiler's own symbols.
  *                          The population a type question about a function value
