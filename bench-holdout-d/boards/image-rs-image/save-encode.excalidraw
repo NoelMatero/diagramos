@@ -1,0 +1,1909 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 1069.2,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 2051450431,
+      "version": 1,
+      "versionNonce": 125795673,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "role": "title"
+      },
+      "text": "DynamicImage::save picks an encoder from the path and writes through ImageEncoder",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "DynamicImage::save picks an encoder from the path and writes through ImageEncoder",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 60,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 799765890,
+      "version": 1,
+      "versionNonce": 697794038,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--node-0-label"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "node": "save",
+        "ref": "src/images/dynimage.rs#save"
+      }
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-1",
+      "type": "rectangle",
+      "x": 700,
+      "y": 360,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 66366003,
+      "version": 1,
+      "versionNonce": 1920429069,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--node-1-label"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "node": "from_path",
+        "ref": "src/io/format.rs#from_path"
+      }
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-2",
+      "type": "rectangle",
+      "x": 1500,
+      "y": 360,
+      "width": 360,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 657650180,
+      "version": 1,
+      "versionNonce": 1762542864,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--node-2-label"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "node": "from_extension",
+        "ref": "src/io/format.rs#from_extension"
+      }
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-3",
+      "type": "rectangle",
+      "x": 660,
+      "y": 40,
+      "width": 380,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1006991005,
+      "version": 1,
+      "versionNonce": 2108038919,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--node-3-label"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "node": "save_with_format",
+        "ref": "src/images/dynimage.rs#save_with_format"
+      }
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-4",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 20,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 587210662,
+      "version": 1,
+      "versionNonce": 223067274,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--node-4-label"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "node": "encoder_for_format",
+        "ref": "src/io/free_functions.rs#encoder_for_format"
+      }
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-5",
+      "type": "rectangle",
+      "x": 2000,
+      "y": 280,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1467189751,
+      "version": 1,
+      "versionNonce": 154148689,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--node-5-label"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "node": "write_with_encoder_impl",
+        "ref": "src/images/dynimage.rs#write_with_encoder_impl"
+      }
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-6",
+      "type": "rectangle",
+      "x": 3100,
+      "y": 20,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 916883144,
+      "version": 1,
+      "versionNonce": 151710244,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--node-6-label"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "node": "image_encoder",
+        "ref": "src/io/encoder.rs#ImageEncoder"
+      }
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-7",
+      "type": "rectangle",
+      "x": 2460,
+      "y": 20,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1596071409,
+      "version": 1,
+      "versionNonce": 106924667,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--node-7-label"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "node": "png_encoder",
+        "ref": "src/codecs/png.rs#PngEncoder"
+      }
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-8",
+      "type": "rectangle",
+      "x": 1500,
+      "y": 200,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 690580858,
+      "version": 1,
+      "versionNonce": 1133475022,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--node-8-label"
+        },
+        {
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "node": "output_file",
+        "state": "external"
+      }
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-0",
+      "type": "arrow",
+      "x": 272,
+      "y": 125.33333333333333,
+      "width": 434.4,
+      "height": 267.6666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 807680789,
+      "version": 1,
+      "versionNonce": 1486176287,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "edge": {
+          "from": "save",
+          "to": "from_path",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          267.6666666666667
+        ],
+        [
+          83.36666666666662,
+          267.6666666666667
+        ],
+        [
+          171.125,
+          267.6666666666667
+        ],
+        [
+          258.8833333333333,
+          267.6666666666667
+        ],
+        [
+          433.9,
+          267.6666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-0",
+        "focus": 0.30666666666666625,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-1",
+        "focus": 0.17499999999999857,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-1",
+      "type": "arrow",
+      "x": 272,
+      "y": 92,
+      "width": 394.4,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 882694268,
+      "version": 1,
+      "versionNonce": 1965408008,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "edge": {
+          "from": "save",
+          "to": "save_with_format",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          197.2,
+          0
+        ],
+        [
+          393.9,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-0",
+        "focus": -0.35999999999999993,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-3",
+        "focus": 0.13333333333333297,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-2",
+      "type": "arrow",
+      "x": 1006.4,
+      "y": 393,
+      "width": 496.0000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 298952779,
+      "version": 1,
+      "versionNonce": 1931607749,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "edge": {
+          "from": "from_path",
+          "to": "from_extension"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          248.0000000000001,
+          0
+        ],
+        [
+          495.5000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-1",
+        "focus": -0.175,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-2",
+        "focus": 0.175,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-3",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 62,
+      "width": 466,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2014047290,
+      "version": 1,
+      "versionNonce": 2049176974,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "edge": {
+          "from": "save_with_format",
+          "to": "encoder_for_format",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          233,
+          0
+        ],
+        [
+          465.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-3",
+        "focus": -0.6333333333333335,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-4",
+        "focus": 0.16000000000000025,
+        "gap": 7.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-4",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 122,
+      "width": 956,
+      "height": 190,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1073977801,
+      "version": 1,
+      "versionNonce": 2100536147,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "edge": {
+          "from": "save_with_format",
+          "to": "write_with_encoder_impl",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          190
+        ],
+        [
+          383,
+          190
+        ],
+        [
+          526.25,
+          190
+        ],
+        [
+          669.5,
+          190
+        ],
+        [
+          955.5,
+          190
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-3",
+        "focus": 0.36666666666666653,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-5",
+        "focus": 0.19999999999999998,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-5",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 92,
+      "width": 456,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 68262784,
+      "version": 1,
+      "versionNonce": 61895516,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "edge": {
+          "from": "save_with_format",
+          "to": "output_file"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          140
+        ],
+        [
+          158,
+          140
+        ],
+        [
+          232.5,
+          140
+        ],
+        [
+          307,
+          140
+        ],
+        [
+          455.5,
+          140
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-3",
+        "focus": -0.13333333333333353,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-8",
+        "focus": 0.2,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-6",
+      "type": "arrow",
+      "x": 1852.4,
+      "y": 62,
+      "width": 610,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1692337007,
+      "version": 1,
+      "versionNonce": 111819977,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "edge": {
+          "from": "encoder_for_format",
+          "to": "png_encoder"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          305,
+          0
+        ],
+        [
+          609.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-4",
+        "focus": -0.16000000000000025,
+        "gap": 7.599999999999909
+      },
+      "endBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-7",
+        "focus": -0.05,
+        "gap": 2.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-7",
+      "type": "arrow",
+      "x": 2322.4,
+      "y": 312,
+      "width": 779.1999999999998,
+      "height": 216.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1557362462,
+      "version": 1,
+      "versionNonce": 1797280578,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "edge": {
+          "from": "write_with_encoder_impl",
+          "to": "image_encoder"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          124.48333333333312,
+          0
+        ],
+        [
+          248.9666666666667,
+          0
+        ],
+        [
+          497.9333333333334,
+          0
+        ],
+        [
+          671.1999999999998,
+          0
+        ],
+        [
+          671.1999999999998,
+          -216.66666666666669
+        ],
+        [
+          778.6999999999998,
+          -216.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-5",
+        "focus": -0.19999999999999998,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-6",
+        "focus": -0.5066666666666674,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-8",
+      "type": "arrow",
+      "x": 2742.4,
+      "y": 62,
+      "width": 359.1999999999998,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1864526429,
+      "version": 1,
+      "versionNonce": 1815376071,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dynamicimage-save-picks-an-encoder-from--edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-",
+        "edge": {
+          "from": "png_encoder",
+          "to": "image_encoder",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          179.5999999999999,
+          0
+        ],
+        [
+          358.6999999999998,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-7",
+        "focus": 0.05,
+        "gap": 2.400000000000091
+      },
+      "endBinding": {
+        "elementId": "dynamicimage-save-picks-an-encoder-from--node-6",
+        "focus": 0.1600000000000012,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-0-label",
+      "type": "text",
+      "x": 50.999999999999986,
+      "y": 97.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 499217379,
+      "version": 1,
+      "versionNonce": 1735404669,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "DynamicImage::save",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--node-0",
+      "originalText": "DynamicImage::save",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-1-label",
+      "type": "text",
+      "x": 729,
+      "y": 387.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 753721742,
+      "version": 1,
+      "versionNonce": 1822376498,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "ImageFormat::from_path",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--node-1",
+      "originalText": "ImageFormat::from_path",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-2-label",
+      "type": "text",
+      "x": 1531.5,
+      "y": 387.5,
+      "width": 297,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1710228369,
+      "version": 1,
+      "versionNonce": 902583707,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "ImageFormat::from_extension",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--node-2",
+      "originalText": "ImageFormat::from_extension",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-3-label",
+      "type": "text",
+      "x": 685,
+      "y": 87.5,
+      "width": 330,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1518021972,
+      "version": 1,
+      "versionNonce": 86031008,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "DynamicImage::save_with_format",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--node-3",
+      "originalText": "DynamicImage::save_with_format",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-4-label",
+      "type": "text",
+      "x": 1536,
+      "y": 45,
+      "width": 308,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 2055080599,
+      "version": 1,
+      "versionNonce": 738623089,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "encoder_for_format (match on\nformat)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--node-4",
+      "originalText": "encoder_for_format (match on format)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-5-label",
+      "type": "text",
+      "x": 2033.5,
+      "y": 307.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1024597874,
+      "version": 1,
+      "versionNonce": 1060779302,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "write_with_encoder_impl",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--node-5",
+      "originalText": "write_with_encoder_impl",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-6-label",
+      "type": "text",
+      "x": 3131,
+      "y": 45,
+      "width": 198.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1962441749,
+      "version": 1,
+      "versionNonce": 850891551,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "ImageEncoder trait\n(write_image)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--node-6",
+      "originalText": "ImageEncoder trait (write_image)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-7-label",
+      "type": "text",
+      "x": 2490,
+      "y": 47.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 447054408,
+      "version": 1,
+      "versionNonce": 1936774308,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "PngEncoder (one arm)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--node-7",
+      "originalText": "PngEncoder (one arm)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--node-8-label",
+      "type": "text",
+      "x": 1525.5,
+      "y": 227.5,
+      "width": 209.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1075083499,
+      "version": 1,
+      "versionNonce": 684355301,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "output file on disk",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--node-8",
+      "originalText": "output file on disk",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-0-label",
+      "type": "text",
+      "x": 298.16666666666663,
+      "y": 383,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1068511420,
+      "version": 1,
+      "versionNonce": 1977575496,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "format @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--edge-0",
+      "originalText": "format @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-1-label",
+      "type": "text",
+      "x": 412,
+      "y": 82,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1194103321,
+      "version": 1,
+      "versionNonce": 2116245347,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "format @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--edge-1",
+      "originalText": "format @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-2-label",
+      "type": "text",
+      "x": 1214.8000000000002,
+      "y": 383,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 272198646,
+      "version": 1,
+      "versionNonce": 179621210,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "extension",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--edge-2",
+      "originalText": "extension",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-3-label",
+      "type": "text",
+      "x": 1191.4,
+      "y": 52,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 569577259,
+      "version": 1,
+      "versionNonce": 2050080549,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "boxed encoder @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--edge-3",
+      "originalText": "boxed encoder @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-4-label",
+      "type": "text",
+      "x": 1367.8000000000002,
+      "y": 302,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1277812368,
+      "version": 1,
+      "versionNonce": 176793196,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "encoder @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--edge-4",
+      "originalText": "encoder @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-5-label",
+      "type": "text",
+      "x": 1156,
+      "y": 222,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 338832221,
+      "version": 1,
+      "versionNonce": 1140933575,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "create file",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--edge-5",
+      "originalText": "create file",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-6-label",
+      "type": "text",
+      "x": 2126.6,
+      "y": 52,
+      "width": 61.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1865530,
+      "version": 1,
+      "versionNonce": 741262990,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "PNG arm",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--edge-6",
+      "originalText": "PNG arm",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-7-label",
+      "type": "text",
+      "x": 2771.9333333333334,
+      "y": 302,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 327686655,
+      "version": 1,
+      "versionNonce": 159902489,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "write_image",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--edge-7",
+      "originalText": "write_image",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dynamicimage-save-picks-an-encoder-from--edge-8-label",
+      "type": "text",
+      "x": 2882.4,
+      "y": 52,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1843197076,
+      "version": 1,
+      "versionNonce": 825904864,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "dynamicimage-save-picks-an-encoder-from-"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dynamicimage-save-picks-an-encoder-from--edge-8",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

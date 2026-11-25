@@ -1,0 +1,2094 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "git-branch-and-git-status-read-the-repo--title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 726.0000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 960908887,
+      "version": 1,
+      "versionNonce": 1413134385,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "role": "title"
+      },
+      "text": "git_branch and git_status read the repo through Context",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "git_branch and git_status read the repo through Context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-0",
+      "type": "rectangle",
+      "x": 840,
+      "y": 520,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff4e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1902175258,
+      "version": 1,
+      "versionNonce": 1856367598,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--node-0-label"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "node": "ctx",
+        "ref": "src/context/mod.rs#get_git_repo"
+      }
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-1",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 620,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff4e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 847895979,
+      "version": 1,
+      "versionNonce": 395891365,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--node-1-label"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "node": "repo",
+        "ref": "src/context/git_repo.rs#GitRepo"
+      }
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-2",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 320,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff4e6",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 26587612,
+      "version": 1,
+      "versionNonce": 304798696,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--node-2-label"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "node": "runGit",
+        "ref": "src/context/git_repo.rs#exec_git_with_required_trust"
+      }
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-3",
+      "type": "rectangle",
+      "x": 20,
+      "y": 600,
+      "width": 340,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e7f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 695808757,
+      "version": 1,
+      "versionNonce": 1994223999,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--node-3-label"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "node": "gbMod",
+        "ref": "src/modules/git_branch.rs#module"
+      }
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-4",
+      "type": "rectangle",
+      "x": 820,
+      "y": 360,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e7f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 701255806,
+      "version": 1,
+      "versionNonce": 178144802,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--node-4-label"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "node": "gbInfo",
+        "ref": "src/modules/git_branch.rs#get_branch_info_from_git"
+      }
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-5",
+      "type": "rectangle",
+      "x": 20,
+      "y": 400,
+      "width": 340,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e7f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 93899727,
+      "version": 1,
+      "versionNonce": 1148044713,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--node-5-label"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "node": "gsMod",
+        "ref": "src/modules/git_status.rs#module"
+      }
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-6",
+      "type": "rectangle",
+      "x": 840,
+      "y": 180,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e7f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 617309152,
+      "version": 1,
+      "versionNonce": 1098120252,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--node-6-label"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "node": "gsInfo",
+        "ref": "src/modules/git_status.rs#GitStatusInfo"
+      }
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-7",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 140,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#e7f5ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 962105769,
+      "version": 1,
+      "versionNonce": 927134387,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--node-7-label"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "node": "rs",
+        "ref": "src/modules/git_status.rs#RepoStatus"
+      }
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-8",
+      "type": "rectangle",
+      "x": 820,
+      "y": 20,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ebfbee",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 801091490,
+      "version": 1,
+      "versionNonce": 695114134,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--node-8-label"
+        },
+        {
+          "id": "git-branch-and-git-status-read-the-repo--edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "node": "fmt",
+        "ref": "src/modules/utils/format.rs#count"
+      }
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-0",
+      "type": "arrow",
+      "x": 352,
+      "y": 662,
+      "width": 478.1333333333333,
+      "height": 83.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1651803565,
+      "version": 1,
+      "versionNonce": 265057559,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "edge": {
+          "from": "gbMod",
+          "to": "ctx",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          -83.33333333333337
+        ],
+        [
+          197.39999999999998,
+          -83.33333333333337
+        ],
+        [
+          267.58333333333326,
+          -83.33333333333337
+        ],
+        [
+          337.76666666666665,
+          -83.33333333333337
+        ],
+        [
+          477.6333333333333,
+          -83.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-3",
+        "focus": 0.033333333333333284,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-0",
+        "focus": -0.17333333333333245,
+        "gap": 9.866666666666674
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-1",
+      "type": "arrow",
+      "x": 352,
+      "y": 492,
+      "width": 478.1333333333333,
+      "height": 53.33333333333337,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 589359060,
+      "version": 1,
+      "versionNonce": 1644515872,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "edge": {
+          "from": "gsMod",
+          "to": "ctx",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          66.43333333333334,
+          0
+        ],
+        [
+          132.86666666666667,
+          0
+        ],
+        [
+          265.73333333333335,
+          0
+        ],
+        [
+          356.79999999999995,
+          0
+        ],
+        [
+          356.79999999999995,
+          53.33333333333337
+        ],
+        [
+          477.6333333333333,
+          53.33333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-5",
+        "focus": 0.5333333333333333,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-0",
+        "focus": 0.4933333333333322,
+        "gap": 9.866666666666674
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-2",
+      "type": "arrow",
+      "x": 1110.1333333333332,
+      "y": 562,
+      "width": 473.8666666666668,
+      "height": 96.66666666666674,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1167536899,
+      "version": 1,
+      "versionNonce": 690665501,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "edge": {
+          "from": "ctx",
+          "to": "repo"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          142.6333333333332,
+          0
+        ],
+        [
+          213.94999999999982,
+          0
+        ],
+        [
+          285.26666666666665,
+          0
+        ],
+        [
+          365.8666666666668,
+          0
+        ],
+        [
+          365.8666666666668,
+          96.66666666666663
+        ],
+        [
+          473.3666666666668,
+          96.16666666666674
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-0",
+        "focus": -0.15999999999999986,
+        "gap": 9.866666666666788
+      },
+      "endBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-1",
+        "focus": 0.22666666666666216,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-3",
+      "type": "arrow",
+      "x": 352,
+      "y": 692,
+      "width": 1232,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 402814866,
+      "version": 1,
+      "versionNonce": 1477316806,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "edge": {
+          "from": "gbMod",
+          "to": "repo",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          616,
+          0
+        ],
+        [
+          1231.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-3",
+        "focus": 0.5333333333333333,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-1",
+        "focus": -0.4400000000000005,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-4",
+      "type": "arrow",
+      "x": 352,
+      "y": 632,
+      "width": 464.79999999999995,
+      "height": 240,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 580889601,
+      "version": 1,
+      "versionNonce": 1546595915,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "edge": {
+          "from": "gbMod",
+          "to": "gbInfo",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          -240
+        ],
+        [
+          112.39999999999998,
+          -240
+        ],
+        [
+          288.5999999999999,
+          -240
+        ],
+        [
+          376.69999999999993,
+          -240
+        ],
+        [
+          464.29999999999995,
+          -240
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-3",
+        "focus": -0.46666666666666656,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-4",
+        "focus": 0.19999999999999998,
+        "gap": 3.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-5",
+      "type": "arrow",
+      "x": 1136.8,
+      "y": 392,
+      "width": 447.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1924315224,
+      "version": 1,
+      "versionNonce": 2013730100,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "edge": {
+          "from": "gbInfo",
+          "to": "runGit",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          223.60000000000014,
+          0
+        ],
+        [
+          446.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-4",
+        "focus": -0.19999999999999998,
+        "gap": 3.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-2",
+        "focus": -0.44000000000000067,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-6",
+      "type": "arrow",
+      "x": 352,
+      "y": 462,
+      "width": 491.4666666666666,
+      "height": 240,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 452111111,
+      "version": 1,
+      "versionNonce": 2145739553,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "edge": {
+          "from": "gsMod",
+          "to": "gsInfo",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -240
+        ],
+        [
+          125.73333333333329,
+          -240
+        ],
+        [
+          308.5999999999999,
+          -240
+        ],
+        [
+          400.0333333333333,
+          -240
+        ],
+        [
+          490.9666666666666,
+          -240
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-5",
+        "focus": 0.033333333333333284,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-6",
+        "focus": 0.15999999999999912,
+        "gap": 3.4666666666665833
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-7",
+      "type": "arrow",
+      "x": 352,
+      "y": 432,
+      "width": 464.79999999999995,
+      "height": 380,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1264027254,
+      "version": 1,
+      "versionNonce": 454591706,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "edge": {
+          "from": "gsMod",
+          "to": "fmt",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -380
+        ],
+        [
+          42.39999999999998,
+          -380
+        ],
+        [
+          253.5999999999999,
+          -380
+        ],
+        [
+          359.19999999999993,
+          -380
+        ],
+        [
+          464.29999999999995,
+          -380
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-5",
+        "focus": -0.46666666666666656,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-8",
+        "focus": 0.19999999999999998,
+        "gap": 3.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-8",
+      "type": "arrow",
+      "x": 1123.4666666666667,
+      "y": 238.66666666666666,
+      "width": 460.5333333333333,
+      "height": 120.00000000000006,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1905238053,
+      "version": 1,
+      "versionNonce": 35917999,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "edge": {
+          "from": "gsInfo",
+          "to": "runGit",
+          "claim": "depends"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          145.1333333333332,
+          -2.842170943040401e-14
+        ],
+        [
+          217.69999999999982,
+          -2.842170943040401e-14
+        ],
+        [
+          290.26666666666665,
+          -2.842170943040401e-14
+        ],
+        [
+          352.5333333333333,
+          -2.842170943040401e-14
+        ],
+        [
+          352.5333333333333,
+          120.00000000000003
+        ],
+        [
+          460.0333333333333,
+          120.00000000000003
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-6",
+        "focus": 0.17333333333333245,
+        "gap": 3.466666666666697
+      },
+      "endBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-2",
+        "focus": 0.22666666666666707,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-9",
+      "type": "arrow",
+      "x": 1123.4666666666667,
+      "y": 205.33333333333331,
+      "width": 460.5333333333333,
+      "height": 23.466666666666697,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1765348876,
+      "version": 1,
+      "versionNonce": 207462872,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "git-branch-and-git-status-read-the-repo--edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-",
+        "edge": {
+          "from": "gsInfo",
+          "to": "rs"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          45.33333333333326,
+          0
+        ],
+        [
+          45.33333333333326,
+          -23.466666666666697
+        ],
+        [
+          218.5333333333333,
+          -23.466666666666697
+        ],
+        [
+          279.0333333333333,
+          -23.466666666666697
+        ],
+        [
+          339.5333333333333,
+          -23.466666666666697
+        ],
+        [
+          460.0333333333333,
+          -23.466666666666697
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-6",
+        "focus": -0.49333333333333296,
+        "gap": 3.466666666666697
+      },
+      "endBinding": {
+        "elementId": "git-branch-and-git-status-read-the-repo--node-7",
+        "focus": 0.1626666666666674,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-0-label",
+      "type": "text",
+      "x": 870,
+      "y": 545,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1554940555,
+      "version": 1,
+      "versionNonce": 256323845,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "Context.get_git_repo\n(lazy open, cached)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--node-0",
+      "originalText": "Context.get_git_repo (lazy open, cached)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-1-label",
+      "type": "text",
+      "x": 1608,
+      "y": 645,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 2076604118,
+      "version": 1,
+      "versionNonce": 2083923642,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "GitRepo (branch, remote,\nworkdir)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--node-1",
+      "originalText": "GitRepo (branch, remote, workdir)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-2-label",
+      "type": "text",
+      "x": 1585.5,
+      "y": 345,
+      "width": 209.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 29731705,
+      "version": 1,
+      "versionNonce": 1562712899,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "run git CLI (trust-\nchecked)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--node-2",
+      "originalText": "run git CLI (trust-checked)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-3-label",
+      "type": "text",
+      "x": 52.5,
+      "y": 647.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1351216796,
+      "version": 1,
+      "versionNonce": 480621736,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "git_branch: render branch",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--node-3",
+      "originalText": "git_branch: render branch",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-4-label",
+      "type": "text",
+      "x": 848,
+      "y": 387.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 875902175,
+      "version": 1,
+      "versionNonce": 436838009,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "get_branch_info_from_git",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--node-4",
+      "originalText": "get_branch_info_from_git",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-5-label",
+      "type": "text",
+      "x": 52.5,
+      "y": 447.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1867756570,
+      "version": 1,
+      "versionNonce": 870538222,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "git_status: render counts",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--node-5",
+      "originalText": "git_status: render counts",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-6-label",
+      "type": "text",
+      "x": 870,
+      "y": 205,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 611624509,
+      "version": 1,
+      "versionNonce": 686200103,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "GitStatusInfo (lazy,\ncached)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--node-6",
+      "originalText": "GitStatusInfo (lazy, cached)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-7-label",
+      "type": "text",
+      "x": 1611,
+      "y": 165,
+      "width": 198.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 27341296,
+      "version": 1,
+      "versionNonce": 690071372,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "RepoStatus (change\ncounts)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--node-7",
+      "originalText": "RepoStatus (change counts)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--node-8-label",
+      "type": "text",
+      "x": 849,
+      "y": 47.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2086133891,
+      "version": 1,
+      "versionNonce": 1518065821,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "format::count / symbol",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--node-8",
+      "originalText": "format::count / symbol",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-0-label",
+      "type": "text",
+      "x": 483.4,
+      "y": 568.6666666666666,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 518116452,
+      "version": 1,
+      "versionNonce": 496769008,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "get repo @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--edge-0",
+      "originalText": "get repo @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-1-label",
+      "type": "text",
+      "x": 551.7333333333333,
+      "y": 482,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 345365281,
+      "version": 1,
+      "versionNonce": 1521797611,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "get repo @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--edge-1",
+      "originalText": "get repo @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-2-label",
+      "type": "text",
+      "x": 1373.3999999999999,
+      "y": 552,
+      "width": 44,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 29875358,
+      "version": 1,
+      "versionNonce": 400300994,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "opens",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--edge-2",
+      "originalText": "opens",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-3-label",
+      "type": "text",
+      "x": 897.6,
+      "y": 682,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 77178291,
+      "version": 1,
+      "versionNonce": 1982813837,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "branch @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--edge-3",
+      "originalText": "branch @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-4-label",
+      "type": "text",
+      "x": 372,
+      "y": 382,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 370323544,
+      "version": 1,
+      "versionNonce": 672824628,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "branch via git @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--edge-4",
+      "originalText": "branch via git @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-5-label",
+      "type": "text",
+      "x": 1276.8000000000002,
+      "y": 382,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 251100965,
+      "version": 1,
+      "versionNonce": 1286086063,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "symbolic-ref @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--edge-5",
+      "originalText": "symbolic-ref @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-6-label",
+      "type": "text",
+      "x": 398.5333333333333,
+      "y": 212,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1570040962,
+      "version": 1,
+      "versionNonce": 1881002742,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "read counts @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--edge-6",
+      "originalText": "read counts @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-7-label",
+      "type": "text",
+      "x": 337.2,
+      "y": 42,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 384466727,
+      "version": 1,
+      "versionNonce": 117959873,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "format @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--edge-7",
+      "originalText": "format @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-8-label",
+      "type": "text",
+      "x": 1330.1333333333334,
+      "y": 228.66666666666663,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 344677644,
+      "version": 1,
+      "versionNonce": 1055090392,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "git status @depends",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--edge-8",
+      "originalText": "git status @depends",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "git-branch-and-git-status-read-the-repo--edge-9-label",
+      "type": "text",
+      "x": 1315.6,
+      "y": 171.86666666666662,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 975992745,
+      "version": 1,
+      "versionNonce": 81134771,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "git-branch-and-git-status-read-the-repo-"
+      },
+      "text": "caches",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "git-branch-and-git-status-read-the-repo--edge-9",
+      "originalText": "caches",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

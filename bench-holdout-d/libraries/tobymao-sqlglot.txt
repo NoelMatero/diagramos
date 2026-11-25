@@ -1,0 +1,40 @@
+# tobymao-sqlglot: its dependencies and extras, resolved as of its pinned commit (2026-11-24), the way the main set's unlocked projects were:
+#   uv pip compile --extra dev pyproject.toml --python-version 3.14 --exclude-newer 2026-11-24T15:06:22Z
+# (the dev extra only: c and rs install sqlglotc and sqlglotrs, compiled copies of sqlglot itself, and the project itself is never installed)
+ast-serialize==0.13.1
+cfgv==3.5.0
+distlib==0.4.4
+duckdb==2.0.1
+filelock==4.3.1
+identify==2.6.20
+jinja2==3.1.6
+librt==0.17.0
+markdown2==2.5.5
+markupsafe==3.0.4
+mypy==2.4.1
+mypy-extensions==1.2.0
+nodeenv==1.12.0
+numpy==2.5.5
+packaging==26.4
+pandas==3.1.1
+pandas-stubs==3.1.0.261029
+pathspec==1.1.1
+pdoc==16.0.0
+platformdirs==4.14.8
+pre-commit==4.7.0
+psutil==7.2.2
+pygments==2.21.0
+pyperf==2.11.0
+python-dateutil==4.0.0
+python-discovery==1.9.7
+pytz==2026.6
+pyyaml==6.0.4
+ruff==0.15.6
+setuptools==84.2.1
+setuptools-scm==10.3.4
+types-python-dateutil==2.9.0.20261122
+types-pytz==2026.6.0.20261122
+typing-extensions==4.16.0
+tzdata==2026.6
+vcs-versioning==2.6.0
+virtualenv==21.15.13

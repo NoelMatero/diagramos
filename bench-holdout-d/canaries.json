@@ -1,0 +1,103 @@
+{
+  "picked": "2026-11-25 on main 500a557 (holdout-d-bench), the same way as bench-holdout/canaries.json: planted mistakes that went red with the compilers answering and were not red with no compiler at all, at most one per project. Candidates were 4 (then 8 more for the projects with none) not-red-without-a-compiler false claims per project, taken by a stable hash, not by reading them. 'needs' is read off which compilers answered that arrow's check. Harness: ~/bench-holdout-d/pick.mts (a copy of ~/bench-canary/pick.mts), sel.py, canaries.py.",
+  "canaries": [
+    {
+      "project": "networkx-networkx",
+      "claim": "calls|networkx/algorithms/flow/edmondskarp.py#edmonds_karp_impl|networkx/algorithms/flow/utils.py#__all__|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@calls networkx/algorithms/flow/edmondskarp.py#edmonds_karp_impl -> networkx/algorithms/flow/utils.py#__all__  (end-lacks-part)"
+    },
+    {
+      "project": "pre-commit-pre-commit",
+      "claim": "calls|pre_commit/commands/run.py#run|pre_commit/commands/run.py#cols|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@calls pre_commit/commands/run.py#run -> pre_commit/commands/run.py#cols  (end-lacks-part)"
+    },
+    {
+      "project": "sqlalchemy-sqlalchemy",
+      "claim": "calls|lib/sqlalchemy/engine/default.py#_init_compiled|lib/sqlalchemy/engine/default.py#context|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@calls lib/sqlalchemy/engine/default.py#_init_compiled -> lib/sqlalchemy/engine/default.py#context  (end-lacks-part)"
+    },
+    {
+      "project": "tobymao-sqlglot",
+      "claim": "calls|sqlglot/tokens.py#tokenize|sqlglot/tokenizer_core.py#FALSE|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@calls sqlglot/tokens.py#tokenize -> sqlglot/tokenizer_core.py#FALSE  (calls-refuted)"
+    },
+    {
+      "project": "tornadoweb-tornado",
+      "claim": "calls|tornado/http1connection.py#_read_message_inner|tornado/iostream.py#writing|",
+      "language": "python",
+      "needs": "python",
+      "arrow": "@calls tornado/http1connection.py#_read_message_inner -> tornado/iostream.py#writing  (calls-indirect)"
+    },
+    {
+      "project": "alacritty-alacritty",
+      "claim": "calls|alacritty_terminal/src/term/mod.rs#linefeed|alacritty_terminal/src/term/mod.rs#scroll_up_relative|",
+      "language": "rust",
+      "needs": "rustc",
+      "arrow": "@calls alacritty_terminal/src/term/mod.rs#linefeed -> alacritty_terminal/src/term/mod.rs#scroll_up_relative  (calls-indirect)"
+    },
+    {
+      "project": "cberner-redb",
+      "claim": "needs|src/complex_types.rs|src/tree_store/btree.rs#insert|",
+      "language": "rust",
+      "needs": "rust",
+      "arrow": "@needs src/complex_types.rs -> src/tree_store/btree.rs#insert  (needs-indirect)"
+    },
+    {
+      "project": "image-rs-image",
+      "claim": "calls|src/imageops/sample.rs#resize|src/imageops/sample.rs#new_from_radius|",
+      "language": "rust",
+      "needs": "rust",
+      "arrow": "@calls src/imageops/sample.rs#resize -> src/imageops/sample.rs#new_from_radius  (calls-wrong-routine)"
+    },
+    {
+      "project": "starship-starship",
+      "claim": "calls|src/context/git_repo.rs#exec_git_with_required_trust|src/modules/git_branch.rs#get_branch_info_from_git|",
+      "language": "rust",
+      "needs": "rustc",
+      "arrow": "@calls src/context/git_repo.rs#exec_git_with_required_trust -> src/modules/git_branch.rs#get_branch_info_from_git  (calls-refuted)"
+    },
+    {
+      "project": "graphql-graphql-js",
+      "claim": "builds|src/language/parser.ts#Parser|src/language/lexer.ts#readNumber|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@builds src/language/parser.ts#Parser -> src/language/lexer.ts#readNumber  (end-lacks-part)"
+    },
+    {
+      "project": "kysely-org-kysely",
+      "claim": "calls|src/driver/default-connection-provider.ts#provideConnection|src/driver/driver.ts#TRANSACTION_ISOLATION_LEVELS|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@calls src/driver/default-connection-provider.ts#provideConnection -> src/driver/driver.ts#TRANSACTION_ISOLATION_LEVELS  (end-lacks-part)"
+    },
+    {
+      "project": "meta-lexical",
+      "claim": "calls|packages/lexical-history/src/index.ts#getUndoEntry|packages/lexical-history/src/index.ts#getChangeType|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@calls packages/lexical-history/src/index.ts#getUndoEntry -> packages/lexical-history/src/index.ts#getChangeType  (calls-refuted)"
+    },
+    {
+      "project": "puppeteer-puppeteer",
+      "claim": "calls|packages/puppeteer-core/src/cdp/FrameManager.ts#onLifecycleEvent|packages/puppeteer-core/src/cdp/Frame.ts#extensionWorld|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@calls packages/puppeteer-core/src/cdp/FrameManager.ts#onLifecycleEvent -> packages/puppeteer-core/src/cdp/Frame.ts#extensionWorld  (end-lacks-part)"
+    },
+    {
+      "project": "rollup-rollup",
+      "claim": "builds|src/Graph.ts#Graph|src/ModuleLoader.ts#addModuleSource|",
+      "language": "ts",
+      "needs": "typescript",
+      "arrow": "@builds src/Graph.ts#Graph -> src/ModuleLoader.ts#addModuleSource  (end-lacks-part)"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+# tornadoweb-tornado: its dependencies and extras, resolved as of its pinned commit (2026-11-23), the way the main set's unlocked projects were:
+#   uv pip compile --all-extras pyproject.toml --python-version 3.14 --exclude-newer 2026-11-23T20:57:20Z
+# (none: tornado declares no dependencies and no extras; pycurl and pycares are optional imports)

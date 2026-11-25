@@ -1,0 +1,1585 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "migrator-find-lock-run-up-or-down-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 475.20000000000005,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1083275249,
+      "version": 1,
+      "versionNonce": 1755986043,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "role": "title"
+      },
+      "text": "Migrator: find, lock, run up or down",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Migrator: find, lock, run up or down",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-0",
+      "type": "rectangle",
+      "x": 2240,
+      "y": 320,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1040363224,
+      "version": 2,
+      "versionNonce": 115876020,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-node-0-label"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "node": "provider",
+        "ref": "src/migration/file-migration-provider.ts#getMigrations"
+      }
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-1",
+      "type": "rectangle",
+      "x": 20,
+      "y": 420,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1844421249,
+      "version": 1,
+      "versionNonce": 1796225483,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-node-1-label"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "node": "entry",
+        "ref": "src/migration/migrator.ts#migrate"
+      }
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-2",
+      "type": "rectangle",
+      "x": 780,
+      "y": 260,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 380075254,
+      "version": 1,
+      "versionNonce": 704221274,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-node-2-label"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "node": "ensure",
+        "ref": "src/migration/migrator.ts#ensureMigrationLockTableExists"
+      }
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-3",
+      "type": "rectangle",
+      "x": 1540,
+      "y": 340,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1715642759,
+      "version": 1,
+      "versionNonce": 247885473,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-node-3-label"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "node": "state",
+        "ref": "src/migration/migrator.ts#getState"
+      }
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-4",
+      "type": "rectangle",
+      "x": 820,
+      "y": 420,
+      "width": 280,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1852890708,
+      "version": 1,
+      "versionNonce": 1894145440,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-node-4-label"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "node": "runner",
+        "ref": "src/migration/migrator.ts#runMigrations"
+      }
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-5",
+      "type": "rectangle",
+      "x": 1540,
+      "y": 20,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 767851565,
+      "version": 1,
+      "versionNonce": 514687127,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-node-5-label"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "node": "lock",
+        "ref": "src/dialect/dialect-adapter.ts"
+      }
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-6",
+      "type": "rectangle",
+      "x": 1540,
+      "y": 500,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1666346514,
+      "version": 1,
+      "versionNonce": 1726946374,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-node-6-label"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "node": "up",
+        "ref": "src/migration/migrator.ts#migrateUp"
+      }
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-7",
+      "type": "rectangle",
+      "x": 1540,
+      "y": 180,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 283584899,
+      "version": 1,
+      "versionNonce": 940295069,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-node-7-label"
+        },
+        {
+          "id": "migrator-find-lock-run-up-or-down-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "node": "down",
+        "ref": "src/migration/migrator.ts#migrateDown"
+      }
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-0",
+      "type": "arrow",
+      "x": 332,
+      "y": 456.6666666666667,
+      "width": 447.20000000000005,
+      "height": 156.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 840238735,
+      "version": 1,
+      "versionNonce": 242737513,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "edge": {
+          "from": "entry",
+          "to": "ensure",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -156.66666666666669
+        ],
+        [
+          145.2666666666667,
+          -156.66666666666669
+        ],
+        [
+          296.23333333333335,
+          -156.66666666666669
+        ],
+        [
+          371.7166666666667,
+          -156.66666666666669
+        ],
+        [
+          446.70000000000005,
+          -156.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-1",
+        "focus": -0.26666666666666655,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-2",
+        "focus": 0,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-1",
+      "type": "arrow",
+      "x": 332,
+      "y": 490,
+      "width": 495.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 663687486,
+      "version": 1,
+      "versionNonce": 1185867490,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "edge": {
+          "from": "entry",
+          "to": "runner",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          247.60000000000002,
+          0
+        ],
+        [
+          494.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-1",
+        "focus": 0.4,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-4",
+        "focus": 0,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-2",
+      "type": "arrow",
+      "x": 1107.2,
+      "y": 504,
+      "width": 441.60000000000014,
+      "height": 132,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 924537449,
+      "version": 1,
+      "versionNonce": 726389107,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "edge": {
+          "from": "runner",
+          "to": "state",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          92,
+          0
+        ],
+        [
+          92,
+          -132
+        ],
+        [
+          154.79999999999995,
+          -132
+        ],
+        [
+          226.5,
+          -132
+        ],
+        [
+          298.20000000000005,
+          -132
+        ],
+        [
+          441.10000000000014,
+          -132
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-4",
+        "focus": 0.20000000000000004,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-3",
+        "focus": 0.19999999999999998,
+        "gap": 8.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-3",
+      "type": "arrow",
+      "x": 1868.8000000000002,
+      "y": 372,
+      "width": 368,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1363751328,
+      "version": 1,
+      "versionNonce": 1597966076,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "edge": {
+          "from": "state",
+          "to": "provider"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          184,
+          0
+        ],
+        [
+          367.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-3",
+        "focus": -0.19999999999999998,
+        "gap": 8.800000000000182
+      },
+      "endBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-0",
+        "focus": -0.04000000000000052,
+        "gap": 3.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-4",
+      "type": "arrow",
+      "x": 1107.2,
+      "y": 448,
+      "width": 441.60000000000014,
+      "height": 396,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1552761451,
+      "version": 1,
+      "versionNonce": 2062525285,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "edge": {
+          "from": "runner",
+          "to": "lock"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          44,
+          0
+        ],
+        [
+          44,
+          -374.80000000000007
+        ],
+        [
+          44,
+          -396
+        ],
+        [
+          441.10000000000014,
+          -396
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-4",
+        "focus": -0.6000000000000001,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-5",
+        "focus": 0.2,
+        "gap": 8.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-5",
+      "type": "arrow",
+      "x": 1107.2,
+      "y": 532,
+      "width": 441.60000000000014,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 141683930,
+      "version": 1,
+      "versionNonce": 250572462,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "edge": {
+          "from": "runner",
+          "to": "up",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          220.79999999999995,
+          0
+        ],
+        [
+          441.10000000000014,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-4",
+        "focus": 0.6000000000000001,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-6",
+        "focus": 0.2,
+        "gap": 8.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-6",
+      "type": "arrow",
+      "x": 1107.2,
+      "y": 476,
+      "width": 441.60000000000014,
+      "height": 264,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1082697909,
+      "version": 1,
+      "versionNonce": 112029247,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "migrator-find-lock-run-up-or-down-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down",
+        "edge": {
+          "from": "runner",
+          "to": "down",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          68,
+          0
+        ],
+        [
+          68,
+          -264
+        ],
+        [
+          88.79999999999995,
+          -264
+        ],
+        [
+          177,
+          -264
+        ],
+        [
+          265.20000000000005,
+          -264
+        ],
+        [
+          441.10000000000014,
+          -264
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-4",
+        "focus": -0.20000000000000004,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "migrator-find-lock-run-up-or-down-node-7",
+        "focus": 0.2,
+        "gap": 8.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-0-label",
+      "type": "text",
+      "x": 2268,
+      "y": 345,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1326694821,
+      "version": 1,
+      "versionNonce": 958713135,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "Migration provider reads\nfiles",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-node-0",
+      "originalText": "Migration provider reads files",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-1-label",
+      "type": "text",
+      "x": 53.499999999999986,
+      "y": 457.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1445917400,
+      "version": 1,
+      "versionNonce": 345451700,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "migrateUp / migrateDown",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-node-1",
+      "originalText": "migrateUp / migrateDown",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-2-label",
+      "type": "text",
+      "x": 812.5,
+      "y": 287.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1460060583,
+      "version": 1,
+      "versionNonce": 1938070593,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "Ensure lock table and row",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-node-2",
+      "originalText": "Ensure lock table and row",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-3-label",
+      "type": "text",
+      "x": 1568,
+      "y": 367.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 498151170,
+      "version": 1,
+      "versionNonce": 1553629814,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "Read executed vs pending",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-node-3",
+      "originalText": "Read executed vs pending",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-4-label",
+      "type": "text",
+      "x": 850,
+      "y": 465,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1420959137,
+      "version": 1,
+      "versionNonce": 1194424683,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "Lock and transaction\nwrapper",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-node-4",
+      "originalText": "Lock and transaction wrapper",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-5-label",
+      "type": "text",
+      "x": 1570,
+      "y": 47.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1593710308,
+      "version": 1,
+      "versionNonce": 169396080,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "Dialect lock adapter",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-node-5",
+      "originalText": "Dialect lock adapter",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-6-label",
+      "type": "text",
+      "x": 1572,
+      "y": 527.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1152772147,
+      "version": 1,
+      "versionNonce": 1655440909,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "Run pending up()",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-node-6",
+      "originalText": "Run pending up()",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-node-7-label",
+      "type": "text",
+      "x": 1564.5,
+      "y": 207.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1105469214,
+      "version": 1,
+      "versionNonce": 72928066,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "Run down() in reverse",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-node-7",
+      "originalText": "Run down() in reverse",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-0-label",
+      "type": "text",
+      "x": 393.6666666666667,
+      "y": 290,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1367300954,
+      "version": 1,
+      "versionNonce": 252994094,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "ensure table @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-edge-0",
+      "originalText": "ensure table @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-1-label",
+      "type": "text",
+      "x": 535.6,
+      "y": 480,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 2077651487,
+      "version": 1,
+      "versionNonce": 484196537,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "run @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-edge-1",
+      "originalText": "run @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-2-label",
+      "type": "text",
+      "x": 1187.2,
+      "y": 362,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 19046448,
+      "version": 1,
+      "versionNonce": 610101388,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "read state @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-edge-2",
+      "originalText": "read state @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-3-label",
+      "type": "text",
+      "x": 2008.8000000000002,
+      "y": 362,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 2104139901,
+      "version": 1,
+      "versionNonce": 266825575,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "find files",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-edge-3",
+      "originalText": "find files",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-4-label",
+      "type": "text",
+      "x": 1076.4,
+      "y": 63.19999999999993,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1637530902,
+      "version": 1,
+      "versionNonce": 1838835962,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "acquire / release",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-edge-4",
+      "originalText": "acquire / release",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-5-label",
+      "type": "text",
+      "x": 1288.4,
+      "y": 522,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 2121484491,
+      "version": 1,
+      "versionNonce": 1972480069,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "up @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-edge-5",
+      "originalText": "up @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "migrator-find-lock-run-up-or-down-edge-6-label",
+      "type": "text",
+      "x": 1147.6,
+      "y": 202,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 246871772,
+      "version": 1,
+      "versionNonce": 1032485608,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "migrator-find-lock-run-up-or-down"
+      },
+      "text": "down @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "migrator-find-lock-run-up-or-down-edge-6",
+      "originalText": "down @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

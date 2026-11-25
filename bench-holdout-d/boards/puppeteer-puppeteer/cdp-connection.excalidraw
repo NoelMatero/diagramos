@@ -1,0 +1,1480 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "cdp-connection-send-match-route-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 448.8,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1861592652,
+      "version": 1,
+      "versionNonce": 287477784,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "CDP Connection: send, match, route",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "CDP Connection: send, match, route",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-0",
+      "type": "rectangle",
+      "x": 80,
+      "y": 20,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 393494395,
+      "version": 1,
+      "versionNonce": 459418869,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-node-0-label"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "node": "send_session",
+        "ref": "packages/puppeteer-core/src/cdp/CdpSession.ts#send"
+      }
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-1",
+      "type": "rectangle",
+      "x": 380,
+      "y": 420,
+      "width": 280,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1779159082,
+      "version": 1,
+      "versionNonce": 1144449534,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-node-1-label"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "node": "raw_send",
+        "ref": "packages/puppeteer-core/src/cdp/Connection.ts#_rawSend"
+      }
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-2",
+      "type": "rectangle",
+      "x": 360,
+      "y": 840,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1995956869,
+      "version": 1,
+      "versionNonce": 666749071,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-node-2-label"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "node": "transport",
+        "state": "external"
+      }
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-3",
+      "type": "rectangle",
+      "x": 380,
+      "y": 1240,
+      "width": 280,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1390136684,
+      "version": 1,
+      "versionNonce": 838397112,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-node-3-label"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "node": "route",
+        "ref": "packages/puppeteer-core/src/cdp/Connection.ts#onMessage"
+      }
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-4",
+      "type": "rectangle",
+      "x": 580,
+      "y": 1660,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1509368095,
+      "version": 1,
+      "versionNonce": 1246739897,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-node-4-label"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "node": "session_cls",
+        "ref": "packages/puppeteer-core/src/cdp/CdpSession.ts#CdpCDPSession"
+      }
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-5",
+      "type": "rectangle",
+      "x": 80,
+      "y": 1660,
+      "width": 320,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 492887822,
+      "version": 1,
+      "versionNonce": 1933005490,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-node-5-label"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "node": "session_msg",
+        "ref": "packages/puppeteer-core/src/cdp/CdpSession.ts#onMessage"
+      }
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-6",
+      "type": "rectangle",
+      "x": 80,
+      "y": 2080,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 849432185,
+      "version": 1,
+      "versionNonce": 1189524547,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-node-6-label"
+        },
+        {
+          "id": "cdp-connection-send-match-route-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "node": "listeners",
+        "state": "external"
+      }
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-0",
+      "type": "arrow",
+      "x": 287.06666666666666,
+      "y": 112,
+      "width": 237.40000000000003,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1858658444,
+      "version": 1,
+      "versionNonce": 1303996760,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "edge": {
+          "from": "send_session",
+          "to": "raw_send",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          237.10000000000008,
+          32
+        ],
+        [
+          237.40000000000003,
+          32
+        ],
+        [
+          237.40000000000003,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "cdp-connection-send-match-route-node-0",
+        "focus": -0.2941666666666667,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "cdp-connection-send-match-route-node-1",
+        "focus": 0.031904761904762075,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-1",
+      "type": "arrow",
+      "x": 524.4666666666667,
+      "y": 532.8,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1998547621,
+      "version": 1,
+      "versionNonce": 1132451887,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "edge": {
+          "from": "raw_send",
+          "to": "transport"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "cdp-connection-send-match-route-node-1",
+        "focus": -0.031904761904762075,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "cdp-connection-send-match-route-node-2",
+        "focus": 0.027916666666666905,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-2",
+      "type": "arrow",
+      "x": 524.4666666666667,
+      "y": 933.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 844431818,
+      "version": 1,
+      "versionNonce": 146561310,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "edge": {
+          "from": "transport",
+          "to": "route"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "cdp-connection-send-match-route-node-2",
+        "focus": -0.027916666666666905,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "cdp-connection-send-match-route-node-3",
+        "focus": 0.03190476190476237,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-3",
+      "type": "arrow",
+      "x": 571.1333333333333,
+      "y": 1354.3999999999999,
+      "width": 152.8666666666668,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1606250779,
+      "version": 1,
+      "versionNonce": 1609014293,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "edge": {
+          "from": "route",
+          "to": "session_cls",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          152.8666666666668,
+          32
+        ],
+        [
+          152.8666666666668,
+          73.96666666666647
+        ],
+        [
+          152.8666666666668,
+          130.67499999999995
+        ],
+        [
+          152.8666666666668,
+          187.3833333333332
+        ],
+        [
+          152.8666666666668,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "cdp-connection-send-match-route-node-3",
+        "focus": -0.3652380952380955,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "cdp-connection-send-match-route-node-4",
+        "focus": -0.03999999999999932,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-4",
+      "type": "arrow",
+      "x": 477.8,
+      "y": 1354.3999999999999,
+      "width": 190.7333333333334,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1386006544,
+      "version": 1,
+      "versionNonce": 829373164,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "edge": {
+          "from": "route",
+          "to": "session_msg",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          5.684341886080802e-14,
+          192.79999999999995
+        ],
+        [
+          -52.96666666666664,
+          192.79999999999995
+        ],
+        [
+          -190.73333333333335,
+          192.79999999999995
+        ],
+        [
+          -190.73333333333335,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "cdp-connection-send-match-route-node-3",
+        "focus": 0.301428571428572,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "cdp-connection-send-match-route-node-5",
+        "focus": 0.29416666666666685,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-5",
+      "type": "arrow",
+      "x": 233.73333333333335,
+      "y": 1775.1999999999998,
+      "width": 0,
+      "height": 300.8000000000002,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 657035545,
+      "version": 1,
+      "versionNonce": 426296419,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "edge": {
+          "from": "session_msg",
+          "to": "listeners"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.3000000000002
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "cdp-connection-send-match-route-node-5",
+        "focus": 0.03916666666666655,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "cdp-connection-send-match-route-node-6",
+        "focus": -0.039166666666666655,
+        "gap": 4
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-6",
+      "type": "arrow",
+      "x": 180.4,
+      "y": 1655.1999999999998,
+      "width": 0,
+      "height": 1543.1999999999998,
+      "angle": 0,
+      "strokeColor": "#e8590c",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 258914478,
+      "version": 1,
+      "versionNonce": 188978642,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "cdp-connection-send-match-route-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route",
+        "edge": {
+          "from": "session_msg",
+          "to": "send_session"
+        }
+      },
+      "points": [
+        [
+          0,
+          -0.5
+        ],
+        [
+          0,
+          -771.5999999999999
+        ],
+        [
+          0,
+          -1542.6999999999998
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "cdp-connection-send-match-route-node-5",
+        "focus": -0.3724999999999998,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "cdp-connection-send-match-route-node-0",
+        "focus": 0.3725,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-0-label",
+      "type": "text",
+      "x": 113.49999999999999,
+      "y": 45,
+      "width": 253.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1531138854,
+      "version": 1,
+      "versionNonce": 521522954,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "CdpCDPSession.send: tag\ncommand with sessionId",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-node-0",
+      "originalText": "CdpCDPSession.send: tag command with sessionId",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-1-label",
+      "type": "text",
+      "x": 404.5,
+      "y": 442.5,
+      "width": 231.00000000000003,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 680215515,
+      "version": 1,
+      "versionNonce": 304513493,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "Connection._rawSend:\nassign id, write JSON\nframe",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-node-1",
+      "originalText": "Connection._rawSend: assign id, write JSON frame",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-2-label",
+      "type": "text",
+      "x": 371.5,
+      "y": 865,
+      "width": 297,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 92910828,
+      "version": 1,
+      "versionNonce": 2042387256,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "CDP transport (WebSocket or\npipe)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-node-2",
+      "originalText": "CDP transport (WebSocket or pipe)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-3-label",
+      "type": "text",
+      "x": 404.5,
+      "y": 1262.5,
+      "width": 231.00000000000003,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1250754057,
+      "version": 1,
+      "versionNonce": 1041163667,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "Connection.onMessage:\nparse and route each\nframe",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-node-3",
+      "originalText": "Connection.onMessage: parse and route each frame",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-4-label",
+      "type": "text",
+      "x": 609,
+      "y": 1685,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 169759914,
+      "version": 1,
+      "versionNonce": 1096646526,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "CdpCDPSession: one per\nattached target",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-node-4",
+      "originalText": "CdpCDPSession: one per attached target",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-5-label",
+      "type": "text",
+      "x": 97,
+      "y": 1695,
+      "width": 286,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 220012975,
+      "version": 1,
+      "versionNonce": 968972809,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "CdpCDPSession.onMessage:\nsettle reply or emit event",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-node-5",
+      "originalText": "CdpCDPSession.onMessage: settle reply or emit event",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-node-6-label",
+      "type": "text",
+      "x": 113.49999999999999,
+      "y": 2107.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 187096832,
+      "version": 1,
+      "versionNonce": 707376604,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "Session event listeners",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-node-6",
+      "originalText": "Session event listeners",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-0-label",
+      "type": "text",
+      "x": 453.76666666666677,
+      "y": 134,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 468315689,
+      "version": 1,
+      "versionNonce": 1645711411,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "delegates @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-edge-0",
+      "originalText": "delegates @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-1-label",
+      "type": "text",
+      "x": 449.6666666666667,
+      "y": 663.1999999999999,
+      "width": 149.60000000000002,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1984484236,
+      "version": 1,
+      "versionNonce": 472183384,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "JSON {id, method,\nsessionId}",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-edge-1",
+      "originalText": "JSON {id, method, sessionId}",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-2-label",
+      "type": "text",
+      "x": 467.2666666666667,
+      "y": 1074,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1083162875,
+      "version": 1,
+      "versionNonce": 1370425717,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "inbound frame",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-edge-2",
+      "originalText": "inbound frame",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-3-label",
+      "type": "text",
+      "x": 653.6000000000001,
+      "y": 1408.3666666666663,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1472467270,
+      "version": 1,
+      "versionNonce": 2068308138,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "attachedToTarget\n@builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-edge-3",
+      "originalText": "attachedToTarget @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-4-label",
+      "type": "text",
+      "x": 345.6333333333334,
+      "y": 1527.1999999999998,
+      "width": 158.4,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1122562285,
+      "version": 1,
+      "versionNonce": 613816407,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "sessionId or reply\nid @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-edge-4",
+      "originalText": "sessionId or reply id @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-5-label",
+      "type": "text",
+      "x": 189.73333333333335,
+      "y": 1915.6,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1390606624,
+      "version": 1,
+      "versionNonce": 1683232124,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "emit event",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-edge-5",
+      "originalText": "emit event",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "cdp-connection-send-match-route-edge-6-label",
+      "type": "text",
+      "x": 101.2,
+      "y": 873.5999999999999,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#e8590c",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 71836367,
+      "version": 1,
+      "versionNonce": 846445225,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "cdp-connection-send-match-route"
+      },
+      "text": "resolve pending id",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "cdp-connection-send-match-route-edge-6",
+      "originalText": "resolve pending id",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
