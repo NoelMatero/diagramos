@@ -233,20 +233,23 @@ describe("a call on a value nothing could type, handed a function of the reposit
   });
 });
 
-describe("the head kept where a call of another name finds it stays a doubt: Rust", () => {
+/*
+ * Rust is the exception since the calls research of 2026-11: `h.on_error(e)`
+ * is method-call syntax and runs a method declared `on_error`, whatever is
+ * kept where (`calls-dispatched-name.test.ts`, `calls-could-run.test.ts`).
+ */
+describe("Rust: the head kept anywhere is still not what a method call of another name runs", () => {
   const shapes: Record<string, [Record<string, string>, "free" | "method", string]> = {
     "a method handed by its path": [{ "src/wire.rs": "use crate::worker::Worker;\n\npub fn wire() {\n    register(Worker::handle_completed);\n}\n" }, "method", "value"],
     "called from a closure that is kept": [{ "src/wire.rs": "pub fn wire() -> Box<dyn Fn(u32) -> u32> {\n    Box::new(move |e| handle_failed(e))\n}\n" }, "free", "wrapped"],
     "renamed by a use": [{ "src/wire.rs": "pub use crate::worker::handle_failed as on_error;\n" }, "free", "renamed"],
   };
   for (const [shape, [extra, kind, how]] of Object.entries(shapes)) {
-    it(`withholds when the head is ${shape}`, () => {
+    it(`reads the call when the head is ${shape}`, () => {
       const files = { ...RS, ...extra };
       const arrow = kind === "free" ? RS_FREE : RS_METHOD;
       expect(found(files, arrow.to.names[0]!, kind === "method", "rust")).toContain(how);
-      const one = verdict(files, arrow.from, arrow.to);
-      expect(refuted(one)).toBe(false);
-      expect(notClosed(one)).toBe("receiver");
+      expect(refuted(verdict(files, arrow.from, arrow.to))).toBe(true);
     });
   }
 
@@ -338,8 +341,13 @@ describe("through the whole check, with no compiler", () => {
     expect(found[0]!.detail).toContain("2 on values nothing could type, each running a method of the name it calls");
   }, 60_000);
 
-  it("leaves it alone when the head is kept somewhere", async () => {
-    expect(await reds({ ...FILES, "wire.py": "from openapi import get_fields_from_routes\n\nHOOKS = [get_fields_from_routes]\n" })).toEqual([]);
+  it("leaves it alone when the head is kept somewhere, and takes what the calls pass", async () => {
+    const kept = { "wire.py": "from openapi import get_fields_from_routes\n\nHOOKS = [get_fields_from_routes]\n" };
+    // Both calls pass two arguments: a far end that takes two may be what one of them runs.
+    const takesTwo = FILES["openapi.py"].replace("def get_fields_from_routes(routes):", "def get_fields_from_routes(routes, flat):");
+    expect(await reds({ "openapi.py": takesTwo, ...kept })).toEqual([]);
+    // One that takes a single argument cannot be, kept or not (`calls-could-run.test.ts`).
+    expect((await reds({ ...FILES, ...kept })).map((one) => one.kind)).toEqual(["calls-refuted"]);
   }, 60_000);
 
   it("asks a compiler where those calls go, so a live check still starts one", async () => {

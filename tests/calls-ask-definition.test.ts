@@ -136,8 +136,20 @@ describe("TypeScript: a call through an optional field", () => {
   }, 120_000);
 
   it("accuses nothing on a call through an interface when the head is stored", async () => {
-    write({ ...FILES, "wire.ts": "import { render } from \"./render\";\nexport const logger = { warn: render };\n" });
+    // Stored where a `Logger` can hold it: `render` takes what `warn` is given.
+    write({
+      ...FILES,
+      "render.ts": "export function render(message: string): void {\n  void message;\n}\n",
+      "wire.ts": "import type { Logger } from \"./logger\";\nimport { render } from \"./render\";\nexport const logger: Logger = { warn: render };\n",
+    });
     expect(accusations(await checked("run.ts#report", "render.ts#render"))).toEqual([]);
+  }, 120_000);
+
+  it("still calls it wrong when what is stored could never be a Logger (#512)", async () => {
+    // `render(n: number)` stored under `warn` is no `Logger` without a cast:
+    // the compiler says the value `report` calls cannot hold it.
+    write({ ...FILES, "wire.ts": "import { render } from \"./render\";\nexport const logger = { warn: render };\n" });
+    expect(accusations(await checked("run.ts#report", "render.ts#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
   }, 120_000);
 });
 
@@ -225,12 +237,13 @@ describe("Rust: a call on a type's name", () => {
     expect(accusations(await checked("src/run.rs#through", "src/render.rs#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
   }, 180_000);
 
-  it.skipIf(!hasRustAnalyzer)("accuses nothing on a call through a trait when the head is wrapped in a closure", async () => {
+  // A method call runs a method of its own name in Rust, wherever a closure around the head is kept (calls research 2026-11).
+  it.skipIf(!hasRustAnalyzer)("still accuses on a call through a trait when the head is wrapped in a closure kept elsewhere", async () => {
     write({
       ...FILES,
       "src/lib.rs": "pub mod own;\npub mod store;\npub mod run;\npub mod render;\npub mod wire;\n",
       "src/wire.rs": "pub fn wire() -> Box<dyn Fn(u32) -> u32> {\n    Box::new(move |n| crate::render::render(n))\n}\n",
     });
-    expect(accusations(await checked("src/run.rs#through", "src/render.rs#render"))).toEqual([]);
+    expect(accusations(await checked("src/run.rs#through", "src/render.rs#render")).map((finding) => finding.kind)).toEqual(["calls-refuted"]);
   }, 180_000);
 });
