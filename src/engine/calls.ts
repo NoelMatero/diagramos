@@ -7073,15 +7073,36 @@ function matcherOfExpressions(pattern: Node, outer: boolean): boolean {
   return true;
 }
 
+/**
+ * Every `macro_rules!` in a parsed tree, by name, in the order the file
+ * writes them: one walk of a file per tree, not one per macro looked up.
+ *
+ * `macroRulesIn` used to walk the whole file for every macro call it was
+ * asked about, and a crate full of macros asks thousands of times: on
+ * regex it was 39% of everything the checker did (CPU profile, 2026-11-25),
+ * and the bench's slowest project. Keyed on the tree itself: the parse cache
+ * hands back the same tree for the same text, a file whose text changed is a
+ * new tree with an index of its own, and a tree the cache lets go of takes
+ * its entry with it.
+ */
+const macrosByTree = new WeakMap<Tree, Map<string, Node[]>>();
+
 /** Every `macro_rules! name` written in one file. */
 function macroRulesIn(file: string, source: string, name: string): MacroDefinition[] {
   const tree = parseSource(source, "rust");
   if (!tree) return [];
-  const out: MacroDefinition[] = [];
-  each(tree.rootNode, (node) => {
-    if (node.type === "macro_definition" && node.childForFieldName("name")?.text === name) out.push({ file, node });
-  });
-  return out;
+  let byName = macrosByTree.get(tree);
+  if (!byName) {
+    const found = new Map<string, Node[]>();
+    each(tree.rootNode, (node) => {
+      if (node.type !== "macro_definition") return;
+      const named = node.childForFieldName("name")?.text;
+      if (named !== undefined) found.set(named, [...(found.get(named) ?? []), node]);
+    });
+    macrosByTree.set(tree, found);
+    byName = found;
+  }
+  return (byName.get(name) ?? []).map((node) => ({ file, node }));
 }
 
 /**
