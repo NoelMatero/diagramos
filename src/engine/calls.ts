@@ -4100,6 +4100,60 @@ function readsByAComputedKey(body: Node): boolean {
   return computed;
 }
 
+/** Arguments and members that stand for everything a container holds: `f(*xs)`, `f(**opts)`, `{ ...obj }`, Rust's `S { ..base }`. */
+const HANDS_ALL_ON = /^(list_splat|dictionary_splat|spread_element|base_field_initializer)$/;
+
+/**
+ * Whether the tail can call a value without writing its name, because it
+ * calls something it took out of a container, or hands a whole container on:
+ *
+ *   `for h in self.handlers: h()`          a loop's variable is called
+ *   `hooks.forEach((f) => f())`,           a parameter of a function written
+ *   `hs.iter().for_each(|h| h(1))`         inside the tail is called
+ *   `h = self.pending.pop()` .. `h()`      a local the body set is called
+ *   `self._callbacks[k](x)`, `pick()(x)`   the callee has no name at all
+ *   `xs[0].call(this)`, `f.call_once(..)`  a value run through `call`/`apply`
+ *   `run(**opts)`, `{ ...this }`,          everything a container holds is
+ *   `Job { ..*job }`                       handed on at once
+ *
+ * A container may hold the value -- `handlers = [self.on_error]` -- and each
+ * of these runs, or passes on, whatever it holds. The one call of a value
+ * this lets through is the tail calling its own parameter: that is "calls a
+ * function it was handed", and the arrow belongs at whoever handed it.
+ *
+ * Read off the tail's own call sites: `local-callee` is a name the routine
+ * binds, `computed` a callee with no name.
+ */
+function callsWhatItTookOut(from: CallSide & { routine: string }): boolean {
+  const reading = ownBodies(from);
+  if (!reading.read) return true;
+  const own = new Set<string>();
+  const routines = typeTailOf(from.source, from.language, from.routine)?.routines
+    ?? routinesNamed(from.source, from.routine, from.language).routines;
+  for (const routine of routines) {
+    const list = parametersOf(routine) ?? parametersOf(routine.childForFieldName("value"));
+    if (list) each(list, (leaf) => { if (leaf.childCount === 0 && NAME_LEAF.test(leaf.type)) own.add(leaf.text); });
+  }
+  for (const body of reading.bodies) {
+    for (const site of body.sites) {
+      if (site.file !== undefined) continue;
+      if (site.why === "computed" || RUNS_WHAT_IT_HOLDS.has(site.name)) return true;
+      if (site.why === "local-callee" && !own.has(site.name)) return true;
+    }
+  }
+  let all = false;
+  for (const node of ownNodes(from)) {
+    each(node, (inner) => {
+      if (all || inner.childCount === 0) return;
+      if (HANDS_ALL_ON.test(inner.type)) all = true;
+      // And by the token, where a grammar names the node otherwise: `...x`, `**x`. Not a parameter's own `...rest`.
+      const first = inner.child(0)?.type;
+      if ((first === "..." || first === "**") && !/pattern|parameter/.test(inner.type)) all = true;
+    });
+  }
+  return all;
+}
+
 /**
  * Whether the head is a value and the tail's own code never writes its name
  * (owner decision, 2026-11-25: a value is called by its name).
@@ -4120,15 +4174,19 @@ function readsByAComputedKey(body: Node): boolean {
  *   a read by a key that is not written out   `table[kind]`, `getattr(x, k)`,
  *                                             `Object.values(x)`, and for a
  *                                             value kept under a key `d.get(k)`,
- *                                             `d.items()` -- unless the value is
- *                                             plainly data, which nothing can call
+ *                                             `d.items()`
+ *   a call of something taken out of a        `for h in self.handlers: h()`,
+ *   container, or a container handed on whole `cbs[k](x)`, `run(**opts)`
+ *                                             (`callsWhatItTookOut`)
+ *       -- neither of these two when the value is plainly data, which
+ *          nothing can call
  *   the value renamed in some other file      `export { table as t }`, which
  *                                             the tail may import as `t`
  *   a class tail with code it did not write   a base elsewhere, a decorator
  *   a parse that recovered inside the tail
  *
- * Rust needs none of the first: it has no way to read a member by a computed
- * name.
+ * Rust has no way to read a member by a computed name, so of these it needs
+ * only the call of something taken out of a container.
  */
 function valueNeverNamed(from: CallSide & { routine: string }, to: CallSide & { names: string[] }): boolean {
   if (to.names.length === 0) return false;
@@ -4153,6 +4211,7 @@ function valueNeverNamed(from: CallSide & { routine: string }, to: CallSide & { 
   if (typeTail && (typeTail.notWhole ?? (from.language === "rust" ? crateNotWhole(from, typeTail) : undefined))) return false;
   const nodes = ownNodes(from);
   if (nodes.length === 0) return false;
+  if (!plain && callsWhatItTookOut(from)) return false;
   const code = codeOnly(from.source, from.language);
   const readsAny = plain ? undefined : READS_ANY_NAME[from.language];
   for (const node of nodes) {

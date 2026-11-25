@@ -228,6 +228,41 @@ describe("TypeScript: a value the tail never names", () => {
     });
   }
 
+  /*
+   * A container may hold the value, and a tail that calls what it takes out
+   * of one, or hands one on whole, can call the value without writing its
+   * name. Each shape is one line added to `execute`, which otherwise still
+   * goes red (`a field that may hold a function`, above).
+   */
+  describe("stays quiet when the tail calls something it took out of a container, or hands one on whole", () => {
+    const shapes: Record<string, string> = {
+      "a loop's variable is called": "for (const h of this.handlers) h();",
+      "a callback's parameter is called (forEach)": "this.handlers.forEach((h: any) => h());",
+      "every value of an object is called (Object.values)": "Object.values(this.hooks).forEach((f: any) => f());",
+      "a member read by a key that is not written out is called": "this.callbacks[this.kind](1);",
+      "a member read by its place is called": "this.callbacks[0](1);",
+      "a local the body took out of a container is called": "const h = this.pending.pop();\n    h();",
+      "what a call hands back is called": "this.pick()(1);",
+      "a member read by its place is run through .call": "this.callbacks[0].call(this, 1);",
+      "the object is spread into another": "notify({ ...this });",
+      "a container is spread into a call": "notify(...this.handlers);",
+      "a member is read through Reflect": "Reflect.get(this, this.kind)(1);",
+    };
+    for (const [shape, line] of Object.entries(shapes)) {
+      it(shape, () => {
+        const took = { "mutation.ts": STATE.replace("    cb();\n    return 1;", `    cb();\n    ${line}\n    return 1;`) };
+        expect(took["mutation.ts"]).not.toBe(STATE);
+        expect(byName(verdict(took, arrow("retry")))).toBe(false);
+      });
+    }
+
+    it("but its own parameter is a function it was handed, and data cannot be called whatever is taken out", () => {
+      expect(byName(verdict(files, arrow("retry")))).toBe(true);
+      const took = { "mutation.ts": STATE.replace("    cb();\n    return 1;", "    cb();\n    for (const h of this.handlers) h();\n    return 1;") };
+      expect(byName(verdict(took, arrow("unit")))).toBe(true);
+    });
+  });
+
   it("plain data cannot be called whatever reads it: a computed key does not keep it a doubt", () => {
     const data = { "mutation.ts": STATE.replace("execute(cb: () => void) {\n    cb();", "execute(cb: () => void, key: string) {\n    (this as any)[key](1);") };
     expect(byName(verdict(data, arrow("unit")))).toBe(true);
@@ -316,6 +351,33 @@ describe("Python: a value the tail never names", () => {
     });
   }
 
+  describe("stays quiet when the tail calls something it took out of a container, or hands one on whole", () => {
+    const shapes: Record<string, string> = {
+      "a loop's variable is called": "for h in self.handlers:\n            h(data)",
+      "a comprehension's variable is called": "done = [h(data) for h in self.handlers]",
+      "a member read by a key that is not written out is called": "self._callbacks[data](data)",
+      "a member read by its place is called": "self._callbacks[0](data)",
+      "a local the body took out of a container is called": "h = self.pending.pop()\n        h(data)",
+      "what a call hands back is called": "self.pick()(data)",
+      "a dictionary is spread into a call (**)": "notify(**self.opts)",
+      "a list is spread into a call (*)": "notify(*self.handlers)",
+      "the object's own dictionary is read (vars)": "table = vars(self)",
+      "the object's own dictionary is read (__dict__)": "table = self.__dict__",
+      "an attribute is read by a computed name (getattr)": "getattr(self, data)(data)",
+    };
+    for (const [shape, line] of Object.entries(shapes)) {
+      it(shape, () => {
+        const took = { "schema.py": SCHEMA.replace("        hook(data)\n        return data", `        hook(data)\n        ${line}\n        return data`) };
+        expect(took["schema.py"]).not.toBe(SCHEMA);
+        expect(byName(verdict(took, arrow("dump_fields")))).toBe(false);
+      });
+    }
+
+    it("but its own parameter is a function it was handed", () => {
+      expect(byName(verdict(files, arrow("dump_fields")))).toBe(true);
+    });
+  });
+
   it("a key is a value too, and a dictionary method on something else does not keep an attribute a doubt", () => {
     expect(byName(verdict({ "schema.py": `HOOKS = {"after": build()}\n\n${SCHEMA}` }, arrow("after")))).toBe(true);
     // flask's `wsgi_app` calls `ctx.pop(error)`: `.pop` reads a dictionary's key, never an attribute or a parameter.
@@ -346,6 +408,29 @@ describe("Rust: a value the tail never names", () => {
 
   it("the tail that does write it is not accused by this rule", () => {
     expect(byName(verdict(files, arrow("done", "finish")))).toBe(false);
+  });
+
+  describe("stays quiet when the tail calls something it took out of a container, or hands one on whole", () => {
+    const shapes: Record<string, string> = {
+      "a loop's variable is called": "for h in &job.handlers {\n        h(job.id);\n    }",
+      "a closure's parameter is called (for_each)": "job.handlers.iter().for_each(|h| h(job.id));",
+      "an element read by a key is called": "job.callbacks[job.kind](job.id);",
+      "an element read by its place is called": "(job.callbacks[0])(job.id);",
+      "a local the body took out of a container is called": "let h = job.pending.last().unwrap();\n    h(job.id);",
+      "what a call hands back is called": "job.pick()(job.id);",
+      "a struct is built from all of another's fields": "let copy = Job { id: 1, ..*job };",
+    };
+    for (const [shape, line] of Object.entries(shapes)) {
+      it(shape, () => {
+        const took = { "src/lib.rs": LIB.replace("    f(job.id);\n", `    f(job.id);\n    ${line}\n`) };
+        expect(took["src/lib.rs"]).not.toBe(LIB);
+        expect(byName(verdict(took, arrow("done")))).toBe(false);
+      });
+    }
+
+    it("but its own parameter is a function it was handed", () => {
+      expect(byName(verdict(files, arrow("done")))).toBe(true);
+    });
   });
 
   const quiet: Record<string, [Files, Arrow]> = {
