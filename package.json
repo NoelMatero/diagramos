@@ -60,6 +60,8 @@
     "measure:closed-bodies": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-closed-bodies.mts",
     "measure:wrong-routine": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-wrong-routine.mts",
     "measure:compiler-true": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-compiler-true.mts",
+    "measure:calls-at-run-time": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-calls-at-run-time.mts",
+    "measure:handed-on": "NODE_OPTIONS=--max-old-space-size=8192 tsx scripts/measure-handed-on.mts",
     "measure:conforms": "tsx scripts/measure-conforms.mts",
     "measure:constructs": "tsx scripts/measure-constructs.mts",
     "measure:dataflow": "tsx scripts/measure-dataflow.mts",
