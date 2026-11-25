@@ -66,6 +66,13 @@ export interface StoredFinding {
   line: number;
   /** For `wrapped`: the function with no name is written as a call's argument, not stored. */
   argument?: true;
+  /**
+   * For `wrapped`: every function with no name around the call, up to the
+   * nearest named routine, innermost last, by their byte ranges -- what a
+   * call elsewhere may run, so what a question about that call is put to
+   * (`callee-type.ts`).
+   */
+  wrappers?: Array<{ start: number; end: number }>;
 }
 
 export interface Stored {
@@ -208,6 +215,8 @@ interface Context {
   imported?: "plain" | "renamed";
   /** The nearest function around this has no name: written as a call's argument, or anywhere else. */
   anonymous?: "argument" | "stored";
+  /** The functions with no name around this, up to the nearest named routine. */
+  wrappers?: Array<{ start: number; end: number }>;
   /** For a function handed as an argument: the routine of this file it is handed to, and in which place. */
   handedTo?: { name: string; own: boolean; index: number };
   /** Inside a call's arguments: the routine called, when it is named plainly or as `this.f` / `self.f`. */
@@ -242,7 +251,11 @@ function findingsIn(root: Node, name: string, member: boolean, file: StoredSourc
     if (called.has(node.startIndex) || callNext) {
       if (context.anonymous) {
         if (context.anonymous === "argument" && context.handedTo && runsOnTheSpot(context.handedTo, file, called)) return;
-        found.push({ how: "wrapped", file: file.file, line: line(node.startIndex), ...(context.anonymous === "argument" ? { argument: true as const } : {}) });
+        found.push({
+          how: "wrapped", file: file.file, line: line(node.startIndex),
+          ...(context.anonymous === "argument" ? { argument: true as const } : {}),
+          ...(context.wrappers ? { wrappers: context.wrappers } : {}),
+        });
       }
       return;
     }
@@ -258,7 +271,7 @@ function findingsIn(root: Node, name: string, member: boolean, file: StoredSourc
     if (TYPE_OR_PATTERN.test(node.type)) here.quiet = true;
     if (node.childForFieldName("name") && node.childForFieldName("body") && !ANONYMOUS.has(node.type)) {
       // A named routine or a class: whatever is around it no longer decides.
-      here = { ...here, anonymous: undefined, classBody: python && node.type === "class_definition" };
+      here = { ...here, anonymous: undefined, wrappers: undefined, classBody: python && node.type === "class_definition" };
     }
     const renames = Boolean(node.childForFieldName("alias")) && Boolean(here.imported);
     const byNameCall = Boolean(node.childForFieldName("arguments")) && BY_NAME.has(lastName(node.childForFieldName("function")));
@@ -282,6 +295,7 @@ function findingsIn(root: Node, name: string, member: boolean, file: StoredSourc
       if (ANONYMOUS.has(child.type)) {
         const handed = listed || (node.type === "keyword_argument" && field === "value");
         inner.anonymous = handed ? "argument" : "stored";
+        inner.wrappers = [...(here.wrappers ?? []), { start: child.startIndex, end: child.endIndex }];
         inner.handedTo = listed && here.calling ? { ...here.calling, index: position } : undefined;
         inner.classBody = false;
       }

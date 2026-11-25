@@ -42,6 +42,7 @@ import path from "node:path";
 
 import type * as TS from "typescript";
 
+import { calleeCanHold, forgetsShape, type CalleeHead } from "./callee-type";
 import { workspacePackages } from "./deps";
 import type { Workspace } from "./workspace";
 
@@ -228,6 +229,22 @@ export interface TsReferee {
    * well-known symbol is written `[Symbol.iterator]`.
    */
   memberAt(file: string, start: number, end: number, name: string): Array<{ file: string; line: number }> | undefined;
+  /**
+   * Whether the value called at exactly this range could be the head (calls
+   * research 2026-11, `callee-type.ts`): `false` only when the compiler says
+   * none of the head's declarations fits the called value's type, or the
+   * head is a class's `constructor` and the call has no `new`; `undefined`
+   * wherever the types cannot say. Absolute files; `head.at` names a
+   * function with no name by its range in `head.file`.
+   */
+  calleeCanHoldAt(file: string, start: number, end: number, head: CalleeHead): boolean | undefined;
+  /**
+   * Whether a name written as a value on this 1-based line is handed to
+   * something that forgets what it is -- `any`, `unknown`, `Function`,
+   * `object`, `{}`, a free type variable -- or is cast. `undefined` when the
+   * file is not in a program, or the line writes none of the names as a value.
+   */
+  forgetsShapeAt(file: string, line: number, names: readonly string[]): boolean | undefined;
 }
 
 /** `TsReferee.typePartsAt`'s answer: `TypeParts` before `referee.ts` makes its paths relative. */
@@ -1009,9 +1026,31 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
     }
   }
 
+  function calleeCanHoldAt(file: string, start: number, end: number, head: CalleeHead): boolean | undefined {
+    const found = located(file, start, end);
+    if (!found) return undefined;
+    try {
+      return calleeCanHold(ts, found.program, found.checker, found.node, head);
+    } catch {
+      return undefined;
+    }
+  }
+
+  function forgetsShapeAt(file: string, line: number, names: readonly string[]): boolean | undefined {
+    const configPath = configOf.get(file);
+    if (configPath === undefined) return undefined;
+    try {
+      const { program, checker } = programFor(configPath);
+      const sourceFile = program.getSourceFile(file);
+      return sourceFile ? forgetsShape(ts, checker, sourceFile, line, names) : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
   return {
     typeAt, symbolDeclarationAt, symbolDeclarationLocationAt, kindAt, renderableAt, ancestorsAt,
-    typePartsAt, fitsAt, importTargetAt, memberAt,
+    typePartsAt, fitsAt, importTargetAt, memberAt, calleeCanHoldAt, forgetsShapeAt,
   };
 }
 

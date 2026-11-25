@@ -78,6 +78,7 @@ import { macroArguments } from "./macro-args";
 import { enclosing, lookUp, moduleScope, type Meaning, type Space, type WildcardAnswer } from "./names";
 import { declaresMember, holdersIn } from "./overrides";
 import { each, incomplete, parametersOf, parseSource, type Language, type Node, type Tree } from "./parse";
+import type { StoredFinding } from "./stored";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -227,6 +228,12 @@ export interface CallsRefutedEvidence {
    * running a routine of the name it calls.
    */
   untyped?: number;
+  /**
+   * How many of `sites` call a value -- a function handed in, a field, a
+   * method through an interface -- whose type the TypeScript compiler says
+   * cannot hold the head (`typeCannotHold`).
+   */
+  cannotHold?: number;
   /**
    * Where each of those calls writes its name, in the tail's file: the
    * places a compiler is asked about when one is there (`drift.ts`), so a
@@ -572,6 +579,28 @@ export interface CallSide {
    * routines are asked (`stored.ts`).
    */
   runsUnderAnotherName?: (name: string, member: boolean, language: Language) => boolean;
+  /**
+   * `runsUnderAnotherName`'s places themselves (`stored.ts`): where the
+   * repository writes the head as a value, or calls it from a function with
+   * no name. A question about a call nobody could place has to hold for each
+   * of them too (`typeCannotHold`).
+   */
+  storedFindings?: (name: string, member: boolean, language: Language) => readonly StoredFinding[];
+  /**
+   * Whether the value called at this range of this file could be the head,
+   * on the TypeScript compiler's word (calls research 2026-11, step 2):
+   * `false` only when none of the head's declarations in `head.file` fits the
+   * called value's type. `head.at` asks about a function with no name instead,
+   * by its range. `undefined` wherever the types cannot say. `drift.ts` hands
+   * it to `@calls`' tail when a compiler is on hand.
+   */
+  calleeCanHold?: (at: { start: number; end: number }, head: { file: string; names: readonly string[]; at?: { start: number; end: number } }) => boolean | undefined;
+  /**
+   * Whether one of `names`, written as a value on this 1-based line of
+   * `file`, is handed to a type that forgets what it is or is cast: then the
+   * called value's type says nothing about whether it holds the head.
+   */
+  forgetsShape?: (file: string, line: number, names: readonly string[]) => boolean | undefined;
   /**
    * The crate the Rust compiler built this file into, when it has (#357) --
    * every body after macro expansion, with every call it makes.
@@ -2116,6 +2145,8 @@ function callsTo(
     hooked?: boolean;
     /** Only a call reaching the head's own declaration counts (`callsBetween`'s `ownerOnly`). */
     ownerOnly?: boolean;
+    /** The head's side, when a compiler can be asked whether a doubted call could be it (`typeCannotHold`). */
+    head?: CallSide & { names: readonly string[] };
   },
   /** The nodes to read instead of the routines of that name: a class or struct tail's own code (#459). */
   own?: Node[],
@@ -2167,6 +2198,9 @@ function callsTo(
       if (answer === undefined) return;
       // Read or set by name, and the result runs nowhere: no call to the head (#431).
       if (answer === "dynamic" && quiet?.has(node.id)) return;
+      // A value whose type cannot hold the head is no doubt about it (step 2).
+      if (target.head && (answer === "computed" || answer === "local-callee" || answer === "receiver")
+        && typeCannotHold(valueCalledAt(callee, node), { ...side, routine }, target.head)) return;
       if (answer === "yes") {
         found = {
           name: callee.kind === "computed" ? "" : callee.name,
@@ -2245,6 +2279,7 @@ export function callsBetween(
   const typeTail = typeTailOf(from.source, from.language, from.routine);
   const forward = callsTo(from, from.routine, {
     file: to.file, names: wanted, hooked: runsOnRead(to, to.names), ...(to.ownerOnly ? { ownerOnly: true } : {}),
+    ...(from.calleeCanHold ? { head: to } : {}),
   }, typeTail?.nodes);
   if (forward.evidence) return { verdict: "confirmed", evidence: forward.evidence };
   /*
@@ -3186,6 +3221,72 @@ function onlyAMethod(source: string, language: Language, name: string): boolean 
   });
 }
 
+/**
+ * Whether a call nobody could place cannot be the head, on the TypeScript
+ * compiler's word (calls research 2026-11, step 2): `handler(req)`,
+ * `this.processFn(job)`, `strategy.apply(n)` run whatever value they are
+ * given, and a function whose type does not fit that value's type cannot be
+ * it -- unless something on the way forgot the type.
+ *
+ * So the compiler's "does not fit" (`calleeCanHold`) stands only when every
+ * place the repository writes the head so that it can run without its name
+ * (`stored.ts`) leaves it standing:
+ *
+ *   called from a function with no name  that function may be what the value
+ *   (`(e) => handleFailed(e)`)           holds, so it must not fit either
+ *   written as a value                   not handed to `any`, `unknown`,
+ *                                        `Function`, `{}` or a type variable,
+ *                                        and not cast (`forgetsShape`)
+ *   read by a name in a string, renamed  the type question cannot follow it,
+ *   on the way, decorated, unread        and the call stays a doubt
+ *   written as a value in the tail's own  the tail may build what it calls out
+ *   body                                 of the head -- `f.bind(this, a)`,
+ *                                        `memo(f)` -- and a value of another
+ *                                        type may still run it
+ *
+ * A plain call never runs a class's `constructor` -- JavaScript throws -- so
+ * for that head the places do not matter.
+ *
+ * TypeScript at both ends only, and only where a compiler is on hand: a
+ * JavaScript value's type is a guess, and without a compiler nobody asks.
+ */
+function typeCannotHold(
+  calleeAt: { start: number; end: number } | undefined,
+  from: CallSide & { routine: string },
+  to: CallSide & { names: readonly string[] },
+): boolean {
+  if (!calleeAt || !from.calleeCanHold || !from.storedFindings || to.names.length === 0) return false;
+  if (!TYPED.has(from.language) || !TYPED.has(to.language)) return false;
+  const names = to.names.map((name) => name.replace(/^#/, ""));
+  if (from.calleeCanHold(calleeAt, { file: to.file, names }) !== false) return false;
+  if (names.every((name) => name === "constructor")) return true;
+  let own: Array<[number, number]> | undefined;
+  const inTail = (line: number) => (own ??= tailLines(from)).some(([first, last]) => first <= line && line <= last);
+  for (const name of names) {
+    for (const one of from.storedFindings(name, onlyAMethod(to.source, to.language, name), to.language)) {
+      if (one.how === "value" && one.file === from.file && inTail(one.line)) return false;
+      if (one.how === "wrapped") {
+        if (!one.wrappers || one.wrappers.length === 0) return false;
+        if (one.wrappers.some((at) => from.calleeCanHold!(calleeAt, { file: one.file, names: [], at }) !== false)) return false;
+        continue;
+      }
+      if (one.how === "value" && from.forgetsShape?.(one.file, one.line, names) === false) continue;
+      return false;
+    }
+  }
+  return true;
+}
+
+/** The languages the type question is asked in. */
+const TYPED = new Set<Language>(["ts", "tsx"]);
+
+/** The 1-based lines the tail's own code spans: its routines, or a class tail's declaration. */
+function tailLines(from: CallSide & { routine: string }): Array<[number, number]> {
+  const typeTail = typeTailOf(from.source, from.language, from.routine);
+  const nodes = typeTail ? typeTail.nodes : routinesNamed(from.source, from.routine, from.language).routines;
+  return nodes.map((node) => [lineOf(from.source, node.startIndex), lineOf(from.source, node.endIndex)]);
+}
+
 /** `closedBodyRefutes` as it was before #357: the text reading alone. */
 function textClosed(
   from: CallSide & { routine: string },
@@ -3216,6 +3317,8 @@ function textClosed(
   let sites = 0;
   let dispatched = 0;
   let untyped = 0;
+  /** Calls of a value whose type cannot hold the head (`typeCannotHold`). */
+  let cannotHold = 0;
   const untypedAt: Array<{ start: number; end: number }> = [];
   const reached: Array<{ name: string; line: number }> = [];
   let hooked: boolean | undefined;
@@ -3231,6 +3334,18 @@ function textClosed(
          */
         if (site.why === "receiver" && !site.handsOn && runsItsOwnName(site, from, to)) {
           untyped += 1;
+          if (site.nameAt) untypedAt.push(site.nameAt);
+          sites += 1;
+          continue;
+        }
+        /*
+         * A function value, a computed callee or a value nothing could type,
+         * whose type the compiler says cannot hold the head (step 2). The
+         * call's name is asked about again when the red is shown, as above.
+         */
+        if ((site.why === "local-callee" || site.why === "computed" || site.why === "receiver") && !site.handsOn
+          && typeCannotHold(site.calleeAt, from, to)) {
+          cannotHold += 1;
           if (site.nameAt) untypedAt.push(site.nameAt);
           sites += 1;
           continue;
@@ -3258,6 +3373,12 @@ function textClosed(
          */
         if (runsItsOwnName(site, from, to)) {
           dispatched += 1;
+          sites += 1;
+          continue;
+        }
+        // Or one whose type cannot hold the head, whatever implements it (step 2).
+        if (typeCannotHold(site.calleeAt, from, to)) {
+          cannotHold += 1;
           sites += 1;
           continue;
         }
@@ -3349,7 +3470,9 @@ function textClosed(
       routine: from.routine, line, sites,
       ...(elsewhere.length > 0 ? { elsewhere } : {}),
       ...(dispatched > 0 ? { dispatched } : {}),
-      ...(untyped > 0 ? { untyped, untypedAt } : {}),
+      ...(untyped > 0 ? { untyped } : {}),
+      ...(cannotHold > 0 ? { cannotHold } : {}),
+      ...(untyped > 0 || untypedAt.length > 0 ? { untypedAt } : {}),
     }, ...readMacros };
   }
   /*
@@ -3362,7 +3485,7 @@ function textClosed(
   if (!to.names.every((name) => isRoutine(to.source, name, to.language))) {
     return { why: "reaches-the-file" };
   }
-  return { reached: { routine: from.routine, line, sites, reached, ...(untyped > 0 ? { untypedAt } : {}) }, ...readMacros };
+  return { reached: { routine: from.routine, line, sites, reached, ...(untyped > 0 || untypedAt.length > 0 ? { untypedAt } : {}) }, ...readMacros };
 }
 
 /**
@@ -4470,6 +4593,15 @@ export interface CallSitePlaced {
    * calls, so the name alone never rules it out.
    */
   handsOn?: true;
+  /**
+   * The value a call runs, as written -- `h` in `h(x)` and `h.call(t, x)`,
+   * `this.run` (by `run`'s range) in `this.run(x)`, `table[k]` in
+   * `table[k](x)`, `this` in `new this(x)` -- the range a compiler is asked
+   * whether that value could be the head (`CallSide.calleeCanHold`). Absent
+   * for a JSX tag, and for JavaScript's `x.call(..)` when nothing says what
+   * `x` is.
+   */
+  calleeAt?: { start: number; end: number };
 }
 
 /** Every call site in one routine, placed or refused. */
@@ -5517,11 +5649,29 @@ function functionsInReach(side: CallSide): Set<string> | undefined {
 }
 
 /** One call site as `callSitesIn` lists it, placed or refused. */
+/**
+ * Where the value a call runs is written (`CallSitePlaced.calleeAt`): the
+ * called name, a member's name, or a computed callee's whole expression --
+ * `new`'s too. None for a render, and none for JavaScript's `x.call(..)`
+ * that `valueCalled` could not read as a call of `x`.
+ */
+function valueCalledAt(callee: Callee, at: Node): { start: number; end: number } | undefined {
+  if (at.type !== "call_expression" && at.type !== "call" && at.type !== "new_expression") return undefined;
+  if (callee.kind === "computed") {
+    const written = at.childForFieldName("function") ?? at.childForFieldName("constructor");
+    return written ? { start: written.startIndex, end: written.endIndex } : undefined;
+  }
+  if (callee.kind === "through") return callee.runs ? undefined : callee.memberAt;
+  return callee.nameAt;
+}
+
 function siteOf(callee: Callee, source: string, at: Node, where: Placement | { why: SiteUnresolved }): CallSitePlaced {
+  const calleeAt = valueCalledAt(callee, at);
   return {
     name: callee.kind === "computed" ? "" : callee.name,
     line: lineOf(source, at.startIndex),
     receiver: callee.kind === "through",
+    ...(calleeAt ? { calleeAt } : {}),
     ...(callee.kind === "through" ? { memberAt: callee.memberAt } : {}),
     ...(callee.kind === "computed" ? {} : { nameAt: callee.kind === "through" ? callee.memberAt : callee.nameAt }),
     ...("file" in where

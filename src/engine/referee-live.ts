@@ -340,6 +340,8 @@ export async function refereedCheckLive(
         // TypeScript's alone, and answered on the spot: no language server is asked.
         renderableAt: ts?.renderableAt?.bind(ts),
         parentsOutsideAt: ts?.parentsOutsideAt?.bind(ts),
+        calleeCanHold: ts?.calleeCanHold?.bind(ts),
+        forgetsShapeAt: ts?.forgetsShapeAt?.bind(ts),
         ...(askCompiler
           ? { compiledCrateOf: (file: string) => { compilable.add(file); return undefined; } }
           : {}),
@@ -404,6 +406,8 @@ export async function refereedCheckLive(
       kindAt: counted(ts.kindAt?.bind(ts)),
       renderableAt: counted(ts.renderableAt?.bind(ts)),
       parentsOutsideAt: counted(ts.parentsOutsideAt?.bind(ts)),
+      calleeCanHold: counted(ts.calleeCanHold?.bind(ts)),
+      forgetsShapeAt: counted(ts.forgetsShapeAt?.bind(ts)),
       ancestorsAt: counted(ts.ancestorsAt?.bind(ts)),
       typePartsAt: counted(ts.typePartsAt?.bind(ts)),
       fitsAt: counted(ts.fitsAt?.bind(ts)),
@@ -439,6 +443,8 @@ export async function refereedCheckLive(
       },
       renderableAt: (file, at) => tsAsk?.renderableAt?.(file, at),
       parentsOutsideAt: (file, at) => tsAsk?.parentsOutsideAt?.(file, at),
+      calleeCanHold: (file, at, head) => tsAsk?.calleeCanHold?.(file, at, head),
+      forgetsShapeAt: (file, line, names) => tsAsk?.forgetsShapeAt?.(file, line, names),
       ancestorsAt: (file, at) => {
         const language = languageOf(file);
         if (language === "python" || language === "rust") {
