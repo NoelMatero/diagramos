@@ -1,0 +1,1687 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 963.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1390570318,
+      "version": 1,
+      "versionNonce": 484428786,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "transpile: read in one dialect, write through another dialect's Generator",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "transpile: read in one dialect, write through another dialect's Generator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-0",
+      "type": "rectangle",
+      "x": 700,
+      "y": 20,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 658148913,
+      "version": 1,
+      "versionNonce": 1579428539,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-node-0-label"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "node": "transpile",
+        "ref": "sqlglot/__init__.py#transpile"
+      }
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-1",
+      "type": "rectangle",
+      "x": 480,
+      "y": 420,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1384216840,
+      "version": 1,
+      "versionNonce": 540742244,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-node-1-label"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "node": "parse",
+        "ref": "sqlglot/__init__.py#parse"
+      }
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-2",
+      "type": "rectangle",
+      "x": 700,
+      "y": 800,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1934523447,
+      "version": 1,
+      "versionNonce": 1751648657,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-node-2-label"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "node": "dialect",
+        "ref": "sqlglot/dialects/dialect.py#Dialect"
+      }
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-3",
+      "type": "rectangle",
+      "x": 380,
+      "y": 1200,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1330840806,
+      "version": 1,
+      "versionNonce": 290521290,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-node-3-label"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "node": "tokenizer",
+        "ref": "sqlglot/tokens.py#Tokenizer"
+      }
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-4",
+      "type": "rectangle",
+      "x": 20,
+      "y": 1200,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1008290525,
+      "version": 1,
+      "versionNonce": 349690439,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-node-4-label"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "node": "parser",
+        "ref": "sqlglot/parser.py#Parser"
+      }
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-5",
+      "type": "rectangle",
+      "x": 780,
+      "y": 1200,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1825634628,
+      "version": 1,
+      "versionNonce": 1405539408,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-node-5-label"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "node": "write-dialect",
+        "ref": "sqlglot/dialects/duckdb.py#DuckDB"
+      }
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-6",
+      "type": "rectangle",
+      "x": 740,
+      "y": 1600,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 533596531,
+      "version": 1,
+      "versionNonce": 203554125,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-node-6-label"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "node": "duckdb-gen",
+        "ref": "sqlglot/generators/duckdb.py#DuckDBGenerator"
+      }
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-7",
+      "type": "rectangle",
+      "x": 760,
+      "y": 2000,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1584972738,
+      "version": 1,
+      "versionNonce": 765144886,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-node-7-label"
+        },
+        {
+          "id": "transpile-read-in-one-dialect-write-thro-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "node": "generator",
+        "ref": "sqlglot/generator.py#Generator"
+      }
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-0",
+      "type": "arrow",
+      "x": 785.3333333333334,
+      "y": 112,
+      "width": 146.66666666666674,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1335905894,
+      "version": 1,
+      "versionNonce": 184268106,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "edge": {
+          "from": "transpile",
+          "to": "parse",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -146.66666666666674,
+          32
+        ],
+        [
+          -146.66666666666674,
+          77.06666666666663
+        ],
+        [
+          -146.66666666666674,
+          133
+        ],
+        [
+          -146.66666666666674,
+          188.93333333333334
+        ],
+        [
+          -146.66666666666674,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-0",
+        "focus": 0.39047619047619025,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-1",
+        "focus": -0.008333333333334195,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-1",
+      "type": "arrow",
+      "x": 878.6666666666666,
+      "y": 112,
+      "width": 0,
+      "height": 681.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1939588535,
+      "version": 1,
+      "versionNonce": 1645395473,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "edge": {
+          "from": "transpile",
+          "to": "dialect",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          340.79999999999995
+        ],
+        [
+          0,
+          681.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-0",
+        "focus": -0.276190476190476,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-2",
+        "focus": 0.27619047619047604,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-2",
+      "type": "arrow",
+      "x": 638.6666666666666,
+      "y": 492.8,
+      "width": 146.66666666666674,
+      "height": 300.7999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1389281928,
+      "version": 1,
+      "versionNonce": 434489060,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "edge": {
+          "from": "parse",
+          "to": "dialect",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          192.7999999999999
+        ],
+        [
+          30.933333333333394,
+          192.7999999999999
+        ],
+        [
+          146.66666666666674,
+          192.7999999999999
+        ],
+        [
+          146.66666666666674,
+          300.2999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-1",
+        "focus": 0.008333333333334195,
+        "gap": 7.199999999999989
+      },
+      "endBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-2",
+        "focus": -0.39047619047619025,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-3",
+      "type": "arrow",
+      "x": 832,
+      "y": 893.5999999999999,
+      "width": 300,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 663214001,
+      "version": 1,
+      "versionNonce": 1473175355,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "edge": {
+          "from": "dialect",
+          "to": "tokenizer"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          -244.39999999999998,
+          56
+        ],
+        [
+          -300,
+          56
+        ],
+        [
+          -300,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-2",
+        "focus": 0.05714285714285722,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-3",
+        "focus": -0.049999999999999996,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-4",
+      "type": "arrow",
+      "x": 762,
+      "y": 893.5999999999999,
+      "width": 610,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1590037826,
+      "version": 1,
+      "versionNonce": 658891702,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "edge": {
+          "from": "dialect",
+          "to": "parser"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -423.4,
+          32
+        ],
+        [
+          -610,
+          32
+        ],
+        [
+          -610,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-2",
+        "focus": 0.5571428571428573,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-4",
+        "focus": -0.05714285714285702,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-5",
+      "type": "arrow",
+      "x": 902,
+      "y": 893.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 538661619,
+      "version": 1,
+      "versionNonce": 97300941,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "edge": {
+          "from": "dialect",
+          "to": "write-dialect"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-2",
+        "focus": -0.44285714285714284,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-5",
+        "focus": -0.06153846153846158,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-6",
+      "type": "arrow",
+      "x": 902,
+      "y": 1294.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1830699716,
+      "version": 1,
+      "versionNonce": 1299286224,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "edge": {
+          "from": "write-dialect",
+          "to": "duckdb-gen"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-5",
+        "focus": 0.06153846153846158,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-6",
+        "focus": 0.0125,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-7",
+      "type": "arrow",
+      "x": 902,
+      "y": 1695.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1013355613,
+      "version": 1,
+      "versionNonce": 243437255,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "transpile-read-in-one-dialect-write-thro-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro",
+        "edge": {
+          "from": "duckdb-gen",
+          "to": "generator",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-6",
+        "focus": -0.0125,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "transpile-read-in-one-dialect-write-thro-node-7",
+        "focus": -0.05333333333333303,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-0-label",
+      "type": "text",
+      "x": 730,
+      "y": 45,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 72855304,
+      "version": 1,
+      "versionNonce": 343020644,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "transpile(sql, read,\nwrite)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-node-0",
+      "originalText": "transpile(sql, read, write)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-1-label",
+      "type": "text",
+      "x": 513.5,
+      "y": 447.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1463464917,
+      "version": 1,
+      "versionNonce": 1253651679,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "parse with read dialect",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-node-1",
+      "originalText": "parse with read dialect",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-2-label",
+      "type": "text",
+      "x": 724.5,
+      "y": 825,
+      "width": 231.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1616298290,
+      "version": 1,
+      "versionNonce": 347968230,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "Dialect: parse and\ngenerate entry points",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-node-2",
+      "originalText": "Dialect: parse and generate entry points",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-3-label",
+      "type": "text",
+      "x": 408,
+      "y": 1227.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 5577303,
+      "version": 1,
+      "versionNonce": 814079025,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "Tokenizer: SQL to tokens",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-node-3",
+      "originalText": "Tokenizer: SQL to tokens",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-4-label",
+      "type": "text",
+      "x": 44.499999999999986,
+      "y": 1227.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 119066900,
+      "version": 1,
+      "versionNonce": 1786145888,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "Parser: tokens to AST",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-node-4",
+      "originalText": "Parser: tokens to AST",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-5-label",
+      "type": "text",
+      "x": 805.5,
+      "y": 1225,
+      "width": 209.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 2099077969,
+      "version": 1,
+      "versionNonce": 1916356443,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "write dialect (e.g.\nDuckDB)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-node-5",
+      "originalText": "write dialect (e.g. DuckDB)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-6-label",
+      "type": "text",
+      "x": 768,
+      "y": 1625,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 323222350,
+      "version": 1,
+      "versionNonce": 1987410930,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "target dialect Generator\n(DuckDBGenerator)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-node-6",
+      "originalText": "target dialect Generator (DuckDBGenerator)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-node-7-label",
+      "type": "text",
+      "x": 767,
+      "y": 2037.5,
+      "width": 286,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 359587235,
+      "version": 1,
+      "versionNonce": 225341245,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "Generator base: AST to SQL",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-node-7",
+      "originalText": "Generator base: AST to SQL",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-0-label",
+      "type": "text",
+      "x": 585.8666666666667,
+      "y": 179.06666666666663,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1156323287,
+      "version": 1,
+      "versionNonce": 708242609,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "parse @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-edge-0",
+      "originalText": "parse @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-1-label",
+      "type": "text",
+      "x": 812.6666666666666,
+      "y": 442.79999999999995,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 619560626,
+      "version": 1,
+      "versionNonce": 242131814,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "generate @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-edge-1",
+      "originalText": "generate @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-2-label",
+      "type": "text",
+      "x": 586,
+      "y": 675.5999999999999,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 466727253,
+      "version": 1,
+      "versionNonce": 1147815263,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "get_or_raise @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-edge-2",
+      "originalText": "get_or_raise @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-3-label",
+      "type": "text",
+      "x": 552.4,
+      "y": 939.5999999999999,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1223601288,
+      "version": 1,
+      "versionNonce": 237184228,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "tokenize",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-edge-3",
+      "originalText": "tokenize",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-4-label",
+      "type": "text",
+      "x": 285.8,
+      "y": 915.5999999999999,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1510333219,
+      "version": 1,
+      "versionNonce": 119504829,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "parse tokens",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-edge-4",
+      "originalText": "parse tokens",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-5-label",
+      "type": "text",
+      "x": 880,
+      "y": 1034,
+      "width": 44,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1473968334,
+      "version": 1,
+      "versionNonce": 1881574514,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "write",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-edge-5",
+      "originalText": "write",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-6-label",
+      "type": "text",
+      "x": 862.4,
+      "y": 1434.7999999999997,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1102340305,
+      "version": 1,
+      "versionNonce": 1810520027,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "Generator",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-edge-6",
+      "originalText": "Generator",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "transpile-read-in-one-dialect-write-thro-edge-7-label",
+      "type": "text",
+      "x": 862.4,
+      "y": 1835.6,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1269812884,
+      "version": 1,
+      "versionNonce": 1680309472,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "transpile-read-in-one-dialect-write-thro"
+      },
+      "text": "@conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "transpile-read-in-one-dialect-write-thro-edge-7",
+      "originalText": "@conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

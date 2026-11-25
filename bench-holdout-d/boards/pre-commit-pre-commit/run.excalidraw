@@ -1,0 +1,2513 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 646.8000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 2043967235,
+      "version": 1,
+      "versionNonce": 1704772637,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "pre-commit run: config, hook envs, hook execution",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "pre-commit run: config, hook envs, hook execution",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-0",
+      "type": "rectangle",
+      "x": 140,
+      "y": 20,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1805730566,
+      "version": 1,
+      "versionNonce": 474187370,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-0-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "entry",
+        "ref": "pre_commit/main.py#main"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-1",
+      "type": "rectangle",
+      "x": 120,
+      "y": 420,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 964587479,
+      "version": 1,
+      "versionNonce": 748123313,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-1-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "run",
+        "ref": "pre_commit/commands/run.py#run"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 820,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 414280872,
+      "version": 1,
+      "versionNonce": 745684868,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-2-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "config",
+        "ref": "pre_commit/clientlib.py#load_config"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-3",
+      "type": "rectangle",
+      "x": 840,
+      "y": 820,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 667004497,
+      "version": 1,
+      "versionNonce": 316364891,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-3-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "hooks",
+        "ref": "pre_commit/repository.py#all_hooks"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-4",
+      "type": "rectangle",
+      "x": 860,
+      "y": 1220,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 2018285794,
+      "version": 1,
+      "versionNonce": 907234262,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-4-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "store",
+        "ref": "pre_commit/store.py#Store"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-5",
+      "type": "rectangle",
+      "x": 420,
+      "y": 820,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1286686739,
+      "version": 1,
+      "versionNonce": 366920045,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-5-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "install",
+        "ref": "pre_commit/repository.py#install_hook_envs"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-6",
+      "type": "rectangle",
+      "x": 440,
+      "y": 1220,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 897275364,
+      "version": 1,
+      "versionNonce": 826471536,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-6-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "build",
+        "ref": "pre_commit/repository.py#_hook_install"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-7",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 820,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 822261885,
+      "version": 1,
+      "versionNonce": 1213544295,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-7-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "loop",
+        "ref": "pre_commit/commands/run.py#_run_hooks"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-8",
+      "type": "rectangle",
+      "x": 1280,
+      "y": 1620,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 709982142,
+      "version": 1,
+      "versionNonce": 515261026,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-8-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "classify",
+        "ref": "pre_commit/commands/run.py#Classifier"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-9",
+      "type": "rectangle",
+      "x": 1480,
+      "y": 1220,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 886533391,
+      "version": 1,
+      "versionNonce": 1719614697,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-9-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "single",
+        "ref": "pre_commit/commands/run.py#_run_single_hook"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-10",
+      "type": "rectangle",
+      "x": 1660,
+      "y": 1620,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1903022599,
+      "version": 2,
+      "versionNonce": 600033313,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-10-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "lang",
+        "ref": "pre_commit/lang_base.py#run_xargs"
+      },
+      "label": "Shuffle files, run hook command"
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-11",
+      "type": "rectangle",
+      "x": 1680,
+      "y": 2020,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 567455094,
+      "version": 1,
+      "versionNonce": 1056369114,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-node-11-label"
+        },
+        {
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "node": "xargs",
+        "ref": "pre_commit/xargs.py#xargs"
+      }
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-0",
+      "type": "arrow",
+      "x": 282.4,
+      "y": 112,
+      "width": 0,
+      "height": 300.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1308038809,
+      "version": 1,
+      "versionNonce": 787606755,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "entry",
+          "to": "run",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.3
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-0",
+        "focus": 0.05066666666666679,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-1",
+        "focus": -0.044705882352941324,
+        "gap": 7.199999999999989
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-1",
+      "type": "arrow",
+      "x": 180.4,
+      "y": 512.8,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 2037009808,
+      "version": 1,
+      "versionNonce": 1190683500,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "run",
+          "to": "config",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-1",
+        "focus": 0.6447058823529412,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-2",
+        "focus": 0.0025000000000000326,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-2",
+      "type": "arrow",
+      "x": 316.4,
+      "y": 512.8,
+      "width": 674,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 439832767,
+      "version": 1,
+      "versionNonce": 1331422425,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "run",
+          "to": "hooks",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          56
+        ],
+        [
+          431.4,
+          56
+        ],
+        [
+          674,
+          56
+        ],
+        [
+          674,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-1",
+        "focus": -0.15529411764705867,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-3",
+        "focus": 0.0026666666666665152,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-3",
+      "type": "arrow",
+      "x": 990.4,
+      "y": 913.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 909917742,
+      "version": 1,
+      "versionNonce": 550288978,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "hooks",
+          "to": "store"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-3",
+        "focus": -0.0026666666666665152,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-4",
+        "focus": -0.06857142857142849,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-4",
+      "type": "arrow",
+      "x": 248.4,
+      "y": 512.8,
+      "width": 342,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 502067237,
+      "version": 1,
+      "versionNonce": 1493762223,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "run",
+          "to": "install",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          241.39999999999995,
+          80
+        ],
+        [
+          342,
+          80
+        ],
+        [
+          342,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-1",
+        "focus": 0.24470588235294116,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-5",
+        "focus": 0.0023529411764704757,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-5",
+      "type": "arrow",
+      "x": 590.4,
+      "y": 913.5999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 362178060,
+      "version": 1,
+      "versionNonce": 1665307096,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "install",
+          "to": "build",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-5",
+        "focus": -0.0023529411764704757,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-6",
+        "focus": 0.002666666666666742,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-6",
+      "type": "arrow",
+      "x": 384.4,
+      "y": 512.8,
+      "width": 1044.4,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 109770395,
+      "version": 1,
+      "versionNonce": 1970324629,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "run",
+          "to": "loop",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          640.6,
+          32
+        ],
+        [
+          1044.4,
+          32
+        ],
+        [
+          1044.4,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-1",
+        "focus": -0.5552941176470587,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-7",
+        "focus": -0.007999999999998864,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-7",
+      "type": "arrow",
+      "x": 1378.8000000000002,
+      "y": 913.5999999999999,
+      "width": 0,
+      "height": 701.5999999999999,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1495435082,
+      "version": 1,
+      "versionNonce": 507871646,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "loop",
+          "to": "classify",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          350.79999999999995
+        ],
+        [
+          0,
+          701.0999999999999
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-7",
+        "focus": 0.3413333333333323,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-8",
+        "focus": -0.3413333333333321,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-8",
+      "type": "arrow",
+      "x": 1478.8000000000002,
+      "y": 913.5999999999999,
+      "width": 138.4666666666667,
+      "height": 314.1333333333332,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1325202433,
+      "version": 1,
+      "versionNonce": 856956491,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "loop",
+          "to": "single",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          138.4666666666667,
+          32
+        ],
+        [
+          138.4666666666667,
+          87.83333333333326
+        ],
+        [
+          138.4666666666667,
+          200.98333333333312
+        ],
+        [
+          138.4666666666667,
+          257.55833333333317
+        ],
+        [
+          138.4666666666667,
+          313.6333333333332
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-7",
+        "focus": -0.3253333333333343,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-9",
+        "focus": -0.01952380952380813,
+        "gap": 7.733333333333121
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-9",
+      "type": "arrow",
+      "x": 1570.6000000000001,
+      "y": 1307.7333333333331,
+      "width": 91.79999999999995,
+      "height": 307.4666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 521144408,
+      "version": 1,
+      "versionNonce": 1324090676,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "single",
+          "to": "classify",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          199.4666666666667
+        ],
+        [
+          -0.16666666666674246,
+          199.4666666666667
+        ],
+        [
+          -91.79999999999995,
+          199.4666666666667
+        ],
+        [
+          -91.79999999999995,
+          306.9666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-9",
+        "focus": 0.3528571428571403,
+        "gap": 7.733333333333121
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-8",
+        "focus": 0.3253333333333343,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-10",
+      "type": "arrow",
+      "x": 1663.9333333333336,
+      "y": 1307.7333333333331,
+      "width": 144.86666666666656,
+      "height": 307.4666666666667,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1263605398,
+      "version": 1,
+      "versionNonce": 1470713210,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "single",
+          "to": "lang"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          38.66666666666674
+        ],
+        [
+          144.86666666666656,
+          38.66666666666674
+        ],
+        [
+          144.86666666666656,
+          81.30000000000018
+        ],
+        [
+          144.86666666666656,
+          137.8416666666667
+        ],
+        [
+          144.86666666666656,
+          194.38333333333344
+        ],
+        [
+          144.86666666666656,
+          306.9666666666667
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-9",
+        "focus": -0.31380952380952554,
+        "gap": 7.733333333333121
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-10",
+        "focus": -0.008000000000000453,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-11",
+      "type": "arrow",
+      "x": 1808.8000000000002,
+      "y": 1715.1999999999998,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 451689255,
+      "version": 1,
+      "versionNonce": 1438834881,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "pre-commit-run-config-hook-envs-hook-exe-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe",
+        "edge": {
+          "from": "lang",
+          "to": "xargs",
+          "claim": "calls"
+        },
+        "via": [
+          "run_xargs"
+        ]
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-10",
+        "focus": 0.008000000000000453,
+        "gap": 4.800000000000182
+      },
+      "endBinding": {
+        "elementId": "pre-commit-run-config-hook-envs-hook-exe-node-11",
+        "focus": -0.00923076923076828,
+        "gap": 4.000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-0-label",
+      "type": "text",
+      "x": 169,
+      "y": 45,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1737228023,
+      "version": 1,
+      "versionNonce": 1605389905,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "CLI entry: parse args,\nopen Store",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-0",
+      "originalText": "CLI entry: parse args, open Store",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-1-label",
+      "type": "text",
+      "x": 152.5,
+      "y": 445,
+      "width": 275,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1073479250,
+      "version": 1,
+      "versionNonce": 564364678,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Run: stash, check config,\nselect hooks",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-1",
+      "originalText": "Run: stash, check config, select hooks",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-2-label",
+      "type": "text",
+      "x": 26,
+      "y": 857.5,
+      "width": 308,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1982753653,
+      "version": 1,
+      "versionNonce": 941974271,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Load .pre-commit-config.yaml",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-2",
+      "originalText": "Load .pre-commit-config.yaml",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-3-label",
+      "type": "text",
+      "x": 869,
+      "y": 845,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 83383848,
+      "version": 1,
+      "versionNonce": 538170372,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Resolve each repo into\nhooks",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-3",
+      "originalText": "Resolve each repo into hooks",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-4-label",
+      "type": "text",
+      "x": 884.5,
+      "y": 1245,
+      "width": 231.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 131159107,
+      "version": 1,
+      "versionNonce": 15282525,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Clone repos and cache\nhook envs",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-4",
+      "originalText": "Clone repos and cache hook envs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-5-label",
+      "type": "text",
+      "x": 452.5,
+      "y": 845,
+      "width": 275,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 58603758,
+      "version": 1,
+      "versionNonce": 1441176594,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Install missing hook envs\nunder lock",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-5",
+      "originalText": "Install missing hook envs under lock",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-6-label",
+      "type": "text",
+      "x": 447,
+      "y": 1245,
+      "width": 286,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 39996401,
+      "version": 1,
+      "versionNonce": 73921659,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Build one env: install and\nhealth check",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-6",
+      "originalText": "Build one env: install and health check",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-7-label",
+      "type": "text",
+      "x": 1309,
+      "y": 845,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1810725300,
+      "version": 1,
+      "versionNonce": 46207616,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Loop hooks: fail-fast,\ndiff report",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-7",
+      "originalText": "Loop hooks: fail-fast, diff report",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-8-label",
+      "type": "text",
+      "x": 1309,
+      "y": 1645,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1146201247,
+      "version": 1,
+      "versionNonce": 919388217,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Match changed files to\neach hook",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-8",
+      "originalText": "Match changed files to each hook",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-9-label",
+      "type": "text",
+      "x": 1510,
+      "y": 1247.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 435850714,
+      "version": 1,
+      "versionNonce": 688185774,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Skip or run one hook",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-9",
+      "originalText": "Skip or run one hook",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-10-label",
+      "type": "text",
+      "x": 1667,
+      "y": 1645,
+      "width": 286,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1090444162,
+      "version": 1,
+      "versionNonce": 1877020662,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Build hook command for its\nlanguage",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-10",
+      "originalText": "Build hook command for its language",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-node-11-label",
+      "type": "text",
+      "x": 1705.5,
+      "y": 2045,
+      "width": 209.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 2052353575,
+      "version": 1,
+      "versionNonce": 113977793,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "Split files, run in\nparallel",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-node-11",
+      "originalText": "Split files, run in parallel",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-0-label",
+      "type": "text",
+      "x": 238.39999999999998,
+      "y": 252.39999999999998,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 806900384,
+      "version": 1,
+      "versionNonce": 525335036,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "run @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-0",
+      "originalText": "run @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-1-label",
+      "type": "text",
+      "x": 101.2,
+      "y": 653.1999999999999,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 538856045,
+      "version": 1,
+      "versionNonce": 1603402967,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "load config @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-1",
+      "originalText": "load config @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-2-label",
+      "type": "text",
+      "x": 664.1999999999999,
+      "y": 558.8,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 1506534986,
+      "version": 1,
+      "versionNonce": 686165662,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "select hooks @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-2",
+      "originalText": "select hooks @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-3-label",
+      "type": "text",
+      "x": 942,
+      "y": 1054,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1635613775,
+      "version": 1,
+      "versionNonce": 1836031785,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "clone repos",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-3",
+      "originalText": "clone repos",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-4-label",
+      "type": "text",
+      "x": 392.99999999999994,
+      "y": 582.8,
+      "width": 193.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 1400777996,
+      "version": 1,
+      "versionNonce": 1461769944,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "install missing @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-4",
+      "originalText": "install missing @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-5-label",
+      "type": "text",
+      "x": 520,
+      "y": 1044,
+      "width": 140.8,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 2032093097,
+      "version": 1,
+      "versionNonce": 487814323,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "per missing hook\n@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-5",
+      "originalText": "per missing hook @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-6-label",
+      "type": "text",
+      "x": 954.6,
+      "y": 534.8,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 888761030,
+      "version": 1,
+      "versionNonce": 910411050,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "run hooks @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-6",
+      "originalText": "run hooks @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-7-label",
+      "type": "text",
+      "x": 1299.6000000000001,
+      "y": 1254.3999999999999,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 499456635,
+      "version": 1,
+      "versionNonce": 212528629,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "from_config @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-7",
+      "originalText": "from_config @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-8-label",
+      "type": "text",
+      "x": 1546.8666666666668,
+      "y": 991.4333333333332,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1426423896,
+      "version": 1,
+      "versionNonce": 1079504180,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "each hook @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-8",
+      "originalText": "each hook @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-9-label",
+      "type": "text",
+      "x": 1500.0333333333333,
+      "y": 1497.1999999999998,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1307201317,
+      "version": 1,
+      "versionNonce": 1692765615,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "filenames @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-9",
+      "originalText": "filenames @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-10-label",
+      "type": "text",
+      "x": 1738.4,
+      "y": 1379.0333333333333,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "al",
+      "roundness": null,
+      "seed": 6341575,
+      "version": 1,
+      "versionNonce": 648661473,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "run via language",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-10",
+      "originalText": "run via language",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "pre-commit-run-config-hook-envs-hook-exe-edge-11-label",
+      "type": "text",
+      "x": 1725.2000000000003,
+      "y": 1855.6,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "am",
+      "roundness": null,
+      "seed": 1907139362,
+      "version": 1,
+      "versionNonce": 1903291414,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "pre-commit-run-config-hook-envs-hook-exe"
+      },
+      "text": "file batches @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "pre-commit-run-config-hook-envs-hook-exe-edge-11",
+      "originalText": "file batches @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

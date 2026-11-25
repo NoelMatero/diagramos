@@ -1,0 +1,1866 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 765.6,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 963977495,
+      "version": 1,
+      "versionNonce": 1258220017,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "role": "title"
+      },
+      "text": "Graph and DiGraph: adjacency dicts and the views over them",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Graph and DiGraph: adjacency dicts and the views over them",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-0",
+      "type": "rectangle",
+      "x": 760,
+      "y": 20,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1662300378,
+      "version": 1,
+      "versionNonce": 1026161326,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-0-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "graph",
+        "ref": "networkx/classes/graph.py#Graph"
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-1",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 925894251,
+      "version": 1,
+      "versionNonce": 690630501,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-1-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "digraph",
+        "ref": "networkx/classes/digraph.py#DiGraph"
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-2",
+      "type": "rectangle",
+      "x": 660,
+      "y": 480,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 104585884,
+      "version": 1,
+      "versionNonce": 599537832,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-2-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "init_dicts",
+        "ref": "networkx/classes/graph.py#__init__",
+        "refs": [
+          "networkx/classes/digraph.py#__init__"
+        ]
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-3",
+      "type": "rectangle",
+      "x": 40,
+      "y": 660,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 455830709,
+      "version": 1,
+      "versionNonce": 887618111,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-3-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "add_g",
+        "ref": "networkx/classes/graph.py#add_edge"
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-4",
+      "type": "rectangle",
+      "x": 20,
+      "y": 480,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 36820286,
+      "version": 1,
+      "versionNonce": 1961456354,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-4-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "add_d",
+        "ref": "networkx/classes/digraph.py#add_edge"
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-5",
+      "type": "rectangle",
+      "x": 20,
+      "y": 360,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 213371535,
+      "version": 1,
+      "versionNonce": 1018326377,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-5-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "adj_prop",
+        "ref": "networkx/classes/graph.py#adj",
+        "refs": [
+          "networkx/classes/digraph.py#adj"
+        ]
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-6",
+      "type": "rectangle",
+      "x": 680,
+      "y": 360,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 736884128,
+      "version": 1,
+      "versionNonce": 226071292,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-6-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "adjview",
+        "ref": "networkx/classes/coreviews.py#AdjacencyView"
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-7",
+      "type": "rectangle",
+      "x": 1420,
+      "y": 360,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 297670249,
+      "version": 1,
+      "versionNonce": 1501977971,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-7-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "atlas",
+        "ref": "networkx/classes/coreviews.py#AtlasView"
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-8",
+      "type": "rectangle",
+      "x": 20,
+      "y": 120,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1345123938,
+      "version": 1,
+      "versionNonce": 205945942,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-8-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "nodes_prop",
+        "ref": "networkx/classes/graph.py#nodes"
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-9",
+      "type": "rectangle",
+      "x": 620,
+      "y": 120,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 613524883,
+      "version": 1,
+      "versionNonce": 1813115373,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-9-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "nodeview",
+        "ref": "networkx/classes/reportviews.py#NodeView"
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-10",
+      "type": "rectangle",
+      "x": 20,
+      "y": 240,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 968268003,
+      "version": 1,
+      "versionNonce": 1784245117,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-10-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "edges_prop",
+        "ref": "networkx/classes/graph.py#edges",
+        "refs": [
+          "networkx/classes/digraph.py#edges"
+        ]
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-11",
+      "type": "rectangle",
+      "x": 660,
+      "y": 240,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 945773426,
+      "version": 1,
+      "versionNonce": 1506781478,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-node-11-label"
+        },
+        {
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "node": "edgeview",
+        "ref": "networkx/classes/reportviews.py#EdgeView"
+      }
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-0",
+      "type": "arrow",
+      "x": 332,
+      "y": 52,
+      "width": 429.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 1605865837,
+      "version": 1,
+      "versionNonce": 2111619543,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "edge": {
+          "from": "digraph",
+          "to": "graph",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          214.79999999999995,
+          0
+        ],
+        [
+          429.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-1",
+        "focus": -0.19999999999999998,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-0",
+        "focus": 0.19999999999999998,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-1",
+      "type": "arrow",
+      "x": 332,
+      "y": 702,
+      "width": 332.79999999999995,
+      "height": 146.66666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1668529556,
+      "version": 1,
+      "versionNonce": 1301854688,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "edge": {
+          "from": "add_g",
+          "to": "init_dicts"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          224.79999999999995,
+          0
+        ],
+        [
+          224.79999999999995,
+          -14.933333333333394
+        ],
+        [
+          224.79999999999995,
+          -146.66666666666663
+        ],
+        [
+          332.29999999999995,
+          -146.66666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-3",
+        "focus": -0.16,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-2",
+        "focus": -0.5066666666666666,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-2",
+      "type": "arrow",
+      "x": 332,
+      "y": 522,
+      "width": 332.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1121496003,
+      "version": 1,
+      "versionNonce": 1836576733,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "edge": {
+          "from": "add_d",
+          "to": "init_dicts"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          166.39999999999998,
+          0
+        ],
+        [
+          332.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-4",
+        "focus": -0.15999999999999998,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-2",
+        "focus": 0.16,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-3",
+      "type": "arrow",
+      "x": 292,
+      "y": 402,
+      "width": 385.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 781231442,
+      "version": 1,
+      "versionNonce": 900098694,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "edge": {
+          "from": "adj_prop",
+          "to": "adjview",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          192.8,
+          0
+        ],
+        [
+          385.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-5",
+        "focus": -0.16000000000000003,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-6",
+        "focus": 0.16000000000000075,
+        "gap": 2.3999999999999773
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-4",
+      "type": "arrow",
+      "x": 997.6,
+      "y": 402,
+      "width": 429.5999999999998,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1235705793,
+      "version": 1,
+      "versionNonce": 1904688651,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "edge": {
+          "from": "adjview",
+          "to": "atlas",
+          "claim": "conforms"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          214.79999999999984,
+          0
+        ],
+        [
+          429.0999999999998,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-6",
+        "focus": -0.16000000000000011,
+        "gap": 2.3999999999999773
+      },
+      "endBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-7",
+        "focus": 0.1600000000000006,
+        "gap": 7.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-5",
+      "type": "arrow",
+      "x": 232,
+      "y": 162,
+      "width": 385.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 897578776,
+      "version": 1,
+      "versionNonce": 2095526388,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "edge": {
+          "from": "nodes_prop",
+          "to": "nodeview",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          192.8,
+          0
+        ],
+        [
+          385.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-8",
+        "focus": 0.05,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-9",
+        "focus": 0.15999999999999884,
+        "gap": 2.3999999999999773
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-6",
+      "type": "arrow",
+      "x": 272,
+      "y": 282,
+      "width": 385.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 364596679,
+      "version": 1,
+      "versionNonce": 1144063969,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "graph-and-digraph-adjacency-dicts-and-th-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th",
+        "edge": {
+          "from": "edges_prop",
+          "to": "edgeview",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          192.8,
+          0
+        ],
+        [
+          385.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-10",
+        "focus": -0.16000000000000006,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "graph-and-digraph-adjacency-dicts-and-th-node-11",
+        "focus": -0.04999999999999999,
+        "gap": 2.3999999999999773
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-0-label",
+      "type": "text",
+      "x": 793.5,
+      "y": 47.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1172303051,
+      "version": 1,
+      "versionNonce": 1704449093,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "Graph: undirected class",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-0",
+      "originalText": "Graph: undirected class",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-1-label",
+      "type": "text",
+      "x": 53.499999999999986,
+      "y": 47.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 688349462,
+      "version": 1,
+      "versionNonce": 1570804986,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "DiGraph: directed class",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-1",
+      "originalText": "DiGraph: directed class",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-2-label",
+      "type": "text",
+      "x": 689,
+      "y": 505,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1873718969,
+      "version": 1,
+      "versionNonce": 2033277571,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "Adjacency dicts: _adj,\n_succ, _pred, _node",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-2",
+      "originalText": "Adjacency dicts: _adj, _succ, _pred, _node",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-3-label",
+      "type": "text",
+      "x": 68.99999999999999,
+      "y": 685,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1445173980,
+      "version": 1,
+      "versionNonce": 764454632,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "Graph.add_edge: writes\n_adj both ways",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-3",
+      "originalText": "Graph.add_edge: writes _adj both ways",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-4-label",
+      "type": "text",
+      "x": 48,
+      "y": 505,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1128470047,
+      "version": 1,
+      "versionNonce": 216165561,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "DiGraph.add_edge: writes\n_succ and _pred",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-4",
+      "originalText": "DiGraph.add_edge: writes _succ and _pred",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-5-label",
+      "type": "text",
+      "x": 44.499999999999986,
+      "y": 385,
+      "width": 231.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 418119514,
+      "version": 1,
+      "versionNonce": 2132446766,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "adj property (DiGraph\nsucc and pred alike)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-5",
+      "originalText": "adj property (DiGraph succ and pred alike)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-6-label",
+      "type": "text",
+      "x": 708,
+      "y": 385,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1154958461,
+      "version": 1,
+      "versionNonce": 2146278247,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "AdjacencyView: read-only\ndict of dicts",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-6",
+      "originalText": "AdjacencyView: read-only dict of dicts",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-7-label",
+      "type": "text",
+      "x": 1450,
+      "y": 385,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1217348656,
+      "version": 1,
+      "versionNonce": 342070412,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "AtlasView: read-only\none-level dict",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-7",
+      "originalText": "AtlasView: read-only one-level dict",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-8-label",
+      "type": "text",
+      "x": 53,
+      "y": 147.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 113427907,
+      "version": 1,
+      "versionNonce": 1459543517,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "nodes property",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-8",
+      "originalText": "nodes property",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-9-label",
+      "type": "text",
+      "x": 653.5,
+      "y": 145,
+      "width": 253.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 40872558,
+      "version": 1,
+      "versionNonce": 737953938,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "NodeView: node set over\n_node",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-9",
+      "originalText": "NodeView: node set over _node",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-10-label",
+      "type": "text",
+      "x": 45.499999999999986,
+      "y": 265,
+      "width": 209.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 158279806,
+      "version": 1,
+      "versionNonce": 402148898,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "edges, out_edges,\nin_edges properties",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-10",
+      "originalText": "edges, out_edges, in_edges properties",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-node-11-label",
+      "type": "text",
+      "x": 692.5,
+      "y": 267.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1649698067,
+      "version": 1,
+      "versionNonce": 631597165,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "EdgeView: edges from _adj",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-node-11",
+      "originalText": "EdgeView: edges from _adj",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-0-label",
+      "type": "text",
+      "x": 471.99999999999994,
+      "y": 42,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1898828196,
+      "version": 1,
+      "versionNonce": 1374569776,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "extends @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-edge-0",
+      "originalText": "extends @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-1-label",
+      "type": "text",
+      "x": 530.4,
+      "y": 677.0666666666666,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 94730081,
+      "version": 1,
+      "versionNonce": 1157657387,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "writes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-edge-1",
+      "originalText": "writes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-2-label",
+      "type": "text",
+      "x": 472,
+      "y": 512,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1452163806,
+      "version": 1,
+      "versionNonce": 960228610,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "writes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-edge-2",
+      "originalText": "writes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-3-label",
+      "type": "text",
+      "x": 432,
+      "y": 392,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1988599539,
+      "version": 1,
+      "versionNonce": 306730445,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "wraps @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-edge-3",
+      "originalText": "wraps @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-4-label",
+      "type": "text",
+      "x": 1137.6,
+      "y": 392,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 654881944,
+      "version": 1,
+      "versionNonce": 925467252,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "extends @conforms",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-edge-4",
+      "originalText": "extends @conforms",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-5-label",
+      "type": "text",
+      "x": 372,
+      "y": 152,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1926239589,
+      "version": 1,
+      "versionNonce": 1024869359,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "wraps @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-edge-5",
+      "originalText": "wraps @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "graph-and-digraph-adjacency-dicts-and-th-edge-6-label",
+      "type": "text",
+      "x": 412,
+      "y": 272,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1651954882,
+      "version": 1,
+      "versionNonce": 1989145142,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "graph-and-digraph-adjacency-dicts-and-th"
+      },
+      "text": "wraps @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "graph-and-digraph-adjacency-dicts-and-th-edge-6",
+      "originalText": "wraps @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

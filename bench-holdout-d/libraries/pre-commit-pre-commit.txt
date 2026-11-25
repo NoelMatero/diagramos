@@ -1,0 +1,13 @@
+# pre-commit-pre-commit: its dependencies and extras, resolved as of its pinned commit (2026-11-09), the way the main set's unlocked projects were:
+#   uv pip compile --all-extras setup.cfg --python-version 3.14 --exclude-newer 2026-11-09T21:42:11Z
+# (setup.cfg: pre-commit has no pyproject.toml; setup.cfg lists install_requires and no extras)
+cfgv==3.5.0
+distlib==0.4.4
+filelock==4.2.10
+identify==2.6.20
+nodeenv==1.12.0
+packaging==26.3
+platformdirs==4.14.5
+python-discovery==1.9.5
+pyyaml==6.0.3
+virtualenv==21.15.6

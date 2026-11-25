@@ -1,0 +1,1790 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "shortest-path-method-choice-and-path-con-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 660,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1299924022,
+      "version": 1,
+      "versionNonce": 537836442,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "role": "title"
+      },
+      "text": "shortest_path: method choice and path construction",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "shortest_path: method choice and path construction",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 40,
+      "width": 280,
+      "height": 200,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1708736537,
+      "version": 1,
+      "versionNonce": 1207517539,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-node-0-label"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "node": "dispatch",
+        "ref": "networkx/algorithms/shortest_paths/generic.py#shortest_path"
+      }
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-1",
+      "type": "rectangle",
+      "x": 820,
+      "y": 200,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 290223888,
+      "version": 1,
+      "versionNonce": 1610594284,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-node-1-label"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "node": "bfs_single",
+        "ref": "networkx/algorithms/shortest_paths/unweighted.py#single_source_shortest_path"
+      }
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-2",
+      "type": "rectangle",
+      "x": 1620,
+      "y": 200,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 840530495,
+      "version": 1,
+      "versionNonce": 1751333209,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-node-2-label"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "node": "bfs_levels",
+        "ref": "networkx/algorithms/shortest_paths/unweighted.py#_single_shortest_path"
+      }
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-3",
+      "type": "rectangle",
+      "x": 820,
+      "y": 380,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1310615470,
+      "version": 1,
+      "versionNonce": 970199762,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-node-3-label"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "node": "bfs_pair",
+        "ref": "networkx/algorithms/shortest_paths/unweighted.py#bidirectional_shortest_path"
+      }
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-4",
+      "type": "rectangle",
+      "x": 820,
+      "y": 900,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 902764965,
+      "version": 1,
+      "versionNonce": 1913673007,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-node-4-label"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "node": "dij_single",
+        "ref": "networkx/algorithms/shortest_paths/weighted.py#single_source_dijkstra_path"
+      }
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-5",
+      "type": "rectangle",
+      "x": 1620,
+      "y": 880,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 762875788,
+      "version": 1,
+      "versionNonce": 2085217880,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-node-5-label"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "node": "dij_heap",
+        "ref": "networkx/algorithms/shortest_paths/weighted.py#_dijkstra_multisource"
+      }
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-6",
+      "type": "rectangle",
+      "x": 820,
+      "y": 20,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 510468123,
+      "version": 1,
+      "versionNonce": 242751765,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-node-6-label"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "node": "dij_pair",
+        "ref": "networkx/algorithms/shortest_paths/weighted.py#bidirectional_dijkstra"
+      }
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-7",
+      "type": "rectangle",
+      "x": 820,
+      "y": 720,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1896132810,
+      "version": 1,
+      "versionNonce": 927782430,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-node-7-label"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "node": "bf_single",
+        "ref": "networkx/algorithms/shortest_paths/weighted.py#single_source_bellman_ford_path"
+      }
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-8",
+      "type": "rectangle",
+      "x": 820,
+      "y": 540,
+      "width": 200,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1725900161,
+      "version": 1,
+      "versionNonce": 1276867275,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-node-8-label"
+        },
+        {
+          "id": "shortest-path-method-choice-and-path-con-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "node": "bf_pair",
+        "ref": "networkx/algorithms/shortest_paths/weighted.py#bellman_ford_path"
+      }
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-0",
+      "type": "arrow",
+      "x": 292,
+      "y": 90.57142857142857,
+      "width": 520,
+      "height": 151.42857142857144,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 2121879758,
+      "version": 1,
+      "versionNonce": 996873330,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "edge": {
+          "from": "dispatch",
+          "to": "bfs_single",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          128,
+          0
+        ],
+        [
+          128,
+          151.42857142857144
+        ],
+        [
+          184.28571428571428,
+          151.42857142857144
+        ],
+        [
+          352.1428571428571,
+          151.42857142857144
+        ],
+        [
+          436.07142857142856,
+          151.42857142857144
+        ],
+        [
+          519.5,
+          151.42857142857144
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-0",
+        "focus": -0.4942857142857143,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-1",
+        "focus": 0.16000000000000011,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-1",
+      "type": "arrow",
+      "x": 292,
+      "y": 119.14285714285715,
+      "width": 520,
+      "height": 292.85714285714283,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1929995231,
+      "version": 1,
+      "versionNonce": 34577273,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "edge": {
+          "from": "dispatch",
+          "to": "bfs_pair",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          292.85714285714283
+        ],
+        [
+          113.57142857142861,
+          292.85714285714283
+        ],
+        [
+          215.17857142857144,
+          292.85714285714283
+        ],
+        [
+          316.78571428571433,
+          292.85714285714283
+        ],
+        [
+          519.5,
+          292.85714285714283
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-0",
+        "focus": -0.20857142857142832,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-3",
+        "focus": 0.2,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-2",
+      "type": "arrow",
+      "x": 292,
+      "y": 204.85714285714286,
+      "width": 520,
+      "height": 727.1428571428571,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1379688624,
+      "version": 1,
+      "versionNonce": 1340568076,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "edge": {
+          "from": "dispatch",
+          "to": "dij_single",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          591.5714285714286
+        ],
+        [
+          32,
+          727.1428571428571
+        ],
+        [
+          519.5,
+          727.1428571428571
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-0",
+        "focus": 0.6485714285714288,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-4",
+        "focus": 0.19999999999999998,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-3",
+      "type": "arrow",
+      "x": 292,
+      "y": 62,
+      "width": 520,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2053966649,
+      "version": 1,
+      "versionNonce": 1658648579,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "edge": {
+          "from": "dispatch",
+          "to": "dij_pair",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          260,
+          0
+        ],
+        [
+          519.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-0",
+        "focus": -0.78,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-6",
+        "focus": 0.16,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-4",
+      "type": "arrow",
+      "x": 292,
+      "y": 176.28571428571428,
+      "width": 520,
+      "height": 585.7142857142858,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1260667370,
+      "version": 1,
+      "versionNonce": 1996351166,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "edge": {
+          "from": "dispatch",
+          "to": "bf_single",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          496.85714285714283
+        ],
+        [
+          56,
+          585.7142857142858
+        ],
+        [
+          519.5,
+          585.7142857142858
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-0",
+        "focus": 0.3628571428571428,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-7",
+        "focus": 0.15999999999999986,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-5",
+      "type": "arrow",
+      "x": 292,
+      "y": 147.71428571428572,
+      "width": 520,
+      "height": 434.2857142857143,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 855698235,
+      "version": 1,
+      "versionNonce": 652306101,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "edge": {
+          "from": "dispatch",
+          "to": "bf_pair",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          397.14285714285717
+        ],
+        [
+          80,
+          434.2857142857143
+        ],
+        [
+          519.5,
+          434.2857142857143
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-0",
+        "focus": 0.07714285714285722,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-8",
+        "focus": 0.16,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-6",
+      "type": "arrow",
+      "x": 1132,
+      "y": 242,
+      "width": 482.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1852340524,
+      "version": 1,
+      "versionNonce": 1773614968,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "edge": {
+          "from": "bfs_single",
+          "to": "bfs_levels",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          241.20000000000005,
+          0
+        ],
+        [
+          481.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-1",
+        "focus": -0.16000000000000011,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-2",
+        "focus": 0.16,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-7",
+      "type": "arrow",
+      "x": 1132,
+      "y": 932,
+      "width": 482.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 269203525,
+      "version": 2,
+      "versionNonce": 1602070095,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "shortest-path-method-choice-and-path-con-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con",
+        "edge": {
+          "from": "dij_single",
+          "to": "dij_heap",
+          "claim": "calls"
+        },
+        "via": [
+          "multi_source_dijkstra_path",
+          "multi_source_dijkstra"
+        ]
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          241.20000000000005,
+          0
+        ],
+        [
+          481.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-4",
+        "focus": -0.19999999999999998,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "shortest-path-method-choice-and-path-con-node-5",
+        "focus": -0.03999999999999976,
+        "gap": 5.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-0-label",
+      "type": "text",
+      "x": 28,
+      "y": 90,
+      "width": 264,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1755131936,
+      "version": 1,
+      "versionNonce": 410561148,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "shortest_path: pick\nmethod (weight → BFS,\nelse Dijkstra / Bellman-\nFord)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-node-0",
+      "originalText": "shortest_path: pick method (weight → BFS, else Dijkstra / Bellman-Ford)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-1-label",
+      "type": "text",
+      "x": 853.5,
+      "y": 225,
+      "width": 253.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1487087597,
+      "version": 1,
+      "versionNonce": 1488629079,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "BFS from one source (no\nweights)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-node-1",
+      "originalText": "BFS from one source (no weights)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-2-label",
+      "type": "text",
+      "x": 1649,
+      "y": 225,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 307282890,
+      "version": 1,
+      "versionNonce": 571391774,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "BFS level sweep builds\npaths",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-node-2",
+      "originalText": "BFS level sweep builds paths",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-3-label",
+      "type": "text",
+      "x": 846.5,
+      "y": 407.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 436361679,
+      "version": 1,
+      "versionNonce": 1721257897,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "BFS source→target",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-node-3",
+      "originalText": "BFS source→target",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-4-label",
+      "type": "text",
+      "x": 848,
+      "y": 927.5,
+      "width": 264,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 201525900,
+      "version": 1,
+      "versionNonce": 1346996056,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "Dijkstra from one source",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-node-4",
+      "originalText": "Dijkstra from one source",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-5-label",
+      "type": "text",
+      "x": 1652.5,
+      "y": 905,
+      "width": 275,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 832841001,
+      "version": 1,
+      "versionNonce": 373040435,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "Dijkstra heap pass builds\npaths",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-node-5",
+      "originalText": "Dijkstra heap pass builds paths",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-6-label",
+      "type": "text",
+      "x": 849,
+      "y": 45,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1836992582,
+      "version": 1,
+      "versionNonce": 795637162,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "Bidirectional Dijkstra\nsource→target",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-node-6",
+      "originalText": "Bidirectional Dijkstra source→target",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-7-label",
+      "type": "text",
+      "x": 844.5,
+      "y": 745,
+      "width": 231.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1447688187,
+      "version": 1,
+      "versionNonce": 97754741,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "Bellman-Ford from one\nsource",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-node-7",
+      "originalText": "Bellman-Ford from one source",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-node-8-label",
+      "type": "text",
+      "x": 848.5,
+      "y": 565,
+      "width": 143,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 227171800,
+      "version": 1,
+      "versionNonce": 964730292,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "Bellman-Ford\nsource→target",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-node-8",
+      "originalText": "Bellman-Ford source→target",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-0-label",
+      "type": "text",
+      "x": 401.48571428571427,
+      "y": 232,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1709854959,
+      "version": 1,
+      "versionNonce": 729103689,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "unweighted @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-edge-0",
+      "originalText": "unweighted @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-1-label",
+      "type": "text",
+      "x": 304.3714285714286,
+      "y": 402,
+      "width": 202.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 57396714,
+      "version": 1,
+      "versionNonce": 262097598,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "unweighted, pair @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-edge-1",
+      "originalText": "unweighted, pair @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-2-label",
+      "type": "text",
+      "x": 258,
+      "y": 786.4285714285714,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 846508045,
+      "version": 1,
+      "versionNonce": 537787383,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "dijkstra @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-edge-2",
+      "originalText": "dijkstra @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-3-label",
+      "type": "text",
+      "x": 459.6,
+      "y": 52,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1770859072,
+      "version": 1,
+      "versionNonce": 1916836124,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "dijkstra, pair @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-edge-3",
+      "originalText": "dijkstra, pair @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-4-label",
+      "type": "text",
+      "x": 264.4,
+      "y": 663.1428571428571,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 919592731,
+      "version": 1,
+      "versionNonce": 1911211541,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "bellman-ford @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-edge-4",
+      "originalText": "bellman-ford @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-5-label",
+      "type": "text",
+      "x": 262,
+      "y": 534.8571428571429,
+      "width": 220.00000000000003,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1889881190,
+      "version": 1,
+      "versionNonce": 98013002,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "bellman-ford, pair @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-edge-5",
+      "originalText": "bellman-ford, pair @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-6-label",
+      "type": "text",
+      "x": 1346.8,
+      "y": 232,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1282938697,
+      "version": 1,
+      "versionNonce": 412431315,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "@calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-edge-6",
+      "originalText": "@calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "shortest-path-method-choice-and-path-con-edge-7-label",
+      "type": "text",
+      "x": 1272,
+      "y": 922,
+      "width": 202.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1676569900,
+      "version": 1,
+      "versionNonce": 1805013880,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "shortest-path-method-choice-and-path-con"
+      },
+      "text": "via multi-source @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "shortest-path-method-choice-and-path-con-edge-7",
+      "originalText": "via multi-source @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

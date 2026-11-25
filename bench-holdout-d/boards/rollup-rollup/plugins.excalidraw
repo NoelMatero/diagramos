@@ -1,0 +1,2219 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 594,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1016169823,
+      "version": 1,
+      "versionNonce": 1130125305,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "role": "title"
+      },
+      "text": "PluginDriver hook execution and PluginContext",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "PluginDriver hook execution and PluginContext",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-0",
+      "type": "rectangle",
+      "x": 1600,
+      "y": 300,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 609151266,
+      "version": 1,
+      "versionNonce": 652615190,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-node-0-label"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "node": "plugindriver",
+        "ref": "src/utils/PluginDriver.ts#PluginDriver"
+      }
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-1",
+      "type": "rectangle",
+      "x": 2400,
+      "y": 340,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1086020179,
+      "version": 1,
+      "versionNonce": 453339053,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-node-1-label"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "node": "plugincontext",
+        "ref": "src/utils/PluginContext.ts#getPluginContext"
+      }
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-2",
+      "type": "rectangle",
+      "x": 2400,
+      "y": 20,
+      "width": 260,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 230574628,
+      "version": 1,
+      "versionNonce": 1230763696,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-node-2-label"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "node": "sortedplugins",
+        "ref": "src/utils/PluginDriver.ts#getSortedValidatedPlugins"
+      }
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-3",
+      "type": "rectangle",
+      "x": 20,
+      "y": 20,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1985171645,
+      "version": 1,
+      "versionNonce": 174914727,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-node-3-label"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "node": "hookfirst",
+        "ref": "src/utils/PluginDriver.ts#hookFirstAndGetPlugin"
+      }
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-4",
+      "type": "rectangle",
+      "x": 80,
+      "y": 580,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 396699206,
+      "version": 1,
+      "versionNonce": 177991594,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-node-4-label"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "node": "hookfirstsync",
+        "ref": "src/utils/PluginDriver.ts#hookFirstSync"
+      }
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-5",
+      "type": "rectangle",
+      "x": 120,
+      "y": 400,
+      "width": 240,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 339463447,
+      "version": 1,
+      "versionNonce": 834645489,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-node-5-label"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "node": "hookreduce",
+        "ref": "src/utils/PluginDriver.ts#hookReduceArg0"
+      }
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-6",
+      "type": "rectangle",
+      "x": 80,
+      "y": 200,
+      "width": 280,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1936640488,
+      "version": 1,
+      "versionNonce": 366069700,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-node-6-label"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "node": "hookparallel",
+        "ref": "src/utils/PluginDriver.ts#hookParallel"
+      }
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-7",
+      "type": "rectangle",
+      "x": 780,
+      "y": 280,
+      "width": 320,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 466337937,
+      "version": 1,
+      "versionNonce": 2125913243,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-node-7-label"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "node": "runhook",
+        "ref": "src/utils/PluginDriver.ts#runHook"
+      }
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-8",
+      "type": "rectangle",
+      "x": 800,
+      "y": 580,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1710235034,
+      "version": 1,
+      "versionNonce": 1813868654,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-node-8-label"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "plugindriver-hook-execution-and-pluginco-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "node": "runhooksync",
+        "ref": "src/utils/PluginDriver.ts#runHookSync"
+      }
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-0",
+      "type": "arrow",
+      "x": 1932.8,
+      "y": 366.33333333333337,
+      "width": 464.8000000000004,
+      "height": 23.46666666666664,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 939752373,
+      "version": 1,
+      "versionNonce": 487036735,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "plugindriver",
+          "to": "plugincontext",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          23.46666666666664
+        ],
+        [
+          220.66666666666674,
+          23.46666666666664
+        ],
+        [
+          281.70000000000005,
+          23.46666666666664
+        ],
+        [
+          342.7333333333338,
+          23.46666666666664
+        ],
+        [
+          464.3000000000004,
+          23.46666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-0",
+        "focus": 0.3266666666666665,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-1",
+        "focus": 0.003999999999999254,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-1",
+      "type": "arrow",
+      "x": 1932.8,
+      "y": 333,
+      "width": 464.8000000000004,
+      "height": 203.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 588507548,
+      "version": 1,
+      "versionNonce": 198956456,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "plugindriver",
+          "to": "sortedplugins"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          83.55833333333362,
+          0
+        ],
+        [
+          167.11666666666702,
+          0
+        ],
+        [
+          334.2333333333338,
+          0
+        ],
+        [
+          404.8000000000004,
+          0
+        ],
+        [
+          404.8000000000004,
+          -203.66666666666669
+        ],
+        [
+          464.3000000000004,
+          -203.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-0",
+        "focus": -0.3399999999999998,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-2",
+        "focus": -0.5619047619047632,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-2",
+      "type": "arrow",
+      "x": 352,
+      "y": 78.66666666666666,
+      "width": 429.6,
+      "height": 224.33333333333334,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1409815915,
+      "version": 1,
+      "versionNonce": 290049125,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "hookfirst",
+          "to": "runhook",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          7.666666666666671
+        ],
+        [
+          319.29999999999995,
+          7.666666666666671
+        ],
+        [
+          321.6,
+          7.666666666666671
+        ],
+        [
+          321.6,
+          224.33333333333334
+        ],
+        [
+          429.1,
+          224.33333333333334
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-3",
+        "focus": 0.1733333333333332,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-7",
+        "focus": 0.6166666666666671,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-3",
+      "type": "arrow",
+      "x": 352,
+      "y": 45.33333333333333,
+      "width": 2045.6000000000004,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2146222042,
+      "version": 1,
+      "versionNonce": 625579950,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "hookfirst",
+          "to": "sortedplugins"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          1022.8000000000002,
+          0
+        ],
+        [
+          2045.1000000000004,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-3",
+        "focus": -0.49333333333333346,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-2",
+        "focus": 0.6380952380952368,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-4",
+      "type": "arrow",
+      "x": 352,
+      "y": 622,
+      "width": 439.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 781591913,
+      "version": 1,
+      "versionNonce": 1101396595,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "hookfirstsync",
+          "to": "runhooksync",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          219.79999999999995,
+          0
+        ],
+        [
+          439.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-4",
+        "focus": -0.16000000000000003,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-8",
+        "focus": 0.15999999999999862,
+        "gap": 8.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-5",
+      "type": "arrow",
+      "x": 352,
+      "y": 425.3333333333333,
+      "width": 429.6,
+      "height": 62.333333333333314,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1220805792,
+      "version": 1,
+      "versionNonce": 1972973564,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "hookreduce",
+          "to": "runhook",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          61.491666666666674,
+          0
+        ],
+        [
+          122.98333333333335,
+          0
+        ],
+        [
+          245.9666666666667,
+          0
+        ],
+        [
+          321.6,
+          0
+        ],
+        [
+          321.6,
+          -62.333333333333314
+        ],
+        [
+          429.1,
+          -62.333333333333314
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-5",
+        "focus": -0.4933333333333333,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-7",
+        "focus": -0.3833333333333336,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-6",
+      "type": "arrow",
+      "x": 352,
+      "y": 458.66666666666663,
+      "width": 2045.6000000000004,
+      "height": 396.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 697293199,
+      "version": 1,
+      "versionNonce": 617745001,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "hookreduce",
+          "to": "sortedplugins"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          39.4666666666667
+        ],
+        [
+          1132.8,
+          39.4666666666667
+        ],
+        [
+          1132.8,
+          -29.200000000000273
+        ],
+        [
+          1132.8,
+          -201.66666666666663
+        ],
+        [
+          1961.6000000000004,
+          -201.66666666666663
+        ],
+        [
+          1961.6000000000004,
+          -357.3333333333333
+        ],
+        [
+          2045.1000000000004,
+          -357.3333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-5",
+        "focus": 0.1733333333333317,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-2",
+        "focus": -0.16190476190476316,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-7",
+      "type": "arrow",
+      "x": 352,
+      "y": 272,
+      "width": 429.6,
+      "height": 61,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 520741950,
+      "version": 1,
+      "versionNonce": 1560874978,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "hookparallel",
+          "to": "runhook",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          61
+        ],
+        [
+          184.29999999999995,
+          61
+        ],
+        [
+          245.625,
+          61
+        ],
+        [
+          306.95000000000005,
+          61
+        ],
+        [
+          429.1,
+          61
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-6",
+        "focus": 0.2,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-7",
+        "focus": 0.11666666666666646,
+        "gap": 1.6000000000000227
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-8",
+      "type": "arrow",
+      "x": 352,
+      "y": 232,
+      "width": 2045.6000000000004,
+      "height": 158.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 633021693,
+      "version": 1,
+      "versionNonce": 111674599,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "hookparallel",
+          "to": "sortedplugins"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          275.5333333333333,
+          0
+        ],
+        [
+          551.0666666666667,
+          0
+        ],
+        [
+          1102.1333333333334,
+          0
+        ],
+        [
+          1937.6000000000004,
+          0
+        ],
+        [
+          1937.6000000000004,
+          -158.66666666666669
+        ],
+        [
+          2045.1000000000004,
+          -158.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-6",
+        "focus": -0.46666666666666656,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-2",
+        "focus": 0.2380952380952369,
+        "gap": 2.399999999999636
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-9",
+      "type": "arrow",
+      "x": 1101.6,
+      "y": 333,
+      "width": 491.20000000000005,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 708035172,
+      "version": 1,
+      "versionNonce": 1872085488,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "runhook",
+          "to": "plugindriver",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          245.5999999999999,
+          0
+        ],
+        [
+          490.70000000000005,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-7",
+        "focus": -0.11666666666666646,
+        "gap": 1.599999999999909
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-0",
+        "focus": 0.3399999999999997,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-10",
+      "type": "arrow",
+      "x": 1091.6,
+      "y": 622,
+      "width": 501.20000000000005,
+      "height": 255.66666666666663,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 962786042,
+      "version": 1,
+      "versionNonce": 1310498126,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "plugindriver-hook-execution-and-pluginco-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco",
+        "edge": {
+          "from": "runhooksync",
+          "to": "plugindriver",
+          "claim": "accesses"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          94.60833333333335,
+          0
+        ],
+        [
+          189.2166666666667,
+          0
+        ],
+        [
+          378.4333333333334,
+          0
+        ],
+        [
+          417.20000000000005,
+          0
+        ],
+        [
+          417.20000000000005,
+          -255.66666666666663
+        ],
+        [
+          500.70000000000005,
+          -255.66666666666663
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-8",
+        "focus": -0.16,
+        "gap": 8.400000000000091
+      },
+      "endBinding": {
+        "elementId": "plugindriver-hook-execution-and-pluginco-node-0",
+        "focus": -0.3266666666666666,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-0-label",
+      "type": "text",
+      "x": 1610.5,
+      "y": 325,
+      "width": 319,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 597773827,
+      "version": 1,
+      "versionNonce": 856897821,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "PluginDriver: one context per\nplugin",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-node-0",
+      "originalText": "PluginDriver: one context per plugin",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-1-label",
+      "type": "text",
+      "x": 2428,
+      "y": 365,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1544355758,
+      "version": 1,
+      "versionNonce": 678255314,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "getPluginContext: builds\neach plugin's context",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-node-1",
+      "originalText": "getPluginContext: builds each plugin's context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-2-label",
+      "type": "text",
+      "x": 2431,
+      "y": 65,
+      "width": 198.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1638761905,
+      "version": 1,
+      "versionNonce": 1629473083,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "Plugin order: pre,\nnormal, post",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-node-2",
+      "originalText": "Plugin order: pre, normal, post",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-3-label",
+      "type": "text",
+      "x": 25,
+      "y": 57.5,
+      "width": 330,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 161172340,
+      "version": 1,
+      "versionNonce": 2111665728,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "hookFirst: first non-null wins",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-node-3",
+      "originalText": "hookFirst: first non-null wins",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-4-label",
+      "type": "text",
+      "x": 109.99999999999999,
+      "y": 605,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 2008366775,
+      "version": 1,
+      "versionNonce": 1445738769,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "hookFirstSync: first\nnon-null wins, sync",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-node-4",
+      "originalText": "hookFirstSync: first non-null wins, sync",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-5-label",
+      "type": "text",
+      "x": 152,
+      "y": 425,
+      "width": 176,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 2134773778,
+      "version": 1,
+      "versionNonce": 1524572742,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "hookReduceArg0:\nsequential chain",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-node-5",
+      "originalText": "hookReduceArg0: sequential chain",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-6-label",
+      "type": "text",
+      "x": 109.99999999999999,
+      "y": 222.5,
+      "width": 220.00000000000003,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 578588213,
+      "version": 1,
+      "versionNonce": 966768319,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "hookParallel: run\ntogether, sequential\nplugins as barriers",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-node-6",
+      "originalText": "hookParallel: run together, sequential plugins as barriers",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-7-label",
+      "type": "text",
+      "x": 797,
+      "y": 315,
+      "width": 286,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 1891424232,
+      "version": 1,
+      "versionNonce": 1471271364,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "runHook: filter, then call\nwith plugin context",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-node-7",
+      "originalText": "runHook: filter, then call with plugin context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-node-8-label",
+      "type": "text",
+      "x": 829,
+      "y": 605,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 66580491,
+      "version": 1,
+      "versionNonce": 1742639493,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "runHookSync: call with\nplugin context",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-node-8",
+      "originalText": "runHookSync: call with plugin context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-0-label",
+      "type": "text",
+      "x": 2061.0666666666666,
+      "y": 379.8,
+      "width": 184.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1438855644,
+      "version": 1,
+      "versionNonce": 365648872,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "one per plugin @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-0",
+      "originalText": "one per plugin @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-1-label",
+      "type": "text",
+      "x": 2240.6333333333337,
+      "y": 323,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1867400633,
+      "version": 1,
+      "versionNonce": 1634471811,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "orders",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-1",
+      "originalText": "orders",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-2-label",
+      "type": "text",
+      "x": 596.5,
+      "y": 76.33333333333333,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 682031126,
+      "version": 1,
+      "versionNonce": 1171999226,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "per plugin @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-2",
+      "originalText": "per plugin @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-3-label",
+      "type": "text",
+      "x": 1322.0000000000002,
+      "y": 35.33333333333333,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1165984715,
+      "version": 1,
+      "versionNonce": 1305643333,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "plugin order",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-3",
+      "originalText": "plugin order",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-4-label",
+      "type": "text",
+      "x": 496.99999999999994,
+      "y": 612,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1211030320,
+      "version": 1,
+      "versionNonce": 2090748300,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "per plugin @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-4",
+      "originalText": "per plugin @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-5-label",
+      "type": "text",
+      "x": 523.1666666666667,
+      "y": 415.3333333333333,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1148640125,
+      "version": 1,
+      "versionNonce": 1747472487,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "per plugin @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-5",
+      "originalText": "per plugin @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-6-label",
+      "type": "text",
+      "x": 1432,
+      "y": 419.46666666666636,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 411801178,
+      "version": 1,
+      "versionNonce": 1733641006,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "plugin order",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-6",
+      "originalText": "plugin order",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-7-label",
+      "type": "text",
+      "x": 461.49999999999994,
+      "y": 323,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1122151711,
+      "version": 1,
+      "versionNonce": 1964843449,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "per plugin @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-7",
+      "originalText": "per plugin @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-8-label",
+      "type": "text",
+      "x": 1401.3333333333335,
+      "y": 222,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1786675764,
+      "version": 1,
+      "versionNonce": 1091662848,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "plugin order",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-8",
+      "originalText": "plugin order",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-9-label",
+      "type": "text",
+      "x": 1241.6,
+      "y": 323,
+      "width": 211.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 15946865,
+      "version": 1,
+      "versionNonce": 1119376891,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "pluginContexts @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-9",
+      "originalText": "pluginContexts @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "plugindriver-hook-execution-and-pluginco-edge-10-label",
+      "type": "text",
+      "x": 1364.4333333333334,
+      "y": 612,
+      "width": 211.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1532351083,
+      "version": 1,
+      "versionNonce": 279597925,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "plugindriver-hook-execution-and-pluginco"
+      },
+      "text": "pluginContexts @accesses",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "plugindriver-hook-execution-and-pluginco-edge-10",
+      "originalText": "pluginContexts @accesses",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

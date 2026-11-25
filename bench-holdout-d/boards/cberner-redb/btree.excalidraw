@@ -1,0 +1,1924 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 620.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 698293196,
+      "version": 1,
+      "versionNonce": 1776715928,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "role": "title"
+      },
+      "text": "BtreeMut insert and remove through MutateHelper",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "BtreeMut insert and remove through MutateHelper",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 320,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#d0ebff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1882732539,
+      "version": 1,
+      "versionNonce": 1474453109,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-node-0-label"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "node": "btree-insert",
+        "ref": "src/tree_store/btree.rs#insert"
+      }
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-1",
+      "type": "rectangle",
+      "x": 20,
+      "y": 160,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#d0ebff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1120913578,
+      "version": 1,
+      "versionNonce": 12000126,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-node-1-label"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "node": "btree-remove",
+        "ref": "src/tree_store/btree.rs#remove"
+      }
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-2",
+      "type": "rectangle",
+      "x": 640,
+      "y": 280,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3bf",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1337711365,
+      "version": 1,
+      "versionNonce": 1681783311,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-node-2-label"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "node": "mutate-helper",
+        "ref": "src/tree_store/btree_mutator.rs#MutateHelper"
+      }
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-3",
+      "type": "rectangle",
+      "x": 1400,
+      "y": 20,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3bf",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 731891180,
+      "version": 1,
+      "versionNonce": 1853431352,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-node-3-label"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "node": "insert-helper",
+        "ref": "src/tree_store/btree_mutator.rs#insert_helper"
+      }
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-4",
+      "type": "rectangle",
+      "x": 2120,
+      "y": 20,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#eebefa",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 851122591,
+      "version": 1,
+      "versionNonce": 114290489,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-node-4-label"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "node": "leaf-split",
+        "ref": "src/tree_store/btree_base.rs#leaf_split_required"
+      }
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-5",
+      "type": "rectangle",
+      "x": 1380,
+      "y": 300,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3bf",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1982125966,
+      "version": 1,
+      "versionNonce": 800556082,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-node-5-label"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "node": "delete-helper",
+        "ref": "src/tree_store/btree_mutator.rs#delete_helper"
+      }
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-6",
+      "type": "rectangle",
+      "x": 2120,
+      "y": 200,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3bf",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 191186681,
+      "version": 1,
+      "versionNonce": 57075139,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-node-6-label"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "node": "plan-leaf-delete",
+        "ref": "src/tree_store/btree_mutator.rs#plan_leaf_delete"
+      }
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-7",
+      "type": "rectangle",
+      "x": 2860,
+      "y": 120,
+      "width": 360,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#eebefa",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 300815984,
+      "version": 1,
+      "versionNonce": 1378704588,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-node-7-label"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "node": "merge-threshold",
+        "ref": "src/tree_store/btree_base.rs#leaf_below_merge_threshold"
+      }
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-8",
+      "type": "rectangle",
+      "x": 2860,
+      "y": 300,
+      "width": 360,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff3bf",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1580808931,
+      "version": 1,
+      "versionNonce": 1677619581,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-node-8-label"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "btreemut-insert-and-remove-through-mutat-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "node": "sibling-merge",
+        "ref": "src/tree_store/btree_mutator.rs#apply_child_deletion_result"
+      }
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-0",
+      "type": "arrow",
+      "x": 252,
+      "y": 355.33333333333337,
+      "width": 394.4,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1200412940,
+      "version": 1,
+      "versionNonce": 171547352,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "edge": {
+          "from": "btree-insert",
+          "to": "mutate-helper",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          197.2,
+          0
+        ],
+        [
+          393.9,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-0",
+        "focus": -0.11666666666666552,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-2",
+        "focus": -0.506666666666668,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-1",
+      "type": "arrow",
+      "x": 252,
+      "y": 195.33333333333334,
+      "width": 394.4,
+      "height": 126.66666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1340302117,
+      "version": 1,
+      "versionNonce": 2479,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "edge": {
+          "from": "btree-remove",
+          "to": "mutate-helper"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          65.13333333333333,
+          0
+        ],
+        [
+          130.26666666666665,
+          0
+        ],
+        [
+          260.5333333333333,
+          0
+        ],
+        [
+          286.4,
+          0
+        ],
+        [
+          286.4,
+          126.66666666666666
+        ],
+        [
+          393.9,
+          126.66666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-1",
+        "focus": -0.11666666666666665,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-2",
+        "focus": 0.15999999999999964,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-2",
+      "type": "arrow",
+      "x": 986.4,
+      "y": 322,
+      "width": 404.4000000000002,
+      "height": 260,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 186186314,
+      "version": 1,
+      "versionNonce": 1161595550,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "edge": {
+          "from": "mutate-helper",
+          "to": "insert-helper",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -260
+        ],
+        [
+          72.20000000000016,
+          -260
+        ],
+        [
+          155.2500000000001,
+          -260
+        ],
+        [
+          238.3000000000003,
+          -260
+        ],
+        [
+          403.9000000000002,
+          -260
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-2",
+        "focus": -0.16000000000000025,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-3",
+        "focus": 0.15999999999999948,
+        "gap": 9.199999999999818
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-3",
+      "type": "arrow",
+      "x": 1710.8000000000002,
+      "y": 62,
+      "width": 404.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 948005275,
+      "version": 1,
+      "versionNonce": 476564885,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "edge": {
+          "from": "insert-helper",
+          "to": "leaf-split",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          202.20000000000005,
+          0
+        ],
+        [
+          403.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-3",
+        "focus": -0.15999999999999948,
+        "gap": 9.199999999999818
+      },
+      "endBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-4",
+        "focus": 0.1600000000000006,
+        "gap": 4.799999999999727
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-4",
+      "type": "arrow",
+      "x": 986.4,
+      "y": 355.33333333333337,
+      "width": 394.4000000000002,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 727761040,
+      "version": 1,
+      "versionNonce": 1844407404,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "edge": {
+          "from": "mutate-helper",
+          "to": "delete-helper"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          197.20000000000016,
+          0
+        ],
+        [
+          393.9000000000002,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-2",
+        "focus": 0.5066666666666673,
+        "gap": 6.399999999999977
+      },
+      "endBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-5",
+        "focus": -0.10666666666666721,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-5",
+      "type": "arrow",
+      "x": 1720.8000000000002,
+      "y": 338.6666666666667,
+      "width": 394.4000000000001,
+      "height": 96.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 2146273689,
+      "version": 1,
+      "versionNonce": 1441330659,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "edge": {
+          "from": "delete-helper",
+          "to": "plan-leaf-delete"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -96.66666666666669
+        ],
+        [
+          148.8666666666668,
+          -96.66666666666669
+        ],
+        [
+          210.25,
+          -96.66666666666669
+        ],
+        [
+          271.63333333333344,
+          -96.66666666666669
+        ],
+        [
+          393.9000000000001,
+          -96.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-5",
+        "focus": -0.2266666666666665,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-6",
+        "focus": 0.15999999999999903,
+        "gap": 4.799999999999727
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-6",
+      "type": "arrow",
+      "x": 1720.8000000000002,
+      "y": 372,
+      "width": 1137.6,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1748152622,
+      "version": 1,
+      "versionNonce": 1204012882,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "edge": {
+          "from": "delete-helper",
+          "to": "sibling-merge"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          568.8000000000002,
+          0
+        ],
+        [
+          1137.1,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-5",
+        "focus": 0.4399999999999998,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-8",
+        "focus": -0.4399999999999991,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-7",
+      "type": "arrow",
+      "x": 2455.2000000000003,
+      "y": 225.33333333333331,
+      "width": 403.1999999999998,
+      "height": 49.99999999999997,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1278067647,
+      "version": 1,
+      "versionNonce": 1985146329,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "edge": {
+          "from": "plan-leaf-delete",
+          "to": "merge-threshold",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -49.99999999999997
+        ],
+        [
+          176.5999999999999,
+          -49.99999999999997
+        ],
+        [
+          233.25,
+          -49.99999999999997
+        ],
+        [
+          289.9000000000001,
+          -49.99999999999997
+        ],
+        [
+          402.6999999999998,
+          -49.99999999999997
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-6",
+        "focus": -0.493333333333334,
+        "gap": 4.799999999999727
+      },
+      "endBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-7",
+        "focus": -0.10666666666666573,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-8",
+      "type": "arrow",
+      "x": 2455.2000000000003,
+      "y": 258.66666666666663,
+      "width": 403.1999999999998,
+      "height": 80.00000000000006,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 24423124,
+      "version": 1,
+      "versionNonce": 1608600352,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "btreemut-insert-and-remove-through-mutat-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat",
+        "edge": {
+          "from": "plan-leaf-delete",
+          "to": "sibling-merge"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          120.79999999999973,
+          0
+        ],
+        [
+          181.19999999999982,
+          0
+        ],
+        [
+          241.5999999999999,
+          0
+        ],
+        [
+          295.1999999999998,
+          0
+        ],
+        [
+          295.1999999999998,
+          80.00000000000006
+        ],
+        [
+          402.6999999999998,
+          80.00000000000006
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-6",
+        "focus": 0.17333333333333345,
+        "gap": 4.799999999999727
+      },
+      "endBinding": {
+        "elementId": "btreemut-insert-and-remove-through-mutat-node-8",
+        "focus": 0.2266666666666676,
+        "gap": 1.599999999999909
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-0-label",
+      "type": "text",
+      "x": 52,
+      "y": 347.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1227065254,
+      "version": 1,
+      "versionNonce": 386430090,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "BtreeMut::insert",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-node-0",
+      "originalText": "BtreeMut::insert",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-1-label",
+      "type": "text",
+      "x": 52,
+      "y": 187.5,
+      "width": 176,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 376141915,
+      "version": 1,
+      "versionNonce": 169420629,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "BtreeMut::remove",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-node-1",
+      "originalText": "BtreeMut::remove",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-2-label",
+      "type": "text",
+      "x": 672.5,
+      "y": 305,
+      "width": 275,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1936320876,
+      "version": 1,
+      "versionNonce": 1907294392,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "MutateHelper: edits pages\nunder root",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-node-2",
+      "originalText": "MutateHelper: edits pages under root",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-3-label",
+      "type": "text",
+      "x": 1433.5,
+      "y": 45,
+      "width": 253.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 946680457,
+      "version": 1,
+      "versionNonce": 906070803,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "insert_helper: descend,\ninsert into leaf",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-node-3",
+      "originalText": "insert_helper: descend, insert into leaf",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-4-label",
+      "type": "text",
+      "x": 2150,
+      "y": 45,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 2013169962,
+      "version": 1,
+      "versionNonce": 961553662,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "leaf_split_required:\nsplit decision",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-node-4",
+      "originalText": "leaf_split_required: split decision",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-5-label",
+      "type": "text",
+      "x": 1385,
+      "y": 325,
+      "width": 330,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 2063423023,
+      "version": 1,
+      "versionNonce": 833879945,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "delete_helper: descend by node\ntype",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-node-5",
+      "originalText": "delete_helper: descend by node type",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-6-label",
+      "type": "text",
+      "x": 2152.5,
+      "y": 225,
+      "width": 275,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 2030506880,
+      "version": 1,
+      "versionNonce": 572283740,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "plan_leaf_delete: delete,\nmerge or rebuild",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-node-6",
+      "originalText": "plan_leaf_delete: delete, merge or rebuild",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-7-label",
+      "type": "text",
+      "x": 2891.5,
+      "y": 145,
+      "width": 297,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 885497165,
+      "version": 1,
+      "versionNonce": 1973937463,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "leaf_below_merge_threshold:\nsparse test",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-node-7",
+      "originalText": "leaf_below_merge_threshold: sparse test",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-node-8-label",
+      "type": "text",
+      "x": 2886,
+      "y": 325,
+      "width": 308,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1624029822,
+      "version": 1,
+      "versionNonce": 541402146,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "apply_child_deletion_result:\nmerge with sibling",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-node-8",
+      "originalText": "apply_child_deletion_result: merge with sibling",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-0-label",
+      "type": "text",
+      "x": 392,
+      "y": 345.33333333333337,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 164242089,
+      "version": 1,
+      "versionNonce": 1510618547,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "insert @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-edge-0",
+      "originalText": "insert @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-1-label",
+      "type": "text",
+      "x": 486.1333333333333,
+      "y": 185.33333333333334,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1680410636,
+      "version": 1,
+      "versionNonce": 337090520,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "delete",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-edge-1",
+      "originalText": "delete",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-2-label",
+      "type": "text",
+      "x": 1001.4000000000001,
+      "y": 52,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 779089275,
+      "version": 1,
+      "versionNonce": 1235332853,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "insert @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-edge-2",
+      "originalText": "insert @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-3-label",
+      "type": "text",
+      "x": 1855.8000000000002,
+      "y": 52,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1168393670,
+      "version": 1,
+      "versionNonce": 1933215274,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "split? @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-edge-3",
+      "originalText": "split? @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-4-label",
+      "type": "text",
+      "x": 1139.6000000000001,
+      "y": 345.33333333333337,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 818488685,
+      "version": 1,
+      "versionNonce": 478723543,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "delete_key",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-edge-4",
+      "originalText": "delete_key",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-5-label",
+      "type": "text",
+      "x": 1852.066666666667,
+      "y": 232,
+      "width": 35.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1086533024,
+      "version": 1,
+      "versionNonce": 1548139260,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "leaf",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-edge-5",
+      "originalText": "leaf",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-6-label",
+      "type": "text",
+      "x": 2263.2000000000003,
+      "y": 362,
+      "width": 52.800000000000004,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1915246415,
+      "version": 1,
+      "versionNonce": 711352361,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "branch",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-edge-6",
+      "originalText": "branch",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-7-label",
+      "type": "text",
+      "x": 2570.2000000000003,
+      "y": 165.33333333333334,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1786167626,
+      "version": 1,
+      "versionNonce": 1708969886,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "sparse? @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-edge-7",
+      "originalText": "sparse? @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "btreemut-insert-and-remove-through-mutat-edge-8-label",
+      "type": "text",
+      "x": 2674.8,
+      "y": 248.66666666666663,
+      "width": 44,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1681098273,
+      "version": 1,
+      "versionNonce": 803797739,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "btreemut-insert-and-remove-through-mutat"
+      },
+      "text": "merge",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "btreemut-insert-and-remove-through-mutat-edge-8",
+      "originalText": "merge",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

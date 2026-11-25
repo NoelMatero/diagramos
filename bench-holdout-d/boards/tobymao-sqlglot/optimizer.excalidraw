@@ -1,0 +1,2421 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "how-optimize-runs-its-rules-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 356.40000000000003,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 899939701,
+      "version": 1,
+      "versionNonce": 507132159,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "role": "title"
+      },
+      "text": "How optimize runs its rules",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "How optimize runs its rules",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 260,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1931036572,
+      "version": 1,
+      "versionNonce": 72273832,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-0-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "expression",
+        "ref": "sqlglot/expressions/core.py#Expr"
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-1",
+      "type": "rectangle",
+      "x": 20,
+      "y": 80,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 134797749,
+      "version": 1,
+      "versionNonce": 360354111,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-1-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "schema",
+        "ref": "sqlglot/schema.py#Schema"
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-2",
+      "type": "rectangle",
+      "x": 720,
+      "y": 40,
+      "width": 320,
+      "height": 280,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 1341267418,
+      "version": 1,
+      "versionNonce": 498897326,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-2-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "optimize",
+        "ref": "sqlglot/optimizer/optimizer.py#optimize"
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-3",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 1200,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 604861291,
+      "version": 1,
+      "versionNonce": 163366501,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-3-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "qualify",
+        "ref": "sqlglot/optimizer/qualify.py#qualify"
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-4",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 1380,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 415851168,
+      "version": 1,
+      "versionNonce": 1846290940,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-4-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "pushdown_projections",
+        "ref": "sqlglot/optimizer/pushdown_projections.py#pushdown_projections"
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-5",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 20,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 2124120937,
+      "version": 1,
+      "versionNonce": 974713971,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-5-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "normalize",
+        "ref": "sqlglot/optimizer/normalize.py#normalize",
+        "refs": [
+          "sqlglot/optimizer/normalize.py#normalize",
+          "sqlglot/optimizer/unnest_subqueries.py#unnest_subqueries"
+        ]
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-6",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 360,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1863270974,
+      "version": 1,
+      "versionNonce": 1434192354,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-6-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "pushdown_predicates",
+        "ref": "sqlglot/optimizer/pushdown_predicates.py#pushdown_predicates",
+        "refs": [
+          "sqlglot/optimizer/pushdown_predicates.py#pushdown_predicates",
+          "sqlglot/optimizer/optimize_joins.py#optimize_joins"
+        ]
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-7",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 860,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 2039822223,
+      "version": 1,
+      "versionNonce": 491062377,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-7-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "rewrites",
+        "ref": "sqlglot/optimizer/merge_subqueries.py#merge_subqueries",
+        "refs": [
+          "sqlglot/optimizer/eliminate_subqueries.py#eliminate_subqueries",
+          "sqlglot/optimizer/merge_subqueries.py#merge_subqueries",
+          "sqlglot/optimizer/eliminate_joins.py#eliminate_joins",
+          "sqlglot/optimizer/eliminate_ctes.py#eliminate_ctes"
+        ]
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-8",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 1040,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 2050564196,
+      "version": 1,
+      "versionNonce": 1745402864,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-8-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "quote",
+        "ref": "sqlglot/optimizer/qualify_columns.py#quote_identifiers"
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-9",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 700,
+      "width": 220,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1975550717,
+      "version": 1,
+      "versionNonce": 2132475623,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-9-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "annotate",
+        "ref": "sqlglot/optimizer/annotate_types.py#annotate_types"
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-10",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 200,
+      "width": 180,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 808065817,
+      "version": 1,
+      "versionNonce": 1161953891,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-10-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "canonicalize",
+        "ref": "sqlglot/optimizer/canonicalize.py#canonicalize"
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-11",
+      "type": "rectangle",
+      "x": 1520,
+      "y": 540,
+      "width": 160,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1537036816,
+      "version": 1,
+      "versionNonce": 1565030636,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-node-11-label"
+        },
+        {
+          "id": "how-optimize-runs-its-rules-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "node": "simplify",
+        "ref": "sqlglot/optimizer/simplify.py#simplify"
+      }
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-0",
+      "type": "arrow",
+      "x": 332,
+      "y": 297.3333333333333,
+      "width": 394.4,
+      "height": 76.66666666666666,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 636750931,
+      "version": 1,
+      "versionNonce": 1933942189,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "expression",
+          "to": "optimize",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          58.883333333333326,
+          0
+        ],
+        [
+          117.76666666666665,
+          0
+        ],
+        [
+          235.5333333333333,
+          0
+        ],
+        [
+          286.4,
+          0
+        ],
+        [
+          286.4,
+          -76.66666666666666
+        ],
+        [
+          393.9,
+          -76.66666666666666
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-0",
+        "focus": -0.06666666666666789,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": -0.2904761904761905,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-1",
+      "type": "arrow",
+      "x": 332,
+      "y": 127.33333333333333,
+      "width": 394.4,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 159882018,
+      "version": 1,
+      "versionNonce": 2133218326,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "schema",
+          "to": "optimize",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          197.20000000000005,
+          0
+        ],
+        [
+          393.9,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-1",
+        "focus": -0.05333333333333333,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": 0.37619047619047646,
+        "gap": 6.399999999999977
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-2",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 258,
+      "width": 468.79999999999995,
+      "height": 984,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1535902397,
+      "version": 1,
+      "versionNonce": 1655517863,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "optimize",
+          "to": "qualify",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          670.4
+        ],
+        [
+          56,
+          984
+        ],
+        [
+          468.29999999999995,
+          984
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": 0.557142857142857,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-3",
+        "focus": 0.15999999999999562,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-3",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 286,
+      "width": 468.79999999999995,
+      "height": 1126,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1928789028,
+      "version": 1,
+      "versionNonce": 563883184,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "optimize",
+          "to": "pushdown_projections",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          765.4000000000001
+        ],
+        [
+          32,
+          1126
+        ],
+        [
+          468.29999999999995,
+          1126
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": 0.7571428571428569,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-4",
+        "focus": 0.19999999999999848,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-4",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 62,
+      "width": 468.79999999999995,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 2037677847,
+      "version": 1,
+      "versionNonce": 167764977,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "optimize",
+          "to": "normalize",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          234.4000000000001,
+          0
+        ],
+        [
+          468.29999999999995,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": -0.842857142857143,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-5",
+        "focus": 0.15999999999999912,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-5",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 118,
+      "width": 468.79999999999995,
+      "height": 284,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 2094913606,
+      "version": 1,
+      "versionNonce": 1658594730,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "optimize",
+          "to": "pushdown_predicates",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          176,
+          0
+        ],
+        [
+          176,
+          200.39999999999998
+        ],
+        [
+          176,
+          284
+        ],
+        [
+          468.29999999999995,
+          284
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": -0.44285714285714295,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-6",
+        "focus": 0.15999999999999956,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-6",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 202,
+      "width": 468.79999999999995,
+      "height": 700,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 17068689,
+      "version": 1,
+      "versionNonce": 1459032731,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "optimize",
+          "to": "rewrites",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          480.4
+        ],
+        [
+          104,
+          700
+        ],
+        [
+          468.29999999999995,
+          700
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": 0.15714285714285706,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-7",
+        "focus": 0.15999999999999903,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-7",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 230,
+      "width": 468.79999999999995,
+      "height": 842,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 1487371240,
+      "version": 1,
+      "versionNonce": 1846672836,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "optimize",
+          "to": "quote",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          575.4
+        ],
+        [
+          80,
+          842
+        ],
+        [
+          468.29999999999995,
+          842
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": 0.357142857142857,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-8",
+        "focus": 0.2,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-8",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 174,
+      "width": 468.79999999999995,
+      "height": 558,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 206686507,
+      "version": 1,
+      "versionNonce": 1833995557,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "optimize",
+          "to": "annotate",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          128,
+          0
+        ],
+        [
+          128,
+          385.4
+        ],
+        [
+          128,
+          558
+        ],
+        [
+          468.29999999999995,
+          558
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": -0.042857142857142976,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-9",
+        "focus": 0.2,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-9",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 90,
+      "width": 468.79999999999995,
+      "height": 142,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1260965786,
+      "version": 1,
+      "versionNonce": 1146988142,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "optimize",
+          "to": "canonicalize",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          200,
+          0
+        ],
+        [
+          200,
+          105.39999999999998
+        ],
+        [
+          200,
+          142
+        ],
+        [
+          468.29999999999995,
+          142
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": -0.6428571428571429,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-10",
+        "focus": 0.19999999999999998,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-10",
+      "type": "arrow",
+      "x": 1046.4,
+      "y": 146,
+      "width": 468.79999999999995,
+      "height": 426,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1168063932,
+      "version": 1,
+      "versionNonce": 1295048520,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "how-optimize-runs-its-rules-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules",
+        "edge": {
+          "from": "optimize",
+          "to": "simplify",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          152,
+          295.4
+        ],
+        [
+          152,
+          426
+        ],
+        [
+          468.29999999999995,
+          426
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-2",
+        "focus": -0.24285714285714294,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "how-optimize-runs-its-rules-node-11",
+        "focus": 0.2,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-0-label",
+      "type": "text",
+      "x": 53.499999999999986,
+      "y": 287.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 674804665,
+      "version": 1,
+      "versionNonce": 2054633859,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "Input expression (Expr)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-0",
+      "originalText": "Input expression (Expr)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-1-label",
+      "type": "text",
+      "x": 48,
+      "y": 105,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 246259676,
+      "version": 1,
+      "versionNonce": 785810920,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "Schema: table and column\ntypes",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-1",
+      "originalText": "Schema: table and column types",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-2-label",
+      "type": "text",
+      "x": 753.5,
+      "y": 155,
+      "width": 253.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 2120872395,
+      "version": 1,
+      "versionNonce": 1725805381,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "optimize: runs RULES in\norder",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-2",
+      "originalText": "optimize: runs RULES in order",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-3-label",
+      "type": "text",
+      "x": 1531.5,
+      "y": 1225,
+      "width": 297,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1636918806,
+      "version": 1,
+      "versionNonce": 1592161274,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "qualify: resolve tables and\ncolumns",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-3",
+      "originalText": "qualify: resolve tables and columns",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-4-label",
+      "type": "text",
+      "x": 1550,
+      "y": 1407.5,
+      "width": 220.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2103527805,
+      "version": 1,
+      "versionNonce": 20150887,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "pushdown projections",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-4",
+      "originalText": "pushdown projections",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-5-label",
+      "type": "text",
+      "x": 1550,
+      "y": 45,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 18434352,
+      "version": 1,
+      "versionNonce": 363426700,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "normalize and unnest\nsubqueries",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-5",
+      "originalText": "normalize and unnest subqueries",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-6-label",
+      "type": "text",
+      "x": 1553.5,
+      "y": 385,
+      "width": 253.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 2077039391,
+      "version": 1,
+      "versionNonce": 237521849,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "pushdown predicates and\noptimize joins",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-6",
+      "originalText": "pushdown predicates and optimize joins",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-7-label",
+      "type": "text",
+      "x": 1530.5,
+      "y": 885,
+      "width": 319,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1366688858,
+      "version": 1,
+      "versionNonce": 6319406,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "rewrite subqueries, joins and\nCTEs",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-7",
+      "originalText": "rewrite subqueries, joins and CTEs",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-8-label",
+      "type": "text",
+      "x": 1546.5,
+      "y": 1067.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 970834545,
+      "version": 1,
+      "versionNonce": 1539538939,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "quote identifiers",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-8",
+      "originalText": "quote identifiers",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-9-label",
+      "type": "text",
+      "x": 1553,
+      "y": 727.5,
+      "width": 154,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 594079796,
+      "version": 1,
+      "versionNonce": 1511824896,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "annotate types",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-9",
+      "originalText": "annotate types",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-10-label",
+      "type": "text",
+      "x": 1544,
+      "y": 227.5,
+      "width": 132,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1804546848,
+      "version": 1,
+      "versionNonce": 997417852,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "canonicalize",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-10",
+      "originalText": "canonicalize",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-node-11-label",
+      "type": "text",
+      "x": 1556,
+      "y": 567.5,
+      "width": 88,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1536502509,
+      "version": 1,
+      "versionNonce": 2075485783,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "simplify",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-node-11",
+      "originalText": "simplify",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-0-label",
+      "type": "text",
+      "x": 514.7333333333333,
+      "y": 287.3333333333333,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 502276526,
+      "version": 1,
+      "versionNonce": 1627119826,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "input @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-0",
+      "originalText": "input @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-1-label",
+      "type": "text",
+      "x": 472.00000000000006,
+      "y": 117.33333333333333,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1703178243,
+      "version": 1,
+      "versionNonce": 1805762333,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "schema @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-1",
+      "originalText": "schema @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-2-label",
+      "type": "text",
+      "x": 1067.2,
+      "y": 918.4,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1266576756,
+      "version": 1,
+      "versionNonce": 913046592,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "1 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-2",
+      "originalText": "1 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-3-label",
+      "type": "text",
+      "x": 1043.2,
+      "y": 1041.4,
+      "width": 70.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 596682673,
+      "version": 1,
+      "versionNonce": 430853947,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "2 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-3",
+      "originalText": "2 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-4-label",
+      "type": "text",
+      "x": 1236.8000000000002,
+      "y": 52,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1092694546,
+      "version": 1,
+      "versionNonce": 325953606,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "3-4 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-4",
+      "originalText": "3-4 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-5-label",
+      "type": "text",
+      "x": 1178.4,
+      "y": 308.4,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 966287543,
+      "version": 1,
+      "versionNonce": 247119633,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "5-6 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-5",
+      "originalText": "5-6 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-6-label",
+      "type": "text",
+      "x": 1102,
+      "y": 672.4,
+      "width": 96.80000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 849345000,
+      "version": 1,
+      "versionNonce": 272652228,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "7-10 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-6",
+      "originalText": "7-10 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-7-label",
+      "type": "text",
+      "x": 1086.8000000000002,
+      "y": 795.4,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1683992629,
+      "version": 1,
+      "versionNonce": 1915632831,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "11 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-7",
+      "originalText": "11 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-8-label",
+      "type": "text",
+      "x": 1134.8000000000002,
+      "y": 549.4,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 1693648470,
+      "version": 1,
+      "versionNonce": 224136506,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "12 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-8",
+      "originalText": "12 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-9-label",
+      "type": "text",
+      "x": 1206.8000000000002,
+      "y": 185.39999999999998,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1171984907,
+      "version": 1,
+      "versionNonce": 544020357,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "13 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-9",
+      "originalText": "13 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "how-optimize-runs-its-rules-edge-10-label",
+      "type": "text",
+      "x": 1158.8000000000002,
+      "y": 431.4,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 1903395545,
+      "version": 1,
+      "versionNonce": 1271893027,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "how-optimize-runs-its-rules"
+      },
+      "text": "14 @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "how-optimize-runs-its-rules-edge-10",
+      "originalText": "14 @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

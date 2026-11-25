@@ -1,0 +1,2116 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "undo-redo-history-record-merge-undo-and--title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 620.4000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 1659013640,
+      "version": 1,
+      "versionNonce": 1762186596,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "role": "title"
+      },
+      "text": "Undo/redo history: record, merge, undo and redo",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Undo/redo history: record, merge, undo and redo",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 560,
+      "width": 320,
+      "height": 180,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1008483159,
+      "version": 1,
+      "versionNonce": 1258213169,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--node-0-label"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-5",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "node": "entry",
+        "ref": "packages/lexical-history/src/index.ts#registerHistory"
+      }
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-1",
+      "type": "rectangle",
+      "x": 800,
+      "y": 20,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1849626246,
+      "version": 1,
+      "versionNonce": 984277226,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--node-1-label"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "node": "merge",
+        "ref": "packages/lexical-history/src/index.ts#createMergeActionGetter"
+      }
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-2",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 20,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 710900177,
+      "version": 1,
+      "versionNonce": 826454747,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--node-2-label"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "node": "change",
+        "ref": "packages/lexical-history/src/index.ts#getChangeType"
+      }
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-3",
+      "type": "rectangle",
+      "x": 780,
+      "y": 300,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 458176552,
+      "version": 1,
+      "versionNonce": 1255774724,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--node-3-label"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "node": "undoEntry",
+        "ref": "packages/lexical-history/src/index.ts#getUndoEntry"
+      }
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-4",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 660,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 1330582419,
+      "version": 1,
+      "versionNonce": 877009901,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--node-4-label"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "node": "inverse",
+        "ref": "packages/lexical-history/src/index.ts#getInverseEntry"
+      }
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-5",
+      "type": "rectangle",
+      "x": 1580,
+      "y": 420,
+      "width": 300,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 2062181474,
+      "version": 1,
+      "versionNonce": 1417324118,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--node-5-label"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-9",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "node": "state",
+        "ref": "packages/lexical-history/src/index.ts#HistoryState"
+      }
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-6",
+      "type": "rectangle",
+      "x": 800,
+      "y": 480,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 866157565,
+      "version": 1,
+      "versionNonce": 1723634151,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--node-6-label"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "node": "undo",
+        "ref": "packages/lexical-history/src/index.ts#undo"
+      }
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-7",
+      "type": "rectangle",
+      "x": 800,
+      "y": 660,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 941171044,
+      "version": 1,
+      "versionNonce": 1336561392,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--node-7-label"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "undo-redo-history-record-merge-undo-and--edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "node": "redo",
+        "ref": "packages/lexical-history/src/index.ts#redo"
+      }
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-0",
+      "type": "arrow",
+      "x": 332,
+      "y": 584.8,
+      "width": 467.20000000000005,
+      "height": 522.8,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1695461512,
+      "version": 1,
+      "versionNonce": 1418293476,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "entry",
+          "to": "merge",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -463
+        ],
+        [
+          32,
+          -522.8
+        ],
+        [
+          466.70000000000005,
+          -522.8
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-0",
+        "focus": -0.7244444444444444,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-1",
+        "focus": -0.049999999999999996,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-1",
+      "type": "arrow",
+      "x": 1099.2,
+      "y": 62,
+      "width": 476,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 969393585,
+      "version": 1,
+      "versionNonce": 309496123,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "merge",
+          "to": "change",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          238,
+          0
+        ],
+        [
+          475.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-1",
+        "focus": 0.049999999999999996,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-2",
+        "focus": 0.15999999999999948,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-2",
+      "type": "arrow",
+      "x": 332,
+      "y": 644.8,
+      "width": 447.20000000000005,
+      "height": 300,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1642085478,
+      "version": 1,
+      "versionNonce": 1168072522,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "entry",
+          "to": "undoEntry",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          -293.6
+        ],
+        [
+          80,
+          -300
+        ],
+        [
+          446.70000000000005,
+          -300
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-0",
+        "focus": -0.057777777777777865,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-3",
+        "focus": 0.10400000000000104,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-3",
+      "type": "arrow",
+      "x": 332,
+      "y": 614.8,
+      "width": 1243.2,
+      "height": 432.8,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 98284471,
+      "version": 1,
+      "versionNonce": 481716241,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "entry",
+          "to": "state"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          56,
+          0
+        ],
+        [
+          56,
+          -432.8
+        ],
+        [
+          536.7,
+          -432.8
+        ],
+        [
+          1135.2,
+          -432.8
+        ],
+        [
+          1135.2,
+          -169.8
+        ],
+        [
+          1242.7,
+          -169.8
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-0",
+        "focus": -0.3911111111111113,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-5",
+        "focus": 0.5833333333333347,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-4",
+      "type": "arrow",
+      "x": 332,
+      "y": 674.8,
+      "width": 462.20000000000005,
+      "height": 150,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 2136879300,
+      "version": 1,
+      "versionNonce": 135606992,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "entry",
+          "to": "undo",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          -150
+        ],
+        [
+          156.10000000000002,
+          -150
+        ],
+        [
+          232.625,
+          -150
+        ],
+        [
+          309.1500000000001,
+          -150
+        ],
+        [
+          461.70000000000005,
+          -150
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-0",
+        "focus": 0.2755555555555555,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-6",
+        "focus": 0.10400000000000001,
+        "gap": 5.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-5",
+      "type": "arrow",
+      "x": 332,
+      "y": 704.8,
+      "width": 460.5333333333334,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1319535197,
+      "version": 1,
+      "versionNonce": 1227241671,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "entry",
+          "to": "redo",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          230.26666666666665,
+          0
+        ],
+        [
+          460.0333333333334,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-0",
+        "focus": 0.6088888888888887,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-7",
+        "focus": 0.10400000000000065,
+        "gap": 7.466666666666583
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-6",
+      "type": "arrow",
+      "x": 1114.2,
+      "y": 549.8,
+      "width": 461,
+      "height": 138.33333333333337,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1896217410,
+      "version": 1,
+      "versionNonce": 1642696118,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "undo",
+          "to": "inverse",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          149.83333333333326,
+          0
+        ],
+        [
+          224.75,
+          0
+        ],
+        [
+          299.66666666666674,
+          0
+        ],
+        [
+          377,
+          0
+        ],
+        [
+          377,
+          138.33333333333326
+        ],
+        [
+          460.5,
+          137.83333333333337
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-6",
+        "focus": 0.3960000000000001,
+        "gap": 5.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-4",
+        "focus": 0.4373333333333257,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-7",
+      "type": "arrow",
+      "x": 1112.5333333333333,
+      "y": 721.4666666666666,
+      "width": 462.66666666666674,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 844841203,
+      "version": 1,
+      "versionNonce": 1081105357,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "redo",
+          "to": "inverse",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          231.33333333333348,
+          0
+        ],
+        [
+          462.16666666666674,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-7",
+        "focus": 0.22933333333333175,
+        "gap": 7.466666666666697
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-4",
+        "focus": -0.22933333333332967,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-8",
+      "type": "arrow",
+      "x": 1114.2,
+      "y": 524.8,
+      "width": 461,
+      "height": 31.80000000000001,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 1670755200,
+      "version": 1,
+      "versionNonce": 1621244764,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "undo",
+          "to": "state"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          61,
+          0
+        ],
+        [
+          61,
+          -31.80000000000001
+        ],
+        [
+          214.5999999999999,
+          -31.80000000000001
+        ],
+        [
+          276.20000000000005,
+          -31.80000000000001
+        ],
+        [
+          337.79999999999995,
+          -31.80000000000001
+        ],
+        [
+          460.5,
+          -31.80000000000001
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-6",
+        "focus": -0.10400000000000001,
+        "gap": 5.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-5",
+        "focus": -0.21666666666666523,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-9",
+      "type": "arrow",
+      "x": 1112.5333333333333,
+      "y": 688.1333333333333,
+      "width": 462.66666666666674,
+      "height": 171.13333333333333,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 528986569,
+      "version": 1,
+      "versionNonce": 1512401747,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "redo",
+          "to": "state"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          38.66666666666674,
+          -1.1368683772161603e-13
+        ],
+        [
+          38.66666666666674,
+          -23.466666666666697
+        ],
+        [
+          293.4333333333334,
+          -23.466666666666697
+        ],
+        [
+          354.66666666666674,
+          -23.466666666666697
+        ],
+        [
+          354.66666666666674,
+          -171.13333333333333
+        ],
+        [
+          462.16666666666674,
+          -171.13333333333333
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-7",
+        "focus": -0.4373333333333212,
+        "gap": 7.466666666666697
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-5",
+        "focus": -0.6166666666666667,
+        "gap": 4.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-10",
+      "type": "arrow",
+      "x": 1575.2,
+      "y": 468.99999999999994,
+      "width": 461,
+      "height": 31.80000000000001,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1237143597,
+      "version": 1,
+      "versionNonce": 660814999,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "undo-redo-history-record-merge-undo-and--edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-",
+        "edge": {
+          "from": "state",
+          "to": "undo",
+          "claim": "takes"
+        }
+      },
+      "points": [
+        [
+          -0.5,
+          0
+        ],
+        [
+          -108,
+          0
+        ],
+        [
+          -108,
+          -1
+        ],
+        [
+          -245.9000000000001,
+          -1
+        ],
+        [
+          -424,
+          -1
+        ],
+        [
+          -424,
+          30.80000000000001
+        ],
+        [
+          -460.5,
+          30.80000000000001
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-5",
+        "focus": 0.18333333333333465,
+        "gap": 4.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "undo-redo-history-record-merge-undo-and--node-6",
+        "focus": -0.604,
+        "gap": 5.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-0-label",
+      "type": "text",
+      "x": 26,
+      "y": 625,
+      "width": 308,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 474967506,
+      "version": 1,
+      "versionNonce": 2029784070,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "registerHistory: records\neach update, wires UNDO/REDO",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--node-0",
+      "originalText": "registerHistory: records each update, wires UNDO/REDO",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-1-label",
+      "type": "text",
+      "x": 829,
+      "y": 47.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 1138716279,
+      "version": 1,
+      "versionNonce": 923325649,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "Merge-or-push decision",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--node-1",
+      "originalText": "Merge-or-push decision",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-2-label",
+      "type": "text",
+      "x": 1608,
+      "y": 45,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1632355752,
+      "version": 1,
+      "versionNonce": 2003589764,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "Classify change (typing,\ndeletes, composing)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--node-2",
+      "originalText": "Classify change (typing, deletes, composing)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-3-label",
+      "type": "text",
+      "x": 796,
+      "y": 325,
+      "width": 308,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1384241909,
+      "version": 1,
+      "versionNonce": 259910015,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "Snapshot pre-update state as\nundo entry",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--node-3",
+      "originalText": "Snapshot pre-update state as undo entry",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-4-label",
+      "type": "text",
+      "x": 1605.5,
+      "y": 685,
+      "width": 209.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 1607575662,
+      "version": 1,
+      "versionNonce": 759112338,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "Build entry for the\nopposite stack",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--node-4",
+      "originalText": "Build entry for the opposite stack",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-5-label",
+      "type": "text",
+      "x": 1609,
+      "y": 455,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1680131011,
+      "version": 1,
+      "versionNonce": 1480701917,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "HistoryState: current,\nundoStack, redoStack",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--node-5",
+      "originalText": "HistoryState: current, undoStack, redoStack",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-6-label",
+      "type": "text",
+      "x": 806,
+      "y": 505,
+      "width": 308,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 1212213556,
+      "version": 1,
+      "versionNonce": 1511627008,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "undo: pop undo, restore with\nHISTORIC_TAG",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--node-6",
+      "originalText": "undo: pop undo, restore with HISTORIC_TAG",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--node-7-label",
+      "type": "text",
+      "x": 806,
+      "y": 685,
+      "width": 308,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1588968305,
+      "version": 1,
+      "versionNonce": 1539341051,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "redo: pop redo, restore with\nHISTORIC_TAG",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--node-7",
+      "originalText": "redo: pop redo, restore with HISTORIC_TAG",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-0-label",
+      "type": "text",
+      "x": 284.8,
+      "y": 111.79999999999995,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 279064405,
+      "version": 1,
+      "versionNonce": 681615199,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "each update @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-0",
+      "originalText": "each update @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-1-label",
+      "type": "text",
+      "x": 1271.2,
+      "y": 52,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1035938440,
+      "version": 1,
+      "versionNonce": 1918467812,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "classify @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-1",
+      "originalText": "classify @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-2-label",
+      "type": "text",
+      "x": 350.4,
+      "y": 341.19999999999993,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 968660439,
+      "version": 1,
+      "versionNonce": 242042545,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "on push @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-2",
+      "originalText": "on push @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-3-label",
+      "type": "text",
+      "x": 780.7,
+      "y": 171.99999999999994,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 431897778,
+      "version": 1,
+      "versionNonce": 1923415398,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "push / merge current",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-3",
+      "originalText": "push / merge current",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-4-label",
+      "type": "text",
+      "x": 404.5,
+      "y": 514.8,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 914677457,
+      "version": 1,
+      "versionNonce": 1344319963,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "UNDO_COMMAND @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-4",
+      "originalText": "UNDO_COMMAND @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-5-label",
+      "type": "text",
+      "x": 478.66666666666663,
+      "y": 694.8,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1082150036,
+      "version": 1,
+      "versionNonce": 1214109408,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "REDO_COMMAND @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-5",
+      "originalText": "REDO_COMMAND @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-6-label",
+      "type": "text",
+      "x": 1325.8666666666668,
+      "y": 539.8,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1322670371,
+      "version": 1,
+      "versionNonce": 1800788413,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "reverse entry @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-6",
+      "originalText": "reverse entry @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-7-label",
+      "type": "text",
+      "x": 1255.8666666666668,
+      "y": 711.4666666666666,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1286305486,
+      "version": 1,
+      "versionNonce": 1415374450,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "reverse entry @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-7",
+      "originalText": "reverse entry @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-8-label",
+      "type": "text",
+      "x": 1245.2,
+      "y": 482.99999999999994,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1725268829,
+      "version": 1,
+      "versionNonce": 1529138119,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "pop undo, push redo",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-8",
+      "originalText": "pop undo, push redo",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-9-label",
+      "type": "text",
+      "x": 1322.3666666666668,
+      "y": 654.6666666666666,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 516765328,
+      "version": 1,
+      "versionNonce": 564997740,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "pop redo, push undo",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-9",
+      "originalText": "pop redo, push undo",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "undo-redo-history-record-merge-undo-and--edge-10-label",
+      "type": "text",
+      "x": 1258.8999999999999,
+      "y": 457.99999999999994,
+      "width": 140.8,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 210782948,
+      "version": 1,
+      "versionNonce": 1195418480,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "undo-redo-history-record-merge-undo-and-"
+      },
+      "text": "parameter @takes",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "undo-redo-history-record-merge-undo-and--edge-10",
+      "originalText": "parameter @takes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

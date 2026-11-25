@@ -1,0 +1,1892 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "connection-execute-compile-run-on-dbapi--title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 778.8000000000001,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 69551223,
+      "version": 1,
+      "versionNonce": 1694021329,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "role": "title",
+        "direction": "DOWN"
+      },
+      "text": "Connection.execute: compile, run on DBAPI cursor, wrap rows",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Connection.execute: compile, run on DBAPI cursor, wrap rows",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-0",
+      "type": "rectangle",
+      "x": 380,
+      "y": 20,
+      "width": 260,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1423599930,
+      "version": 1,
+      "versionNonce": 322092174,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--node-0-label"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-0",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "node": "execute",
+        "ref": "lib/sqlalchemy/engine/base.py#execute"
+      }
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-1",
+      "type": "rectangle",
+      "x": 360,
+      "y": 240,
+      "width": 300,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1855989067,
+      "version": 1,
+      "versionNonce": 204522949,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--node-1-label"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "node": "compile",
+        "ref": "lib/sqlalchemy/engine/base.py#_execute_clauseelement"
+      }
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-2",
+      "type": "rectangle",
+      "x": 20,
+      "y": 640,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 292246908,
+      "version": 1,
+      "versionNonce": 238323208,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--node-2-label"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-2",
+          "type": "arrow"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "node": "ctx_init",
+        "ref": "lib/sqlalchemy/engine/default.py#_init_compiled"
+      }
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-3",
+      "type": "rectangle",
+      "x": 420,
+      "y": 640,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 217233429,
+      "version": 1,
+      "versionNonce": 1906575135,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--node-3-label"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "node": "execute_ctx",
+        "ref": "lib/sqlalchemy/engine/base.py#_execute_context"
+      }
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-4",
+      "type": "rectangle",
+      "x": 400,
+      "y": 1040,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 966915102,
+      "version": 1,
+      "versionNonce": 70195778,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--node-4-label"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "node": "single",
+        "ref": "lib/sqlalchemy/engine/base.py#_exec_single_context"
+      }
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-5",
+      "type": "rectangle",
+      "x": 60,
+      "y": 1040,
+      "width": 240,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1101889647,
+      "version": 1,
+      "versionNonce": 532218825,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--node-5-label"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-3",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "node": "cursor",
+        "ref": "lib/sqlalchemy/engine/default.py#create_cursor"
+      }
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-6",
+      "type": "rectangle",
+      "x": 60,
+      "y": 1440,
+      "width": 300,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1625299072,
+      "version": 1,
+      "versionNonce": 482294364,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--node-6-label"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "node": "do_exec",
+        "ref": "lib/sqlalchemy/engine/default.py#do_execute"
+      }
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-7",
+      "type": "rectangle",
+      "x": 60,
+      "y": 1820,
+      "width": 280,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dotted",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 483530441,
+      "version": 1,
+      "versionNonce": 373451347,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--node-7-label"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "node": "dbapi",
+        "state": "external"
+      }
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-8",
+      "type": "rectangle",
+      "x": 440,
+      "y": 1440,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1850761282,
+      "version": 1,
+      "versionNonce": 503745718,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--node-8-label"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "node": "result_setup",
+        "ref": "lib/sqlalchemy/engine/default.py#_setup_result_proxy"
+      }
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-9",
+      "type": "rectangle",
+      "x": 440,
+      "y": 1820,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 799385075,
+      "version": 1,
+      "versionNonce": 2089638605,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--node-9-label"
+        },
+        {
+          "id": "connection-execute-compile-run-on-dbapi--edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "node": "cursor_result",
+        "ref": "lib/sqlalchemy/engine/cursor.py#CursorResult"
+      }
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-0",
+      "type": "arrow",
+      "x": 502,
+      "y": 92,
+      "width": 0,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 146560717,
+      "version": 1,
+      "versionNonce": 535292343,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "edge": {
+          "from": "execute",
+          "to": "compile"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          139.5
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-0",
+        "focus": 0.061538461538461535,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-1",
+        "focus": -0.053333333333333365,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-1",
+      "type": "arrow",
+      "x": 552,
+      "y": 332,
+      "width": 0,
+      "height": 310.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 953562228,
+      "version": 1,
+      "versionNonce": 1469727040,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "edge": {
+          "from": "compile",
+          "to": "execute_ctx",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          155.39999999999998
+        ],
+        [
+          0,
+          310.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-1",
+        "focus": -0.28,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-3",
+        "focus": -0.057142857142857224,
+        "gap": 2.7999999999999545
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-2",
+      "type": "arrow",
+      "x": 452,
+      "y": 332,
+      "width": 280,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 406528675,
+      "version": 1,
+      "versionNonce": 1962872381,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "edge": {
+          "from": "compile",
+          "to": "ctx_init"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -258.4,
+          32
+        ],
+        [
+          -280,
+          32
+        ],
+        [
+          -280,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-1",
+        "focus": 0.3866666666666666,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-2",
+        "focus": -0.05,
+        "gap": 7.2000000000000455
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-3",
+      "type": "arrow",
+      "x": 172,
+      "y": 732.8,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 24687410,
+      "version": 1,
+      "versionNonce": 1026394342,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "edge": {
+          "from": "ctx_init",
+          "to": "cursor"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999998
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-2",
+        "focus": 0.05,
+        "gap": 7.2000000000000455
+      },
+      "endBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-5",
+        "focus": -0.06666666666666686,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-4",
+      "type": "arrow",
+      "x": 552,
+      "y": 722.8,
+      "width": 0,
+      "height": 310.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 1181656865,
+      "version": 1,
+      "versionNonce": 1392373227,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "edge": {
+          "from": "execute_ctx",
+          "to": "single",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          155.39999999999998
+        ],
+        [
+          0,
+          310.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-3",
+        "focus": 0.057142857142857224,
+        "gap": 2.7999999999999545
+      },
+      "endBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-4",
+        "focus": -0.05,
+        "gap": 6.400000000000091
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-5",
+      "type": "arrow",
+      "x": 498.6666666666667,
+      "y": 1133.6,
+      "width": 293.33333333333337,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 1544283768,
+      "version": 1,
+      "versionNonce": 795495636,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "edge": {
+          "from": "single",
+          "to": "do_exec",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          0,
+          32
+        ],
+        [
+          -265.06666666666666,
+          32
+        ],
+        [
+          -293.33333333333337,
+          32
+        ],
+        [
+          -293.8333333333333,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-4",
+        "focus": 0.3833333333333334,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-6",
+        "focus": -0.031111111111110656,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-6",
+      "type": "arrow",
+      "x": 205.33333333333337,
+      "y": 1514.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 73983655,
+      "version": 1,
+      "versionNonce": 1694817089,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "edge": {
+          "from": "do_exec",
+          "to": "dbapi"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-6",
+        "focus": 0.031111111111110833,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-7",
+        "focus": 0.03809523809523856,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-7",
+      "type": "arrow",
+      "x": 605.3333333333334,
+      "y": 1133.6,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 885899798,
+      "version": 1,
+      "versionNonce": 1726695418,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "edge": {
+          "from": "single",
+          "to": "result_setup",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.4000000000001
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-4",
+        "focus": -0.2833333333333344,
+        "gap": 6.400000000000091
+      },
+      "endBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-8",
+        "focus": -0.027450980392156533,
+        "gap": 5.600000000000136
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-8",
+      "type": "arrow",
+      "x": 605.3333333333334,
+      "y": 1514.3999999999999,
+      "width": 0,
+      "height": 300.79999999999995,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1527110597,
+      "version": 1,
+      "versionNonce": 1732479183,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "connection-execute-compile-run-on-dbapi--edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-",
+        "edge": {
+          "from": "result_setup",
+          "to": "cursor_result",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0,
+          0.5
+        ],
+        [
+          0,
+          150.39999999999986
+        ],
+        [
+          0,
+          300.29999999999995
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-8",
+        "focus": 0.027450980392156533,
+        "gap": 5.600000000000136
+      },
+      "endBinding": {
+        "elementId": "connection-execute-compile-run-on-dbapi--node-9",
+        "focus": 0.03333333333333411,
+        "gap": 4.800000000000182
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-0-label",
+      "type": "text",
+      "x": 411,
+      "y": 47.5,
+      "width": 198.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 577086507,
+      "version": 1,
+      "versionNonce": 781340197,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "Connection.execute",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--node-0",
+      "originalText": "Connection.execute",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-1-label",
+      "type": "text",
+      "x": 389,
+      "y": 265,
+      "width": 242.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 279707894,
+      "version": 1,
+      "versionNonce": 1058364506,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "Compile statement with\ndialect (cached)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--node-1",
+      "originalText": "Compile statement with dialect (cached)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-2-label",
+      "type": "text",
+      "x": 26,
+      "y": 665,
+      "width": 308,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 1201612569,
+      "version": 1,
+      "versionNonce": 847504995,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "Build execution context from\ncompiled SQL",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--node-2",
+      "originalText": "Build execution context from compiled SQL",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-3-label",
+      "type": "text",
+      "x": 444.5,
+      "y": 667.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 1076020668,
+      "version": 1,
+      "versionNonce": 708835144,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "Run execution context",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--node-3",
+      "originalText": "Run execution context",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-4-label",
+      "type": "text",
+      "x": 428,
+      "y": 1065,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 335195903,
+      "version": 1,
+      "versionNonce": 1038645785,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "Execute one statement on\ncursor",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--node-4",
+      "originalText": "Execute one statement on cursor",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-5-label",
+      "type": "text",
+      "x": 86.49999999999999,
+      "y": 1067.5,
+      "width": 187.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 9374778,
+      "version": 1,
+      "versionNonce": 1620006286,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "Open DBAPI cursor",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--node-5",
+      "originalText": "Open DBAPI cursor",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-6-label",
+      "type": "text",
+      "x": 88.99999999999999,
+      "y": 1467.5,
+      "width": 242.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 346341469,
+      "version": 1,
+      "versionNonce": 2019676871,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "Dialect runs statement",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--node-6",
+      "originalText": "Dialect runs statement",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-7-label",
+      "type": "text",
+      "x": 84.49999999999999,
+      "y": 1847.5,
+      "width": 231.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 1285321616,
+      "version": 1,
+      "versionNonce": 1055536492,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "DBAPI cursor (driver)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--node-7",
+      "originalText": "DBAPI cursor (driver)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-8-label",
+      "type": "text",
+      "x": 472.5,
+      "y": 1467.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 2091226659,
+      "version": 1,
+      "versionNonce": 143843517,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "Set up result from cursor",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--node-8",
+      "originalText": "Set up result from cursor",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--node-9-label",
+      "type": "text",
+      "x": 473.5,
+      "y": 1847.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 2054861774,
+      "version": 1,
+      "versionNonce": 1905913202,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "CursorResult wraps rows",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--node-9",
+      "originalText": "CursorResult wraps rows",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-1-label",
+      "type": "text",
+      "x": 468.4,
+      "y": 477.4,
+      "width": 167.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1362093761,
+      "version": 1,
+      "versionNonce": 1299432203,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "compiled SQL @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--edge-1",
+      "originalText": "compiled SQL @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-2-label",
+      "type": "text",
+      "x": 154.00000000000003,
+      "y": 354,
+      "width": 79.2,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 1926851518,
+      "version": 1,
+      "versionNonce": 1287347810,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "init hook",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--edge-2",
+      "originalText": "init hook",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-3-label",
+      "type": "text",
+      "x": 119.19999999999999,
+      "y": 873.1999999999999,
+      "width": 105.60000000000001,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 907012179,
+      "version": 1,
+      "versionNonce": 1327559085,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "opens cursor",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--edge-3",
+      "originalText": "opens cursor",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-4-label",
+      "type": "text",
+      "x": 464,
+      "y": 868.1999999999999,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 493507064,
+      "version": 1,
+      "versionNonce": 386762580,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "one statement @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--edge-4",
+      "originalText": "one statement @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-5-label",
+      "type": "text",
+      "x": 172,
+      "y": 1155.6,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 881466437,
+      "version": 1,
+      "versionNonce": 1383404111,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "execute @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--edge-5",
+      "originalText": "execute @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-6-label",
+      "type": "text",
+      "x": 161.33333333333337,
+      "y": 1654.7999999999997,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 1189606050,
+      "version": 1,
+      "versionNonce": 500175510,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "DBAPI call",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--edge-6",
+      "originalText": "DBAPI call",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-7-label",
+      "type": "text",
+      "x": 548.1333333333333,
+      "y": 1274,
+      "width": 114.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 1436291911,
+      "version": 1,
+      "versionNonce": 1393029217,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "result @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--edge-7",
+      "originalText": "result @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "connection-execute-compile-run-on-dbapi--edge-8-label",
+      "type": "text",
+      "x": 543.7333333333333,
+      "y": 1654.7999999999997,
+      "width": 123.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1929082028,
+      "version": 1,
+      "versionNonce": 488186360,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "connection-execute-compile-run-on-dbapi-"
+      },
+      "text": "builds @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "connection-execute-compile-run-on-dbapi--edge-8",
+      "originalText": "builds @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}

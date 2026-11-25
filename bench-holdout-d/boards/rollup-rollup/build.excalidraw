@@ -1,0 +1,2460 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagramos",
+  "elements": [
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-title",
+      "type": "text",
+      "x": 0,
+      "y": -115,
+      "width": 673.2,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 428820480,
+      "version": 1,
+      "versionNonce": 1485242588,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "role": "title"
+      },
+      "text": "rollup() build: graph, module loading, tree-shaking",
+      "fontSize": 24,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "rollup() build: graph, module loading, tree-shaking",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-0",
+      "type": "rectangle",
+      "x": 20,
+      "y": 160,
+      "width": 320,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 1373639759,
+      "version": 1,
+      "versionNonce": 1487202089,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-0-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "rollup-entry",
+        "ref": "src/rollup/rollup.ts#rollupInternal"
+      }
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-1",
+      "type": "rectangle",
+      "x": 780,
+      "y": 180,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": null,
+      "seed": 1980995838,
+      "version": 1,
+      "versionNonce": 517302178,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-1-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-0",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-4",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "graph",
+        "ref": "src/Graph.ts#Graph"
+      }
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-2",
+      "type": "rectangle",
+      "x": 800,
+      "y": 400,
+      "width": 320,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a3",
+      "roundness": null,
+      "seed": 94362153,
+      "version": 2,
+      "versionNonce": 1266291763,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-2-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-1",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "graph-build",
+        "ref": "src/Graph.ts#build"
+      },
+      "label": "Graph.build: load, bind, include"
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-3",
+      "type": "rectangle",
+      "x": 1620,
+      "y": 220,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a4",
+      "roundness": null,
+      "seed": 1897049184,
+      "version": 1,
+      "versionNonce": 1437277628,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-3-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-4",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-5",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "module-loader",
+        "ref": "src/ModuleLoader.ts#ModuleLoader"
+      }
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-4",
+      "type": "rectangle",
+      "x": 2500,
+      "y": 220,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a5",
+      "roundness": null,
+      "seed": 2127636011,
+      "version": 1,
+      "versionNonce": 735048741,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-4-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-7",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-8",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "fetch-module",
+        "ref": "src/ModuleLoader.ts#fetchModule"
+      }
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-5",
+      "type": "rectangle",
+      "x": 3220,
+      "y": 80,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a6",
+      "roundness": null,
+      "seed": 1034431642,
+      "version": 1,
+      "versionNonce": 48041326,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-5-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-3",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-8",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "plugin-driver",
+        "ref": "src/utils/PluginDriver.ts#PluginDriver"
+      }
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-6",
+      "type": "rectangle",
+      "x": 3220,
+      "y": 260,
+      "width": 340,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a7",
+      "roundness": null,
+      "seed": 1975548789,
+      "version": 1,
+      "versionNonce": 185897727,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-6-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "module",
+        "ref": "src/Module.ts#Module"
+      }
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-7",
+      "type": "rectangle",
+      "x": 1660,
+      "y": 420,
+      "width": 260,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a8",
+      "roundness": null,
+      "seed": 1306327644,
+      "version": 1,
+      "versionNonce": 643956072,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-7-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-6",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-10",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "include-statements",
+        "ref": "src/Graph.ts#includeStatements"
+      }
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-8",
+      "type": "rectangle",
+      "x": 2460,
+      "y": 420,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a9",
+      "roundness": null,
+      "seed": 1811143703,
+      "version": 1,
+      "versionNonce": 1216301809,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-8-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-10",
+          "type": "arrow"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "module-include",
+        "ref": "src/Module.ts#include"
+      }
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-9",
+      "type": "rectangle",
+      "x": 3220,
+      "y": 420,
+      "width": 280,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aA",
+      "roundness": null,
+      "seed": 1868379462,
+      "version": 1,
+      "versionNonce": 559647914,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-9-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-11",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "program",
+        "ref": "src/ast/nodes/Program.ts#Program"
+      }
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-10",
+      "type": "rectangle",
+      "x": 780,
+      "y": 20,
+      "width": 320,
+      "height": 80,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aB",
+      "roundness": null,
+      "seed": 1683851760,
+      "version": 2,
+      "versionNonce": 396373836,
+      "isDeleted": true,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-node-10-label"
+        },
+        {
+          "id": "rollup-build-graph-module-loading-tree-s-edge-2",
+          "type": "arrow"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "node": "bundle",
+        "ref": "src/Bundle.ts#Bundle"
+      }
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-0",
+      "type": "arrow",
+      "x": 332,
+      "y": 221.99999999999997,
+      "width": 456,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aC",
+      "roundness": null,
+      "seed": 1358999616,
+      "version": 1,
+      "versionNonce": 1293716252,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-0-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "rollup-entry",
+          "to": "graph",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          228,
+          0
+        ],
+        [
+          455.5,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-0",
+        "focus": 0.033333333333332556,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-1",
+        "focus": 0.16000000000000092,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-1",
+      "type": "arrow",
+      "x": 332,
+      "y": 251.99999999999997,
+      "width": 469.33333333333337,
+      "height": 196.79999999999998,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aD",
+      "roundness": null,
+      "seed": 959561609,
+      "version": 1,
+      "versionNonce": 1802207763,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-1-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "rollup-entry",
+          "to": "graph-build",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          196.79999999999998
+        ],
+        [
+          136.26666666666665,
+          196.79999999999998
+        ],
+        [
+          302.79999999999995,
+          196.79999999999998
+        ],
+        [
+          386.0666666666666,
+          196.79999999999998
+        ],
+        [
+          468.83333333333337,
+          196.79999999999998
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-0",
+        "focus": 0.5333333333333325,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-2",
+        "focus": 0.024000000000000913,
+        "gap": 1.3333333333333712
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-2",
+      "type": "arrow",
+      "x": 332,
+      "y": 191.99999999999997,
+      "width": 456,
+      "height": 139.99999999999997,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aE",
+      "roundness": null,
+      "seed": 1442946270,
+      "version": 2,
+      "versionNonce": 1540528898,
+      "isDeleted": true,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-2-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "rollup-entry",
+          "to": "bundle",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -139.99999999999997
+        ],
+        [
+          158,
+          -139.99999999999997
+        ],
+        [
+          232.5,
+          -139.99999999999997
+        ],
+        [
+          307,
+          -139.99999999999997
+        ],
+        [
+          455.5,
+          -139.99999999999997
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-0",
+        "focus": -0.466666666666667,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-10",
+        "focus": 0.19999999999999998,
+        "gap": 8
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-3",
+      "type": "arrow",
+      "x": 1128,
+      "y": 205.33333333333331,
+      "width": 2100.7999999999997,
+      "height": 104.2000000000001,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aF",
+      "roundness": null,
+      "seed": 835590191,
+      "version": 1,
+      "versionNonce": 2085971337,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-3-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "graph",
+          "to": "plugin-driver",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          32,
+          0
+        ],
+        [
+          32,
+          -104.2000000000001
+        ],
+        [
+          1002.1333333333332,
+          -104.2000000000001
+        ],
+        [
+          1992.7999999999997,
+          -104.2000000000001
+        ],
+        [
+          1992.7999999999997,
+          -96.53333333333342
+        ],
+        [
+          2100.2999999999997,
+          -97.0333333333334
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-1",
+        "focus": -0.49333333333333274,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-5",
+        "focus": 0.424000000000001,
+        "gap": 8.799999999999727
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-4",
+      "type": "arrow",
+      "x": 1128,
+      "y": 238.66666666666663,
+      "width": 491.20000000000005,
+      "height": 23.46666666666664,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aG",
+      "roundness": null,
+      "seed": 726701372,
+      "version": 1,
+      "versionNonce": 1667079624,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-4-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "graph",
+          "to": "module-loader",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          64.33333333333348,
+          0
+        ],
+        [
+          128.66666666666674,
+          0
+        ],
+        [
+          257.3333333333335,
+          0
+        ],
+        [
+          383.20000000000005,
+          0
+        ],
+        [
+          383.20000000000005,
+          23.46666666666664
+        ],
+        [
+          490.70000000000005,
+          23.46666666666664
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-1",
+        "focus": 0.17333333333333223,
+        "gap": 8
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-3",
+        "focus": 0.15733333333333346,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-5",
+      "type": "arrow",
+      "x": 1121.3333333333335,
+      "y": 432.13333333333327,
+      "width": 497.86666666666656,
+      "height": 136.66666666666669,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aH",
+      "roundness": null,
+      "seed": 333814741,
+      "version": 1,
+      "versionNonce": 1271164127,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-5-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "graph-build",
+          "to": "module-loader"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          38.666666666666515,
+          0
+        ],
+        [
+          38.666666666666515,
+          -136.66666666666669
+        ],
+        [
+          180.5999999999999,
+          -136.66666666666669
+        ],
+        [
+          339.2333333333331,
+          -136.66666666666669
+        ],
+        [
+          418.5499999999997,
+          -136.66666666666669
+        ],
+        [
+          497.36666666666656,
+          -136.66666666666669
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-2",
+        "focus": -0.35733333333333445,
+        "gap": 1.333333333333485
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-3",
+        "focus": -0.5093333333333304,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-6",
+      "type": "arrow",
+      "x": 1121.3333333333335,
+      "y": 465.4666666666666,
+      "width": 537.8666666666666,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aI",
+      "roundness": null,
+      "seed": 1858054394,
+      "version": 1,
+      "versionNonce": 1326391118,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-6-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "graph-build",
+          "to": "include-statements",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          268.9333333333334,
+          0
+        ],
+        [
+          537.3666666666666,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-2",
+        "focus": 0.3093333333333313,
+        "gap": 1.333333333333485
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-7",
+        "focus": 0.09066666666666832,
+        "gap": 1
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-7",
+      "type": "arrow",
+      "x": 1959.2,
+      "y": 278.79999999999995,
+      "width": 544.5333333333331,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aJ",
+      "roundness": null,
+      "seed": 1548009739,
+      "version": 1,
+      "versionNonce": 1758172293,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-7-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "module-loader",
+          "to": "fetch-module"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          272.26666666666665,
+          0
+        ],
+        [
+          544.0333333333331,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-3",
+        "focus": 0.17600000000000032,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-4",
+        "focus": -0.1760000000000006,
+        "gap": 3.733333333333121
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-8",
+      "type": "arrow",
+      "x": 2763.733333333333,
+      "y": 262.13333333333327,
+      "width": 465.0666666666666,
+      "height": 120.00000000000006,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aK",
+      "roundness": null,
+      "seed": 2084356680,
+      "version": 1,
+      "versionNonce": 344626340,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-8-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "fetch-module",
+          "to": "plugin-driver"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0.5
+        ],
+        [
+          58.666666666666515,
+          0
+        ],
+        [
+          58.666666666666515,
+          -120.00000000000006
+        ],
+        [
+          172.5333333333333,
+          -120.00000000000006
+        ],
+        [
+          318.7999999999997,
+          -120.00000000000006
+        ],
+        [
+          391.93333333333294,
+          -120.00000000000006
+        ],
+        [
+          464.5666666666666,
+          -120.50000000000003
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-4",
+        "focus": -0.1573333333333338,
+        "gap": 3.733333333333121
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-5",
+        "focus": -0.24266666666666378,
+        "gap": 8.799999999999727
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-9",
+      "type": "arrow",
+      "x": 2763.733333333333,
+      "y": 295.4666666666666,
+      "width": 465.0666666666666,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aL",
+      "roundness": null,
+      "seed": 616061297,
+      "version": 1,
+      "versionNonce": 299840763,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-9-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "fetch-module",
+          "to": "module",
+          "claim": "builds"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          232.5333333333333,
+          0
+        ],
+        [
+          464.5666666666666,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-4",
+        "focus": 0.5093333333333318,
+        "gap": 3.733333333333121
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-6",
+        "focus": 0.11333333333333462,
+        "gap": 8.799999999999727
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-10",
+      "type": "arrow",
+      "x": 1919.2,
+      "y": 465.4666666666666,
+      "width": 531.1999999999996,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aM",
+      "roundness": null,
+      "seed": 57344789,
+      "version": 1,
+      "versionNonce": 1895962655,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-10-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "include-statements",
+          "to": "module-include",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          265.5999999999997,
+          0
+        ],
+        [
+          530.6999999999996,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-7",
+        "focus": -0.09066666666666666,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-8",
+        "focus": 0.09066666666666733,
+        "gap": 9.600000000000364
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-11",
+      "type": "arrow",
+      "x": 2790.3999999999996,
+      "y": 465.4666666666666,
+      "width": 438.4000000000001,
+      "height": 0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aN",
+      "roundness": null,
+      "seed": 132358268,
+      "version": 1,
+      "versionNonce": 227710728,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "rollup-build-graph-module-loading-tree-s-edge-11-label"
+        }
+      ],
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s",
+        "edge": {
+          "from": "module-include",
+          "to": "program",
+          "claim": "calls"
+        }
+      },
+      "points": [
+        [
+          0.5,
+          0
+        ],
+        [
+          219.19999999999982,
+          0
+        ],
+        [
+          437.9000000000001,
+          0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-8",
+        "focus": -0.09066666666666733,
+        "gap": 9.600000000000364
+      },
+      "endBinding": {
+        "elementId": "rollup-build-graph-module-loading-tree-s-node-9",
+        "focus": 0.09066666666666576,
+        "gap": 8.799999999999727
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-0-label",
+      "type": "text",
+      "x": 53.499999999999986,
+      "y": 195,
+      "width": 253.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aO",
+      "roundness": null,
+      "seed": 2048702618,
+      "version": 1,
+      "versionNonce": 777351534,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "rollup(): run build and\nbundle",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-0",
+      "originalText": "rollup(): run build and bundle",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-1-label",
+      "type": "text",
+      "x": 812.5,
+      "y": 205,
+      "width": 275,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aP",
+      "roundness": null,
+      "seed": 1056848223,
+      "version": 1,
+      "versionNonce": 343651321,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "Graph: modules and plugin\ndriver",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-1",
+      "originalText": "Graph: modules and plugin driver",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-2-label",
+      "type": "text",
+      "x": 828,
+      "y": 425,
+      "width": 264,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aQ",
+      "roundness": null,
+      "seed": 208287344,
+      "version": 1,
+      "versionNonce": 596884684,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "Graph.build: load, bind,\ninclude",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-2",
+      "originalText": "Graph.build: load, bind, include",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-3-label",
+      "type": "text",
+      "x": 1625,
+      "y": 245,
+      "width": 330,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aR",
+      "roundness": null,
+      "seed": 792570557,
+      "version": 1,
+      "versionNonce": 593013415,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "ModuleLoader: resolve and load\nentries",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-3",
+      "originalText": "ModuleLoader: resolve and load entries",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-4-label",
+      "type": "text",
+      "x": 2531,
+      "y": 245,
+      "width": 198.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aS",
+      "roundness": null,
+      "seed": 110066518,
+      "version": 1,
+      "versionNonce": 1990736954,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "fetchModule: load,\ntransform, parse",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-4",
+      "originalText": "fetchModule: load, transform, parse",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-5-label",
+      "type": "text",
+      "x": 3250,
+      "y": 105,
+      "width": 220.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aT",
+      "roundness": null,
+      "seed": 1735886603,
+      "version": 1,
+      "versionNonce": 163137157,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "PluginDriver: plugin\nhooks",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-5",
+      "originalText": "PluginDriver: plugin hooks",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-6-label",
+      "type": "text",
+      "x": 3252.5,
+      "y": 287.5,
+      "width": 275,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aU",
+      "roundness": null,
+      "seed": 1532162844,
+      "version": 1,
+      "versionNonce": 387435048,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "Module: parsed statements",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-6",
+      "originalText": "Module: parsed statements",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-7-label",
+      "type": "text",
+      "x": 1685.5,
+      "y": 445,
+      "width": 209.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aV",
+      "roundness": null,
+      "seed": 210677753,
+      "version": 1,
+      "versionNonce": 1469526211,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "includeStatements:\ntree-shaking passes",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-7",
+      "originalText": "includeStatements: tree-shaking passes",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-8-label",
+      "type": "text",
+      "x": 2492.5,
+      "y": 445,
+      "width": 275,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aW",
+      "roundness": null,
+      "seed": 1656596242,
+      "version": 1,
+      "versionNonce": 2092554054,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "Module.include: mark kept\nstatements",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-8",
+      "originalText": "Module.include: mark kept statements",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-9-label",
+      "type": "text",
+      "x": 3244.5,
+      "y": 445,
+      "width": 231.00000000000003,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aX",
+      "roundness": null,
+      "seed": 1530189239,
+      "version": 1,
+      "versionNonce": 2013720081,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "Program AST: included\nstatements",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-9",
+      "originalText": "Program AST: included statements",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-node-10-label",
+      "type": "text",
+      "x": 813.5,
+      "y": 47.5,
+      "width": 253.00000000000003,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aY",
+      "roundness": null,
+      "seed": 1159689421,
+      "version": 2,
+      "versionNonce": 804266935,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "Bundle: generate output",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-node-10",
+      "originalText": "Bundle: generate output",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-0-label",
+      "type": "text",
+      "x": 485.2,
+      "y": 211.99999999999997,
+      "width": 149.60000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aZ",
+      "roundness": null,
+      "seed": 830898589,
+      "version": 1,
+      "versionNonce": 2009755655,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "new Graph @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-0",
+      "originalText": "new Graph @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-1-label",
+      "type": "text",
+      "x": 380.26666666666665,
+      "y": 438.79999999999995,
+      "width": 176,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aa",
+      "roundness": null,
+      "seed": 431689680,
+      "version": 1,
+      "versionNonce": 546152108,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "graph.build() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-1",
+      "originalText": "graph.build() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-2-label",
+      "type": "text",
+      "x": 410.8,
+      "y": 42,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ab",
+      "roundness": null,
+      "seed": 1519736895,
+      "version": 2,
+      "versionNonce": 593605465,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "new Bundle @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-2",
+      "originalText": "new Bundle @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-3-label",
+      "type": "text",
+      "x": 2024.5333333333333,
+      "y": 91.13333333333321,
+      "width": 211.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ac",
+      "roundness": null,
+      "seed": 1127259514,
+      "version": 1,
+      "versionNonce": 1021314254,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "new PluginDriver @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-3",
+      "originalText": "new PluginDriver @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-4-label",
+      "type": "text",
+      "x": 1279.7333333333336,
+      "y": 228.66666666666663,
+      "width": 211.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ad",
+      "roundness": null,
+      "seed": 64888409,
+      "version": 1,
+      "versionNonce": 1235375779,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "new ModuleLoader @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-4",
+      "originalText": "new ModuleLoader @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-5-label",
+      "type": "text",
+      "x": 1235.9333333333334,
+      "y": 285.4666666666666,
+      "width": 132,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ae",
+      "roundness": null,
+      "seed": 1342264060,
+      "version": 1,
+      "versionNonce": 340956808,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "addEntryModules",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-5",
+      "originalText": "addEntryModules",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-6-label",
+      "type": "text",
+      "x": 1284.666666666667,
+      "y": 455.4666666666666,
+      "width": 211.20000000000002,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "af",
+      "roundness": null,
+      "seed": 605870187,
+      "version": 1,
+      "versionNonce": 569951589,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "includeStatements @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-6",
+      "originalText": "includeStatements @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-7-label",
+      "type": "text",
+      "x": 2187.4666666666667,
+      "y": 268.79999999999995,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ag",
+      "roundness": null,
+      "seed": 1236547638,
+      "version": 1,
+      "versionNonce": 766957466,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "per module",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-7",
+      "originalText": "per module",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-8-label",
+      "type": "text",
+      "x": 2892.2666666666664,
+      "y": 132.1333333333332,
+      "width": 88,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ah",
+      "roundness": null,
+      "seed": 1493228437,
+      "version": 1,
+      "versionNonce": 736487839,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "load hooks",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-8",
+      "originalText": "load hooks",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-9-label",
+      "type": "text",
+      "x": 2917.0666666666666,
+      "y": 285.4666666666666,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ai",
+      "roundness": null,
+      "seed": 2125324744,
+      "version": 1,
+      "versionNonce": 1822370596,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "new Module @builds",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-9",
+      "originalText": "new Module @builds",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-10-label",
+      "type": "text",
+      "x": 2083.6,
+      "y": 455.4666666666666,
+      "width": 202.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "aj",
+      "roundness": null,
+      "seed": 1921038524,
+      "version": 1,
+      "versionNonce": 1948614728,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "module.include() @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-10",
+      "originalText": "module.include() @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rollup-build-graph-module-loading-tree-s-edge-11-label",
+      "type": "text",
+      "x": 2930.3999999999996,
+      "y": 455.4666666666666,
+      "width": 158.4,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "ak",
+      "roundness": null,
+      "seed": 2046630425,
+      "version": 1,
+      "versionNonce": 2087284579,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 0,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "origin": "diagram",
+        "diagram": "rollup-build-graph-module-loading-tree-s"
+      },
+      "text": "ast.include @calls",
+      "fontSize": 16,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rollup-build-graph-module-loading-tree-s-edge-11",
+      "originalText": "ast.include @calls",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {},
+  "diagramos": {
+    "version": "0.2.0-rc.6",
+    "schema": 1
+  }
+}
