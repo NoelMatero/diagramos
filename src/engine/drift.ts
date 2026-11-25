@@ -6244,9 +6244,10 @@ export function checkDrift(
             const readCalls = (
               tail: CallSide, head: CallSide & { ownerOnly?: boolean }, over: Workspace, counting: boolean,
             ): CallsVerdict => {
+              const owner = ownerOf(toNode, toPath);
               let verdict: CallsVerdict = callsBetween(
                 { ...tail, routine: fromEnd.symbols[0]! },
-                { ...head, names: toEnd.symbols },
+                { ...head, names: toEnd.symbols, ...(owner ? { owner } : {}) },
               );
               if (
                 claimed && tail.language === "rust" && !tail.compiled?.()
@@ -6397,8 +6398,16 @@ export function checkDrift(
              * view does not confirm, the arrow is "not sure". Every other
              * verdict is the plain reading's, so this takes a green away and
              * never adds a red (#409).
+             *
+             * And "it is the other way round" stands only where that view
+             * finds the call running back too: from the head's own routine,
+             * to the tail's own. rich's `Progress.get_default_columns ->
+             * BarColumn.__init__` was turned round because `Progress.__init__`
+             * calls `get_default_columns` -- another class's `__init__`
+             * (`measure:calls-at-run-time --names=qualified`). So this takes
+             * a red away too, and still adds none.
              */
-            if (verdict.verdict === "confirmed") {
+            if (verdict.verdict === "confirmed" || verdict.verdict === "backwards") {
               const masks = new Map<string, string>();
               const ends = [
                 { file: fromFile, name: fromEnd.symbols[0], owner: ownerOf(fromNode, fromPath) },
@@ -6441,7 +6450,17 @@ export function checkDrift(
                 const strict = ownTail && ownHead
                   ? readCalls(ownTail, { ...ownHead, ownerOnly: true }, over, false)
                   : undefined;
-                if (strict?.verdict !== "confirmed") verdict = { verdict: "withheld", why: "other-owner" };
+                if (verdict.verdict === "confirmed") {
+                  if (strict?.verdict !== "confirmed") verdict = { verdict: "withheld", why: "other-owner" };
+                } else {
+                  /*
+                   * Turned round from a namesake: the view's own reading is
+                   * the answer -- the owner's call running back, a closed
+                   * body that reaches neither way, or not sure -- and never a
+                   * green the plain reading did not give.
+                   */
+                  verdict = strict && strict.verdict !== "confirmed" ? strict : { verdict: "withheld", why: "other-owner" };
+                }
               }
             }
 

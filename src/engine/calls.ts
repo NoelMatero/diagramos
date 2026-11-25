@@ -2151,6 +2151,63 @@ function resolves(
 }
 
 /**
+ * The routines making one of a class runs, by the names a box gives them:
+ * Python's `X(..)` runs `X.__new__` and `X.__init__`, TypeScript's
+ * `new X(..)` runs `X`'s `constructor`. Rust has none -- `X::new()` is a
+ * function like any other and `X { .. }` runs no code -- so a Rust head is
+ * never asked this.
+ */
+const CONSTRUCTORS: Record<Language, ReadonlySet<string>> = (() => {
+  const javascript = new Set(["constructor"]);
+  return { python: new Set(["__init__", "__new__"]), ts: javascript, tsx: javascript, js: javascript, rust: new Set<string>() };
+})();
+
+/**
+ * Whether one call makes one of a class whose own constructor is the head
+ * (rich's `get_default_columns` writing `BarColumn()`, for "calls
+ * `BarColumn.__init__`"). Before, the forward reading asked only whether the
+ * call spelled the head's name, so a construction was "not this one", and
+ * "it is the other way round" was then free to answer from any `__init__`
+ * in the file that called the tail.
+ *
+ * Making one runs the class's own constructor and nothing else of it: the
+ * class has to be the one the call names, declared in the head's file, and
+ * declare a routine of that name in its own body -- one it only inherits is
+ * not read here, and stays as it was. A box written `Class.method` names
+ * which class (`owner`); a construction of another is not that one.
+ *
+ * And calling a value the routine binds itself -- a parameter, a local --
+ * may be making whatever class it holds (marshmallow's
+ * `_resolve_field_instance` runs `cls_or_instance()`): for a constructor
+ * that is a doubt, `local-callee`, the one a call of a value of the head's
+ * own name already raises. Python makes one by calling it; TypeScript only
+ * by `new`.
+ */
+function constructionOf(
+  callee: Callee,
+  side: CallSide,
+  bindings: Bindings,
+  target: { file: string; head: CallSide & { names: string[]; owner?: string }; makers: ReadonlySet<string> },
+  site: Node,
+  holder?: Node,
+): { ran: string } | CallsWithheld | undefined {
+  if (callee.kind === "computed") return "computed";
+  if (callee.kind === "own") return undefined;
+  if (callee.kind === "bare" && meaningOf(callee.name, side, bindings, site, "value").at === "bound") return "local-callee";
+  if (resolves(callee, side, bindings, { file: target.file, names: new Set([callee.name]) }, site, holder) !== "yes") return undefined;
+  const type = callee.kind === "bare" ? bindings.imported.get(callee.name)?.name ?? callee.name : callee.name;
+  if (target.head.owner !== undefined && type !== target.head.owner) return undefined;
+  for (const declaration of typeDeclarationsOf(target.head.source, target.head.language, type)) {
+    for (const member of namedKids(declaration.childForFieldName("body") ?? declaration)) {
+      const routine = member.type === "decorated_definition" ? member.childForFieldName("definition") : member;
+      const name = routine && parametersOf(routine) ? declarationName(routine)?.text : undefined;
+      if (name !== undefined && target.makers.has(name)) return { ran: name };
+    }
+  }
+  return undefined;
+}
+
+/**
  * Every call one routine makes to the far end, and every reason to doubt the
  * answer if none was found.
  *
@@ -2168,7 +2225,7 @@ function callsTo(
     /** Only a call reaching the head's own declaration counts (`callsBetween`'s `ownerOnly`). */
     ownerOnly?: boolean;
     /** The head's own side, when a doubt is to be asked whether it can be the head at all (`ruledOut`). */
-    head?: CallSide & { names: string[] };
+    head?: CallSide & { names: string[]; owner?: string };
   },
   /** The nodes to read instead of the routines of that name: a class or struct tail's own code (#459). */
   own?: Node[],
@@ -2188,6 +2245,8 @@ function callsTo(
 
   let why: CallsWithheld | undefined;
   let ruledOutAt: Array<{ start: number; end: number }> | undefined;
+  // The head's names that making one of a class runs: asked of the forward reading only, where the head is known.
+  const makers = new Set(target.head ? [...target.names].filter((name) => CONSTRUCTORS[target.head!.language].has(name)) : []);
   for (const body of routines) {
     if (incomplete(body)) { why ??= "incomplete"; continue; }
     let found: CallsEvidence | undefined;
@@ -2214,10 +2273,18 @@ function callsTo(
         return;
       }
       const written = calleeOf(node);
-      if (!written) return;
+      // `new X()` and TypeScript's `super(..)`, asked about only for a constructor at the head (`constructionOf`).
+      const making = !written && makers.size > 0 ? constructedBy(node) : undefined;
+      if (!written && !making) return;
       const holder = holders.get(body.id) ?? ownHolder(body);
-      const callee = valueCalled(written, side, bindings, node, holder);
-      const answer = resolves(callee, side, bindings, target, node, holder);
+      const callee = written ? valueCalled(written, side, bindings, node, holder) : making!;
+      let answer = written ? resolves(callee, side, bindings, target, node, holder) : undefined;
+      let ran = callee.kind === "computed" ? "" : callee.name;
+      if (answer === undefined && makers.size > 0 && (making || target.head!.language === "python")) {
+        const made = constructionOf(callee, side, bindings, { file: target.file, head: target.head!, makers }, node, holder);
+        if (typeof made === "object") { answer = "yes"; ran = made.ran; }
+        else answer = made;
+      }
       if (answer === undefined) return;
       // Read or set by name, and the result runs nowhere: no call to the head (#431).
       if (answer === "dynamic" && quiet?.has(node.id)) return;
@@ -2240,7 +2307,7 @@ function callsTo(
       }
       if (answer === "yes") {
         found = {
-          name: callee.kind === "computed" ? "" : callee.name,
+          name: ran,
           inside: routine,
           line: lineOf(side.source, node.startIndex),
           wrote: node.text.replace(/\s+/g, " ").slice(0, 80),
@@ -2291,6 +2358,12 @@ export function callsBetween(
      * those, so it is not that.
      */
     ownerOnly?: boolean;
+    /**
+     * The class a box written `Class.method` names (`owner.ts`'s
+     * `pickingOwner`). Read only where making one of a class is the call
+     * (`constructionOf`): making another class runs none of this one's code.
+     */
+    owner?: string;
   },
   /**
    * Whether a call the other way is an answer (#417). `@builds` reads Python
