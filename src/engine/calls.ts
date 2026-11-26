@@ -6067,27 +6067,48 @@ export function routineDeclaredOn(
 ): { name: string; node: Node; holder?: Node } | undefined {
   const tree = parseSource(source, language);
   if (!tree) return undefined;
+  const found = routinesByLine(tree, source).get(line);
+  return found ? { ...found } : undefined;
+}
+
+type RoutineOnLine = { name: string; node: Node; holder?: Node };
+
+/**
+ * Every routine in a tree, by the line its name is on: for each line the
+ * first one a walk from the top meets, with the declaration it sits in --
+ * exactly what `routineDeclaredOn` used to find by walking the file from the
+ * top once per question. A Rust check asks it of the same file for every
+ * place a definition lands, and on redb that walk was 41% of everything the
+ * checker did (CPU profile, 2026-11-26). Kept per tree, like the macro index.
+ */
+const routinesByTree = new WeakMap<Tree, Map<number, RoutineOnLine>>();
+
+function routinesByLine(tree: Tree, source: string): Map<number, RoutineOnLine> {
+  const known = routinesByTree.get(tree);
+  if (known) return known;
+  const found = new Map<number, RoutineOnLine>();
   const isDeclaration = (node: Node) => Boolean(node.childForFieldName("name") ?? node.childForFieldName("type"));
-  const visit = (node: Node, holder: Node | undefined): { name: string; node: Node; holder?: Node } | undefined => {
+  const visit = (node: Node, holder: Node | undefined): void => {
     const name = node.childForFieldName("name") ?? node.childForFieldName("left");
     const value = node.childForFieldName("value");
     if (
       name && name.childCount === 0
       && (parametersOf(node) ?? parametersOf(value))
       && (node.childForFieldName("body") ?? value?.childForFieldName("body"))
-      && lineOf(source, name.startIndex) === line
     ) {
-      return { name: name.text, node, ...(holder ? { holder } : {}) };
+      // The first met on a line wins, as the walk that stopped there did: a parent before its children.
+      const line = lineOf(source, name.startIndex);
+      if (!found.has(line)) found.set(line, { name: name.text, node, ...(holder ? { holder } : {}) });
     }
     const inside = isDeclaration(node) ? node : holder;
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
-      const found = child ? visit(child, inside) : undefined;
-      if (found) return found;
+      if (child) visit(child, inside);
     }
-    return undefined;
   };
-  return visit(tree.rootNode, undefined);
+  visit(tree.rootNode, undefined);
+  routinesByTree.set(tree, found);
+  return found;
 }
 
 /**

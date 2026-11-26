@@ -563,8 +563,38 @@ function headTypeOf(
 }
 
 /** 1-based line of a byte offset, counted the way an editor counts. */
+/**
+ * The 1-based line `offset` is on: one more than the newlines before it, as
+ * `source.slice(0, offset).split("\n").length` counts -- which copied the
+ * file up to the offset on every call, 7% of a Python project's check time
+ * (sqlglot, CPU profile 2026-11-26). Now the newline offsets of a text are
+ * found once and searched.
+ */
 function lineOf(source: string, offset: number): number {
-  return source.slice(0, offset).split("\n").length;
+  const breaks = newlinesOf(source);
+  // A negative offset counts from the end, as `slice` reads it.
+  if (offset < 0) offset = Math.max(source.length + offset, 0);
+  let low = 0;
+  let high = breaks.length;
+  // How many newlines sit before `offset`.
+  while (low < high) {
+    const middle = (low + high) >>> 1;
+    if (breaks[middle]! < offset) low = middle + 1;
+    else high = middle;
+  }
+  return low + 1;
+}
+
+/** The offsets of every newline in a text, for the last few texts asked about. */
+const newlines = new Map<string, number[]>();
+function newlinesOf(source: string): number[] {
+  const known = newlines.get(source);
+  if (known) return known;
+  const found: number[] = [];
+  for (let at = source.indexOf("\n"); at !== -1; at = source.indexOf("\n", at + 1)) found.push(at);
+  if (newlines.size >= 64) newlines.delete(newlines.keys().next().value!);
+  newlines.set(source, found);
+  return found;
 }
 
 /** The callee expression of a call, whatever shape it has. */
