@@ -808,6 +808,30 @@ function targetNames(target: Node, add: (nameNode: Node, holder?: Node) => void,
   for (const child of namedChildren(target)) targetNames(child, add);
 }
 
+/** An assignment's operator: `=`, `+=`, `//=`, `??=`; never a comparison (`==`, `<=`, `!=`). */
+const ASSIGNING = /^(?:[-+*\/%&|^@~]|\*\*|\/\/|<<|>>>?|&&|\|\||\?\?)?=$/;
+
+/**
+ * Whether `left` is a target this node gives a value to, rather than an
+ * operand: `x.a = 1` and `for k, v in xs` give one, `x.a * 2` and `x.a and y`
+ * do not, though every one of them writes `left` and `right`.
+ *
+ * Read off the anonymous token right after `left`, which is its own type
+ * (`docs/reading-a-grammar.md`): an assignment's operator, or the `:` of
+ * Python's `self.x: T = v`. A loop is told by the keyword it opens with, and
+ * there the token is `in` or `of` -- which in TypeScript is also an operator,
+ * `"k" in obj`, so it counts only after `for`.
+ */
+function givesLeftAValue(node: Node, left: Node): boolean {
+  let after: Node | null = null;
+  for (let index = 0; index < node.childCount; index += 1) {
+    if (node.child(index)?.id === left.id) { after = node.child(index + 1); break; }
+  }
+  if (!after || after.isNamed) return false;
+  if (ASSIGNING.test(after.type) || (after.type === ":" && node.childForFieldName("type") !== null)) return true;
+  return (after.type === "in" || after.type === "of") && node.child(0)?.type === "for";
+}
+
 /**
  * Every place a file gives a name a value without a declaration `body.ts`
  * indexes or a binding `boundShapes` reads (missed map 2026-11b, pattern 1d):
@@ -849,7 +873,9 @@ function slotShapes(source: string, language: Language): Map<string, Slot[]> {
     const value = node.childForFieldName("value") ?? node.childForFieldName("right");
     const named = node.childForFieldName("name");
     // An assignment, a loop, a comprehension's `for`: `left`. A declarator destructuring its value: a pattern on `name`.
-    const target = node.childForFieldName("left") ?? (named && named.childCount > 0 && value ? named : null);
+    const left = node.childForFieldName("left");
+    const target = (left && givesLeftAValue(node, left) ? left : null)
+      ?? (named && named.childCount > 0 && value ? named : null);
     if (!target || target.childCount === 0 || parametersOf(node)) return;
     targets.push([target.startIndex, target.endIndex]);
     targetNames(target, add, target.childForFieldName("object") && value ? node : undefined);
