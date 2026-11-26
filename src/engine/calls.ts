@@ -7118,7 +7118,10 @@ function macroRulesIn(file: string, source: string, name: string): MacroDefiniti
     each(tree.rootNode, (node) => {
       if (node.type !== "macro_definition") return;
       const named = node.childForFieldName("name")?.text;
-      if (named !== undefined) found.set(named, [...(found.get(named) ?? []), node]);
+      if (named === undefined) return;
+      const list = found.get(named);
+      if (list) list.push(node);
+      else found.set(named, [node]);
     });
     macrosByTree.set(tree, found);
     byName = found;
