@@ -28,7 +28,7 @@
  */
 import { basesOfDeclaration } from "./conforms";
 import { wholeName } from "./declared";
-import { each, parametersOf, withParsed, type Language, type Node } from "./parse";
+import { each, parametersOf, withParsed, type Language, type Node, type Tree } from "./parse";
 
 export interface Overrides {
   /**
@@ -198,7 +198,18 @@ function onlyNamedChild(node: Node): Node | undefined {
  * method belongs to the method's class. Top-down, because the engine's nodes
  * do not carry a parent.
  */
+/**
+ * `holdersIn` of a whole tree, kept per tree: eight readers in `calls.ts` ask
+ * it of the same file, check after check, and on redb walking the file each
+ * time was 18% of the checker's time (CPU profile, 2026-11-26). A subtree
+ * is walked as before.
+ */
+const holdersByTree = new WeakMap<Tree, Map<number, Node>>();
+
 export function holdersIn(root: Node): Map<number, Node> {
+  const whole = root.tree.rootNode.id === root.id;
+  const known = whole ? holdersByTree.get(root.tree) : undefined;
+  if (known) return known;
   const holders = new Map<number, Node>();
   const visit = (node: Node, holder: Node | undefined): void => {
     const routine = parametersOf(node) !== null;
@@ -211,6 +222,7 @@ export function holdersIn(root: Node): Map<number, Node> {
     }
   };
   visit(root, undefined);
+  if (whole) holdersByTree.set(root.tree, holders);
   return holders;
 }
 
