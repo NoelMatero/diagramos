@@ -72,6 +72,9 @@ describe("comparing two runs", () => {
     expect(scoreOfReport(one)).toEqual({ caught: 60, wrongGreens: 2, planted: 100, falseReds: 1, trueGreens: 40, correct: 50 });
     expect(textDifference(`\n> diagramos@x gate\n\n${one}`, report(400, 9000, []))).toBe(0);
     expect(textDifference(one, report(800, 12, ["  p/t · @calls a -> b"]))).toBeGreaterThan(0);
+    // How many answers came from the compiler memory is how they were got, not what they were.
+    const remembered = one.replace("  machine:", "  compiler memory: 900 of 1000 answers remembered (90%), 100 asked (/m)\n  machine:");
+    expect(textDifference(one, remembered)).toBe(0);
   });
 
   it("compares a score-only set's safety lines in counts, and its result holds no line of them", () => {

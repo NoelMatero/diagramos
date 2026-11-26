@@ -99,6 +99,8 @@ import { pausesLine, readPowerLogSleeps, watchPauses, type Pause } from "./lib/r
 import { CompilerTally, judgeCompilerTrue, type TallyData } from "./lib/run-validity";
 import { projectTimes } from "./lib/bench-jobs";
 import { RUST_AT_ONCE, rustCrateKey, sharingSlots, withSlot } from "./lib/slots";
+import { librariesLine } from "./lib/bench-libraries";
+import { addCounts, CompilerMemory, memoryLine, memoryMode, noCounts, type MemoryCounts } from "./lib/compiler-memory";
 import { inPool, jobsFrom } from "./lib/workers";
 
 const args = process.argv.slice(2);
@@ -113,6 +115,8 @@ const dispatched = args.includes("--dispatched");
 const handedOn = args.includes("--handed-on");
 const words = (flag("words")?.split(",") ?? (classTails || dispatched || handedOn ? ["calls"] : undefined)) as TrueWord[] | undefined;
 const WORDS: TrueWord[] = ["holds", "takes", "returns", "conforms", "calls", "accesses"];
+/** Compiler answers kept across runs for the live arm (`scripts/lib/compiler-memory.ts`); `--no-memory` turns it off. */
+const MEMORY_MODE = memoryMode(args);
 
 /** The pinned clones live in the main checkout; a worktree has none. */
 const CORPUS = existsSync(path.resolve(import.meta.dirname, "..", ".corpus"))
@@ -153,6 +157,8 @@ interface ProjectResult {
   compilers: TallyData;
   /** Times the child did not run while asking the checker. */
   pauses: Pause[];
+  /** What the compiler memory answered and kept for the live arm. */
+  memory?: MemoryCounts;
 }
 
 if (only) {
@@ -244,6 +250,7 @@ function report(results: ProjectResult[], failed: string[]): boolean {
   for (const one of results) compilers.merge(one.compilers);
   const pauses = results.flatMap((one) => one.pauses);
   console.log(`  ${pausesLine(pauses, readPowerLogSleeps(runStarted, Date.now()))}`);
+  console.log(`  ${memoryLine(MEMORY_MODE, results.reduce((sum, one) => addCounts(sum, one.memory), noCounts()))}`);
   console.log(`  referee: ${results.map((one) => `${one.project} ${one.pairs}${one.couldNotRun ? ` (${one.couldNotRun})` : ""}`).join(", ") || "no project measured"}`);
   for (const line of compilers.lines([language])) console.log(`  ${line}`);
   const verdict = judgeCompilerTrue(language, results.map((one) => ({
@@ -365,7 +372,8 @@ async function askChecker(project: string, root: string, pairs: TruePair[]):
   const cache = newCheckCache(createWorkspace(root));
   /* Ten minutes per check, not two: wall clock stretches with a batch's load, and questions cut off by it change counts (bench-planted.mts, BENCH_BUDGET_MS). */
   const BUDGET_MS = 600_000;
-  const pool = liveRefereePool(() => Date.now() + BUDGET_MS);
+  const memory = new CompilerMemory(MEMORY_MODE, { libraries: librariesLine() });
+  const pool = liveRefereePool(() => Date.now() + BUDGET_MS, memory.wrap);
   const compilers = new CompilerTally();
   const pauses = watchPauses();
   const result = { project, tally: {} as Record<string, number>, reds: { live: [], off: [] } as Record<Arm, string[]> };
@@ -432,8 +440,9 @@ async function askChecker(project: string, root: string, pairs: TruePair[]):
     if (batches.indexOf(batch) % 25 === 0) process.stderr.write(`${project}: ${done}/${pairs.length}\n`);
   }
   pool.close();
+  const remembered = memory.flush();
   pauses.stop();
-  return { ...result, compilers: compilers.toJSON(), pauses: pauses.pauses() };
+  return { ...result, compilers: compilers.toJSON(), pauses: pauses.pauses(), memory: remembered };
 }
 
 function bump(result: { tally: Record<string, number> }, key: string): void {

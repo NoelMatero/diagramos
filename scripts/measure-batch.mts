@@ -73,6 +73,8 @@ const languages = args.includes("--no-ct") ? [] : flag("ct")?.split(",") ?? ["ts
 const slots = Number(flag("slots") ?? batchSlots());
 /** Of the slots, how many may be Rust jobs at once (`slots.ts`). */
 const rustSlots = Number(flag("rust") ?? RUST_AT_ONCE);
+/** `--no-memory` / `--memory=verify`, handed to every run (`scripts/lib/compiler-memory.ts`). */
+const memoryArgs = args.filter((one) => one === "--no-memory" || one.startsWith("--memory="));
 const say = (line: string) => console.error(`batch ${new Date().toLocaleTimeString("sv-SE")} ${line}`);
 
 /*
@@ -83,7 +85,7 @@ const say = (line: string) => console.error(`batch ${new Date().toLocaleTimeStri
 const HARNESS = [
   "scripts/bench-planted.mts", "scripts/measure-compiler-true.mts", "scripts/gate.mts",
   "scripts/lib/bench-busy.ts", "scripts/lib/bench-jobs.ts", "scripts/lib/bench-set.ts", "scripts/lib/machine-lock.ts",
-  "scripts/lib/slots.ts", "scripts/lib/workers.ts",
+  "scripts/lib/slots.ts", "scripts/lib/workers.ts", "scripts/lib/compiler-memory.ts",
 ];
 /** The holdout sets kept on branches of their own, never merged. */
 const SET_BRANCHES: Record<string, string> = {
@@ -156,14 +158,14 @@ function runsFor(sha: string, cwd: string): Run[] {
     const study = STUDY_SETS.includes(set);
     list.push({
       arm: sha, name: set, dir, cwd,
-      argv: ["scripts/bench-planted.mts", `--set=${set}`, ...(study ? ["--details", `--dump=${path.join(dir, `${set}.jsonl`)}`] : [])],
+      argv: ["scripts/bench-planted.mts", `--set=${set}`, ...(study ? ["--details", `--dump=${path.join(dir, `${set}.jsonl`)}`] : []), ...memoryArgs],
       out: path.join(dir, `${set}.out`), err: path.join(dir, `${set}.err`), done: path.join(dir, `${set}.done`),
     });
   }
   for (const language of languages) {
     list.push({
       arm: sha, name: `ct-${language}`, dir, cwd,
-      argv: ["scripts/measure-compiler-true.mts", `--language=${language}`, "--cases"],
+      argv: ["scripts/measure-compiler-true.mts", `--language=${language}`, "--cases", ...memoryArgs],
       out: path.join(dir, `ct-${language}.out`), err: path.join(dir, `ct-${language}.err`), done: path.join(dir, `ct-${language}.done`),
     });
   }
@@ -341,7 +343,9 @@ report.push(`MEASURE:BATCH -- ${arms.join(" vs ")} · ${plan.length} runs in ${(
   + ` (${(results.reduce((sum, one) => sum + one.ms, 0) / 1000 / 60).toFixed(1)} min if one after another) · ${slots} slots`);
 report.push(`  ${machine.line()}`);
 for (const one of results) {
-  report.push(`  ${one.run.arm} ${one.run.name.padEnd(10)} ${(one.ms / 1000).toFixed(0).padStart(5)}s  ${one.problems.length === 0 ? "ok" : `NOT COMPARABLE: ${one.problems.join("; ")}`}`);
+  const remembered = /compiler memory: (\d+) of (\d+) answers remembered/.exec(readFileSync(one.run.out, "utf8"));
+  report.push(`  ${one.run.arm} ${one.run.name.padEnd(10)} ${(one.ms / 1000).toFixed(0).padStart(5)}s  ${one.problems.length === 0 ? "ok" : `NOT COMPARABLE: ${one.problems.join("; ")}`}`
+    + (remembered ? `  (${remembered[1]} of ${remembered[2]} compiler answers from memory)` : ""));
 }
 const unusable = toRun.flatMap((sha) => runsFor(sha, "").filter((run) => !existsSync(run.done)).map((run) => `${sha} ${run.name}`));
 if (unusable.length > 0) report.push(`  NOT COMPARABLE, run again to retry: ${unusable.join(", ")}`);

@@ -82,6 +82,7 @@ import { descendantsOf, processRows, stallWindowMs, watchForStall } from "./lib/
 import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
 import { RUST_AT_ONCE, rustCrateKey, sharingSlots, withSlot } from "./lib/slots";
 import { exitWithParent, inPool, jobsFrom, runWorker, sendResult } from "./lib/workers";
+import { addCounts, CompilerMemory, memoryLine, memoryMode, noCounts, type MemoryCounts } from "./lib/compiler-memory";
 
 const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const ACCUSES = new Set<string>(ACCUSING_EDGE_KINDS);
@@ -184,11 +185,21 @@ function rootOf(project: string): string {
  * stopped by the stall watchdog.
  */
 const BENCH_BUDGET_MS = 600_000;
+/**
+ * Compiler answers kept across runs (`scripts/lib/compiler-memory.ts`): a
+ * question an earlier run asked about the same tree, with the same compiler
+ * and the same asking code, is answered from what it kept, and a project
+ * whose every question was asked before starts no server. `--no-memory`
+ * turns it off. The canaries never use it: they are there to show this
+ * machine's compilers answer.
+ */
+const MEMORY_MODE = memoryMode(argv);
+let memory: CompilerMemory | undefined;
 let pools: { project: string; pool: LiveRefereePool } | undefined;
 function poolFor(project: string): LiveRefereePool {
   if (pools?.project !== project) {
     pools?.pool.close();
-    pools = { project, pool: liveRefereePool(() => Date.now() + BENCH_BUDGET_MS) };
+    pools = { project, pool: liveRefereePool(() => Date.now() + BENCH_BUDGET_MS, memory?.wrap) };
   }
   return pools.pool;
 }
@@ -380,6 +391,8 @@ interface ProjectAnswers {
    * retry sleeps and warm-up ladders.
    */
   wallMs: number; cpuMs: number; serverCpuMs: number;
+  /** What the compiler memory answered and kept (`compiler-memory.ts`). */
+  memory: MemoryCounts;
 }
 interface CanaryAnswers { answers: Array<[canary: number, outcome: string, detail: string]>; tally: TallyData }
 
@@ -427,6 +440,7 @@ async function askJob(job: Job): Promise<never> {
     closePools();
     return sendResult({ answers, tally: tally.toJSON() } satisfies CanaryAnswers);
   }
+  memory = new CompilerMemory(MEMORY_MODE, { libraries: librariesLine() });
   const answers: ProjectAnswers["answers"] = [];
   let failed: string | undefined;
   for (const [index, at] of job.claims) {
@@ -450,10 +464,12 @@ async function askJob(job: Job): Promise<never> {
   // Read before the servers go: a process that has exited has no CPU time to read.
   const serverCpuMs = descendantsOf(processRows(), process.pid).reduce((sum, row) => sum + row.cpuMs, 0);
   closePools();
+  const remembered = memory.flush();
   const used = process.cpuUsage();
   return sendResult({
     answers, tally: tally.toJSON(), ...(failed === undefined ? {} : { failed }),
     wallMs: Math.round(performance.now()), cpuMs: Math.round((used.user + used.system) / 1000), serverCpuMs,
+    memory: remembered,
   } satisfies ProjectAnswers);
 }
 
@@ -570,6 +586,8 @@ const queue: Job[] = [...canaryJobs.values(), ...times.plan(projectJobs, jobs, a
 const answers = new Map<Key, Map<KeyClaim, Asked>>();
 /** One line per worker: arrows, wall time, and how much of it the checker itself was running. */
 const costs: string[] = [];
+/** Every worker's compiler memory counts, summed for the header. */
+const memoryCounts = noCounts();
 /** Each project's tallies, by share, merged in report order once every worker is back. */
 const projectTallies = new Map<string, Array<{ share: number; data: TallyData }>>();
 const self = fileURLToPath(import.meta.url);
@@ -609,6 +627,7 @@ const asking = inPool(queue, sharingSlots() ? queue.length : jobs, async (job) =
     return;
   }
   const value = outcome.value as ProjectAnswers;
+  addCounts(memoryCounts, value.memory);
   costs.push(`${job.project}${job.shares > 1 ? ` ${job.share + 1}/${job.shares}` : ""}: ${job.claims.length} claims,`
     + ` ${(value.wallMs / 1000).toFixed(0)}s wall, ${(value.cpuMs / 1000).toFixed(0)}s CPU in the checker`
     + ` (${value.wallMs > 0 ? Math.round((100 * value.cpuMs) / value.wallMs) : 0}%), ${(value.serverCpuMs / 1000).toFixed(0)}s in its servers`
@@ -616,7 +635,8 @@ const asking = inPool(queue, sharingSlots() ? queue.length : jobs, async (job) =
     + Object.entries(value.tally.questions).map(([referee, byProject]) => {
       const row = byProject[job.project] ?? { asked: 0, answered: 0 };
       return `; ${referee} ${row.answered}/${row.asked}`;
-    }).join(""));
+    }).join("")
+    + (value.memory && value.memory.calls > 0 ? `; from memory ${value.memory.remembered}/${value.memory.calls}` : ""));
   if (value.failed !== undefined) {
     if (!failedProjects.has(job.project)) console.error(`  ${job.project}: not measured, left out of every count`);
     failedProjects.set(job.project, value.failed);
@@ -732,6 +752,7 @@ console.log();
 console.log("#296 · PLANTED MISTAKES, AND WHAT THE CHECKER SAID");
 console.log(`  ${librariesLine()}`);
 console.log(`  ${machine.line()}`);
+console.log(`  ${memoryLine(MEMORY_MODE, memoryCounts)}`);
 console.log(`  ${pausesLine(pauses.pauses(), readPowerLogSleeps(runStarted, Date.now()))}`);
 for (const line of tally.lines(scoredLanguages)) console.log(`  ${line}`);
 for (const line of canaryLines) console.log(`  ${line}`);

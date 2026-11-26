@@ -494,6 +494,16 @@ export interface RustLspReferee {
    */
   primedCleanly(): boolean;
   /**
+   * How many times this referee failed to hear an answer: a request that
+   * timed out, came back as an error or was still not ready past every retry,
+   * and the connection closing before it was closed here. A question that
+   * failed reads `undefined` on most of these methods, the same as
+   * rust-analyzer's own "nothing here", so a caller that keeps answers across
+   * runs (`scripts/lib/compiler-memory.ts`) keeps a "nothing here" only from a
+   * referee whose count stayed 0.
+   */
+  failures?(): number;
+  /**
    * `textDocument/documentSymbol` -- what rust-analyzer says each item in a
    * file *is* (#297). `undefined` when it would not answer.
    */
@@ -649,12 +659,18 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
   await spawned;
 
   let closed = false;
+  /** Answers not heard (`failures` on the interface): counted, never acted on here. */
+  let failures = 0;
   const connection = await connectTo(child);
   // rust-analyzer's own stderr is its log, not a failure channel; a referee
   // that printed it would bury the measurement's output in indexing chatter.
   child.stderr.resume();
   connection.onError(() => { /* surfaced per-request instead */ });
-  connection.onClose(() => { closed = true; });
+  connection.onClose(() => {
+    // Closed under it, not by `close()` below: whatever was pending reads as no answer.
+    if (!closed) failures += 1;
+    closed = true;
+  });
   // rust-analyzer asks the client to register capabilities and create progress
   // tokens. Answering `null` is enough -- nothing here acts on either -- but
   // leaving them unanswered stalls its own startup.
@@ -765,6 +781,14 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
   async function askLocationOutcome(
     method: "typeDefinition" | "definition", file: string, source: string, at: number,
   ): Promise<LocationOutcome> {
+    const outcome = await locationOutcome(method, file, source, at);
+    if ("failed" in outcome) failures += 1;
+    return outcome;
+  }
+
+  async function locationOutcome(
+    method: "typeDefinition" | "definition", file: string, source: string, at: number,
+  ): Promise<LocationOutcome> {
     if (closed) return { failed: "rust-analyzer already closed" };
     // Never ask a server that has not said it is ready: an answer from before
     // priming can be an empty array for a receiver it resolves correctly a
@@ -834,10 +858,11 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
         // After priming, no hover is a real "nothing here", as for `askLocation`'s empty array.
         return result ?? undefined;
       } catch (error) {
-        if (!isNotReadyError(error) || attempt >= RETRY_MS.length) return undefined;
+        if (!isNotReadyError(error) || attempt >= RETRY_MS.length) { failures += 1; return undefined; }
       }
       await new Promise((resolve) => setTimeout(resolve, RETRY_MS[attempt]));
     }
+    failures += 1;
     return undefined;
   }
 
@@ -895,15 +920,17 @@ export async function createRustAnalyzerReferee(root: string): Promise<RustLspRe
           const result = (await Promise.race([request, timeout])) as LspDocumentSymbol[] | null;
           if (result) return result;
         } catch (error) {
-          if (!isNotReadyError(error)) return undefined;
+          if (!isNotReadyError(error)) { failures += 1; return undefined; }
         }
-        if (attempt >= RETRY_MS.length) return undefined;
+        if (attempt >= RETRY_MS.length) { failures += 1; return undefined; }
         await new Promise((resolve) => setTimeout(resolve, RETRY_MS[attempt]));
       }
+      failures += 1;
       return undefined;
     },
     warmUp: whenPrimed,
     primedCleanly: () => primed,
+    failures: () => failures,
     version: () => serverVersion,
     close: () => {
       if (closed) return;
