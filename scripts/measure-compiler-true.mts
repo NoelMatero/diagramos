@@ -363,7 +363,9 @@ async function askChecker(project: string, root: string, pairs: TruePair[]):
 
   const accusing = new Set<string>(ACCUSING_EDGE_KINDS);
   const cache = newCheckCache(createWorkspace(root));
-  const pool = liveRefereePool(() => Date.now() + 120_000);
+  /* Ten minutes per check, not two: wall clock stretches with a batch's load, and questions cut off by it change counts (bench-planted.mts, BENCH_BUDGET_MS). */
+  const BUDGET_MS = 600_000;
+  const pool = liveRefereePool(() => Date.now() + BUDGET_MS);
   const compilers = new CompilerTally();
   const pauses = watchPauses();
   const result = { project, tally: {} as Record<string, number>, reds: { live: [], off: [] } as Record<Arm, string[]> };
@@ -399,7 +401,7 @@ async function askChecker(project: string, root: string, pairs: TruePair[]):
       try {
         if (arm === "off") report = run(undefined);
         else {
-          const live = await refereedCheckLive(root, run, { budgetMs: 120_000, pool });
+          const live = await refereedCheckLive(root, run, { budgetMs: BUDGET_MS, pool });
           compilers.add(project, live.checkedWith);
           report = live.report;
         }

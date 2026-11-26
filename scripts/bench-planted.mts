@@ -173,8 +173,17 @@ function rootOf(project: string): string {
  * measurement, so a board that would have degraded to the text reading under
  * the product's own budget should not degrade here: what this run is for is
  * the ceiling, and the product's cost is measured separately.
+ *
+ * Ten minutes, not two (2026-11-26). The deadline counts wall clock, and a
+ * check that takes 50 s alone takes two or three times that with every
+ * project of a batch running at once: holdout-d's sqlalchemy crossed 120 s
+ * part-way and its last batch of pyright questions was never asked -- 129
+ * fewer, in every batch, none alone or in a lighter run. No solo check comes
+ * near it (the slowest, a regex arrow, is 113 s, its questions asked in the
+ * first few), so alone it changes nothing; a server that truly hangs is
+ * stopped by the stall watchdog.
  */
-const BENCH_BUDGET_MS = 120_000;
+const BENCH_BUDGET_MS = 600_000;
 let pools: { project: string; pool: LiveRefereePool } | undefined;
 function poolFor(project: string): LiveRefereePool {
   if (pools?.project !== project) {
