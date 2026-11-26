@@ -231,9 +231,16 @@ const RESOLVERS: Record<LiveLanguage, Resolvers> = {
   },
 };
 
-/** A pool of the right shape for `LiveOptions.pool`, for a caller holding one. */
-export function liveRefereePool(until?: () => number): LiveRefereePool {
-  return refereePool<PyrightLspReferee & RustLspReferee>(until);
+/**
+ * A pool of the right shape for `LiveOptions.pool`, for a caller holding one.
+ * `wrap` is `refereePool`'s: how each server is started, for a measurement
+ * that keeps compiler answers across runs.
+ */
+export function liveRefereePool(
+  until?: () => number,
+  wrap?: (key: string, start: () => Promise<PyrightLspReferee & RustLspReferee>) => Promise<PyrightLspReferee & RustLspReferee>,
+): LiveRefereePool {
+  return refereePool<PyrightLspReferee & RustLspReferee>(until, wrap);
 }
 
 /**

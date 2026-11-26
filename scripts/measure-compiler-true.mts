@@ -10,6 +10,8 @@
  *   ... --words=holds,takes  only these words
  *   ... --projects=a,b     only these projects
  *   ... --one=<project>    one project, in this process (prints raw JSON)
+ *   ... --jobs=<n>         projects at once, each in its own process (default: BOARD_AI_JOBS,
+ *                          else sized to the machine); --jobs=1 is one after another
  *   ... --names=plain      Rust: draw a method as `file#new`, not `file#Money::new`
  *                          (#382). TypeScript and Python always draw `Class.method`.
  *   ... --dispatched       TypeScript, only `@calls` arrows through a call the compiler
@@ -85,7 +87,7 @@
  * a red is always one arrow's. Each project runs in a process of its own, and
  * a project that fails is named, never dropped.
  */
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -95,6 +97,13 @@ import type { CrateOutcome } from "../src/engine/referee-rustc";
 import type { TruePair, TrueWord } from "./lib/compiler-true-ts";
 import { pausesLine, readPowerLogSleeps, watchPauses, type Pause } from "./lib/run-pauses";
 import { CompilerTally, judgeCompilerTrue, type TallyData } from "./lib/run-validity";
+import { projectTimes } from "./lib/bench-jobs";
+import { RUST_AT_ONCE, rustCrateKey, sharingSlots, withSlot } from "./lib/slots";
+import { librariesLine } from "./lib/bench-libraries";
+import {
+  addCounts, CompilerMemory, filesHash, memoryLine, memoryMode, noCounts, remembered, treeState, versionOf, type MemoryCounts,
+} from "./lib/compiler-memory";
+import { inPool, jobsFrom } from "./lib/workers";
 
 const args = process.argv.slice(2);
 const flag = (name: string) => args.find((one) => one.startsWith(`--${name}=`))?.split("=")[1];
@@ -108,6 +117,15 @@ const dispatched = args.includes("--dispatched");
 const handedOn = args.includes("--handed-on");
 const words = (flag("words")?.split(",") ?? (classTails || dispatched || handedOn ? ["calls"] : undefined)) as TrueWord[] | undefined;
 const WORDS: TrueWord[] = ["holds", "takes", "returns", "conforms", "calls", "accesses"];
+/** Compiler answers kept across runs for the live arm (`scripts/lib/compiler-memory.ts`); `--no-memory` turns it off. */
+const MEMORY_MODE = memoryMode(args);
+/*
+ * The pinned clones are never edited while a measurement runs, so the
+ * TypeScript referee may trust a program it built without stat'ing all of its
+ * files again on every question (`referee-ts.ts`, `BOARD_AI_TREES_STILL`).
+ * Passed to every worker through the environment.
+ */
+process.env.BOARD_AI_TREES_STILL ??= "1";
 
 /** The pinned clones live in the main checkout; a worktree has none. */
 const CORPUS = existsSync(path.resolve(import.meta.dirname, "..", ".corpus"))
@@ -148,6 +166,10 @@ interface ProjectResult {
   compilers: TallyData;
   /** Times the child did not run while asking the checker. */
   pauses: Pause[];
+  /** What the compiler memory answered and kept for the live arm. */
+  memory?: MemoryCounts;
+  /** Whether the referee's pairs were remembered from an earlier run rather than worked out; `contradicted` under verify. */
+  referee?: "remembered" | "worked out" | "contradicted";
 }
 
 if (only) {
@@ -167,11 +189,29 @@ const failed: string[] = [];
 const runStarted = Date.now();
 const self = fileURLToPath(import.meta.url);
 const projects = flag("projects")?.split(",") ?? Object.keys(trees);
-for (const project of projects) {
+/*
+ * Up to `--jobs` projects at once (`scripts/lib/workers.ts`; `--jobs=1` is
+ * one after another, as it was), each in its process of its own as before,
+ * and read back in the order above whichever finished first.
+ */
+const childArgs = args.filter((one) => !one.startsWith("--jobs="));
+/* Longest first, by the last run's times; inside `measure:batch`, sharing its worker slots (`slots.ts`). */
+const times = projectTimes(`compiler-true-${language}${words ? `-${words.join("+")}` : ""}`);
+const order = [...projects].sort((a, b) => times.of(b) - times.of(a));
+/* A Rust project shares its crate with the bench's main set: never two rust-analyzers on it at once (`workers.ts`). */
+const apart = (project: string) => (language === "rust" ? rustCrateKey(path.join(CORPUS, project)) : undefined);
+const ran = await inPool(order, sharingSlots() ? order.length : jobsFrom(args), (project) => withSlot(times.of(project), async () => {
   process.stderr.write(`${project}...\n`);
-  const run = spawnSync(process.execPath, [...process.execArgv, self, ...args, `--one=${project}`], {
-    encoding: "utf8", maxBuffer: 1 << 28, env: { ...process.env },
-  });
+  const began = Date.now();
+  const run = await runChild(project);
+  if (run.status === 0) times.record(project, Date.now() - began);
+  process.stderr.write(`${project}: exit ${run.status} in ${((Date.now() - began) / 1000).toFixed(0)}s\n`);
+  return run;
+}, apart(project), language === "rust"), apart, { of: () => language === "rust", at: RUST_AT_ONCE });
+times.save();
+const runs = projects.map((project) => ran[order.indexOf(project)]!);
+for (const [index, project] of projects.entries()) {
+  const run = runs[index]!;
   const line = run.stdout.split("\n").find((one) => one.startsWith("@@RESULT "));
   if (run.status !== 0 || !line) {
     failed.push(`${project} (exit ${run.status}): ${(run.stderr || "").trim().split("\n").slice(-3).join(" | ")}`);
@@ -186,6 +226,29 @@ for (const project of projects) {
 const valid = report(results, failed);
 process.exit(valid ? 0 : 1);
 
+/** One project's child, with everything it printed. Killed with this process, however that ends. */
+function runChild(project: string): Promise<{ status: number | null; stdout: string; stderr: string }> {
+  const child = spawn(process.execPath, [...process.execArgv, self, ...childArgs, `--one=${project}`], {
+    env: { ...process.env }, stdio: ["ignore", "pipe", "pipe"],
+  });
+  const kill = () => { try { child.kill("SIGKILL"); } catch { /* gone */ } };
+  process.once("exit", kill);
+  const out: Buffer[] = [];
+  const err: Buffer[] = [];
+  child.stdout.on("data", (chunk: Buffer) => out.push(chunk));
+  child.stderr.on("data", (chunk: Buffer) => err.push(chunk));
+  return new Promise((resolve) => {
+    child.once("error", (error) => {
+      process.removeListener("exit", kill);
+      resolve({ status: null, stdout: "", stderr: error.message });
+    });
+    child.once("close", (status) => {
+      process.removeListener("exit", kill);
+      resolve({ status, stdout: Buffer.concat(out).toString("utf8"), stderr: Buffer.concat(err).toString("utf8") });
+    });
+  });
+}
+
 /** Prints the run, and says whether it measured anything. */
 function report(results: ProjectResult[], failed: string[]): boolean {
   const tally: Record<string, number> = {};
@@ -198,6 +261,12 @@ function report(results: ProjectResult[], failed: string[]): boolean {
   for (const one of results) compilers.merge(one.compilers);
   const pauses = results.flatMap((one) => one.pauses);
   console.log(`  ${pausesLine(pauses, readPowerLogSleeps(runStarted, Date.now()))}`);
+  console.log(`  ${memoryLine(MEMORY_MODE, results.reduce((sum, one) => addCounts(sum, one.memory), noCounts()))}`);
+  {
+    const count = (what: string) => results.filter((one) => one.referee === what).length;
+    console.log(`  referee memory: pairs remembered for ${count("remembered")} of ${results.length} projects`
+      + (count("contradicted") > 0 ? `; verify: ${count("contradicted")} worked out differently` : ""));
+  }
   console.log(`  referee: ${results.map((one) => `${one.project} ${one.pairs}${one.couldNotRun ? ` (${one.couldNotRun})` : ""}`).join(", ") || "no project measured"}`);
   for (const line of compilers.lines([language])) console.log(`  ${line}`);
   const verdict = judgeCompilerTrue(language, results.map((one) => ({
@@ -240,30 +309,50 @@ function report(results: ProjectResult[], failed: string[]): boolean {
 async function measureOne(project: string): Promise<ProjectResult> {
   const root = path.join(CORPUS, project);
   const dirs = TREES[language]![project] ?? [];
-  let pairs: TruePair[];
   let couldNotRun: string | undefined;
-  if (language === "ts") {
-    const ts = (await import("typescript")).default;
-    const { typescriptTruePairs } = await import("./lib/compiler-true-ts");
-    pairs = typescriptTruePairs(ts, root, dirs, { dispatched, handedOn });
-  } else if (language === "python") {
-    pairs = pythonTruePairs(project, dirs);
-  } else {
+  /*
+   * The referee's pairs depend on the project and the referee alone, never on
+   * the checker, so they are remembered across runs (`compiler-memory.ts`):
+   * keyed on the checkout's state, the referee's code and version, and the
+   * options that shape the list.
+   */
+  const tree = treeState(root);
+  const keyOf = (referee: string[], compiler: string): Record<string, string> | undefined => tree && {
+    language, ...tree, referee: filesHash(referee), compiler,
+    options: JSON.stringify({ dirs, dispatched, handedOn, plainNames }),
+  };
+  const ts = language === "ts" ? (await import("typescript")).default : undefined;
+  const python = process.env.JEDI_PYTHON ?? "python3";
+  const key = language === "ts" ? keyOf(["scripts/lib/compiler-true-ts.ts"], `typescript ${ts!.version}`)
+    : language === "python" ? keyOf(["scripts/lib/compiler_true_jedi.py"],
+      versionOf(python, ["-c", "import sys, jedi, parso; print(sys.version, jedi.__version__, parso.__version__)"]))
+    : keyOf(["scripts/lib/compiler-true-rust.ts", "src/engine/referee-rustc.ts", "src/engine/compiled-calls.ts", "src/engine/parse.ts"],
+      versionOf("rustc", ["-vV"], root));
+  const referee = await remembered(MEMORY_MODE, `pairs-${language}`, key, async (): Promise<TruePair[]> => {
+    if (language === "ts") {
+      const { typescriptTruePairs } = await import("./lib/compiler-true-ts");
+      return typescriptTruePairs(ts!, root, dirs, { dispatched, handedOn });
+    }
+    if (language === "python") return pythonTruePairs(project, dirs);
     const { rustTruePairs } = await import("./lib/compiler-true-rust");
-    pairs = await rustTruePairs(root, plainNames, (crates: readonly CrateOutcome[]) => {
+    return rustTruePairs(root, plainNames, (crates: readonly CrateOutcome[]) => {
       const tried = crates.filter((crate) => !crate.nothingToBuild);
       const built = tried.filter((crate) => crate.built).length;
       if (tried.length > 0 && built === 0) {
         couldNotRun = `the Rust compiler built none of ${tried.length} crates: ${tried[0]!.why ?? "no reason recorded"}`;
       }
     });
-  }
-  const referee = pairs.length;
+  }, (value) => value.length > 0 && couldNotRun === undefined);
+  let pairs = referee.value;
+  const listed = pairs.length;
   if (words) pairs = pairs.filter((pair) => words.includes(pair.word));
   if (classTails) pairs = classTailPairs(pairs);
   process.stderr.write(`${project}: ${pairs.length} pairs\n`);
   const result = await askChecker(project, root, pairs);
-  return { ...result, pairs: referee, ...(couldNotRun ? { couldNotRun } : {}) };
+  return {
+    ...result, pairs: listed, ...(couldNotRun ? { couldNotRun } : {}),
+    referee: referee.remembered ? "remembered" : referee.contradicted ? "contradicted" : "worked out",
+  };
 }
 
 /**
@@ -317,7 +406,10 @@ async function askChecker(project: string, root: string, pairs: TruePair[]):
 
   const accusing = new Set<string>(ACCUSING_EDGE_KINDS);
   const cache = newCheckCache(createWorkspace(root));
-  const pool = liveRefereePool(() => Date.now() + 120_000);
+  /* Ten minutes per check, not two: wall clock stretches with a batch's load, and questions cut off by it change counts (bench-planted.mts, BENCH_BUDGET_MS). */
+  const BUDGET_MS = 600_000;
+  const memory = new CompilerMemory(MEMORY_MODE, { libraries: librariesLine() });
+  const pool = liveRefereePool(() => Date.now() + BUDGET_MS, memory.wrap);
   const compilers = new CompilerTally();
   const pauses = watchPauses();
   const result = { project, tally: {} as Record<string, number>, reds: { live: [], off: [] } as Record<Arm, string[]> };
@@ -353,7 +445,7 @@ async function askChecker(project: string, root: string, pairs: TruePair[]):
       try {
         if (arm === "off") report = run(undefined);
         else {
-          const live = await refereedCheckLive(root, run, { budgetMs: 120_000, pool });
+          const live = await refereedCheckLive(root, run, { budgetMs: BUDGET_MS, pool });
           compilers.add(project, live.checkedWith);
           report = live.report;
         }
@@ -384,8 +476,9 @@ async function askChecker(project: string, root: string, pairs: TruePair[]):
     if (batches.indexOf(batch) % 25 === 0) process.stderr.write(`${project}: ${done}/${pairs.length}\n`);
   }
   pool.close();
+  const remembered = memory.flush();
   pauses.stop();
-  return { ...result, compilers: compilers.toJSON(), pauses: pauses.pauses() };
+  return { ...result, compilers: compilers.toJSON(), pauses: pauses.pauses(), memory: remembered };
 }
 
 function bump(result: { tally: Record<string, number> }, key: string): void {

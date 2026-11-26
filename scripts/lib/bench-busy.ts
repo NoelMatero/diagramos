@@ -26,12 +26,20 @@
  *   `measure-queue-hold.mts`, the place holder of the home-made gate in
  *   `~/bench-477`, which waits on us while we would wait on it.
  *
+ * - **A run in another lane is not in the way (2026-11-25).** With more
+ *   than one lane (`machine-lock.ts`), a run that holds a lane does not wait
+ *   on, or count as sharing, a run that holds another: the holder and
+ *   everything below it are that lane's. A run started without the gate is
+ *   still counted by everyone, and an ungated run counts everything.
+ *
  * And `waitForQuiet` takes the machine before it looks (#489): a look alone
  * let two waiters see the same quiet second and both start.
  */
 import { spawn } from "node:child_process";
 
-import { logStart, loggedRuns, processes, stillGoing, takeMachine, waitingPids, type Proc } from "./machine-lock";
+import {
+  heldLane, laneCount, laneHolders, logStart, loggedRuns, processes, stillGoing, takeMachine, waitingPids, type Proc,
+} from "./machine-lock";
 
 export interface BusyProcess { pid: number; command: string }
 
@@ -44,8 +52,13 @@ const NAMES = process.env.BOARD_AI_GATE_RUNS ?? `(${["bench-plan" + "ted", "meas
 const RUNS = new RegExp(`^\\S*node(\\s|$).*(${NAMES})`);
 /** The script a run's command names, last mention first, so a wrapper and what it starts read alike. */
 const scriptOf = (command: string) => [...command.matchAll(new RegExp(NAMES, "g"))].at(-1)?.[0];
-/** The home-made gate's place in the queue, and ours for it (`holdPlace`); neither is a run. */
-const PLACE_HOLDER = /measure-(queue|gate)-hold/;
+/**
+ * Not runs: the home-made gate's place in the queue and ours for it
+ * (`holdPlace`), and `measure:batch` only reading finished results
+ * (`--compare`, `--dry-run`) -- one such call during a batch marked a set
+ * "SHARED" on 2026-11-25.
+ */
+const PLACE_HOLDER = /measure-(queue|gate)-hold|measure-batch\.mts\b.*--(compare|dry-run)/;
 
 /** This process's own family: itself, every ancestor and every descendant. */
 function family(all: Proc[], self: number): Set<number> {
@@ -80,10 +93,60 @@ function waiting(all: Proc[]): Set<number> {
   return out;
 }
 
+/**
+ * Everything below the holders of the lanes `which` picks: each holder, its
+ * descendants, and the wrappers above it running the same script.
+ */
+function belowHolders(all: Proc[], which: (run: string) => boolean): Set<number> {
+  const out = new Set<number>();
+  const byPid = new Map(all.map((row) => [row.pid, row]));
+  for (const owner of laneHolders(all)) {
+    if (!which(owner.run)) continue;
+    out.add(owner.pid);
+    // And the wrappers right above it running the same script (`tsx`, as for a waiter): the same run.
+    const script = scriptOf(byPid.get(owner.pid)?.command ?? "");
+    if (script !== undefined) {
+      for (let up = byPid.get(byPid.get(owner.pid)?.ppid ?? -1); up && scriptOf(up.command) === script; up = byPid.get(up.ppid)) {
+        out.add(up.pid);
+      }
+    }
+    for (let grew = true; grew;) {
+      grew = false;
+      for (const row of all) if (!out.has(row.pid) && out.has(row.ppid)) { out.add(row.pid); grew = true; }
+    }
+  }
+  return out;
+}
+
+/**
+ * The processes of runs that hold another lane, when this run holds one.
+ * Empty for a run that holds no lane, which shares the machine with every
+ * other run.
+ */
+function otherLanes(all: Proc[]): Set<number> {
+  if (heldLane() === undefined) return new Set();
+  const mine = process.env.BOARD_AI_RUN;
+  return belowHolders(all, (run) => run !== mine);
+}
+
+/**
+ * This run's own processes beyond its ancestors and descendants: everything
+ * below the lock its run holds. `measure:batch` starts several benches side
+ * by side under one lock, and a sibling is the same measurement, not another
+ * one -- counted as busy, each would wait for the others for ever.
+ */
+function ownRun(all: Proc[]): Set<number> {
+  const mine = process.env.BOARD_AI_RUN;
+  return mine === undefined ? new Set() : belowHolders(all, (run) => run === mine);
+}
+
 function busyIn(all: Proc[], self: number): Proc[] {
   const mine = family(all, self);
+  for (const pid of ownRun(all)) mine.add(pid);
   const parked = waiting(all);
-  return all.filter((row) => !mine.has(row.pid) && !parked.has(row.pid) && RUNS.test(row.command) && !PLACE_HOLDER.test(row.command));
+  const beside = otherLanes(all);
+  return all.filter((row) => !mine.has(row.pid) && !parked.has(row.pid) && !beside.has(row.pid)
+    && RUNS.test(row.command) && !PLACE_HOLDER.test(row.command));
 }
 
 /** Other runs that are using the machine now; empty when it is free. */
@@ -98,8 +161,8 @@ export function otherRuns(self: number = process.pid): BusyProcess[] {
  * per new reason, not once per poll.
  */
 export async function waitForQuiet(say: (line: string) => void, pollMs = 2_000,
-  { onSignal = true }: { onSignal?: boolean } = {}): Promise<void> {
-  await takeMachine(process.argv.slice(1).join(" "), say, { pollMs: Math.min(pollMs, 1_000), onSignal });
+  { onSignal = true, whole = false }: { onSignal?: boolean; whole?: boolean } = {}): Promise<void> {
+  await takeMachine(process.argv.slice(1).join(" "), say, { pollMs: Math.min(pollMs, 1_000), onSignal, whole });
   let last = "";
   let hold: (() => void) | undefined;
   try {
@@ -146,6 +209,8 @@ export interface Recorded { line: () => string; end: () => void }
  */
 export function recordRun(command: string, sampleMs = 10_000): Recorded {
   const at = Date.now();
+  /* Whether this run held a lane when it started: it may have let go by the time `line()` is read. */
+  const inLane = heldLane() !== undefined;
   const log = logStart(command, processes());
   const seen = new Map<number, Proc & { from: number; to: number }>();
   const sample = () => {
@@ -165,21 +230,35 @@ export function recordRun(command: string, sampleMs = 10_000): Recorded {
     sample();
     const now = Date.now();
     const all = processes();
-    const runs = loggedRuns().filter((one) => one.run !== process.env.BOARD_AI_RUN
+    const overlapping = loggedRuns().filter((one) => one.run !== process.env.BOARD_AI_RUN
       && one.at < now && (one.end ?? (stillGoing(one, all) ? now : one.at)) >= at);
+    // A run in a lane of its own beside this one, when this one holds a lane too, is by design.
+    const laned = heldLane() !== undefined || inLane;
+    const beside = laned ? overlapping.filter((one) => one.lane !== undefined) : [];
+    const runs = overlapping.filter((one) => !beside.includes(one));
     // One line per other run tree, its first process.
-    const trees = new Map<string, typeof runs[number]>();
-    for (const one of runs) if (!trees.has(one.run)) trees.set(one.run, one);
-    const logged = new Set(runs.flatMap((one) => [one.pid, one.ppid]));
+    const treesOf = (list: typeof overlapping) => {
+      const trees = new Map<string, typeof overlapping[number]>();
+      for (const one of list) if (!trees.has(one.run)) trees.set(one.run, one);
+      return [...trees.values()].map((one) => `pid ${one.pid} ${clock(one.at)}-${one.end ? clock(one.end) : "on"}: ${one.command.slice(0, 80)}`);
+    };
+    const logged = new Set(overlapping.flatMap((one) => [one.pid, one.ppid]));
     const loose = [...seen.values()].filter((one) => !logged.has(one.pid) && !logged.has(one.ppid));
     const shared = [
-      ...[...trees.values()].map((one) => `pid ${one.pid} ${clock(one.at)}-${one.end ? clock(one.end) : "on"}: ${one.command.slice(0, 80)}`),
+      ...treesOf(runs),
       ...loose.map((one) => `pid ${one.pid} seen ${clock(one.from)}-${clock(one.to)}: ${one.command.slice(0, 80)}`),
     ];
-    if (shared.length === 0) return "machine: no other measurement ran during this one";
+    const neighbours = treesOf(beside);
+    const lanesNote = neighbours.length === 0 ? ""
+      : `; beside it in other gate lanes (${laneCount()} lanes): ${neighbours.slice(0, 3).join("; ")}`
+        + (neighbours.length > 3 ? `; and ${neighbours.length - 3} more` : "");
+    if (shared.length === 0) {
+      return neighbours.length === 0 ? "machine: no other measurement ran during this one"
+        : `machine: no ungated measurement ran during this one${lanesNote}`;
+    }
     return `machine: SHARED -- ${shared.length} other run${shared.length === 1 ? "" : "s"} used this machine during this one,`
       + ` so its numbers are not comparable with a run taken alone: ${shared.slice(0, 3).join("; ")}`
-      + (shared.length > 3 ? `; and ${shared.length - 3} more` : "");
+      + (shared.length > 3 ? `; and ${shared.length - 3} more` : "") + lanesNote;
   };
   return { line, end: () => { clearInterval(timer); log.end(); } };
 }
