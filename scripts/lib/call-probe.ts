@@ -75,7 +75,20 @@ interface Insertion {
   text: string;
   /** Text closing what `text` opened, written further on: a value wrapped where it stands. */
   close?: { at: number; text: string };
+  /** Whether `text` carries `CHECKED`, the error that proves the compiler read it. */
+  sentinel?: true;
 }
+
+/**
+ * An error the compiler reports wherever it checks code at all: a member
+ * nothing has. A probe written where the compiler may not look -- a key of
+ * an object handed to a call on an `any`, whose function arguments are never
+ * checked, or a line after `// @ts-expect-error` -- carries it, and is only
+ * believed where it was reported. Without it, 58 keys handed to untyped
+ * calls in nest's and TanStack's tests read as calls accepted.
+ */
+const CHECKED = (index: number) => `;({} as {}).__dgmChecked${index};`;
+const CHECKED_CODE = 2339;
 
 /** Where a call to this declaration can be written, and how it is spelled there. */
 function insertionFor(
@@ -113,8 +126,9 @@ function insertionFor(
     const probe = `__dgmP${index}`;
     return {
       at: value.getStart(sourceFile),
-      text: `((${probe}) => { ;(${probe})?.(); /*dgm-probe-${index}*/ return ${probe}; })(`,
+      text: `((${probe}) => { ;(${probe})?.(); ${CHECKED(index)} /*dgm-probe-${index}*/ return ${probe}; })(`,
       close: { at: value.getEnd(), text: ")" },
+      sentinel: true,
     };
   }
   if (ts.isPropertyAccessExpression(node.parent) && node.parent.name === node) {
@@ -123,7 +137,9 @@ function insertionFor(
     if (access.expression.kind !== ts.SyntaxKind.ThisKeyword || !ts.isBinaryExpression(assignment)
       || assignment.left !== access || assignment.operatorToken.kind !== ts.SyntaxKind.EqualsToken
       || !ts.isExpressionStatement(assignment.parent)) return undefined;
-    return { at: assignment.parent.getEnd(), text: `\n;(this.${name})?.(); /*dgm-probe-${index}*/\n` };
+    return {
+      at: assignment.parent.getEnd(), text: `\n;(this.${name})?.(); ${CHECKED(index)} /*dgm-probe-${index}*/\n`, sentinel: true,
+    };
   }
   if (ts.isVariableDeclaration(declaration)) {
     const list = declaration.parent;
@@ -268,7 +284,7 @@ export function probeCallsTs(sites: readonly ProbeSite[]): Map<string, ProbeAnsw
     options = { ...options, allowJs: true, checkJs: true, noEmit: true, skipLibCheck: true };
 
     const rewritten = new Map<string, string>();
-    const probes: { key: string; file: string; start: number; end: number }[] = [];
+    const probes: { key: string; file: string; start: number; end: number; sentinel?: true }[] = [];
     for (const file of files) {
       const source = readFileSync(file, "utf8");
       const kind = file.endsWith("x") ? ts.ScriptKind.TSX
@@ -293,8 +309,8 @@ export function probeCallsTs(sites: readonly ProbeSite[]): Map<string, ProbeAnsw
        * opens there starts after it.
        */
       const pieces = insertions.flatMap((one) => [
-        { at: one.at, text: one.text, key: one.key as string | undefined, order: 0 },
-        ...(one.close ? [{ at: one.close.at, text: one.close.text, key: undefined, order: 1 }] : []),
+        { at: one.at, text: one.text, key: one.key as string | undefined, order: 0, sentinel: one.sentinel },
+        ...(one.close ? [{ at: one.close.at, text: one.close.text, key: undefined, order: 1, sentinel: undefined }] : []),
       ]).sort((a, b) => a.at - b.at || b.order - a.order);
       let text = "";
       let cursor = 0;
@@ -302,7 +318,9 @@ export function probeCallsTs(sites: readonly ProbeSite[]): Map<string, ProbeAnsw
         text += source.slice(cursor, piece.at);
         const start = text.length;
         text += piece.text;
-        if (piece.key !== undefined) probes.push({ key: piece.key, file, start, end: text.length });
+        if (piece.key !== undefined) {
+          probes.push({ key: piece.key, file, start, end: text.length, ...(piece.sentinel ? { sentinel: true as const } : {}) });
+        }
         cursor = piece.at;
       }
       text += source.slice(cursor);
@@ -335,8 +353,13 @@ export function probeCallsTs(sites: readonly ProbeSite[]): Map<string, ProbeAnsw
       }
       const diagnostics = program.getSemanticDiagnostics(sourceFile);
       for (const probe of probes.filter((one) => one.file === file)) {
-        const inside = diagnostics.filter((one) =>
+        let inside = diagnostics.filter((one) =>
           one.start !== undefined && one.start >= probe.start && one.start < probe.end);
+        if (probe.sentinel) {
+          const heard = inside.some((one) => one.code === CHECKED_CODE && /__dgmChecked/.test(ts.flattenDiagnosticMessageText(one.messageText, "\n")));
+          if (!heard) { answers.set(probe.key, { callable: "unknown", value: true }); continue; }
+          inside = inside.filter((one) => !(one.code === CHECKED_CODE && /__dgmChecked/.test(ts.flattenDiagnosticMessageText(one.messageText, "\n"))));
+        }
         const callable = readProbe(inside, sourceFile, probe, checker);
         answers.set(probe.key, { callable, value: true, ...(callable === "unknown" ? {} : { by: "typescript" as const }) });
       }
@@ -348,7 +371,7 @@ export function probeCallsTs(sites: readonly ProbeSite[]): Map<string, ProbeAnsw
 function readProbe(
   diagnostics: readonly ts.Diagnostic[],
   sourceFile: ts.SourceFile,
-  probe: { start: number; end: number },
+  probe: { start: number; end: number; sentinel?: true },
   checker: ts.TypeChecker,
 ): ProbeReading {
   if (diagnostics.some((one) => NOT_CALLABLE.has(one.code))) return "lacks";
@@ -369,7 +392,17 @@ function readProbe(
   if (!callee) return "unknown";
   const type = checker.getTypeAtLocation(callee);
   const members = type.isUnion() ? type.types : [type];
-  return members.some((one) => one.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) ? "unknown" : "has";
+  if (members.some((one) => one.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown))) return "unknown";
+  /*
+   * A call accepted on a value with no call signature is a compiler that
+   * cannot see its own globals: nest's e2e specs sit outside every
+   * tsconfig, with no `lib`, and there `true?.()` passes in silence. Only the
+   * new probes ask this, so the numbers `measure:parts` licensed by stay as
+   * they were measured.
+   */
+  if (probe.sentinel && !members.some((one) => one.getCallSignatures().length > 0 || one.getConstructSignatures().length > 0
+    || one.getSymbol()?.getName() === "Function")) return "unknown";
+  return "has";
 }
 
 /* ------------------------------------------------------------------- Python */
