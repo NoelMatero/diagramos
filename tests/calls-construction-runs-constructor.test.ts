@@ -267,33 +267,16 @@ const RS = {
   "src/lib.rs": "pub mod progress;\n",
   "src/progress.rs": [
     "pub struct Progress {",
-    "    pub cols: Vec<BarColumn>,",
+    "    pub ticks: u32,",
     "}",
     "",
     "impl Progress {",
-    "    pub fn new() -> Self {",
-    "        let mut made = Progress { cols: Vec::new() };",
-    "        made.refresh();",
-    "        made.cols = Progress::get_default_columns();",
-    "        made",
+    "    pub fn start(&mut self) {",
+    "        self.refresh();",
     "    }",
     "",
-    "    pub fn get_default_columns() -> Vec<BarColumn> {",
-    "        let mut cols = Vec::new();",
-    "        cols.push(BarColumn::new());",
-    "        cols",
-    "    }",
-    "",
-    "    pub fn refresh(&mut self) {}",
-    "}",
-    "",
-    "pub struct BarColumn {",
-    "    pub width: u32,",
-    "}",
-    "",
-    "impl BarColumn {",
-    "    pub fn new() -> Self {",
-    "        BarColumn { width: 1 }",
+    "    pub fn refresh(&mut self) {",
+    "        self.ticks += 1;",
     "    }",
     "}",
     "",
@@ -302,30 +285,36 @@ const RS = {
     "}",
     "",
     "impl Task {",
-    "    pub fn new() -> Self {",
-    "        Task { done: false }",
+    "    pub fn start(&mut self) {",
+    "        self.done = false;",
     "    }",
     "}",
     "",
   ].join("\n"),
 };
 
-describe.skipIf(!hasRustAnalyzer)("Rust: a call found running back from Type::new is that type's own", () => {
-  it("confirms Type::new written at the call, and does not turn it round from another type's new", async () => {
-    repo = scratchRepo(RS);
-    const pairs: Array<[string, string]> = [
-      ["src/progress.rs#Progress::get_default_columns", "src/progress.rs#BarColumn::new"],
-      ["src/progress.rs#Progress::refresh", "src/progress.rs#Task::new"],
-    ];
-    const { each, report } = await verdicts(repo, calls(pairs));
-    expect(each[0]!.reds).toEqual([]);
-    expect(each[1]!.reds).not.toContain("calls-backwards");
-    expect(report.edges.map((one) => one.detail ?? "").join("\n")).not.toMatch(/made\.refresh\(\)/);
-  }, 300_000);
+/* Rust has no constructors; the half that applies is the owner's: `Progress::start` calls `refresh`, `Task::start` does not. */
+describe("Rust: a call found running back from a Type::method end is that type's own", () => {
+  const OTHER: Arrow = ["src/progress.rs#Progress::refresh", "src/progress.rs#Task::start", "calls"];
+  const OWN: Arrow = ["src/progress.rs#Progress::refresh", "src/progress.rs#Progress::start", "calls"];
 
-  it("still turns round an arrow whose own type's new calls the tail", async () => {
+  it("does not turn an arrow round from another type's method of the same name, with no compiler", async () => {
     repo = scratchRepo(RS);
-    const { each } = await verdicts(repo, calls([["src/progress.rs#Progress::refresh", "src/progress.rs#Progress::new"]]));
+    const { each, report } = await verdicts(repo, [OTHER], { compiler: false });
+    expect(each[0]!.reds).not.toContain("calls-backwards");
+    expect(report.edges.map((one) => one.detail ?? "").join("\n")).not.toMatch(/self\.refresh\(\)/);
+  }, 60_000);
+
+  it("still turns round an arrow whose own type's method calls the tail, with no compiler", async () => {
+    repo = scratchRepo(RS);
+    const { each } = await verdicts(repo, [OWN], { compiler: false });
     expect(each.map((one) => one.reds)).toEqual([["calls-backwards"]]);
+  }, 60_000);
+
+  it.skipIf(!hasRustAnalyzer)("says the same with the compiler", async () => {
+    repo = scratchRepo(RS);
+    const { each } = await verdicts(repo, [OTHER, OWN]);
+    expect(each[0]!.reds).not.toContain("calls-backwards");
+    expect(each[1]!.reds).toEqual(["calls-backwards"]);
   }, 300_000);
 });

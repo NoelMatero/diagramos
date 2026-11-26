@@ -6404,8 +6404,10 @@ export function checkDrift(
              * to the tail's own. rich's `Progress.get_default_columns ->
              * BarColumn.__init__` was turned round because `Progress.__init__`
              * calls `get_default_columns` -- another class's `__init__`
-             * (`measure:calls-at-run-time --names=qualified`). So this takes
-             * a red away too, and still adds none.
+             * (`measure:calls-at-run-time --names=qualified`). Over the view
+             * the answer is the view's own: the owner's call running back, a
+             * body that reaches neither way, or not sure -- a red only where
+             * the plain reading already gave one, and never a green.
              */
             if (verdict.verdict === "confirmed" || verdict.verdict === "backwards") {
               const masks = new Map<string, string>();
@@ -6453,12 +6455,6 @@ export function checkDrift(
                 if (verdict.verdict === "confirmed") {
                   if (strict?.verdict !== "confirmed") verdict = { verdict: "withheld", why: "other-owner" };
                 } else {
-                  /*
-                   * Turned round from a namesake: the view's own reading is
-                   * the answer -- the owner's call running back, a closed
-                   * body that reaches neither way, or not sure -- and never a
-                   * green the plain reading did not give.
-                   */
                   verdict = strict && strict.verdict !== "confirmed" ? strict : { verdict: "withheld", why: "other-owner" };
                 }
               }
