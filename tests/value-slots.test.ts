@@ -201,6 +201,14 @@ describe("text alone: what must stay not sure", () => {
     expect(partsOf(source, "step", "python")?.callable).toBe("unsure");
   });
 
+  it("a member only read as an operand is given no value (`x.a * 2`, `!e.shiftKey && ..`, `\"k\" in o`)", () => {
+    const ts = "export function f(e: any, s: any, o: any) {\n  if (!e.shiftKey && e.key === 'Enter') return s.scrollX * 2;\n"
+      + "  return ('k' in o.inner) || (o.inner2 in s);\n}\n";
+    for (const name of ["shiftKey", "scrollX", "inner", "inner2"]) expect(partsOf(ts, name, "ts"), name).toBeUndefined();
+    const py = "def f(self, y):\n    return self.x and y or self.z * 2\n";
+    for (const name of ["x", "z"]) expect(partsOf(py, name, "python"), name).toBeUndefined();
+  });
+
   it("Rust is not read this way: its values go through the written type", () => {
     const source = "fn f() { let (a, b) = (1, 2); }\n";
     expect(partsOf(source, "a", "rust")).toBeUndefined();
