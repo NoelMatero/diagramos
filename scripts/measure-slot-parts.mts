@@ -110,7 +110,7 @@ for (const root of roots) {
       }
       const kinds = await resolvePythonKinds(root, queries);
       kinds.close();
-      console.error(`${path.basename(root)} python: ${queries.length} slots asked of pyright, ${kinds.started ? "answered" : "PYRIGHT DID NOT START"}`);
+      if (queries.length > 0) console.error(`${path.basename(root)} python: ${queries.length} slots asked of pyright, ${kinds.started ? "answered" : "PYRIGHT DID NOT START"}`);
       for (const file of pyFiles) asks.set(file, (at) => kinds.cache.get(file, at) as ValueKind | undefined);
     }
   }
