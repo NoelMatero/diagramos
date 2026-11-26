@@ -54,7 +54,7 @@ import { fileURLToPath } from "node:url";
 import { recordRun, waitForQuiet } from "./lib/bench-busy";
 import {
   changedClaims, changedLine, loadDump, readCompilerTrue, reportProblems, safetyCompare, scoreOfDump, scoreOfReport,
-  scoreTables, textDifference, type Score,
+  differingLines, scoreTables, textDifference, type Score,
 } from "./lib/batch-compare";
 import { STUDY_SETS } from "./lib/bench-set";
 import { heldLaneCount, laneCount } from "./lib/machine-lock";
@@ -273,6 +273,15 @@ function compare(baseDir: string, branchDir: string, baseName: string, branchNam
     if (a === undefined || b === undefined) continue;
     const differ = textDifference(a, b);
     same.push(`  ${name.padEnd(10)} ${differ === 0 ? "identical apart from timing" : `${differ} lines differ`}`);
+    // Which, where no arrow is on the line: a compiler that answered a different number of questions shows here.
+    if (differ > 0) {
+      const { shown, hidden } = differingLines(a, b);
+      for (const [first, second] of shown.slice(0, 12)) {
+        same.push(`    first:  ${(first ?? "(none)").trim().slice(0, 160)}`);
+        same.push(`    second: ${(second ?? "(none)").trim().slice(0, 160)}`);
+      }
+      if (hidden > 0) same.push(`    and ${hidden} differing line${hidden === 1 ? "" : "s"} holding an arrow, not shown`);
+    }
   }
   if (same.length > 0) lines.push("", "WHOLE REPORTS, timing lines and per-claim ms taken out", ...same);
   return lines;

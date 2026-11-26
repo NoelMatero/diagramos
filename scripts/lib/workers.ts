@@ -54,14 +54,16 @@ export function machineJobs(): number {
 
 /**
  * Worker slots for a batch that holds the whole machine (`measure:batch`):
- * all but two cores, one per three GB. A 10-core, 24 GB machine gets 8. On
- * 2026-11-26 one arm took 47 min at 8 slots and 54 min at 6: a worker
- * waiting on a language server holds a slot but not a core, so the batch
- * wants more slots than a single run's workers.
+ * the machine's workers (`machineJobs`, 6 here). Measured 2026-11-26 on one
+ * arm of 76cc7e4: 6 slots took 54 min and every compiler answered exactly
+ * as in the one-at-a-time runs; 8 slots took 45-47 min, and in one of two
+ * runs rust-analyzer answered 64 fewer of the same questions and pyright 2
+ * more -- no claim's answer changed, but a compiler giving up under load is
+ * how one would. `--slots=8` is the faster choice when that risk is
+ * acceptable.
  */
 export function batchSlots(): number {
-  const cores = typeof os.availableParallelism === "function" ? os.availableParallelism() : os.cpus().length;
-  return Math.max(1, Math.min(cores - 2, Math.floor(os.totalmem() / (3 * 1024 ** 3))));
+  return machineJobs();
 }
 
 /** `--jobs=<n>` from a script's arguments, then `BOARD_AI_JOBS`, then this run's share of `machineJobs()`. */

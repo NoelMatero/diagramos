@@ -160,6 +160,26 @@ export function withoutTiming(text: string): string[] {
   return lines;
 }
 
+/**
+ * The lines that differ between two reports, timing taken out, as pairs --
+ * only those holding no arrow (no `@word`, no `->`), so a score-only set's
+ * header and table lines can be shown and its arrows never are. `hidden`
+ * counts the differing lines left out.
+ */
+export function differingLines(a: string, b: string): { shown: Array<[string | undefined, string | undefined]>; hidden: number } {
+  const la = withoutTiming(a);
+  const lb = withoutTiming(b);
+  const shown: Array<[string | undefined, string | undefined]> = [];
+  let hidden = 0;
+  const arrow = (line?: string) => line !== undefined && (/@\w+/.test(line) || line.includes("->"));
+  for (let i = 0; i < Math.max(la.length, lb.length); i++) {
+    if (la[i] === lb[i]) continue;
+    if (arrow(la[i]) || arrow(lb[i])) hidden += 1;
+    else shown.push([la[i], lb[i]]);
+  }
+  return { shown, hidden };
+}
+
 /** How many lines differ between two reports once timing is taken out: 0 is the same report. */
 export function textDifference(a: string, b: string): number {
   const la = withoutTiming(a);
