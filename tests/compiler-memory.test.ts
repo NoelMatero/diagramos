@@ -16,7 +16,7 @@ import path from "node:path";
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { CompilerMemory, memoryLine, memoryMode, type MemoryMode } from "../scripts/lib/compiler-memory";
+import { CompilerMemory, memoryLine, memoryMode, remembered, type MemoryMode } from "../scripts/lib/compiler-memory";
 import { refereePool } from "../src/engine/referee-pool";
 
 let scratch: string;
@@ -306,6 +306,24 @@ describe("compiler memory", () => {
     } finally {
       rmSync(loose, { recursive: true, force: true });
     }
+  });
+
+  it("remembers a referee's whole answer by its key, keeps only what may be kept, and checks it under verify", async () => {
+    let worked = 0;
+    const pairs = (list: string[]) => () => { worked += 1; return list; };
+    const key = { tree: "t1", referee: "r1" };
+    expect(await remembered("on", "pairs-x", key, pairs(["a", "b"]), (v) => v.length > 0, store)).toEqual({ value: ["a", "b"], remembered: false });
+    expect(await remembered("on", "pairs-x", key, pairs(["c"]), () => true, store)).toEqual({ value: ["a", "b"], remembered: true });
+    expect(worked).toBe(1);
+    // Another tree is another key; a value that may not be kept is worked out every time.
+    expect((await remembered("on", "pairs-x", { ...key, tree: "t2" }, pairs([]), (v) => v.length > 0, store)).remembered).toBe(false);
+    expect((await remembered("on", "pairs-x", { ...key, tree: "t2" }, pairs(["d"]), (v) => v.length > 0, store)).remembered).toBe(false);
+    // No key (no checkout to key on), or off: never read, never kept.
+    expect((await remembered("on", "pairs-x", undefined, pairs(["e"]), () => true, store)).remembered).toBe(false);
+    expect(await remembered("off", "pairs-x", key, pairs(["f"]), () => true, store)).toEqual({ value: ["f"], remembered: false });
+    // Verify works it out again and says whether the kept one still holds.
+    expect(await remembered("verify", "pairs-x", key, pairs(["a", "b"]), () => true, store)).toEqual({ value: ["a", "b"], remembered: false, contradicted: false });
+    expect(await remembered("verify", "pairs-x", key, pairs(["a"]), () => true, store)).toEqual({ value: ["a"], remembered: false, contradicted: true });
   });
 
   it("reads its mode from the flags and the environment, and says what it did in one line", () => {

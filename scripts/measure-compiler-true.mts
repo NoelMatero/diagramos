@@ -100,7 +100,9 @@ import { CompilerTally, judgeCompilerTrue, type TallyData } from "./lib/run-vali
 import { projectTimes } from "./lib/bench-jobs";
 import { RUST_AT_ONCE, rustCrateKey, sharingSlots, withSlot } from "./lib/slots";
 import { librariesLine } from "./lib/bench-libraries";
-import { addCounts, CompilerMemory, memoryLine, memoryMode, noCounts, type MemoryCounts } from "./lib/compiler-memory";
+import {
+  addCounts, CompilerMemory, filesHash, memoryLine, memoryMode, noCounts, remembered, treeState, versionOf, type MemoryCounts,
+} from "./lib/compiler-memory";
 import { inPool, jobsFrom } from "./lib/workers";
 
 const args = process.argv.slice(2);
@@ -166,6 +168,8 @@ interface ProjectResult {
   pauses: Pause[];
   /** What the compiler memory answered and kept for the live arm. */
   memory?: MemoryCounts;
+  /** Whether the referee's pairs were remembered from an earlier run rather than worked out; `contradicted` under verify. */
+  referee?: "remembered" | "worked out" | "contradicted";
 }
 
 if (only) {
@@ -258,6 +262,11 @@ function report(results: ProjectResult[], failed: string[]): boolean {
   const pauses = results.flatMap((one) => one.pauses);
   console.log(`  ${pausesLine(pauses, readPowerLogSleeps(runStarted, Date.now()))}`);
   console.log(`  ${memoryLine(MEMORY_MODE, results.reduce((sum, one) => addCounts(sum, one.memory), noCounts()))}`);
+  {
+    const count = (what: string) => results.filter((one) => one.referee === what).length;
+    console.log(`  referee memory: pairs remembered for ${count("remembered")} of ${results.length} projects`
+      + (count("contradicted") > 0 ? `; verify: ${count("contradicted")} worked out differently` : ""));
+  }
   console.log(`  referee: ${results.map((one) => `${one.project} ${one.pairs}${one.couldNotRun ? ` (${one.couldNotRun})` : ""}`).join(", ") || "no project measured"}`);
   for (const line of compilers.lines([language])) console.log(`  ${line}`);
   const verdict = judgeCompilerTrue(language, results.map((one) => ({
@@ -300,30 +309,50 @@ function report(results: ProjectResult[], failed: string[]): boolean {
 async function measureOne(project: string): Promise<ProjectResult> {
   const root = path.join(CORPUS, project);
   const dirs = TREES[language]![project] ?? [];
-  let pairs: TruePair[];
   let couldNotRun: string | undefined;
-  if (language === "ts") {
-    const ts = (await import("typescript")).default;
-    const { typescriptTruePairs } = await import("./lib/compiler-true-ts");
-    pairs = typescriptTruePairs(ts, root, dirs, { dispatched, handedOn });
-  } else if (language === "python") {
-    pairs = pythonTruePairs(project, dirs);
-  } else {
+  /*
+   * The referee's pairs depend on the project and the referee alone, never on
+   * the checker, so they are remembered across runs (`compiler-memory.ts`):
+   * keyed on the checkout's state, the referee's code and version, and the
+   * options that shape the list.
+   */
+  const tree = treeState(root);
+  const keyOf = (referee: string[], compiler: string): Record<string, string> | undefined => tree && {
+    language, ...tree, referee: filesHash(referee), compiler,
+    options: JSON.stringify({ dirs, dispatched, handedOn, plainNames }),
+  };
+  const ts = language === "ts" ? (await import("typescript")).default : undefined;
+  const python = process.env.JEDI_PYTHON ?? "python3";
+  const key = language === "ts" ? keyOf(["scripts/lib/compiler-true-ts.ts"], `typescript ${ts!.version}`)
+    : language === "python" ? keyOf(["scripts/lib/compiler_true_jedi.py"],
+      versionOf(python, ["-c", "import sys, jedi, parso; print(sys.version, jedi.__version__, parso.__version__)"]))
+    : keyOf(["scripts/lib/compiler-true-rust.ts", "src/engine/referee-rustc.ts", "src/engine/compiled-calls.ts", "src/engine/parse.ts"],
+      versionOf("rustc", ["-vV"], root));
+  const referee = await remembered(MEMORY_MODE, `pairs-${language}`, key, async (): Promise<TruePair[]> => {
+    if (language === "ts") {
+      const { typescriptTruePairs } = await import("./lib/compiler-true-ts");
+      return typescriptTruePairs(ts!, root, dirs, { dispatched, handedOn });
+    }
+    if (language === "python") return pythonTruePairs(project, dirs);
     const { rustTruePairs } = await import("./lib/compiler-true-rust");
-    pairs = await rustTruePairs(root, plainNames, (crates: readonly CrateOutcome[]) => {
+    return rustTruePairs(root, plainNames, (crates: readonly CrateOutcome[]) => {
       const tried = crates.filter((crate) => !crate.nothingToBuild);
       const built = tried.filter((crate) => crate.built).length;
       if (tried.length > 0 && built === 0) {
         couldNotRun = `the Rust compiler built none of ${tried.length} crates: ${tried[0]!.why ?? "no reason recorded"}`;
       }
     });
-  }
-  const referee = pairs.length;
+  }, (value) => value.length > 0 && couldNotRun === undefined);
+  let pairs = referee.value;
+  const listed = pairs.length;
   if (words) pairs = pairs.filter((pair) => words.includes(pair.word));
   if (classTails) pairs = classTailPairs(pairs);
   process.stderr.write(`${project}: ${pairs.length} pairs\n`);
   const result = await askChecker(project, root, pairs);
-  return { ...result, pairs: referee, ...(couldNotRun ? { couldNotRun } : {}) };
+  return {
+    ...result, pairs: listed, ...(couldNotRun ? { couldNotRun } : {}),
+    referee: referee.remembered ? "remembered" : referee.contradicted ? "contradicted" : "worked out",
+  };
 }
 
 /**

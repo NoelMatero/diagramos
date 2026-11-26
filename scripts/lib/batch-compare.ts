@@ -152,7 +152,7 @@ export function scoreTables(text: string): string[] {
  */
 export function withoutTiming(text: string): string[] {
   const lines = text.split("\n")
-    .filter((line) => !/^\s*(pauses|machine|compiler memory):/.test(line) && !/^gate: /.test(line) && !/^> /.test(line))
+    .filter((line) => !/^\s*(pauses|machine|compiler memory|referee memory):/.test(line) && !/^gate: /.test(line) && !/^> /.test(line))
     .map((line) => line
       .replace(/ \| \d+ms \| gate: /, " | gate: ")
       .replace(/(claims scored, \d+ left out as undecidable), in \d+s/, "$1"));

@@ -517,6 +517,62 @@ export class CompilerMemory {
   }
 }
 
+/* --------------------------------------------- a referee's whole answer */
+
+/** The content of these repository files, as one hash: the code a remembered value was made by. */
+export function filesHash(files: readonly string[]): string {
+  const hash = createHash("sha1");
+  for (const name of files) {
+    const file = path.join(REPO, name);
+    hash.update(name);
+    hash.update(existsSync(file) ? readFileSync(file) : "missing");
+  }
+  return hash.digest("hex");
+}
+
+/** A command's output for a key (a compiler's version), or "unavailable". */
+export const versionOf = (command: string, args: string[], cwd?: string): string => run(command, args, cwd);
+
+/**
+ * One whole answer remembered across runs: compiler-true's list of true pairs
+ * for a project, which its referee (the TypeScript compiler's API, jedi,
+ * rustc's MIR) works out from the project alone. `key` says everything the
+ * value rests on -- the checkout's state, the referee's code and version,
+ * the options -- and is undefined when it cannot be said (no git checkout):
+ * then it is worked out and not kept. `keep` says whether a value may be kept
+ * (a referee that could not run has nothing worth keeping). Under `verify`
+ * the value is worked out again and compared; under `off`, never read or
+ * kept.
+ *
+ * jedi does not list the same pairs every run (one pydantic call, 2 runs in
+ * 10, 2026-11-26), so a remembered list is also what keeps a base and its
+ * branch measuring the same population.
+ */
+export async function remembered<T>(
+  mode: MemoryMode, what: string, key: Record<string, string> | undefined,
+  compute: () => T | Promise<T>, keep: (value: T) => boolean, dir: string = memoryDir(),
+): Promise<{ value: T; remembered: boolean; contradicted?: boolean }> {
+  if (mode === "off" || !key) return { value: await compute(), remembered: false };
+  const file = path.join(dir, what, `${sha1(JSON.stringify({ format: MEMORY_FORMAT, ...key })).slice(0, 20)}.json`);
+  let kept: { format: number; value: T } | undefined;
+  try {
+    kept = JSON.parse(readFileSync(file, "utf8")) as { format: number; value: T };
+    if (kept.format !== MEMORY_FORMAT) kept = undefined;
+  } catch { kept = undefined; }
+  if (kept && mode === "on") return { value: kept.value, remembered: true };
+  const value = await compute();
+  if (kept) return { value, remembered: false, contradicted: JSON.stringify(kept.value) !== JSON.stringify(value) };
+  if (keep(value)) {
+    try {
+      mkdirSync(path.dirname(file), { recursive: true });
+      const temporary = `${file}.${process.pid}.tmp`;
+      writeFileSync(temporary, JSON.stringify({ format: MEMORY_FORMAT, key, value }));
+      renameSync(temporary, file);
+    } catch { /* the next run works it out again */ }
+  }
+  return { value, remembered: false };
+}
+
 let pyright: string | undefined;
 function pyrightVersion(): string {
   if (pyright) return pyright;
