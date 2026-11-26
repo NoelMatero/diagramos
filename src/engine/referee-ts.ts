@@ -439,6 +439,18 @@ function programFrom(ts: typeof TS, configPath: string | undefined, fallbackFile
  * server) ever holds one of these across many edits without exiting
  * between them.
  */
+/**
+ * Whether nothing edits the trees asked about while this process lives:
+ * `BOARD_AI_TREES_STILL=1`, set by the measurements (`bench:planted`,
+ * `measure:compiler-true`), whose pinned clones nobody writes while they run.
+ * A built program is then trusted without `stillFresh`, which stats every
+ * file of the program on every question: on typeorm, 3,607 files and some
+ * 13,000 questions, that was 64% of the bench's time for the project (250 s
+ * against 91 s, the same report; 2026-11-26). The product never sets it, so
+ * an editor's checks still see every edit.
+ */
+const treesHoldStill = (): boolean => process.env.BOARD_AI_TREES_STILL === "1";
+
 export function createTsReferee(root: string): TsReferee | undefined {
   const ts = typescriptModule();
   return ts ? buildReferee(ts, root) : undefined;
@@ -509,7 +521,7 @@ function buildReferee(ts: typeof TS, root: string): TsReferee {
 
   function programFor(configPath: string): { program: TS.Program; checker: TS.TypeChecker } {
     const cached = programCache.get(configPath);
-    if (cached && stillFresh(cached.snapshot)) {
+    if (cached && (treesHoldStill() || stillFresh(cached.snapshot))) {
       programCache.delete(configPath); // re-insert to mark most-recently-used
       programCache.set(configPath, cached);
       return cached;

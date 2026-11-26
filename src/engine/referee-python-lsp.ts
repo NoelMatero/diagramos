@@ -331,6 +331,15 @@ export interface PyrightLspReferee {
    */
   withheldNoType(): number;
   /**
+   * How many times this referee failed to hear an answer: a request that
+   * timed out or came back as an error, a probe whose control diagnostic never
+   * arrived, the server exiting before it was closed. A question that failed
+   * reads `undefined`, the same as pyright's own "nothing here", so a caller
+   * that keeps answers across runs (`scripts/lib/compiler-memory.ts`) keeps a
+   * "nothing here" only from a referee whose count stayed 0.
+   */
+  failures?(): number;
+  /**
    * `textDocument/documentSymbol` -- what pyright says each name in a file
    * *is* (#297). `undefined` when it would not answer.
    */
@@ -648,6 +657,8 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
   const pending = new Map<number, PendingRequest>();
   let nextId = 1;
   let closed = false;
+  /** Answers not heard (`failures` on the interface): counted, never acted on here. */
+  let failures = 0;
   /** Whether a warm-up sweep has had a real answer, so the binder has run. */
   let bound = false;
   /** Who is waiting on a probe document's diagnostics, by its URI (#393). */
@@ -658,6 +669,8 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     pending.clear();
   });
   child.on("exit", () => {
+    // An exit nobody asked for: whatever was pending, and anything asked after, reads as no answer.
+    if (!closed) failures += 1;
     closed = true;
     for (const { reject } of pending.values()) reject(new Error("pyright-langserver exited"));
     pending.clear();
@@ -695,13 +708,17 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
   function send(method: string, params: unknown): Promise<unknown>;
   function send(method: string, params: unknown, notification: true): void;
   function send(method: string, params: unknown, notification = false): Promise<unknown> | void {
-    if (closed) return notification ? undefined : Promise.reject(new Error("pyright-langserver already closed"));
+    if (closed) {
+      if (notification) return undefined;
+      failures += 1;
+      return Promise.reject(new Error("pyright-langserver already closed"));
+    }
     const id = notification ? undefined : nextId++;
     const payload = { jsonrpc: "2.0", method, params, ...(id !== undefined ? { id } : {}) };
     const body = JSON.stringify(payload);
     child.stdin.write(`Content-Length: ${Buffer.byteLength(body, "utf8")}\r\n\r\n${body}`);
     if (id === undefined) return undefined;
-    return new Promise((resolve, reject) => {
+    const answer = new Promise((resolve, reject) => {
       pending.set(id, { resolve, reject });
       // `unref`, or a request that answered leaves its timeout pending and
       // Node declines to exit until it fires. The same bug the rust client's
@@ -710,6 +727,9 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
         if (pending.delete(id)) reject(new Error(`textDocument request ${method} timed out`));
       }, REQUEST_TIMEOUT_MS).unref();
     });
+    // Timed out, an error answer, or the server gone: the caller reads no answer.
+    answer.catch(() => { failures += 1; });
+    return answer;
   }
 
   await send("initialize", {
@@ -990,11 +1010,16 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
     const uri = pathToFileURL(file).toString();
     const control = lines.length;
     const source = `${[...lines, "__board_control: int = ''"].join("\n")}\n`;
+    let heard = false;
     const checked = new Promise<ProbeDiagnostic[] | undefined>((resolve) => {
       diagnosticWaiters.set(uri, (diagnostics) => {
-        if (diagnostics.some((one) => one.range.start.line === control)) resolve(diagnostics);
+        if (diagnostics.some((one) => one.range.start.line === control)) { heard = true; resolve(diagnostics); }
       });
-      setTimeout(() => resolve(undefined), PROBE_TIMEOUT_MS).unref();
+      setTimeout(() => {
+        // The control never came: this probe has no answer.
+        if (!heard) failures += 1;
+        resolve(undefined);
+      }, PROBE_TIMEOUT_MS).unref();
     });
     send("textDocument/didOpen", { textDocument: { uri, languageId: "python", version: 1, text: source } }, true);
     try {
@@ -1269,6 +1294,7 @@ export async function createPyrightLspReferee(root: string): Promise<PyrightLspR
       );
     },
     withheldNoType: () => withheldNoType,
+    failures: () => failures,
     documentSymbols: async (file) => {
       for (const wait of [0, ...STEADY_RETRY_MS]) {
         if (wait) await new Promise((resolve) => setTimeout(resolve, wait));

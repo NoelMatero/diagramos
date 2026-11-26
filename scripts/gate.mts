@@ -22,6 +22,12 @@
  *
  *   npm run gate -- npm run bench:planted -- --project=regex
  *   npm run gate -- npm test
+ *   npm run gate -- --whole npm run measure:batch -- ...
+ *
+ * The machine has lanes (`machine-lock.ts`): with two, two gated commands
+ * run side by side and neither counts the other as sharing it. `--whole`
+ * waits for every lane and holds them all, for a command that spreads its
+ * own work over the machine.
  */
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
@@ -31,6 +37,8 @@ import { recordRun, waitForQuiet } from "./lib/bench-busy";
 
 let command = process.argv.slice(2);
 if (command[0] === "--") command = command.slice(1);
+const whole = command[0] === "--whole";
+if (whole) command = command.slice(1);
 if (command.length === 0) {
   console.error("usage: npm run gate -- <command...>   (runs it when no other measurement is using the machine)");
   process.exit(2);
@@ -51,7 +59,7 @@ for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"] as const) {
   });
 }
 
-await waitForQuiet(say, 1_000, { onSignal: false });
+await waitForQuiet(say, 1_000, { onSignal: false, whole });
 const run = recordRun(`gate: ${shown}`);
 const began = Date.now();
 say(`running ${shown}`);

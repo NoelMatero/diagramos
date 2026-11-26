@@ -6140,27 +6140,48 @@ export function routineDeclaredOn(
 ): { name: string; node: Node; holder?: Node } | undefined {
   const tree = parseSource(source, language);
   if (!tree) return undefined;
+  const found = routinesByLine(tree, source).get(line);
+  return found ? { ...found } : undefined;
+}
+
+type RoutineOnLine = { name: string; node: Node; holder?: Node };
+
+/**
+ * Every routine in a tree, by the line its name is on: for each line the
+ * first one a walk from the top meets, with the declaration it sits in --
+ * exactly what `routineDeclaredOn` used to find by walking the file from the
+ * top once per question. A Rust check asks it of the same file for every
+ * place a definition lands, and on redb that walk was 41% of everything the
+ * checker did (CPU profile, 2026-11-26). Kept per tree, like the macro index.
+ */
+const routinesByTree = new WeakMap<Tree, Map<number, RoutineOnLine>>();
+
+function routinesByLine(tree: Tree, source: string): Map<number, RoutineOnLine> {
+  const known = routinesByTree.get(tree);
+  if (known) return known;
+  const found = new Map<number, RoutineOnLine>();
   const isDeclaration = (node: Node) => Boolean(node.childForFieldName("name") ?? node.childForFieldName("type"));
-  const visit = (node: Node, holder: Node | undefined): { name: string; node: Node; holder?: Node } | undefined => {
+  const visit = (node: Node, holder: Node | undefined): void => {
     const name = node.childForFieldName("name") ?? node.childForFieldName("left");
     const value = node.childForFieldName("value");
     if (
       name && name.childCount === 0
       && (parametersOf(node) ?? parametersOf(value))
       && (node.childForFieldName("body") ?? value?.childForFieldName("body"))
-      && lineOf(source, name.startIndex) === line
     ) {
-      return { name: name.text, node, ...(holder ? { holder } : {}) };
+      // The first met on a line wins, as the walk that stopped there did: a parent before its children.
+      const line = lineOf(source, name.startIndex);
+      if (!found.has(line)) found.set(line, { name: name.text, node, ...(holder ? { holder } : {}) });
     }
     const inside = isDeclaration(node) ? node : holder;
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
-      const found = child ? visit(child, inside) : undefined;
-      if (found) return found;
+      if (child) visit(child, inside);
     }
-    return undefined;
   };
-  return visit(tree.rootNode, undefined);
+  visit(tree.rootNode, undefined);
+  routinesByTree.set(tree, found);
+  return found;
 }
 
 /**
@@ -7146,15 +7167,39 @@ function matcherOfExpressions(pattern: Node, outer: boolean): boolean {
   return true;
 }
 
+/**
+ * Every `macro_rules!` in a parsed tree, by name, in the order the file
+ * writes them: one walk of a file per tree, not one per macro looked up.
+ *
+ * `macroRulesIn` used to walk the whole file for every macro call it was
+ * asked about, and a crate full of macros asks thousands of times: on
+ * regex it was 39% of everything the checker did (CPU profile, 2026-11-25),
+ * and the bench's slowest project. Keyed on the tree itself: the parse cache
+ * hands back the same tree for the same text, a file whose text changed is a
+ * new tree with an index of its own, and a tree the cache lets go of takes
+ * its entry with it.
+ */
+const macrosByTree = new WeakMap<Tree, Map<string, Node[]>>();
+
 /** Every `macro_rules! name` written in one file. */
 function macroRulesIn(file: string, source: string, name: string): MacroDefinition[] {
   const tree = parseSource(source, "rust");
   if (!tree) return [];
-  const out: MacroDefinition[] = [];
-  each(tree.rootNode, (node) => {
-    if (node.type === "macro_definition" && node.childForFieldName("name")?.text === name) out.push({ file, node });
-  });
-  return out;
+  let byName = macrosByTree.get(tree);
+  if (!byName) {
+    const found = new Map<string, Node[]>();
+    each(tree.rootNode, (node) => {
+      if (node.type !== "macro_definition") return;
+      const named = node.childForFieldName("name")?.text;
+      if (named === undefined) return;
+      const list = found.get(named);
+      if (list) list.push(node);
+      else found.set(named, [node]);
+    });
+    macrosByTree.set(tree, found);
+    byName = found;
+  }
+  return (byName.get(name) ?? []).map((node) => ({ file, node }));
 }
 
 /**

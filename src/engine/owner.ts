@@ -29,7 +29,7 @@
  */
 import { declaredShapes } from "./body";
 import { declarationName } from "./declared";
-import { parseSource, type Language, type Node } from "./parse";
+import { parseSource, type Language, type Node, type Tree } from "./parse";
 
 /** The bare name a type is spelled with: `Wrap` in `&'a mut Wrap<T>`, `Error` in `crate::Error`. */
 function typeName(node: Node | null): string | undefined {
@@ -72,12 +72,32 @@ function declarationsOf(source: string, language: Language, name: string): Decla
    */
   const declared = new Set((declaredShapes(source, language)?.get(name) ?? []).map(({ nameNode }) => nameNode.startIndex));
   if (declared.size === 0) return [];
-  const found: Declared[] = [];
+  return (namedIn(tree).get(name) ?? []).filter((one) => declared.has(one.name.startIndex));
+}
+
+/**
+ * Every node a declaration name can be read off, by that name, in the order
+ * a walk from the top meets them, with the owners around each: one walk of a
+ * file per tree. `declarationsOf` used to walk the whole file, building an
+ * owner list at every node, once per name asked about -- 19.5% of
+ * compiler-true's regex (CPU profile, 2026-11-26). Kept per tree, like the
+ * macro index; each question filters it the way the walk did.
+ */
+const namedByTree = new WeakMap<Tree, Map<string, Declared[]>>();
+
+function namedIn(tree: Tree): Map<string, Declared[]> {
+  const known = namedByTree.get(tree);
+  if (known) return known;
+  const found = new Map<string, Declared[]>();
   const visit = (node: Node, owners: string[]): void => {
     if (node.type === "token_tree") return;
     if (node.type !== "impl_item") {
       const named = declarationName(node);
-      if (named?.text === name && declared.has(named.startIndex)) found.push({ name: named, owners });
+      if (named) {
+        const list = found.get(named.text);
+        if (list) list.push({ name: named, owners });
+        else found.set(named.text, [{ name: named, owners }]);
+      }
     }
     const inside = [...owners, ...ownerNames(node)];
     for (let index = 0; index < node.childCount; index += 1) {
@@ -86,6 +106,7 @@ function declarationsOf(source: string, language: Language, name: string): Decla
     }
   };
   visit(tree.rootNode, []);
+  namedByTree.set(tree, found);
   return found;
 }
 

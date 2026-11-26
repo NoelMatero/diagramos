@@ -569,6 +569,15 @@ export function refereePool<T extends { close(): void }>(
    * seconds after it booted. Asked per call, each check gets its own.
    */
   until?: number | (() => number),
+  /**
+   * How a server is started, when the caller wants a say: given the key and
+   * the plain start, it returns the referee the pool hands out. A measurement
+   * that keeps compiler answers across runs (`scripts/lib/compiler-memory.ts`)
+   * hands out a referee that answers what it has kept and starts the real
+   * server only for a question it has not. Left out, the server is started as
+   * it always was; nothing in the product passes one.
+   */
+  wrap?: (key: string, start: () => Promise<T>) => Promise<T>,
 ): RefereePool<T> {
   const open = new Map<string, Promise<T | undefined>>();
   const deadline = (): number | undefined =>
@@ -579,7 +588,7 @@ export function refereePool<T extends { close(): void }>(
       if (!held) {
         const by = deadline();
         if (by !== undefined && Date.now() >= by) return Promise.resolve(undefined);
-        held = start().catch(() => undefined);
+        held = (wrap ? wrap(key, start) : start()).catch(() => undefined);
         open.set(key, held);
       }
       return held;
