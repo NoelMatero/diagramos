@@ -70,7 +70,12 @@ const NOT_CALLABLE = new Set([2349, 2721, 2722, 2723]);
  */
 const CALLABLE_BUT = new Set([2348, 2554, 2555, 2556, 2575, 2769, 2345]);
 
-interface Insertion { at: number; text: string }
+interface Insertion {
+  at: number;
+  text: string;
+  /** Text closing what `text` opened, written further on: a value wrapped where it stands. */
+  close?: { at: number; text: string };
+}
 
 /** Where a call to this declaration can be written, and how it is spelled there. */
 function insertionFor(
@@ -93,6 +98,33 @@ function insertionFor(
   const blockStart = (body: ts.Node | undefined): number | undefined =>
     body && ts.isBlock(body) ? body.getStart(sourceFile) + 1 : undefined;
 
+  /*
+   * A name given a value without a declaration (missed map 2026-11b): a key
+   * of an object literal, an attribute set on `this`. Each is probed with the
+   * value it is given there, which is what the reader reads it by.
+   *
+   * A key has no statement of its own, so its value is wrapped where it
+   * stands -- `k: ((p) => { p?.(); return p; })(value)` -- and the compiler
+   * types `p` from the argument. A member is called on the line after its
+   * assignment, through the same `this`.
+   */
+  if (ts.isPropertyAssignment(node.parent) && node.parent.name === node) {
+    const value = node.parent.initializer;
+    const probe = `__dgmP${index}`;
+    return {
+      at: value.getStart(sourceFile),
+      text: `((${probe}) => { ;(${probe})?.(); /*dgm-probe-${index}*/ return ${probe}; })(`,
+      close: { at: value.getEnd(), text: ")" },
+    };
+  }
+  if (ts.isPropertyAccessExpression(node.parent) && node.parent.name === node) {
+    const access = node.parent;
+    const assignment = access.parent;
+    if (access.expression.kind !== ts.SyntaxKind.ThisKeyword || !ts.isBinaryExpression(assignment)
+      || assignment.left !== access || assignment.operatorToken.kind !== ts.SyntaxKind.EqualsToken
+      || !ts.isExpressionStatement(assignment.parent)) return undefined;
+    return { at: assignment.parent.getEnd(), text: `\n;(this.${name})?.(); /*dgm-probe-${index}*/\n` };
+  }
   if (ts.isVariableDeclaration(declaration)) {
     const list = declaration.parent;
     const holder = list?.parent;
@@ -245,21 +277,33 @@ export function probeCallsTs(sites: readonly ProbeSite[]): Map<string, ProbeAnsw
       const insertions: (Insertion & { key: string })[] = [];
       for (const site of byFile.get(file)!) {
         const key = probeKey(site.file, site.line, site.name);
-        const node = declarationNamesOn(tree, site.line, site.name)[0];
-        const insertion = node ? insertionFor(node, tree, index) : undefined;
+        // The first name on the line a call can be written for: a member read before a member set is not one.
+        let insertion: Insertion | undefined;
+        for (const node of declarationNamesOn(tree, site.line, site.name)) {
+          insertion = insertionFor(node, tree, index);
+          if (insertion) break;
+        }
         if (!insertion) { answers.set(key, { callable: "unknown", value: false }); continue; }
         insertions.push({ ...insertion, key });
         index += 1;
       }
-      insertions.sort((a, b) => a.at - b.at);
+      /*
+       * Every piece in source order, a wrap's closing text among them. At one
+       * place a closing goes first: what it closes ended there, and whatever
+       * opens there starts after it.
+       */
+      const pieces = insertions.flatMap((one) => [
+        { at: one.at, text: one.text, key: one.key as string | undefined, order: 0 },
+        ...(one.close ? [{ at: one.close.at, text: one.close.text, key: undefined, order: 1 }] : []),
+      ]).sort((a, b) => a.at - b.at || b.order - a.order);
       let text = "";
       let cursor = 0;
-      for (const insertion of insertions) {
-        text += source.slice(cursor, insertion.at);
+      for (const piece of pieces) {
+        text += source.slice(cursor, piece.at);
         const start = text.length;
-        text += insertion.text;
-        probes.push({ key: insertion.key, file, start, end: text.length });
-        cursor = insertion.at;
+        text += piece.text;
+        if (piece.key !== undefined) probes.push({ key: piece.key, file, start, end: text.length });
+        cursor = piece.at;
       }
       text += source.slice(cursor);
       /*
@@ -393,10 +437,13 @@ for path, sites in request.items():
         line = min([first.lineno] + [one.lineno for one in getattr(first, "decorator_list", [])])
         return (line - 1, first.col_offset) if own_line(first) else None
     placed = {}
+    spelled = {}
     tail = []
-    def place(line, name, where):
+    def place(line, name, where, written=None):
         if where is not None and (line, name) not in placed:
             placed[(line, name)] = where
+            if written is not None:
+                spelled[(line, name)] = written
     # A comprehension's own binding has no line after it: the call goes into
     # the element instead, which runs once per binding. One per element, so
     # every probe line names one site.
@@ -440,6 +487,16 @@ for path, sites in request.items():
                     placed[key] = None
             elif isinstance(up, (ast.Assign, ast.AnnAssign, ast.AugAssign)) and own_line(up):
                 place(*key, (up.end_lineno, up.col_offset))
+        elif (isinstance(node, ast.Attribute) and isinstance(node.ctx, ast.Store)
+              and isinstance(node.value, ast.Name)):
+            # An attribute set on an object (missed map 2026-11b): called
+            # through the same name on the line after, as a name is.
+            key = (node.lineno - 1, node.attr)
+            up = parents.get(node)
+            while up is not None and not isinstance(up, ast.stmt):
+                up = parents.get(up)
+            if key in wanted and isinstance(up, (ast.Assign, ast.AnnAssign, ast.AugAssign)) and own_line(up):
+                place(*key, (up.end_lineno, up.col_offset), node.value.id + "." + node.attr)
         elif isinstance(node, ast.arg):
             key = (node.lineno - 1, node.arg)
             routine = parents.get(parents.get(node))
@@ -452,7 +509,7 @@ for path, sites in request.items():
     by_line = {}
     for (line, name), where in placed.items():
         if where is not None:
-            by_line.setdefault(where[0], []).append((line, name, where[1]))
+            by_line.setdefault(where[0], []).append((line, name, where[1], spelled.get((line, name), name)))
     # ast columns are UTF-8 byte offsets; the lines here are text.
     def column(line, byte):
         return len(lines[line].encode("utf-8")[:byte].decode("utf-8", "ignore"))
@@ -471,13 +528,13 @@ for path, sites in request.items():
         for line, name in starts_on.get(index, []):
             if len(starts_on[index]) == 1:
                 probes.append([line, name, len(out) + 1 + len(by_line.get(index, []))])
-        for line, name, indent in by_line.get(index, []):
+        for line, name, indent, written in by_line.get(index, []):
             probes.append([line, name, len(out) + 1])
-            out.append(" " * indent + name + "(); reveal_type(" + name + "); 0 + ''  # dgm-probe")
+            out.append(" " * indent + written + "(); reveal_type(" + written + "); 0 + ''  # dgm-probe")
         out.append(text)
-    for line, name, indent in by_line.get(len(lines), []):
+    for line, name, indent, written in by_line.get(len(lines), []):
         probes.append([line, name, len(out) + 1])
-        out.append(" " * indent + name + "(); reveal_type(" + name + "); 0 + ''  # dgm-probe")
+        out.append(" " * indent + written + "(); reveal_type(" + written + "); 0 + ''  # dgm-probe")
     for index, ((line, name), owner, member) in enumerate(tail):
         out.append("def __dgm_probe_" + str(index) + "(__dgm_x: " + owner + ") -> None:")
         probes.append([line, name, len(out) + 1])
