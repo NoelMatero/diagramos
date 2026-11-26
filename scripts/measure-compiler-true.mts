@@ -17,6 +17,12 @@
  *                          drawn to each routine stored under that method: a class
  *                          that implements it, or an object literal typed by the
  *                          interface naming a routine or wrapping one in an arrow.
+ *   ... --handed-on        TypeScript, only `@calls` arrows to a routine handed on one
+ *                          step (`npm run measure:compiler-true-handed-on`): `run(fits)` where `run`
+ *                          calls that parameter, an option's member, or a field set
+ *                          to the routine -- followed with the compiler's own symbols.
+ *                          The population a type question about a function value
+ *                          puts at risk; every one is correct (calls research 2026-11).
  *   ... --class-tails      only `@calls` arrows drawn FROM a class or struct (#459):
  *                          each call the compiler resolves in a method becomes
  *                          "the method's class calls it", drawn at the class in
@@ -99,7 +105,8 @@ const showCases = args.includes("--cases");
 const plainNames = flag("names") === "plain";
 const classTails = args.includes("--class-tails");
 const dispatched = args.includes("--dispatched");
-const words = (flag("words")?.split(",") ?? (classTails || dispatched ? ["calls"] : undefined)) as TrueWord[] | undefined;
+const handedOn = args.includes("--handed-on");
+const words = (flag("words")?.split(",") ?? (classTails || dispatched || handedOn ? ["calls"] : undefined)) as TrueWord[] | undefined;
 const WORDS: TrueWord[] = ["holds", "takes", "returns", "conforms", "calls", "accesses"];
 
 /** The pinned clones live in the main checkout; a worktree has none. */
@@ -238,7 +245,7 @@ async function measureOne(project: string): Promise<ProjectResult> {
   if (language === "ts") {
     const ts = (await import("typescript")).default;
     const { typescriptTruePairs } = await import("./lib/compiler-true-ts");
-    pairs = typescriptTruePairs(ts, root, dirs, { dispatched });
+    pairs = typescriptTruePairs(ts, root, dirs, { dispatched, handedOn });
   } else if (language === "python") {
     pairs = pythonTruePairs(project, dirs);
   } else {

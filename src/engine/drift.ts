@@ -1388,6 +1388,16 @@ export interface ClaimTally {
    */
   callsCompilable: number;
   /**
+   * `@calls` arrows with a TypeScript tail that ended without an answer at a
+   * call of a value -- a function handed in, a computed callee, a method a
+   * subclass replaces -- while no compiler was on hand (calls research
+   * 2026-11). The compiler can say whether that value could be the head at
+   * all (`calleeCanHold`), so `wouldHelp` starts one for these. Counted for
+   * TypeScript only: a Python or Rust board with such a call has no question
+   * a language server would answer, and must not start one for it.
+   */
+  callsTypeAskable: number;
+  /**
    * `@builds` arrows with a Rust tail that rustc's body for the routine
    * could answer: every text rule would let it say "creates none" (#362), or
    * the text found no construction or stopped reading (#396). The same
@@ -2504,6 +2514,13 @@ function callSide(
         runsUnderAnotherName: (name, member, language) => written(stored.findings(name, member, language)).length > 0,
         storedFindings: (name, member, language) => written(stored.findings(name, member, language)),
       } : {}),
+      // Whether a doubted call could be the head at all, on the TypeScript compiler's word (calls research 2026-11).
+      ...(askDefinition && closedBodyReferee?.calleeCanHold
+        ? { calleeCanHold: (at, head) => closedBodyReferee.calleeCanHold!(target, at, head) }
+        : {}),
+      ...(askDefinition && closedBodyReferee?.forgetsShapeAt
+        ? { forgetsShape: (file, line, names) => closedBodyReferee.forgetsShapeAt!(file, line, names) }
+        : {}),
       ...(askDefinition && closedBodyReferee?.compiledCrateOf
         ? { compiled: () => closedBodyReferee.compiledCrateOf!(target) }
         : {}),
@@ -2837,6 +2854,20 @@ export interface ClosedBodyReferee {
    * out (#398). TypeScript only.
    */
   parentsOutsideAt?(file: string, at: { start: number; end: number }): boolean | undefined;
+  /**
+   * Whether the value called at this range could be the head (calls research
+   * 2026-11, step 2): `false` only on the compiler's word that none of the
+   * head's declarations in `head.file` fits the called value's type, or that
+   * a plain call cannot run the head's `constructor`. `head.at` asks about a
+   * function with no name by its range instead. TypeScript only; repo-relative.
+   */
+  calleeCanHold?(file: string, at: { start: number; end: number }, head: { file: string; names: readonly string[]; at?: { start: number; end: number } }): boolean | undefined;
+  /**
+   * Whether one of `names`, written as a value on this 1-based line, is
+   * handed to a type that forgets what it is (`any`, `unknown`, `Function`,
+   * `{}`) or is cast. TypeScript only; repo-relative.
+   */
+  forgetsShapeAt?(file: string, line: number, names: readonly string[]): boolean | undefined;
 }
 
 /**
@@ -3257,7 +3288,10 @@ function notDirectSentence(word: "calls" | "needs", route: readonly string[], ar
  * a routine of the name it calls, and that is the whole of why it is not the
  * head.
  */
-function throughDispatch(dispatched: number | undefined, untyped?: number, ruled?: { misfit?: number; inMacros?: number }): string {
+function throughDispatch(
+  dispatched: number | undefined, untyped?: number,
+  ruled?: { misfit?: number; inMacros?: number; cannotHold?: number }, head?: readonly string[],
+): string {
   const parts: string[] = [];
   if (dispatched) {
     parts.push(dispatched === 1 ? "one through an interface or an override" : `${dispatched} through an interface or an override`);
@@ -3265,6 +3299,11 @@ function throughDispatch(dispatched: number | undefined, untyped?: number, ruled
   if (untyped) parts.push(untyped === 1 ? "one on a value nothing could type" : `${untyped} on values nothing could type`);
   const one = (dispatched ?? 0) + (untyped ?? 0) === 1;
   const said = parts.length === 0 ? [] : [`${parts.join(", ")}, ${one ? "which runs" : "each running"} a method of the name it calls`];
+  // A function handed in, a field, a method through an interface, whose type rules the head out (calls research 2026-11).
+  if (ruled?.cannotHold) {
+    said.push(`${ruled.cannotHold === 1 ? "one calls a value" : `${ruled.cannotHold} call values`} whose type the compiler says `
+      + `cannot hold ${head && head.length > 0 ? head.join(" or ") : "it"}`);
+  }
   // The calls ruled out by what they pass, or by what a macro's template writes (calls research 2026-11, `ruledOut`).
   if (ruled?.misfit) said.push(ruled.misfit === 1 ? "one passing arguments it does not take" : `${ruled.misfit} passing arguments it does not take`);
   if (ruled?.inMacros) {
@@ -3927,7 +3966,7 @@ export function checkDrift(
     accesses: 0, accessesConfirmed: 0, accessesWithheld: {},
     conforms: 0, conformsConfirmed: 0, conformsWithheld: {},
     builds: 0, buildsConfirmed: 0, buildsWithheld: {},
-    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {}, callsCompilable: 0, buildsCompilable: 0, buildsNotClosed: {}, buildsUnsettled: 0,
+    calls: 0, callsConfirmed: 0, callsWithheld: {}, callsNotClosed: {}, callsCompilable: 0, callsTypeAskable: 0, buildsCompilable: 0, buildsNotClosed: {}, buildsUnsettled: 0,
     feeds: 0, feedsConfirmed: 0, feedsWithheld: {},
     plannedWithheld: {},
     endsUnsettled: 0,
@@ -6262,6 +6301,10 @@ export function checkDrift(
               ) {
                 if (counting) claims.callsCompilable += 1;
               }
+              if (claimed && counting && !options?.closedBodyReferee && (tail.language === "ts" || tail.language === "tsx")) {
+                const why = verdict.verdict === "withheld" ? verdict.why : verdict.verdict === "absent" ? verdict.notClosed : undefined;
+                if (why === "local-callee" || why === "computed" || why === "overridden") claims.callsTypeAskable += 1;
+              }
 
               /*
                * A class at the head (#374): "main calls Parser" is true when
@@ -6786,7 +6829,7 @@ export function checkDrift(
                       + `writing its name, and nothing in ${verdict.evidence.routine} writes \`${toEnd.symbols[0]!}\`. `
                     : `and every call `
                       + `${verdict.evidence.routine} makes was checked -- ${verdict.evidence.sites} of `
-                      + `them${throughDispatch(verdict.evidence.dispatched, verdict.evidence.untyped, verdict.evidence)}, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `)
+                      + `them${throughDispatch(verdict.evidence.dispatched, verdict.evidence.untyped, verdict.evidence, toEnd.symbols)}, ${landedBeside(verdict.evidence.elsewhere, toPath, toEnd.symbols)}. `)
                   + `${fromPath} line ${verdict.evidence.line} is where ${verdict.evidence.routine} is declared.`,
               }, rests: refutedRests(verdict.evidence) }); };
               if (verdict.evidence.valueNeverNamed) {
