@@ -52,6 +52,18 @@ export function machineJobs(): number {
   return Math.max(1, Math.min(6, cores - 4, byMemory));
 }
 
+/**
+ * Worker slots for a batch that holds the whole machine (`measure:batch`):
+ * all but two cores, one per three GB. A 10-core, 24 GB machine gets 8. On
+ * 2026-11-26 one arm took 47 min at 8 slots and 54 min at 6: a worker
+ * waiting on a language server holds a slot but not a core, so the batch
+ * wants more slots than a single run's workers.
+ */
+export function batchSlots(): number {
+  const cores = typeof os.availableParallelism === "function" ? os.availableParallelism() : os.cpus().length;
+  return Math.max(1, Math.min(cores - 2, Math.floor(os.totalmem() / (3 * 1024 ** 3))));
+}
+
 /** `--jobs=<n>` from a script's arguments, then `BOARD_AI_JOBS`, then this run's share of `machineJobs()`. */
 export function jobsFrom(argv: readonly string[]): number {
   const given = argv.find((one) => one.startsWith("--jobs="))?.slice("--jobs=".length) ?? process.env.BOARD_AI_JOBS;

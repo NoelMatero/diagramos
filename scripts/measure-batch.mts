@@ -59,7 +59,7 @@ import {
 import { STUDY_SETS } from "./lib/bench-set";
 import { heldLaneCount, laneCount } from "./lib/machine-lock";
 import { makeSlots } from "./lib/slots";
-import { machineJobs } from "./lib/workers";
+import { batchSlots } from "./lib/workers";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -68,7 +68,7 @@ const out = path.resolve(flag("out") ?? path.join(os.homedir(), ".board-ai-bench
 const ALL_SETS = ["main", "holdout", "holdout-b", "holdout-c", "holdout-d"];
 const sets = flag("sets")?.split(",") ?? ALL_SETS;
 const languages = args.includes("--no-ct") ? [] : flag("ct")?.split(",") ?? ["ts", "python", "rust"];
-const slots = Number(flag("slots") ?? machineJobs());
+const slots = Number(flag("slots") ?? batchSlots());
 const say = (line: string) => console.error(`batch ${new Date().toLocaleTimeString("sv-SE")} ${line}`);
 
 /*

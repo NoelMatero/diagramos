@@ -276,7 +276,8 @@ export function runHoldsLock(): boolean {
   return heldLane() !== undefined;
 }
 
-interface Ticket { pid: number; started: string; file: string }
+/** `whole`: the waiter wants every lane, so nobody behind it may take one in the meantime. */
+interface Ticket { pid: number; started: string; file: string; whole?: boolean }
 
 function tickets(all: Proc[]): Ticket[] {
   let names: string[];
@@ -288,9 +289,9 @@ function tickets(all: Proc[]): Ticket[] {
   const out: Ticket[] = [];
   for (const name of names) {
     const file = path.join(waitingPath(), name);
-    let ticket: { pid: number; started: string };
+    let ticket: { pid: number; started: string; whole?: boolean };
     try {
-      ticket = JSON.parse(readFileSync(file, "utf8")) as { pid: number; started: string };
+      ticket = JSON.parse(readFileSync(file, "utf8")) as { pid: number; started: string; whole?: boolean };
     } catch {
       continue;
     }
@@ -329,7 +330,7 @@ export async function takeMachine(command: string, say: (line: string) => void,
   mkdirSync(waitingPath(), { recursive: true });
   const name = `${String(Date.now()).padStart(15, "0")}-${String(process.pid).padStart(8, "0")}.json`;
   const mine = path.join(waitingPath(), name);
-  writeFileSync(mine, JSON.stringify({ pid: process.pid, started: me.started }));
+  writeFileSync(mine, JSON.stringify({ pid: process.pid, started: me.started, ...(whole ? { whole: true } : {}) }));
   const drop = () => { try { unlinkSync(mine); } catch { /* gone */ } };
   process.once("exit", drop);
   let last = "";
@@ -341,7 +342,9 @@ export async function takeMachine(command: string, say: (line: string) => void,
       const lanes = laneCount();
       const states = Array.from({ length: lanes }, (_, lane) => holder(now, lane));
       const free = states.filter((one) => one === undefined).length;
-      const mayTry = whole ? position === 0 && free === lanes : position >= 0 && position < free;
+      // Behind a waiter for the whole machine nobody takes a lane, or it would never see every lane free at once.
+      const wholeAhead = queue.slice(0, Math.max(0, position)).some((one) => one.whole);
+      const mayTry = whole ? position === 0 && free === lanes : position >= 0 && position < free && !wholeAhead;
       if (mayTry && (whole || position === 0 ? tryLock(now, command, onSignal, whole) : tryLastFirst(now, command, onSignal, lanes))) return;
       const held = states.filter((one): one is Owner => one !== undefined && one !== "being written");
       const line = states.some((one) => one === "being written") && held.length === 0 ? "waiting: the machine is being taken by another run"
