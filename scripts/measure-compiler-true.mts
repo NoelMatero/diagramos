@@ -98,7 +98,7 @@ import type { TruePair, TrueWord } from "./lib/compiler-true-ts";
 import { pausesLine, readPowerLogSleeps, watchPauses, type Pause } from "./lib/run-pauses";
 import { CompilerTally, judgeCompilerTrue, type TallyData } from "./lib/run-validity";
 import { projectTimes } from "./lib/bench-jobs";
-import { rustCrateKey, sharingSlots, withSlot } from "./lib/slots";
+import { RUST_AT_ONCE, rustCrateKey, sharingSlots, withSlot } from "./lib/slots";
 import { inPool, jobsFrom } from "./lib/workers";
 
 const args = process.argv.slice(2);
@@ -190,7 +190,7 @@ const ran = await inPool(order, sharingSlots() ? order.length : jobsFrom(args), 
   if (run.status === 0) times.record(project, Date.now() - began);
   process.stderr.write(`${project}: exit ${run.status} in ${((Date.now() - began) / 1000).toFixed(0)}s\n`);
   return run;
-}, apart(project)), apart);
+}, apart(project), language === "rust"), apart, { of: () => language === "rust", at: RUST_AT_ONCE });
 times.save();
 const runs = projects.map((project) => ran[order.indexOf(project)]!);
 for (const [index, project] of projects.entries()) {

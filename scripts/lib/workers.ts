@@ -172,26 +172,36 @@ export function exitWithParent(): void {
  * are kept apart.
  */
 export async function inPool<J, R>(jobs: readonly J[], n: number, work: (job: J, index: number) => Promise<R>,
-  apart: (job: J) => string | undefined = () => undefined): Promise<R[]> {
+  apart: (job: J) => string | undefined = () => undefined,
+  /** A class of jobs of which at most `at` run at once (Rust jobs: `slots.ts`); the rest go ahead meanwhile. */
+  limit?: { of: (job: J) => boolean; at: number }): Promise<R[]> {
   const results = new Array<R>(jobs.length);
   const waiting = jobs.map((_, index) => index);
   const held = new Set<string>();
+  let limited = 0;
   let wake: () => void = () => {};
   const lane = async (): Promise<void> => {
     for (;;) {
       if (waiting.length === 0) return;
-      const at = waiting.findIndex((index) => { const name = apart(jobs[index]!); return name === undefined || !held.has(name); });
+      const at = waiting.findIndex((index) => {
+        const name = apart(jobs[index]!);
+        if (name !== undefined && held.has(name)) return false;
+        return !limit || !limit.of(jobs[index]!) || limited < limit.at;
+      });
       if (at < 0) {
         await new Promise<void>((resolve) => { const before = wake; wake = () => { before(); resolve(); }; });
         continue;
       }
       const index = waiting.splice(at, 1)[0]!;
       const name = apart(jobs[index]!);
+      const counted = limit?.of(jobs[index]!) ?? false;
       if (name !== undefined) held.add(name);
+      if (counted) limited += 1;
       try {
         results[index] = await work(jobs[index]!, index);
       } finally {
         if (name !== undefined) held.delete(name);
+        if (counted) limited -= 1;
         const woken = wake;
         wake = () => {};
         woken();

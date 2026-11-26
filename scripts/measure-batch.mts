@@ -30,7 +30,9 @@
  *   commit's measuring scripts laid over its own (said in the output).
  * - **Every run at once**, sharing one set of worker slots (`slots.ts`,
  *   `--slots`, default sized to the machine), longest job first across all of
- *   them: the batch is as long as its longest project, not the sum.
+ *   them: the batch is as long as its longest project, not the sum. At most
+ *   `--rust` of them (default 3) are Rust jobs: rust-analyzers analysing side
+ *   by side ran their requests past the client's time limit.
  * - **Resumable and shared.** Each arm's results go to `<out>/<sha>/`
  *   (default `~/.board-ai-bench/batch`), a run's `.done` written only when it
  *   finished and could be compared. A base already measured is reused, so one
@@ -58,7 +60,7 @@ import {
 } from "./lib/batch-compare";
 import { STUDY_SETS } from "./lib/bench-set";
 import { heldLaneCount, laneCount } from "./lib/machine-lock";
-import { makeSlots } from "./lib/slots";
+import { makeSlots, RUST_AT_ONCE } from "./lib/slots";
 import { batchSlots } from "./lib/workers";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -69,6 +71,8 @@ const ALL_SETS = ["main", "holdout", "holdout-b", "holdout-c", "holdout-d"];
 const sets = flag("sets")?.split(",") ?? ALL_SETS;
 const languages = args.includes("--no-ct") ? [] : flag("ct")?.split(",") ?? ["ts", "python", "rust"];
 const slots = Number(flag("slots") ?? batchSlots());
+/** Of the slots, how many may be Rust jobs at once (`slots.ts`). */
+const rustSlots = Number(flag("rust") ?? RUST_AT_ONCE);
 const say = (line: string) => console.error(`batch ${new Date().toLocaleTimeString("sv-SE")} ${line}`);
 
 /*
@@ -314,9 +318,9 @@ const machine = recordRun(`measure-batch ${args.join(" ")}`);
 if (process.platform === "darwin" && existsSync("/usr/bin/caffeinate")) {
   spawn("/usr/bin/caffeinate", ["-i", "-w", String(process.pid)], { stdio: "ignore" }).unref();
 }
-say(`machine taken after ${((Date.now() - began) / 1000).toFixed(0)}s; arms ${arms.join(", ")}; sets ${sets.join(",")}; compiler-true ${languages.join(",") || "none"}; ${slots} slots; ${plan.length} runs to go`);
+say(`machine taken after ${((Date.now() - began) / 1000).toFixed(0)}s; arms ${arms.join(", ")}; sets ${sets.join(",")}; compiler-true ${languages.join(",") || "none"}; ${slots} slots, at most ${Math.min(rustSlots, slots)} of them Rust; ${plan.length} runs to go`);
 const slotsDir = path.join(out, `.slots-${process.pid}`);
-makeSlots(slotsDir, slots);
+makeSlots(slotsDir, slots, rustSlots);
 const ranAt = Date.now();
 const results = await Promise.all(plan.map(async (run) => {
   say(`${run.arm} ${run.name}: start`);

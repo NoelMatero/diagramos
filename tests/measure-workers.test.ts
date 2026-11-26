@@ -125,6 +125,43 @@ describe("slots shared between runs", () => {
   }, 30_000);
 });
 
+describe("Rust jobs at once", () => {
+  it("never lets more Rust jobs hold slots than the folder allows, and lets other jobs past a waiting one", async () => {
+    // Several rust-analyzers analysing at once lost 2,411 answers to timeouts in one batch.
+    const dir = path.join(scratch, "rust-slots");
+    makeSlots(dir, 4, 2);
+    process.env.BOARD_AI_SLOTS = dir;
+    try {
+      let rust = 0;
+      let most = 0;
+      const order: string[] = [];
+      const job = (name: string, ms: number, isRust: boolean) => withSlot(ms, async () => {
+        order.push(name);
+        if (isRust) { rust += 1; most = Math.max(most, rust); }
+        await new Promise((resolve) => { setTimeout(resolve, 300); });
+        if (isRust) rust -= 1;
+      }, undefined, isRust);
+      await Promise.all([job("r1", 900, true), job("r2", 800, true), job("r3", 700, true), job("p1", 100, false)]);
+      expect(most).toBe(2);
+      // p1 is the shortest, and still starts before r3, which waits for Rust room.
+      expect(order.indexOf("p1")).toBeLessThan(order.indexOf("r3"));
+    } finally {
+      delete process.env.BOARD_AI_SLOTS;
+    }
+  }, 30_000);
+
+  it("holds a class of jobs to a limit in a single run's own pool", async () => {
+    let going = 0;
+    let most = 0;
+    await inPool(["r", "r", "r", "t", "r", "t"], 6, async (kind) => {
+      if (kind === "r") { going += 1; most = Math.max(most, going); }
+      await new Promise((resolve) => { setTimeout(resolve, 40); });
+      if (kind === "r") going -= 1;
+    }, () => undefined, { of: (kind) => kind === "r", at: 2 });
+    expect(most).toBe(2);
+  });
+});
+
 describe("a worker process", () => {
   it("hands back what it sent", async () => {
     const got = await runWorker<{ n: number }>(worker(`await sendResult({ n: 41 + 1 });`), [], { execArgv: TS });

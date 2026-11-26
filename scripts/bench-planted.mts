@@ -80,7 +80,7 @@ import { pausesLine, readPowerLogSleeps, watchPauses } from "./lib/run-pauses";
 import { CompilerTally, judgeCanaries, languageGroup, loadCanaries, type CanaryAnswer, type TallyData } from "./lib/run-validity";
 import { descendantsOf, processRows, stallWindowMs, watchForStall } from "./lib/stall-watchdog";
 import { UNDECIDED_BUCKETS, type Bucket } from "./lib/undecided-buckets";
-import { rustCrateKey, sharingSlots, withSlot } from "./lib/slots";
+import { RUST_AT_ONCE, rustCrateKey, sharingSlots, withSlot } from "./lib/slots";
 import { exitWithParent, inPool, jobsFrom, runWorker, sendResult } from "./lib/workers";
 
 const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
@@ -592,7 +592,7 @@ const asking = inPool(queue, sharingSlots() ? queue.length : jobs, async (job) =
   const outcome = await withSlot(job.kind === "canaries" ? CANARIES_FIRST : times.expect(job), () =>
     runWorker<ProjectAnswers | CanaryAnswers>(self, workerArgs, {
       env: { ...process.env, BENCH_PLANTED_JOB: JSON.stringify(job) },
-    }), apart(job));
+    }), apart(job), rustProjects.has(job.project));
   if (job.kind === "canaries") {
     for (const index of job.canaries) {
       const said = outcome.ok ? (outcome.value as CanaryAnswers).answers.find(([at]) => at === index) : undefined;
@@ -630,7 +630,7 @@ const asking = inPool(queue, sharingSlots() ? queue.length : jobs, async (job) =
     answers.set(key, byClaim);
   }
   projectTallies.set(job.project, [...(projectTallies.get(job.project) ?? []), { share: job.share, data: value.tally }]);
-}, apart);
+}, apart, { of: (job) => rustProjects.has(job.project), at: RUST_AT_ONCE });
 
 await canariesBack;
 const canaryAnswers: CanaryAnswer[] = canaryIndices.map((index) => ({ canary: allCanaries[index]!, ...canarySaid.get(index)! }));

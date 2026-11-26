@@ -16,6 +16,13 @@
  * name no two holders share at once (a Rust project: two rust-analyzers on
  * one crate contend for its `target/`), held the same way.
  *
+ * **At most `rust` of the holders may be Rust jobs** (`<folder>/rust`, default
+ * 3). A rust-analyzer runs a thread per core; several analysing at once
+ * crowded the run queue past 40 and their requests ran past the client's
+ * 30 s limit -- 2,411 answers lost on holdout-d and three claims turned "not
+ * sure" in one batch (2026-11-26), none alone. A Rust job held back lets the
+ * next job of another language go ahead.
+ *
  * One poll per process, for all of its waiting jobs at once, every 200 ms.
  * The first version polled once per waiting job every 150 ms: 67 waiters
  * each reading every slot and checking every queued process was alive, and
@@ -67,6 +74,7 @@ function take(lock: string): boolean {
 
 interface Waiter {
   ticket: string;
+  rust: boolean;
   apartLock?: string;
   grant: (held: { slot: string; apartLock?: string }) => void;
 }
@@ -119,10 +127,20 @@ function poll(dir: string): void {
   };
   // Only waiters whose name is free count for the queue: one held back must not hold back the rest.
   const eligible = live.filter((one) => !held(one.split("-")[4] ?? "none"));
-  // As many of the first eligible waiters as there were free slots when this look began.
-  const room = free.length;
-  for (const [position, name] of eligible.entries()) {
-    if (position >= room) break;
+  // Rust jobs running now, by the slots that say so.
+  let rustLeft = rustCount(dir);
+  for (let i = 0; i < count(dir); i++) {
+    if (existsSync(path.join(dir, `slot-${i}`, "rust"))) rustLeft -= 1;
+  }
+  // The first eligible waiters, as many as there were free slots when this look began.
+  let slotsLeft = free.length;
+  for (const name of eligible) {
+    if (slotsLeft <= 0) break;
+    const isRust = name.split("-")[5] === "r";
+    // A Rust job with no Rust room left waits, and lets the next one through.
+    if (isRust && rustLeft <= 0) continue;
+    slotsLeft -= 1;
+    if (isRust) rustLeft -= 1;
     const at = waiters.findIndex((one) => path.basename(one.ticket) === name);
     // A place another process's waiter holds in the queue: its slot is kept for it.
     if (at < 0) continue;
@@ -133,6 +151,7 @@ function poll(dir: string): void {
       if (waiter.apartLock) rmSync(waiter.apartLock, { recursive: true, force: true });
       break;
     }
+    if (waiter.rust) writeFileSync(path.join(slot, "rust"), "");
     free.splice(free.indexOf(slot), 1);
     waiters.splice(at, 1);
     try { unlinkSync(waiter.ticket); } catch { /* gone */ }
@@ -141,23 +160,35 @@ function poll(dir: string): void {
   schedule(dir, POLL_MS);
 }
 
+/** How many holders may be Rust jobs at once: `<folder>/rust`, default 3. */
+function rustCount(dir: string): number {
+  try {
+    const n = Number(readFileSync(path.join(dir, "rust"), "utf8").trim());
+    return Number.isInteger(n) && n >= 1 ? n : RUST_AT_ONCE;
+  } catch {
+    return RUST_AT_ONCE;
+  }
+}
+
 /**
  * Run `work` once this process holds one of the shared slots, if there are
  * any; at once if there are none. `expectMs` orders the waiters: longest
  * first, then first come. `apart` is a name no two holders may share at once;
- * a waiter whose name is held lets the next one go ahead.
+ * a waiter whose name is held lets the next one go ahead. `rust` marks a job
+ * whose language server is rust-analyzer: at most `<folder>/rust` of those
+ * hold slots at once.
  */
-export async function withSlot<T>(expectMs: number, work: () => Promise<T>, apart?: string): Promise<T> {
+export async function withSlot<T>(expectMs: number, work: () => Promise<T>, apart?: string, rust = false): Promise<T> {
   const dir = slotsDir();
   if (!dir) return work();
   const waiting = path.join(dir, "waiting");
   mkdirSync(waiting, { recursive: true });
   const name = apart === undefined ? "none" : createHash("sha1").update(apart).digest("hex").slice(0, 12);
   // Longest first: a name that sorts the longest expectation to the front, then the oldest.
-  const ticket = path.join(waiting, `${String(1e12 - Math.min(1e12 - 1, Math.round(expectMs))).padStart(13, "0")}-${String(Date.now()).padStart(15, "0")}-${process.pid}-${sequence++}-${name}`);
+  const ticket = path.join(waiting, `${String(1e12 - Math.min(1e12 - 1, Math.round(expectMs))).padStart(13, "0")}-${String(Date.now()).padStart(15, "0")}-${process.pid}-${sequence++}-${name}-${rust ? "r" : "n"}`);
   writeFileSync(ticket, String(process.pid));
   const held = await new Promise<{ slot: string; apartLock?: string }>((grant) => {
-    waiters.push({ ticket, ...(apart === undefined ? {} : { apartLock: path.join(dir, `apart-${name}`) }), grant });
+    waiters.push({ ticket, rust, ...(apart === undefined ? {} : { apartLock: path.join(dir, `apart-${name}`) }), grant });
     schedule(dir, 0);
   });
   try {
@@ -169,11 +200,15 @@ export async function withSlot<T>(expectMs: number, work: () => Promise<T>, apar
   }
 }
 
-/** Make a slots folder with `n` slots, for a batch to hand its runs. */
-export function makeSlots(dir: string, n: number): void {
+/** Rust jobs at once, unless a folder says otherwise. */
+export const RUST_AT_ONCE = 3;
+
+/** Make a slots folder with `n` slots, at most `rust` of them Rust jobs, for a batch to hand its runs. */
+export function makeSlots(dir: string, n: number, rust = RUST_AT_ONCE): void {
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(path.join(dir, "waiting"), { recursive: true });
   writeFileSync(path.join(dir, "count"), String(n));
+  writeFileSync(path.join(dir, "rust"), String(Math.min(rust, n)));
 }
 
 /** Whether runs in this process share slots with others (`BOARD_AI_SLOTS`). */
