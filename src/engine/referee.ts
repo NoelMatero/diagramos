@@ -99,7 +99,7 @@ export function createClosedBodyReferee(root: string): ClosedBodyReferee | undef
 export function tsQuestions(
   ts: NonNullable<ReturnType<typeof createTsReferee>>,
   root: string,
-): Pick<ClosedBodyReferee, "typePartsAt" | "fitsAt" | "importTargetAt" | "memberAt" | "parentsOutsideAt"> {
+): Pick<ClosedBodyReferee, "typePartsAt" | "fitsAt" | "importTargetAt" | "memberAt" | "parentsOutsideAt" | "calleeCanHold" | "forgetsShapeAt"> {
   return {
     typePartsAt: (file, at) => {
       if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
@@ -134,7 +134,20 @@ export function tsQuestions(
       if (languageOf(file) === "python" || languageOf(file) === "rust") return undefined;
       return ts.ancestorsAt(path.resolve(root, file), at.start, at.end)?.some((one) => isOutsideTree(one.file, root));
     },
+    calleeCanHold: (file, at, head) => {
+      if (!typed(file) || !typed(head.file)) return undefined;
+      return ts.calleeCanHoldAt(path.resolve(root, file), at.start, at.end, {
+        file: path.resolve(root, head.file), names: head.names, ...(head.at ? { at: head.at } : {}),
+      });
+    },
+    forgetsShapeAt: (file, line, names) => (typed(file) ? ts.forgetsShapeAt(path.resolve(root, file), line, names) : undefined),
   };
+}
+
+/** A TypeScript file: the type question is not asked of JavaScript, whose types are guesses, nor of Python or Rust. */
+function typed(file: string): boolean {
+  const language = languageOf(file);
+  return language === "ts" || language === "tsx";
 }
 
 /** An absolute file and 0-based line from a compiler, as the engine holds a place -- or `"outside"`. */
@@ -247,6 +260,9 @@ export function wouldHelp(report: DriftReport): boolean {
     || (buildsNotClosed.receiver ?? 0) > 0
     || (buildsNotClosed["abstract-receiver"] ?? 0) > 0
     || (callsWithheld.receiver ?? 0) > 0
+    // A TypeScript call of a value nobody could place: whether it could be the
+    // head at all is the compiler's to say (calls research 2026-11).
+    || (report.claims.callsTypeAskable ?? 0) > 0
     || buildsUnsettled > 0
     || endsUnsettled > 0
     // A red with a question for the compiler, on a pass that had none to ask

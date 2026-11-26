@@ -51,7 +51,7 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[], options?: { dispatched?: boolean }): TruePair[] {
+export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[], options?: { dispatched?: boolean; handedOn?: boolean }): TruePair[] {
   const files = dirs.flatMap((dir) => walk(path.join(root, dir)));
   const reading = new Set(files);
   // The project's own settings: whether one type fits another depends on
@@ -220,6 +220,7 @@ export function typescriptTruePairs(ts: typeof TS, root: string, dirs: string[],
   }
 
   if (options?.dispatched) return dispatchedPairs(ts, checker, sources, routines, refOfDeclaration, rel);
+  if (options?.handedOn) return handedOnPairs(ts, checker, sources, routines, refOfDeclaration);
 
   for (const routine of routines) {
     const { node } = routine;
@@ -468,5 +469,140 @@ function dispatchedPairs(
     visit(routine.node.body);
   }
   void rel;
+  return pairs;
+}
+
+/**
+ * `--handed-on` (calls research 2026-11): a routine handed to another one
+ * step, followed with the compiler's own symbols -- the population a type
+ * question about a function value puts at risk, which the plain `calls`
+ * pairs never hold, because every one of them writes the far end's name:
+ *
+ *   - `handed-argument`: `run(fits)`, and `run`'s body calls that parameter;
+ *   - `handed-option`: `run({ onError: fail })`, and `run`'s body calls
+ *     `options.onError(..)` on that parameter;
+ *   - `handed-field`: `this.handler = fail` in a class, and a method of the
+ *     class calls `this.handler(..)`.
+ *
+ * Each says "run calls fits": what `run` calls is the routine it was handed.
+ * A `-cast` on the end marks a hand-over through `as` or `<T>`, where the
+ * types say nothing about the value and the checker must not lean on them.
+ */
+function handedOnPairs(
+  ts: typeof TS,
+  checker: TS.TypeChecker,
+  sources: readonly TS.SourceFile[],
+  routines: ReadonlyArray<{ ref: string; node: TS.SignatureDeclaration & { body?: TS.Node } }>,
+  refOfDeclaration: Map<TS.Node, string>,
+): TruePair[] {
+  const pairs: TruePair[] = [];
+  const seen = new Set<string>();
+  const add = (from: string, to: string, how: string) => {
+    const key = `${from} ${to}`;
+    if (from === to || seen.has(key)) return;
+    seen.add(key);
+    pairs.push({ word: "calls", from, to, how });
+  };
+  const refOfRoutine = new Map<TS.Node, string>(routines.map((one) => [one.node, one.ref]));
+  /** The value with what only wraps it taken off, and whether a cast was among it. */
+  const strip = (node: TS.Expression): { node: TS.Expression; cast: boolean } => {
+    let cast = false;
+    let at = node;
+    for (;;) {
+      if (ts.isParenthesizedExpression(at) || ts.isNonNullExpression(at)) at = at.expression;
+      else if (ts.isSatisfiesExpression(at)) at = at.expression;
+      else if (ts.isAsExpression(at) || ts.isTypeAssertionExpression(at)) { cast = true; at = at.expression; }
+      else return { node: at, cast };
+    }
+  };
+  /** The routine a value names, by the compiler's symbol, following an import. */
+  const routineNamed = (value: TS.Node): string | undefined => {
+    let symbol = ts.isShorthandPropertyAssignment(value) ? checker.getShorthandAssignmentValueSymbol(value)
+      : ts.isIdentifier(value) || ts.isPropertyAccessExpression(value)
+        ? checker.getSymbolAtLocation(ts.isPropertyAccessExpression(value) ? value.name : value)
+        : undefined;
+    if (symbol && symbol.flags & ts.SymbolFlags.Alias) symbol = checker.getAliasedSymbol(symbol);
+    const declarations = symbol?.declarations ?? [];
+    if (declarations.length !== 1) return undefined;
+    const declaration = declarations[0]!;
+    return refOfDeclaration.get(declaration)
+      ?? (ts.isVariableDeclaration(declaration) && declaration.initializer ? refOfDeclaration.get(declaration.initializer) : undefined);
+  };
+  /** Whether a body calls the parameter itself, or its member `key`. */
+  const bodyCalls = (body: TS.Node, parameter: TS.Symbol, key?: string): boolean => {
+    let found = false;
+    const visit = (node: TS.Node): void => {
+      if (found) return;
+      if (ts.isCallExpression(node)) {
+        const callee = strip(node.expression).node;
+        if (key === undefined && ts.isIdentifier(callee) && checker.getSymbolAtLocation(callee) === parameter) { found = true; return; }
+        if (key !== undefined && ts.isPropertyAccessExpression(callee) && callee.name.text === key && ts.isIdentifier(callee.expression)
+          && checker.getSymbolAtLocation(callee.expression) === parameter) { found = true; return; }
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(body);
+    return found;
+  };
+
+  for (const source of sources) {
+    const visit = (node: TS.Node): void => {
+      if (ts.isCallExpression(node)) {
+        const declaration = checker.getResolvedSignature(node)?.declaration;
+        const tail = declaration && !ts.isJSDocSignature(declaration) ? refOfRoutine.get(declaration) : undefined;
+        const body = tail ? (declaration as TS.FunctionLikeDeclaration).body : undefined;
+        if (tail && body && declaration && !ts.isJSDocSignature(declaration)) {
+          node.arguments.forEach((argument, index) => {
+            const parameter = declaration.parameters[index];
+            if (!parameter || parameter.dotDotDotToken || !ts.isIdentifier(parameter.name)) return;
+            const symbol = checker.getSymbolAtLocation(parameter.name);
+            if (!symbol) return;
+            const { node: value, cast } = strip(argument);
+            const head = routineNamed(value);
+            if (head && bodyCalls(body, symbol)) add(tail, head, `handed-argument${cast ? "-cast" : ""}`);
+            if (!ts.isObjectLiteralExpression(value)) return;
+            for (const property of value.properties) {
+              if (!(ts.isPropertyAssignment(property) || ts.isShorthandPropertyAssignment(property))) continue;
+              if (!ts.isIdentifier(property.name)) continue;
+              const inner = ts.isPropertyAssignment(property) ? strip(property.initializer) : { node: property, cast: false };
+              const held = routineNamed(inner.node);
+              if (held && bodyCalls(body, symbol, property.name.text)) add(tail, held, `handed-option${cast || inner.cast ? "-cast" : ""}`);
+            }
+          });
+        }
+      }
+      // `this.h = f` in a class, and a method of that class calling `this.h(..)`.
+      if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken && ts.isPropertyAccessExpression(node.left)
+        && node.left.expression.kind === ts.SyntaxKind.ThisKeyword) {
+        const { node: value, cast } = strip(node.right);
+        const head = routineNamed(value);
+        const field = node.left.name.text;
+        let holder: TS.Node | undefined = node;
+        while (holder && !ts.isClassLike(holder)) holder = holder.parent;
+        if (head && holder && ts.isClassLike(holder)) {
+          for (const member of holder.members) {
+            const tail = refOfRoutine.get(member);
+            if (!tail || !ts.isMethodDeclaration(member) || !member.body) continue;
+            let calls = false;
+            const look = (inner: TS.Node): void => {
+              if (calls) return;
+              if (ts.isCallExpression(inner)) {
+                const callee = strip(inner.expression).node;
+                if (ts.isPropertyAccessExpression(callee) && callee.name.text === field && callee.expression.kind === ts.SyntaxKind.ThisKeyword) {
+                  calls = true;
+                  return;
+                }
+              }
+              ts.forEachChild(inner, look);
+            };
+            look(member.body);
+            if (calls) add(tail, head, `handed-field${cast ? "-cast" : ""}`);
+          }
+        }
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+  }
   return pairs;
 }
