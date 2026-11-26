@@ -117,6 +117,13 @@ const words = (flag("words")?.split(",") ?? (classTails || dispatched || handedO
 const WORDS: TrueWord[] = ["holds", "takes", "returns", "conforms", "calls", "accesses"];
 /** Compiler answers kept across runs for the live arm (`scripts/lib/compiler-memory.ts`); `--no-memory` turns it off. */
 const MEMORY_MODE = memoryMode(args);
+/*
+ * The pinned clones are never edited while a measurement runs, so the
+ * TypeScript referee may trust a program it built without stat'ing all of its
+ * files again on every question (`referee-ts.ts`, `BOARD_AI_TREES_STILL`).
+ * Passed to every worker through the environment.
+ */
+process.env.BOARD_AI_TREES_STILL ??= "1";
 
 /** The pinned clones live in the main checkout; a worktree has none. */
 const CORPUS = existsSync(path.resolve(import.meta.dirname, "..", ".corpus"))

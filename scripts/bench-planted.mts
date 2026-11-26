@@ -194,6 +194,13 @@ const BENCH_BUDGET_MS = 600_000;
  * machine's compilers answer.
  */
 const MEMORY_MODE = memoryMode(argv);
+/*
+ * The pinned clones are never edited while a measurement runs, so the
+ * TypeScript referee may trust a program it built without stat'ing all of its
+ * files again on every question (`referee-ts.ts`, `BOARD_AI_TREES_STILL`).
+ * Passed to every worker through the environment.
+ */
+process.env.BOARD_AI_TREES_STILL ??= "1";
 let memory: CompilerMemory | undefined;
 let pools: { project: string; pool: LiveRefereePool } | undefined;
 function poolFor(project: string): LiveRefereePool {

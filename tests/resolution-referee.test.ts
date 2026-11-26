@@ -208,4 +208,25 @@ describe("a cached program invalidates when a file it was built from changes (#2
     const after = referee.typeAt(path.join(repo, "a.ts"), start, start + 1);
     expect(after?.concrete).toBe(false);
   });
+
+  it("is trusted without that check when a measurement says its trees hold still (BOARD_AI_TREES_STILL)", () => {
+    write("foo.ts", "export class Foo {\n  run(): void {}\n}\n");
+    const source = 'import { Foo } from "./foo";\nfunction use(f: Foo) {\n  f.run();\n}\n';
+    write("a.ts", source);
+    const had = process.env.BOARD_AI_TREES_STILL;
+    process.env.BOARD_AI_TREES_STILL = "1";
+    try {
+      const referee = refereeIn(repo);
+      const { start } = rangeOf(source, "f.run()");
+      expect(referee.typeAt(path.join(repo, "a.ts"), start, start + 1)?.concrete).toBe(true);
+      write("foo.ts", "export interface Foo {\n  run(): void;\n}\n");
+      const bumped = new Date(Date.now() + 60_000);
+      utimesSync(path.join(repo, "foo.ts"), bumped, bumped);
+      // The program built before the edit is still the one asked: only a measurement of pinned clones sets this.
+      expect(referee.typeAt(path.join(repo, "a.ts"), start, start + 1)?.concrete).toBe(true);
+    } finally {
+      if (had === undefined) delete process.env.BOARD_AI_TREES_STILL;
+      else process.env.BOARD_AI_TREES_STILL = had;
+    }
+  });
 });
