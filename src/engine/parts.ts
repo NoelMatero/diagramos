@@ -755,6 +755,214 @@ function readBound({ node, kind }: Bound, language: Language): Record<Part, Part
 }
 
 /**
+ * A place a file gives a name a value without declaring it (missed map
+ * 2026-11b, pattern 1d): the name as written there, and the node whose
+ * `value`, `right` and `type` fields belong to it, where one does.
+ */
+interface Slot {
+  holder?: Node;
+  nameNode: Node;
+}
+
+/** Held against the tree, as `boundCache` is. */
+const slotCache = new WeakMap<Tree, Map<string, Slot[]>>();
+
+/** A name as a grammar writes one: an identifier of any kind. */
+const NAME_LEAF = /identifier$/;
+
+/**
+ * A box means a name given a value in at most this many places. A name given
+ * one in more is a common word -- `name`, `value`, `error` in a large file --
+ * and one compiler question each is how #417's `files` took seventeen
+ * minutes.
+ */
+const MOST_SLOTS = 8;
+
+/**
+ * The names a target gives a value to: `a` and `b` in `a, (b, c) = ...`,
+ * `const [a, b] = ...`, `const { a, k: b } = ...`, `for k, v in ...`; and
+ * the member in `self.x = ...`, `this.x = ...`.
+ *
+ * Read off fields, never node names (`docs/reading-a-grammar.md`). A member
+ * access writes its member on an `attribute` (Python) or `property`
+ * (TypeScript) field beside an `object`; a pattern's `key: value` binds what
+ * is on `value`, and a default `a = 1` what is on `left`. A subscript,
+ * `a[i] = ...`, gives a value to no name.
+ */
+function targetNames(target: Node, add: (nameNode: Node, holder?: Node) => void, holder?: Node): void {
+  if (target.childCount === 0) {
+    if (target.isNamed && NAME_LEAF.test(target.type)) add(target, holder);
+    return;
+  }
+  const member = target.childForFieldName("attribute") ?? target.childForFieldName("property");
+  if (member && target.childForFieldName("object")) {
+    if (member.childCount === 0 && NAME_LEAF.test(member.type)) add(member, holder);
+    return;
+  }
+  if (target.childForFieldName("subscript") || target.childForFieldName("index")
+    || target.childForFieldName("function") || target.childForFieldName("arguments")) return;
+  const value = target.childForFieldName("key") ? target.childForFieldName("value") : null;
+  if (value) { targetNames(value, add); return; }
+  const left = target.childForFieldName("left");
+  if (left) { targetNames(left, add); return; }
+  for (const child of namedChildren(target)) targetNames(child, add);
+}
+
+/** An assignment's operator: `=`, `+=`, `//=`, `??=`; never a comparison (`==`, `<=`, `!=`). */
+const ASSIGNING = /^(?:[-+*\/%&|^@~]|\*\*|\/\/|<<|>>>?|&&|\|\||\?\?)?=$/;
+
+/**
+ * Whether `left` is a target this node gives a value to, rather than an
+ * operand: `x.a = 1` and `for k, v in xs` give one, `x.a * 2` and `x.a and y`
+ * do not, though every one of them writes `left` and `right`.
+ *
+ * Read off the anonymous token right after `left`, which is its own type
+ * (`docs/reading-a-grammar.md`): an assignment's operator, or the `:` of
+ * Python's `self.x: T = v`. A loop is told by the keyword it opens with, and
+ * there the token is `in` or `of` -- which in TypeScript is also an operator,
+ * `"k" in obj`, so it counts only after `for`.
+ */
+function givesLeftAValue(node: Node, left: Node): boolean {
+  let after: Node | null = null;
+  for (let index = 0; index < node.childCount; index += 1) {
+    if (node.child(index)?.id === left.id) { after = node.child(index + 1); break; }
+  }
+  if (!after || after.isNamed) return false;
+  if (ASSIGNING.test(after.type) || (after.type === ":" && node.childForFieldName("type") !== null)) return true;
+  return (after.type === "in" || after.type === "of") && node.child(0)?.type === "for";
+}
+
+/**
+ * Every place a file gives a name a value without a declaration `body.ts`
+ * indexes or a binding `boundShapes` reads (missed map 2026-11b, pattern 1d):
+ *
+ *   an attribute set on an object      `self._nested = False`, `this.attempts = 0`,
+ *                                      `self.fields: dict[str, Field] = {}`
+ *   a key of an object literal         `{ source: '' }`, `{ error: message }`
+ *   a name in a destructuring target   `start, stop, step = s.indices(n)`,
+ *                                      `const [a, b] = pair()`, `for k, v in xs`
+ *
+ * Haiku anchors boxes at all three, and the kind reader found none of them:
+ * 27 wrong arrows on the study sets ended at one and stayed "not sure" for
+ * want of anything to ask.
+ *
+ * A target that is a single name is a declaration already, and is left to it.
+ * A member's value is read only when the member is the whole target; inside a
+ * tuple it is one piece of what is unpacked, as every name there is.
+ *
+ * A key is read off the `key` field of a node that also has a `value`,
+ * outside any target, where the same shape is a pattern. Python's dictionary
+ * keys are strings and a keyword argument writes `name`, so neither is a name
+ * given a value here. TypeScript's shorthand `{ x }` writes no field at all:
+ * it is the one node read by its type, and is a slot whose value nobody
+ * wrote beside it.
+ */
+function slotShapes(source: string, language: Language): Map<string, Slot[]> {
+  const tree = parseSource(source, language);
+  if (!tree) return new Map();
+  const hit = slotCache.get(tree);
+  if (hit) return hit;
+  const found = new Map<string, Slot[]>();
+  slotCache.set(tree, found);
+  const add = (nameNode: Node, holder?: Node) => {
+    found.set(nameNode.text, [...(found.get(nameNode.text) ?? []), { nameNode, ...(holder ? { holder } : {}) }]);
+  };
+  /** Every target read, so a pattern's `key: value` is not read again as an object's key. */
+  const targets: Array<[number, number]> = [];
+  each(tree.rootNode, (node) => {
+    const value = node.childForFieldName("value") ?? node.childForFieldName("right");
+    const named = node.childForFieldName("name");
+    // An assignment, a loop, a comprehension's `for`: `left`. A declarator destructuring its value: a pattern on `name`.
+    const left = node.childForFieldName("left");
+    const target = (left && givesLeftAValue(node, left) ? left : null)
+      ?? (named && named.childCount > 0 && value ? named : null);
+    if (!target || target.childCount === 0 || parametersOf(node)) return;
+    targets.push([target.startIndex, target.endIndex]);
+    targetNames(target, add, target.childForFieldName("object") && value ? node : undefined);
+  });
+  const insideATarget = (node: Node) =>
+    targets.some(([start, end]) => node.startIndex >= start && node.endIndex <= end);
+  each(tree.rootNode, (node) => {
+    const key = node.childForFieldName("key");
+    if (key && node.childForFieldName("value") && key.childCount === 0 && NAME_LEAF.test(key.type)
+      && !insideATarget(node)) add(key, node);
+    if (node.type === "shorthand_property_identifier" && !insideATarget(node)) add(node);
+  });
+  return found;
+}
+
+/**
+ * Whether the file binds or reaches `name` some way the slots do not read,
+ * which leaves them saying nothing about it:
+ *
+ *   imported, or under a star import         `from .x import step`
+ *   a parameter's destructuring              `function f({ source })`
+ *   an `as`: a `with`, an import             `with open() as (a, b)`
+ *   the name written as a string             `setattr(self, "x", f)`, `o["x"] = f`,
+ *                                            `Object.defineProperty(o, "x", ..)`
+ */
+function slotsSayNothing(source: string, name: string, language: Language): boolean {
+  const bindings = bindingsIn(source, language);
+  if (!bindings || bindings.wildcard || bindings.imported.has(name) || bindings.shadowed.has(name)
+    || bindings.forwarded.has(name)) return true;
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (new RegExp(`(["'\`])${escaped}\\1`).test(source)) return true;
+  const tree = parseSource(source, language);
+  if (!tree) return true;
+  let other = false;
+  each(tree.rootNode, (node) => {
+    if (other) return;
+    const fenced = parametersOf(node) ?? node.childForFieldName("alias");
+    if (fenced) each(fenced, (leaf) => { if (leaf.childCount === 0 && leaf.text === name) other = true; });
+  });
+  return other;
+}
+
+/** The words that write a value not given yet. */
+const NOT_YET = /^(None|null|undefined)$/;
+
+/**
+ * How a slot reads: by `readShape`'s rules, on what it is given. A literal is
+ * data, a construction an instance, a type written beside it says what it
+ * says; a name in a tuple, or a value the text cannot judge, is a doubt.
+ *
+ * One difference, and it is why a slot is not simply a declaration: a slot
+ * given `None`, `null` or `undefined` is waiting for its value, not holding
+ * it. A declaration with one -- `callback = None` in a class body -- writes
+ * the name's own type; `self._middleware_chain = None` in `__init__` is
+ * filled in later, often from another method or file, and with a function
+ * (django). Nothing is said about one, and no compiler is asked: it would
+ * say what the slot holds there, which is nothing yet.
+ */
+function readSlot({ holder }: Slot, language: Language): { shape: Shape; waiting?: true } {
+  if (!holder) return { shape: { ...UNSURE } };
+  const value = holder.childForFieldName("value") ?? holder.childForFieldName("right");
+  if (value && value.childCount === 0 && NOT_YET.test(value.text)) return { shape: { ...UNSURE }, waiting: true };
+  const shape = readShape(holder, language);
+  /*
+   * A function written under a key or an attribute may be a component
+   * (`{ Row: () => <tr /> }`), which `@builds` means to point at (#363).
+   * Where a language has JSX, only a compiler can say a function is not
+   * one, and it is asked at a declared name -- so here it stays a doubt.
+   */
+  if (value && isWrittenValue(value) && language !== "python") return { shape: { ...shape, type: "unsure" } };
+  return { shape };
+}
+
+/**
+ * The name's slots, where they are all it has: no declaration, no binding,
+ * not Rust (whose values are read by their written type, and a name a Rust
+ * file writes and does not declare may be a macro's), nothing the slots do
+ * not see (`slotsSayNothing`), and few enough to mean one thing.
+ */
+function slotsOf(source: string, name: string, language: Language): Slot[] {
+  if (language === "rust") return [];
+  const slots = slotShapes(source, language).get(name) ?? [];
+  if (slots.length === 0 || slots.length > MOST_SLOTS || slotsSayNothing(source, name, language)) return [];
+  return slots;
+}
+
+/**
  * What one name in one file has, by every declaration of it there -- or, when
  * nothing declares it, by every parameter or `let` that binds it (#417).
  *
@@ -781,6 +989,26 @@ export function partsOf(
    * it turned seven measured reds back to "not sure".
    */
   const bound = declarations.length === 0 ? boundShapes(source, language).get(name) ?? [] : [];
+  /*
+   * And where nothing declares or binds it, the places the file gives it a
+   * value (missed map 2026-11b): an attribute, a key, a name in a tuple.
+   * Each is a value; a compiler is asked about each where the text left a
+   * doubt, as about a declared one, and the name lacks a part only when
+   * every place lacks it.
+   */
+  const slots = declarations.length === 0 && bound.length === 0 ? slotsOf(source, name, language) : [];
+  if (slots.length > 0) {
+    const readings = slots.map((slot) => {
+      const { shape: read, waiting } = readSlot(slot, language);
+      const { nameNode } = slot;
+      // Not a slot waiting for its value: a compiler would say what it holds now, `None`.
+      const shape = ask && !waiting && (read.callable === "unsure" || read.type === "unsure")
+        ? settle(read, ask({ start: nameNode.startIndex, end: nameNode.startIndex + nameNode.text.length }))
+        : read;
+      return { ...shape, implementable: shape.type };
+    });
+    return combine(readings);
+  }
   if (declarations.length === 0 && bound.length === 0) return undefined;
   /*
    * A name the file also imports is, to a box anchored at it, most likely the
@@ -793,6 +1021,11 @@ export function partsOf(
     ...declarations.map(({ node, nameNode, soup }) => (soup ? UNSURE : readDeclaration(node, nameNode, language, ask))),
     ...bound.map((one) => (imported ? UNSURE : readBound(one, language))),
   ];
+  return combine(readings);
+}
+
+/** A name lacks a part only when every reading of it does, and has one when any reading has it. */
+function combine(readings: Array<Record<Part, PartReading>>): Record<Part, PartReading> {
   const combined = { ...UNSURE };
   for (const part of PARTS) {
     const all = readings.map((reading) => reading[part]);
@@ -801,6 +1034,22 @@ export function partsOf(
       : all.some((one) => one === "has") ? "has" : "unsure";
   }
   return combined;
+}
+
+/**
+ * Every name this file gives a value only through slots -- an attribute, a
+ * key, a name in a destructuring target -- and where, for the measurement of
+ * those readings (`measure:slot-parts`). Only names `partsOf` reads that way.
+ */
+export function slotNames(source: string, language: Language): Array<{ name: string; start: number }> {
+  const out: Array<{ name: string; start: number }> = [];
+  const declared = declaredShapes(source, language);
+  const bound = boundShapes(source, language);
+  for (const name of slotShapes(source, language).keys()) {
+    if ((declared?.get(name)?.length ?? 0) > 0 || (bound.get(name)?.length ?? 0) > 0) continue;
+    for (const { nameNode } of slotsOf(source, name, language)) out.push({ name, start: nameNode.startIndex });
+  }
+  return out;
 }
 
 /**
@@ -1019,7 +1268,9 @@ function nounOf(source: string, name: string, language: Language): string {
   if (!declaration) {
     // Bound and not declared (#417): a parameter says so, and a `let` is a value.
     const bound = boundShapes(source, language).get(name)?.[0];
-    return bound?.kind === "parameter" ? "a parameter" : bound ? "a value" : "a type";
+    // An attribute, a key, a name in a tuple (missed map 2026-11b) is a value too.
+    return bound?.kind === "parameter" ? "a parameter"
+      : bound || slotsOf(source, name, language).length > 0 ? "a value" : "a type";
   }
   const { node, nameNode } = declaration;
   if (parametersOf(node) !== null) return "a function";

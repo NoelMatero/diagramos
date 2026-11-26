@@ -928,6 +928,60 @@ On `bench:planted` this read 7 more wrong arrows red (4 `@builds` into a
 parameter or loop variable, 3 `@calls` into a parameter) and turned none
 back.
 
+### A name only given a value (missed map 2026-11b, pattern 1d)
+
+Haiku anchors boxes at names nothing declares or binds: a key of an object
+literal (`source: ''`), an attribute set in a method (`self._nested =
+False`), one name out of a tuple (`start, stop, step = s.indices(n)`). The
+kind reader found nothing there and asked nothing, so "`transformElement`
+calls `source`" stayed "not sure"; 27 wrong arrows on the study sets ended at
+such a name. Where a file neither declares nor binds the name, `partsOf` now
+reads every place it gives the name a value (`slotShapes`): a literal or a
+plain annotation by the text, the rest by the compiler at that place, and the
+name lacks a part only when every place does. Not read: Rust; a name the file
+imports, destructures in a parameter, binds with `as`, or writes as a string
+(`setattr`, `o["x"]`); a name given a value in more than 8 places. A place
+given `None`, `null` or `undefined` says nothing and asks nothing -- django's
+`_middleware_chain` is `None` in `__init__` and a function later.
+
+```
+npm run measure:slot-parts -- /Users/noelmatero/board-ai/.corpus/*
+npm run measure:slot-parts -- /Users/noelmatero/board-ai/.corpus/* --compiler
+```
+
+The referee is the call probe, taught the three places: the call written
+after `self.x = ..`, `this.x = ..` and a tuple's unpacking, and a key's value
+wrapped where it stands (`k: ((p) => { p?.(); return p; })(v)`). A key
+handed to a call on an `any` is never checked by the compiler, and a line
+after `// @ts-expect-error` reports nothing, so each new TypeScript probe
+carries an error the compiler reports wherever it looks and is believed only
+where that error was heard, and "accepted" only on a value with a call
+signature (nest's e2e specs sit outside every tsconfig, with no `lib`, and
+there `true?.()` passes in silence). Before that, 76 keys read as wrong; all
+were those shapes.
+
+Every name read as lacking, every place it is given a value, on the
+fifteen pinned repositories (27,700 names read through their slots):
+
+| language | part | read by | wrong lacks | unjudged | agreed lacks |
+|---|---|---|---:|---:|---:|
+| python | callable | text | 0 | 92 | 504 |
+| python | type | text | 0 | 93 | 572 |
+| python | callable | with pyright | 0 | 165 | 2,103 |
+| python | type | with pyright | 0 | 155 | 2,138 |
+| ts | callable | text | 0 | 491 | 5,609 |
+| ts | type | text | 0 | 409 | 5,691 |
+| ts | callable | with the compiler | 0 | 1,064 | 13,730 |
+| ts | type | with the compiler | 0 | 955 | 13,836 |
+
+The unjudged are places the probe cannot write a line: a member set on
+something other than `self` or `this` (`clone.query.default_ordering =
+True`), a tuple inside a comprehension, a shorthand key, a JavaScript file
+the compiler never types. **The first run counted operands as targets**: a
+binary operator writes `left` and `right` just as an assignment does, so
+`!event.shiftKey && ..` read as excalidraw giving `shiftKey` a value. A target
+is now what an assignment's operator, or a loop's `in`/`of`, follows.
+
 ### What #301's test set says
 
 `npm run bench:planted`, 855 planted and drawn mistakes and 428 true claims:

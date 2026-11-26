@@ -78,6 +78,24 @@ describe("TypeScript", () => {
     expect(ask(file, SOURCE, "angle: number", "onDone")?.callable).toBe("has");
   });
 
+  it("reaches a key of an object literal, wrapped where it stands (missed map 2026-11b)", () => {
+    write("tsconfig.json", JSON.stringify({ compilerOptions: { strict: true, target: "ES2022" } }));
+    const source = "function fail(): void {}\nexport function query(message: string) {\n"
+      + "  return { error: `${message}!`,\n    retry: fail };\n}\n";
+    const file = write("k.ts", source);
+    expect(ask(file, source, "{ error", "error")?.callable).toBe("lacks");
+    expect(ask(file, source, "retry: fail", "retry")?.callable).toBe("has");
+  });
+
+  it("reaches an attribute set on `this` in a JavaScript class, and not a member read on the same line", () => {
+    write("tsconfig.json", JSON.stringify({ compilerOptions: { strict: true, target: "ES2022", allowJs: true, checkJs: true } }));
+    const source = "export class Job {\n  constructor(make) {\n    this.attempts = 0;\n"
+      + "    if (make.ready) this.ready = () => 1;\n  }\n}\n";
+    const file = write("j.js", source);
+    expect(ask(file, source, "this.attempts", "attempts")?.callable).toBe("lacks");
+    expect(ask(file, source, "make.ready", "ready")?.callable).toBe("has");
+  });
+
   it("still judges a file marked // @ts-nocheck, which reports nothing unless told otherwise", () => {
     write("tsconfig.json", JSON.stringify({ compilerOptions: { strict: true, target: "ES2022" } }));
     const source = `// @ts-nocheck\n${SOURCE}`;
@@ -154,6 +172,15 @@ describe.skipIf(!hasMypy || !hasPython)("Python", () => {
     // The probe went between the decorator and its `def`, and mypy refused the
     // whole tree: flask's tests, pydantic's, django's.
     expect(answersFor([["def register(", "limit"]])).toEqual(["lacks"]);
+  });
+
+  it("reaches an attribute set on self, and a name unpacked from a tuple (missed map 2026-11b)", () => {
+    const source = "class Live:\n    def __init__(self, hook) -> None:\n        self.nested = False\n"
+      + "        self.hook = hook\n\n\ndef span(r: tuple[int, int]) -> int:\n    start, end = r\n    return end - start\n";
+    const file = write("s.py", source);
+    const asked = [["self.nested", "nested"], ["start, end", "end"]].map(([text, name]) => ({ file, line: lineOf(source, text!), name: name! }));
+    const { answers } = probeCallsPython(tree, asked);
+    expect(asked.map((site) => answers.get(probeKey(site.file, site.line, site.name))?.callable)).toEqual(["lacks", "lacks"]);
   });
 
   it("gives no answer inside @no_type_check, where a checker reveals types and reports nothing", () => {
