@@ -582,6 +582,71 @@ function parameterTypes(
 }
 
 /**
+ * What `signatureNames` reads off a whole file before it looks at one
+ * declaration: the names the file aliases, whether it declares a `Self` of
+ * its own, its generic classes, every declaration by its name (with what
+ * `Self` meant where it was written), and the type parameters it declares.
+ *
+ * Read once per parsed tree, not once per question. Each was a walk of the
+ * whole file on every call, and a check asks the same file about one name
+ * after another: in compiler-true TypeScript on excalidraw, `signatureNames`
+ * was 67% of the run (414 s of 616 s, 2026-11-26). A tree belongs to one
+ * text (`parseSource` keys its cache on it), so an edited file is a new tree
+ * and gets its own. Nothing here may be changed by a caller: `aliases` is
+ * copied before a question adds to it.
+ */
+interface FileFacts {
+  aliases: ReadonlySet<string>;
+  declaresSelf: boolean;
+  genericClasses: ReadonlySet<string>;
+  declarations: ReadonlyMap<string, ReadonlyArray<{ node: Node; self: string | undefined }>>;
+  generics: Set<string>;
+}
+
+const fileFacts = new WeakMap<Tree, FileFacts>();
+
+function factsOf(tree: Tree, source: string): FileFacts {
+  const had = fileFacts.get(tree);
+  if (had) return had;
+  let declaresSelf = false;
+  each(tree.rootNode, (node) => {
+    const name = node.childForFieldName("name");
+    if (name && name.childCount === 0 && name.text === SELF && /(_item|_definition|_declaration)$/.test(node.type)) {
+      declaresSelf = true;
+    }
+  });
+  const genericClasses = new Set<string>();
+  each(tree.rootNode, (node) => {
+    if (!/^(abstract_)?class(_declaration)?$/.test(node.type) || !node.childForFieldName("type_parameters")) return;
+    const name = plainType(node.childForFieldName("name"));
+    if (name) genericClasses.add(name);
+  });
+  /* Every declaration, by its name, in the order the walk meets them. */
+  const declarations = new Map<string, Array<{ node: Node; self: string | undefined }>>();
+  const collect = (node: Node, self: string | undefined): void => {
+    const here = selfTypeOf(node, self);
+    if (node.type !== "token_tree" && node.type !== "impl_item") {
+      const name = declarationName(node)?.text;
+      if (name !== undefined) {
+        const list = declarations.get(name);
+        if (list) list.push({ node, self: here }); else declarations.set(name, [{ node, self: here }]);
+      }
+    }
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child) collect(child, here);
+    }
+  };
+  collect(tree.rootNode, undefined);
+  const facts: FileFacts = {
+    aliases: aliasNames(tree.rootNode), declaresSelf, genericClasses, declarations,
+    generics: typeParametersIn(tree.rootNode, source),
+  };
+  fileFacts.set(tree, facts);
+  return facts;
+}
+
+/**
  * What one function's signature says about a set of type names.
  *
  * `targets` is every name the far box stands for, and any one of them is enough
@@ -615,7 +680,9 @@ export function signatureNames(
   if (!tree) return { verdict: "withheld", why: "unreadable" };
   if (incomplete(tree.rootNode)) return { verdict: "withheld", why: "incomplete" };
 
-  const shadows = aliasNames(tree.rootNode);
+  const facts = factsOf(tree, source);
+  // A copy: the subject's own aliases are added to it for this question only.
+  const shadows = new Set(facts.aliases);
   if (subject) for (const name of aliasesFor(subject.source, subject.language, targets)) shadows.add(name);
   /* The other way round (#479): the arrow names an alias, and the signature may write what it stands for. */
   const stands = subject ? standsFor(subject.source, subject.language, targets) : [];
@@ -633,36 +700,13 @@ export function signatureNames(
    * the reading off for every `-> Self` in the file -- 44 correct clap and
    * regex arrows red (#393's `measure:compiler-true`).
    */
-  let declaresSelf = false;
-  each(tree.rootNode, (node) => {
-    const name = node.childForFieldName("name");
-    if (name && name.childCount === 0 && name.text === SELF && /(_item|_definition|_declaration)$/.test(node.type)) {
-      declaresSelf = true;
-    }
-  });
-  const selfMeansEnclosing = SELF_MEANS_ENCLOSING.has(language) && !declaresSelf;
+  const selfMeansEnclosing = SELF_MEANS_ENCLOSING.has(language) && !facts.declaresSelf;
   /** TypeScript classes with type parameters, whose `this` names more than the class. */
-  const genericClasses = new Set<string>();
-  each(tree.rootNode, (node) => {
-    if (!/^(abstract_)?class(_declaration)?$/.test(node.type) || !node.childForFieldName("type_parameters")) return;
-    const name = plainType(node.childForFieldName("name"));
-    if (name) genericClasses.add(name);
-  });
+  const { genericClasses } = facts;
   const quoting = QUOTED_TYPES.has(language);
 
   /* Every declaration of the name, with what `Self` meant where it was written. */
-  const declarations: Array<{ node: Node; self: string | undefined }> = [];
-  const collect = (node: Node, self: string | undefined): void => {
-    const here = selfTypeOf(node, self);
-    if (node.type !== "token_tree") {
-      if (node.type !== "impl_item" && declarationName(node)?.text === symbol) declarations.push({ node, self: here });
-    }
-    for (let index = 0; index < node.childCount; index += 1) {
-      const child = node.child(index);
-      if (child) collect(child, here);
-    }
-  };
-  collect(tree.rootNode, undefined);
+  const declarations = facts.declarations.get(symbol) ?? [];
 
   /*
    * Every declaration of the name, and the safest answer wins.
@@ -684,7 +728,7 @@ export function signatureNames(
   let absent: SignatureVerdict | undefined;
   /** Where the claimed half was read, over every declaration that read absent. */
   const sites: Site[] = [];
-  const generics = typeParametersIn(tree.rootNode, source);
+  const { generics } = facts;
 
   for (const { node: declaration, self } of declarations) {
     sawName = true;
