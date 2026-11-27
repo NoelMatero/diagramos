@@ -21,7 +21,6 @@
  * not build; and conforms, which Rust boards draw as `impl Trait for X` and
  * this licence does not cover.
  */
-import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
@@ -37,7 +36,7 @@ export async function rustTruePairs(
   /** Told which crates built and why the others did not, so a run can say it read nothing (2026-11-22). */
   onCrates?: (crates: readonly CrateOutcome[]) => void,
 ): Promise<TruePair[]> {
-  const { compileCrates, rustcCacheDir } = await import("../../src/engine/referee-rustc");
+  const { compileCrates } = await import("../../src/engine/referee-rustc");
   const { compiledBodiesOf } = await import("../../src/engine/compiled-calls");
   const { initEngine, parseSource } = await import("../../src/engine/parse");
   await initEngine();
@@ -57,22 +56,20 @@ export async function rustTruePairs(
   const crates = await compileCrates(root, files, { until: Date.now() + 900_000 });
   onCrates?.(crates.crates);
 
-  // Raw MIR by printed path, one map per Cargo.toml: two crates in one
-  // workspace may each print a function as `subcommands`.
+  // Raw MIR by printed path, one map per crate's dump: two crates in one
+  // workspace -- or a package's library and its program -- may each print a
+  // function as `subcommands`.
   const mirOf = new Map<string, Map<string, Header>>();
-  const manifests = new Set<string>();
-  for (const file of absolute) {
-    for (let dir = path.dirname(file); dir.startsWith(root); dir = path.dirname(dir)) {
-      if (existsSync(path.join(dir, "Cargo.toml"))) { manifests.add(path.join(dir, "Cargo.toml")); break; }
+  const mirFor = (file: string): Map<string, Header> | undefined => {
+    const dump = crates.dumpOf(file);
+    if (!dump) return undefined;
+    if (!mirOf.has(dump)) {
+      const mir = new Map<string, Header>();
+      if (existsSync(dump)) readMir(readFileSync(dump, "utf8"), mir);
+      mirOf.set(dump, mir);
     }
-  }
-  for (const manifest of manifests) {
-    const key = createHash("sha1").update(manifest).digest("hex").slice(0, 16);
-    const dump = path.join(rustcCacheDir(), key, "calls.mir");
-    const mir = new Map<string, Header>();
-    if (existsSync(dump)) readMir(readFileSync(dump, "utf8"), mir);
-    mirOf.set(manifest, mir);
-  }
+    return mirOf.get(dump);
+  };
 
   // What the files declare: types once, their named fields in order, and
   // every routine with the ref a board gives it.
@@ -229,7 +226,7 @@ export async function rustTruePairs(
     const body = one(bodies);
     if (!body) continue;
     const manifest = manifestOf(routine.file);
-    const header = manifest ? mirOf.get(manifest)?.get(body.path) : undefined;
+    const header = mirFor(routine.file)?.get(body.path);
     if (!header) continue;
 
     // takes and returns, off the header. A method's receiver is not a parameter.
