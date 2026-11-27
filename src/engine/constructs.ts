@@ -75,6 +75,7 @@ import { declarationName, escapeName, NAME_END } from "./declared";
 import { providedByHost, providedByLanguage } from "./builtins";
 import { mayAccuse } from "./licence";
 import { each, incomplete, parametersOf, parseSource, type Language, type Node } from "./parse";
+import { runInNewContext } from "node:vm";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -473,11 +474,44 @@ function mayWriteOne(
 }
 
 /**
+ * Every member an object made by one of the language's own classes can
+ * have, asked of the language itself, as `builtins.ts` asks it for names: a
+ * bare ECMAScript realm, nothing the host added. Its prototype chain, and
+ * what a new one gets of its own (`stack`; `cause` when given one).
+ * `undefined` when the realm has no such class or will not make one.
+ */
+const languageMembers_ = new Map<string, Set<string> | undefined>();
+function languageMembers(name: string): Set<string> | undefined {
+  if (languageMembers_.has(name)) return languageMembers_.get(name);
+  let found: Set<string> | undefined;
+  try {
+    const realm = runInNewContext("globalThis") as Record<string, unknown>;
+    const made = realm[name];
+    if (typeof made === "function" && made.prototype) {
+      found = new Set<string>();
+      for (let at: object | null = made.prototype as object; at; at = Object.getPrototypeOf(at)) {
+        for (const one of Object.getOwnPropertyNames(at)) found.add(one);
+      }
+      const Made = made as new (...args: unknown[]) => object;
+      for (const one of Object.getOwnPropertyNames(new Made())) found.add(one);
+      for (const one of Object.getOwnPropertyNames(new Made(undefined, { cause: undefined }))) found.add(one);
+    }
+  } catch {
+    found = undefined;
+  }
+  languageMembers_.set(name, found);
+  return found;
+}
+
+/**
  * Whether `new C(..)` makes a class of this repository that is no kind of
  * anything (no `extends` or `implements`) and whose own text never spells
  * one of the required members: then the value it makes is not of the
- * interface. Anything else -- a JSX element, a qualified or computed
- * constructor, a name not followed to a class declaration -- may be.
+ * interface; and so does one of the language's own classes that lacks a
+ * required member (`languageMembers`: `throw new Error(..)` makes no
+ * `Router`). Anything else -- a JSX element, a qualified or computed
+ * constructor, a host class, a name not followed to a class declaration --
+ * may be.
  */
 function classLacksAMember(
   node: Node, source: string, language: Language, bindings: Bindings, required: Set<string>, names: ConstructsNames | undefined,
@@ -495,6 +529,10 @@ function classLacksAMember(
     far = placed.file === names.side.file ? { source, language } : names.side.open?.(placed.file);
   } else if (bindings.local.has(made.text)) {
     far = { source, language };
+  } else if (providedApart(made.text, source, language, new Set())) {
+    // The language's own class (`throw new Error(..)`): its members are the language's to say.
+    const members = languageMembers(made.text);
+    return members !== undefined && [...required].some((member) => !members.has(member));
   }
   if (!far || !isTypeScript(far.language)) return false;
   const tree = parseSource(far.source, far.language);

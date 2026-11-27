@@ -110,6 +110,8 @@ const TYPESCRIPT: Case[] = [
     "i.ts": SHAPE,
     "sq.ts": "export class Square {\n  name = \"sq\";\n  area(): number { return 1; }\n}\n",
     "a.ts": "import { Square } from \"./sq\";\nexport function f(): object {\n  return new Square();\n}\n" } },
+  { name: "ts wrong: interface head, the only thing made is a language class that lacks a member", want: "red", from: "a.ts#f", to: "i.ts#Shape", files: { ...TSCFG,
+    "i.ts": SHAPE, "a.ts": "export function f(n: number): number {\n  if (n < 0) throw new Error(\"negative\");\n  return n + 1;\n}\n" } },
   { name: "ts correct: interface head, makes a language class that may have every member", want: "not-red", from: "a.ts#f", to: "e.ts#Failure", files: { ...TSCFG,
     "e.ts": "export interface Failure {\n  name: string;\n  message: string;\n}\n",
     "a.ts": "export function f(): object {\n  return new Error(\"no\");\n}\n" } },
