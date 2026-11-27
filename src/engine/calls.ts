@@ -2110,11 +2110,13 @@ function resolves(
    * for that reason (`wouldHelp`), so leaving it `ambiguous` meant nothing
    * was ever asked -- the first build of this moved no arrow on the bench.
    */
-  if ((site ? bindings.importedTwice : bindings.ambiguous).has(bound)) {
+  const inside = site && (bindings.importedTwice.has(bound) || bindings.shadowed.has(bound))
+    ? importedInside(bound, side, site) : undefined;
+  if (inside === "ambiguous" || (inside === undefined && (site ? bindings.importedTwice : bindings.ambiguous).has(bound))) {
     return callee.kind === "through" ? landsOnTarget(callee, side, target) : "ambiguous";
   }
 
-  const imported = bindings.imported.get(bound);
+  const imported = inside ?? bindings.imported.get(bound);
   if (!imported) {
     /*
      * Not imported. Declared here is an answer -- the call means this file's own
@@ -2172,6 +2174,47 @@ function resolves(
 }
 
 /**
+ * The import a Python function writes for `name` itself, read from the
+ * functions around `site`, innermost first: Python binds an imported name in
+ * the function that imports it, for the whole of that function and the
+ * functions written inside it, whatever else the module binds under that
+ * name. rich's `Screen.__init__` writes `from rich.console import Group`
+ * while the module imports `Group` from `.console` for the type checker;
+ * the file-wide reading saw two spellings and called `Group(..)` ambiguous,
+ * which a construction read as "not this one" (`constructionOf`).
+ *
+ * Asked only for a name the file binds more than one way. `ambiguous` when
+ * the one function imports it twice over; `undefined` when no function
+ * around the site imports it, and the module's reading stands. TypeScript
+ * has no import inside a function, and Rust's `use` in a body is a scope
+ * `names.ts` reads already.
+ */
+function importedInside(name: string, side: CallSide, site: Node): Binding | "ambiguous" | undefined {
+  if (side.language !== "python") return undefined;
+  for (const around of enclosing(side.source, side.language, site)) {
+    if (around.type !== "function_definition") continue;
+    const into: Bindings = {
+      imported: new Map(), local: new Set(), ambiguous: new Set(), importedTwice: new Set(), shadowed: new Map(),
+      forwarded: new Map(), wildcard: false, reExported: [],
+    };
+    // This function's own statements: a function or class written inside it is a scope of its own.
+    const visit = (node: Node): void => {
+      for (const child of children(node)) {
+        if (child.type === "function_definition" || child.type === "class_definition" || child.type === "decorated_definition") continue;
+        if (child.type === "import_from_statement" || child.type === "import_statement") bindPython(child, into);
+        else visit(child);
+      }
+    };
+    const body = around.childForFieldName("body");
+    if (body) visit(body);
+    if (into.importedTwice.has(name)) return "ambiguous";
+    const found = into.imported.get(name);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+/**
  * The routines making one of a class runs, by the names a box gives them:
  * Python's `X(..)` runs `X.__new__` and `X.__init__`, TypeScript's
  * `new X(..)` runs `X`'s `constructor`. Rust has none -- `X::new()` is a
@@ -2215,14 +2258,21 @@ function constructionOf(
   if (callee.kind === "computed") return "computed";
   if (callee.kind === "own") return undefined;
   if (callee.kind === "bare" && meaningOf(callee.name, side, bindings, site, "value").at === "bound") return "local-callee";
-  if (resolves(callee, side, bindings, { file: target.file, names: new Set([callee.name]) }, site, holder) !== "yes") return undefined;
+  /*
+   * A name the file binds two ways, one of which may be the head's file
+   * (`try: from .console import Group` / `except: from .fallback import
+   * Group`), may be making the head's class: a doubt, never "not this one",
+   * which left "it is the other way round" free to answer.
+   */
+  const placed = resolves(callee, side, bindings, { file: target.file, names: new Set([callee.name]) }, site, holder);
+  if (placed !== "yes" && !(placed === "ambiguous" && callee.kind === "bare")) return undefined;
   const type = callee.kind === "bare" ? bindings.imported.get(callee.name)?.name ?? callee.name : callee.name;
   if (target.head.owner !== undefined && type !== target.head.owner) return undefined;
   for (const declaration of typeDeclarationsOf(target.head.source, target.head.language, type)) {
     for (const member of namedKids(declaration.childForFieldName("body") ?? declaration)) {
       const routine = member.type === "decorated_definition" ? member.childForFieldName("definition") : member;
       const name = routine && parametersOf(routine) ? declarationName(routine)?.text : undefined;
-      if (name !== undefined && target.makers.has(name)) return { ran: name };
+      if (name !== undefined && target.makers.has(name)) return placed === "yes" ? { ran: name } : placed;
     }
   }
   return undefined;
