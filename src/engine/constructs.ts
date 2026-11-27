@@ -1651,9 +1651,19 @@ export function constructions(
    * it. No `reverse` means a planned arrow or a head nothing could read, and
    * both stay quiet.
    */
+  /*
+   * `@calls` into a Rust type, with rustc's exact list of the body on hand
+   * (batch 7, rule 7): what the body makes is the list's word -- every value
+   * a call hands back sits in a typed local, every value built in place is an
+   * aggregate (`compiledCreatesNone`) -- and not the text's. The type written
+   * as a local's or a return type makes nothing, so it is no reason to stay
+   * quiet. Not for `@builds`, whose reading is unchanged.
+   */
+  const listSays = forCalls && language === "rust" && Boolean(names?.side.compiled?.())
+    && compiledBodiesFor({ ...names!.side, routine }, [...wanted])?.exact === true;
   const byText = reverse !== undefined && mayAccuse("builds", language, "absence")
     && onlyNewCreates(reverse.source, language, reverse.language, targets)
-    && !namesTheHead(routines, source, language, wanted, forCalls, reverse, names?.calls ?? names?.side)
+    && (listSays || !namesTheHead(routines, source, language, wanted, forCalls, reverse, names?.calls ?? names?.side))
     && !(language === "rust" && macroDeclares(source, routine));
   if (byText && language === "rust" && names && !names.side.compiled?.()) {
     return { verdict: "absent", awaitsCompiler: true };

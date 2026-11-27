@@ -95,7 +95,9 @@ export class CompilerTally {
       const byManifest = this.crates.get(project) ?? new Map<string, CrateOutcome>();
       // A crate seen built once stays built: a later check that ran out of
       // time before reading it is not a failed build.
-      if (!byManifest.get(crate.manifest)?.built) byManifest.set(crate.manifest, crate);
+      // One package may have a library and programs: each target is a crate of its own.
+      const key = crate.target ? `${crate.manifest}#${crate.target}` : crate.manifest;
+      if (!byManifest.get(key)?.built) byManifest.set(key, crate);
       this.crates.set(project, byManifest);
     }
   }

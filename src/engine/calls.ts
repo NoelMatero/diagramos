@@ -69,7 +69,7 @@ import path from "node:path";
 
 import { providedByLanguage } from "./builtins";
 import {
-  compiledBodiesOf, compiledRefutes, ownCallIn, traitImplsOf, type CompiledBody, type CompiledCrate,
+  compiledBodiesOf, compiledBodiesOfImpls, compiledRefutes, ownCallIn, testNamesakes, traitImplsOf, type CompiledBody, type CompiledCrate,
 } from "./compiled-calls";
 import { declaredShapes } from "./body";
 import { declaredBases } from "./conforms";
@@ -1807,6 +1807,20 @@ function runsOnRead(side: { source: string; language: Language }, names: readonl
 
 type Named = { routines: Node[]; declared: boolean; unreadable: boolean };
 const named_ = new WeakMap<Tree, Map<string, Named>>();
+const testNamesakes_ = new WeakMap<Tree, Set<number>>();
+
+/**
+ * The `#[test]` functions of a Rust tree that share their name with one that
+ * is not a test (batch 7; owner decision: tests are not product calls). They
+ * are left out of the routine of that name: regex-syntax's `parse_set_class`
+ * read its test namesake's calls as its own.
+ */
+function rustTestNamesakes(tree: Tree, language: Language): Set<number> | undefined {
+  if (language !== "rust") return undefined;
+  let found = testNamesakes_.get(tree);
+  if (!found) { found = testNamesakes(tree.rootNode); testNamesakes_.set(tree, found); }
+  return found;
+}
 
 /**
  * Every routine of this name in this source.
@@ -1840,8 +1854,10 @@ export function routinesNamed(
 
   const routines: Node[] = [];
   let declared = false;
+  const tests = rustTestNamesakes(tree, language);
   each(tree.rootNode, (node) => {
     if (declarationName(node)?.text !== routine) return;
+    if (tests?.has(node.id)) return;
     declared = true;
     const value = node.childForFieldName("value");
     if (parametersOf(node) ?? parametersOf(value)) {
@@ -2634,11 +2650,13 @@ function closedBodyRead(
   const verdict = compiledVerdict(compiled, to);
   if ("why" in verdict) return { why: verdict.why };
   if (!("why" in text) && !macrosRead) return closedByText();
+  // A struct at the tail (batch 7): the list was read only where its `impl`s are the whole of it.
+  const structTail = typeTailOf(from.source, from.language, from.routine);
   const first = routinesNamed(from.source, from.routine, "rust").routines[0];
   return {
     evidence: {
       routine: from.routine,
-      line: first ? lineOf(from.source, first.startIndex) : 1,
+      line: structTail ? structTail.line : first ? lineOf(from.source, first.startIndex) : 1,
       sites: verdict.sites,
     },
   };
@@ -2662,6 +2680,12 @@ export interface CompiledTail {
   generics: Set<string>;
   /** Source ranges a `#[cfg(..)]` inside the routine switched off: code rustc may never have read. */
   unbuilt: Array<{ start: number; end: number }>;
+  /**
+   * The list's call lines are the whole of what the routine calls (batch 7,
+   * `compiledBodiesFor`): what rule 7 needs before a type named off them is
+   * "not called". False, every reader falls back to the words it used before.
+   */
+  exact: boolean;
 }
 
 /**
@@ -3289,27 +3313,52 @@ export function compiledBodiesFor(
   heads?: readonly string[],
 ): CompiledTail | undefined {
   if (from.language !== "rust" || !from.compiled) return undefined;
-  // A struct has no body of its own in rustc's list; its methods are read in the text (#459).
-  if (typeTailOf(from.source, from.language, from.routine)) return undefined;
+  /*
+   * A struct has no body of its own in rustc's list. Since batch 7 it is read
+   * through the bodies of the functions its `impl`s in this file write --
+   * when those are the whole of its code: no `impl` of it, or macro naming
+   * it, elsewhere in the crate, and nothing about it the text cannot read
+   * (`crateNotWhole`, #459's own guard for a red from a struct).
+   */
+  const typeTail = typeTailOf(from.source, from.language, from.routine);
+  if (typeTail && (typeTail.notWhole ?? crateNotWhole(from, typeTail))) return undefined;
   const crate = from.compiled();
   if (!crate) return undefined;
-  const reading = compiledBodiesOf(crate, from.file, from.source, from.routine, heads);
+  const reading = typeTail
+    ? compiledBodiesOfImpls(crate, from.file, from.source, typeTail.impls, heads)
+    : compiledBodiesOf(crate, from.file, from.source, from.routine, heads);
   if (!("bodies" in reading)) return undefined;
-  const seen = callSitesIn(from, from.routine);
+  const seen = typeTail ? ownBodies(from) : callSitesIn(from, from.routine);
   if (!seen.read) return undefined;
   // A call written in a switched-off region is one rustc may never have read.
   const unbuilt = (at: number) => reading.unbuilt.some((region) => at >= region.start && at < region.end);
+  /*
+   * "Exact" (batch 7): every block of every body ends in a terminator this
+   * reader knows, and every call the text shows is on a call line of the
+   * list or is a value built in place (`Some(x)`, `Kind::A(..)`, a tuple
+   * struct). Then the list's call lines are the whole of what the routine
+   * calls, and a type none of them names is not called. A rustc that prints
+   * calls in another shape fails the first test, and the rule goes quiet.
+   */
+  /*
+   * A block ending in a line this reader does not know may be a call printed
+   * in a shape it does not know -- and then a body that makes calls would
+   * read as one that makes none. No reader takes the list then.
+   */
+  if (!reading.bodies.every((compiled) => compiled.listWhole)) return undefined;
+  let exact = true;
   for (const body of seen.bodies) {
-    if (body.routine !== from.routine) continue;
+    if (!typeTail && body.routine !== from.routine) continue;
     for (const site of body.sites) {
       if (site.name === "" || site.why === "macro" || site.inMacro) continue;
       if (site.nameAt && unbuilt(site.nameAt.start)) continue;
       // `ok!(..)` is read as a call to `ok`; what rustc lists is what it expands to.
       if (site.nameAt && from.source[site.nameAt.end] === "!") continue;
       if (!reading.bodies.some((compiled) => compiled.words.has(site.name))) return undefined;
+      if (!reading.bodies.some((compiled) => compiled.callWords.has(site.name) || compiled.made.has(site.name))) exact = false;
     }
   }
-  return { bodies: reading.bodies, generics: reading.generics, unbuilt: reading.unbuilt };
+  return { bodies: reading.bodies, generics: reading.generics, unbuilt: reading.unbuilt, exact };
 }
 
 /**
@@ -3333,7 +3382,9 @@ function listedCall(
     return { name, inside: from.routine, line, wrote: from.source.split("\n")[line - 1]!.trim() };
   }
   const first = routinesNamed(from.source, from.routine, "rust").routines[0];
-  return { name, inside: from.routine, line: first ? lineOf(from.source, first.startIndex) : 1, wrote: `${name}(..), in rustc's call list` };
+  // A struct at the tail (batch 7) has no routine of its name: its declaration's line.
+  const line = typeTailOf(from.source, from.language, from.routine)?.line ?? (first ? lineOf(from.source, first.startIndex) : 1);
+  return { name, inside: from.routine, line, wrote: `${name}(..), in rustc's call list` };
 }
 
 /**
@@ -3583,53 +3634,6 @@ function hasFile(files: CrateFiles, file: string): boolean {
   return "has" in files ? files.has(file) : files.includes(file);
 }
 
-const crateImpls_ = new WeakMap<object, Map<string, { members: Set<string>; routines: string[] } | { unknown: string }>>();
-
-/**
- * What the `impl` blocks of `type` written in the crate's other files
- * declare: their member names and their routines. `unknown` when one of those
- * files cannot be read, or a macro there names the type (it may write an
- * `impl`), or an `impl` writes an item through a macro.
- *
- * Made once per crate and type, not per arrow: kept against the files
- * object, which lives as long as the crate's compiled list or the package
- * listing of one check. The class-calls prototype read every file of the
- * crate again for each arrow, and one referee took twice as long (json 152 s
- * against 72; regex stopped after 43 minutes against 16).
- */
-function crateImplsOf(
-  files: CrateFiles, home: string, open: NonNullable<CallSide["open"]>, type: string,
-): { members: Set<string>; routines: string[] } | { unknown: string } {
-  const known = crateImpls_.get(files) ?? new Map<string, { members: Set<string>; routines: string[] } | { unknown: string }>();
-  crateImpls_.set(files, known);
-  const key = `${home}\u0000${type}`;
-  const cached = known.get(key);
-  if (cached) return cached;
-  const scan = (): { members: Set<string>; routines: string[] } | { unknown: string } => {
-    const typeWord = wholeName(type);
-    const members = new Set<string>();
-    const routines: string[] = [];
-    for (const file of files) {
-      if (file === home) continue;
-      const other = open(file);
-      if (!other) return { unknown: "crate-file-unread" };
-      if (!typeWord.test(other.source)) continue;
-      const otherTree = parseSource(other.source, "rust");
-      if (!otherTree) return { unknown: "crate-file-unparsed" };
-      if (itemMacroNames(otherTree.rootNode, type)) return { unknown: "macro-impl" };
-      const there = typeDeclNodes(otherTree, type).impls;
-      routines.push(...typeRoutineNames(there));
-      const declared = declaredMemberNames(there, "rust");
-      if (!declared) return { unknown: "computed-member" };
-      for (const name of declared) members.add(name);
-    }
-    return { members, routines };
-  };
-  const found = scan();
-  known.set(key, found);
-  return found;
-}
-
 /**
  * Whether a type declares anything called `called`, itself or through a base
  * this repository declares (owner decision 1, 2026-11-27: a method a class
@@ -3694,10 +3698,13 @@ function typeMayDeclare(
     if (declarations.some((one) => one.type === "trait_item")) return { declares: false, routines };
     const files = crateFiles?.();
     if (!files || !hasFile(files, to.file) || !to.open) return { unknown: "no-crate-list" };
-    const elsewhere = crateImplsOf(files, to.file, to.open, type);
-    if ("unknown" in elsewhere) return elsewhere;
-    routines.push(...elsewhere.routines);
-    if (called.some((one) => elsewhere.members.has(one.replace(/^r#/, "")))) return { declares: true, routines };
+    const index = crateImplsOf(files, to);
+    if (index.unread) return { unknown: "crate-file-unread" };
+    if (index.macroImpl.has(type)) return { unknown: "macro-impl" };
+    const typeWord = wholeName(type);
+    if (index.itemMacros.some((text) => typeWord.test(text))) return { unknown: "macro-impl" };
+    routines.push(...(index.routines.get(type) ?? []));
+    if (called.some((one) => index.members.get(type)?.has(one.replace(/^r#/, "")) ?? false)) return { declares: true, routines };
     return { declares: false, routines };
   }
 
@@ -5132,6 +5139,8 @@ export type TypeCallsReading =
     verdict: "closed"; sites: number; line: number;
     /** Where a call was ruled out by the name it calls alone: a compiler is asked about each before a red shows. */
     untypedAt?: Array<{ start: number; end: number }>;
+    /** Closed on rustc's own list of the tail's calls, which no text doubt reopens (batch 7, rule 7). */
+    exact?: true;
   }
   | { verdict: "open"; why: CallsNotClosed };
 
@@ -5253,6 +5262,13 @@ export function callsIntoType(
       if (inherits && holders.some((one) => one.name !== undefined)) { if (named(site)) continue; stopped("inherits"); }
     }
   }
+  /*
+   * rustc's list of the tail can close what the text could not (batch 7,
+   * rule 7); it never reopens a reading the text closed. For a struct at the
+   * tail this is the one way it closes at all.
+   */
+  const byRustc = closedByRustc(from, to);
+  if (byRustc) return byRustc;
   // A class at the tail closes when its own code is the whole of what it runs (rule 6).
   if (!why && typeTail) {
     const tail = typeTailOf(from.source, from.language, from.routine);
@@ -5262,6 +5278,136 @@ export function callsIntoType(
   }
   if (why || typeTail) return { verdict: "open", why: why ?? "routine-not-found" };
   return { verdict: "closed", sites, line: bodies[0]!.line, ...(untypedAt.length > 0 ? { untypedAt } : {}) };
+}
+
+/**
+ * Rule 7 (batch 7): a Rust type at the head, and rustc built the tail. Its
+ * list of the tail's calls is after every macro, with every receiver typed,
+ * and a call of anything the type has -- its own function, a trait's method
+ * on it, an operator, a conversion, a library routine handed one of it -- is
+ * written on the line that makes the call with the type's name on it:
+ * `Widget::run(..)`, `<Widget as ToString>::to_string(..)`,
+ * `Iterator::collect::<Vec<Widget>>(..)`. So when no call line names the
+ * type, none of the tail's calls is the type's, whatever the text could not
+ * place. A type named off those lines -- a local's type, a return type --
+ * runs nothing. The name alone is never enough: `w.to_string()` runs code
+ * written for Widget although Widget declares no `to_string`, and its line
+ * says `Widget`.
+ *
+ * Still a doubt: a call of a value (a function handed in); a call through a
+ * type parameter, `dyn` or `impl Trait` by a name the type declares (or when
+ * what it declares cannot be read); a value going out of scope when the type
+ * writes `Drop`; a `const` or `static` inside the tail, built before the
+ * program runs and in no body's list. And no answer unless the list is
+ * `exact` (`compiledBodiesFor`): a rustc that printed calls in another shape
+ * would leave this quiet.
+ */
+function closedByRustc(
+  from: CallSide & { routine: string },
+  to: CallSide & { names: string[] },
+): TypeCallsReading | undefined {
+  if (from.language !== "rust" || to.language !== "rust") return undefined;
+  const compiled = compiledBodiesFor(from, to.names);
+  if (!compiled || !compiled.exact || compiled.bodies.length === 0) return undefined;
+  const tailText = ownNodes(from).map((node) => node.text).join("\n");
+  if (/\b(const|static)\s+[A-Z_][A-Z0-9_]*\s*:/.test(tailText)) return undefined;
+  const bare = (through: string) => through.replace(/^&(?:mut )?/, "").replace(/^'\w+ /, "");
+  const dispatched = (through: string): boolean => /^(?:dyn|impl) /.test(bare(through)) || bare(through).startsWith("<")
+    || compiled.generics.has(bare(through).match(/^[A-Za-z_]\w*/)?.[0] ?? "");
+  for (const body of compiled.bodies) {
+    if (to.names.some((name) => body.callWords.has(name))) return undefined;
+    if (body.calls.some((call) => call.kind === "opaque")) return undefined;
+    if (body.drops > 0 && to.names.some((name) => rustTypeMayDeclare(from, to, name, ["drop"]) !== false)) return undefined;
+    for (const call of body.calls) {
+      if (call.kind !== "named" || call.through === undefined || !dispatched(call.through)) continue;
+      if (to.names.some((name) => rustTypeMayDeclare(from, to, name, [call.name]) !== false)) return undefined;
+    }
+  }
+  const tail = typeTailOf(from.source, from.language, from.routine);
+  const first = tail?.line ?? routinesNamed(from.source, from.routine, "rust").routines[0];
+  return {
+    verdict: "closed",
+    sites: compiled.bodies.reduce((sum, body) => sum + body.calls.length, 0),
+    line: typeof first === "number" ? first : first ? lineOf(from.source, first.startIndex) : 1,
+    exact: true,
+  };
+}
+
+/** What every `impl` in one crate declares, by the type it is for: read once per crate. */
+interface CrateImpls {
+  members: Map<string, Set<string>>;
+  /** The names of the routines each type's `impl`s write. */
+  routines: Map<string, string[]>;
+  /** Types with a macro inside one of their `impl`s, which may write any member. */
+  macroImpl: Set<string>;
+  /** The text of each macro written where an item goes: one naming a type may write an `impl` of it. */
+  itemMacros: string[];
+  /** A crate file could not be read: nothing is known. */
+  unread: boolean;
+}
+
+const crateImpls_ = new WeakMap<object, CrateImpls>();
+
+/**
+ * Whether a Rust type may declare a member called one of `called`, in the
+ * sense the answer key counts: an item of an `impl` of it anywhere in its
+ * crate (inherent or a trait's), or a method a std derive on it writes.
+ * `"unknown"` when that cannot be read: a derive or attribute that may write
+ * anything, a macro inside an `impl` of it or one naming it where an item
+ * goes, no list of the crate's files.
+ *
+ * Rule 7's question put to `typeMayDeclare`, the same reading rule 1 uses,
+ * over the crate's index of `impl`s (`crateImplsOf`), which is built once per
+ * crate, never per arrow: the prototype re-read every `impl` of the crate for
+ * each arrow, and one referee took twice as long for it.
+ */
+function rustTypeMayDeclare(
+  from: CallSide,
+  to: CallSide,
+  type: string,
+  called: readonly string[],
+): boolean | "unknown" {
+  const crate = from.compiled?.();
+  if (!crate) return "unknown";
+  const may = typeMayDeclare(to, type, [...called], () => crate.files);
+  return "unknown" in may ? "unknown" : may.declares;
+}
+
+function crateImplsOf(files: CrateFiles, side: TypeSide): CrateImpls {
+  const known = crateImpls_.get(files);
+  if (known) return known;
+  const index: CrateImpls = { members: new Map(), routines: new Map(), macroImpl: new Set(), itemMacros: [], unread: false };
+  for (const file of files) {
+    const source = file === side.file ? side.source : side.open?.(file)?.source;
+    const tree = source === undefined ? undefined : parseSource(source, "rust");
+    if (!tree) { index.unread = true; break; }
+    const visit = (node: Node): void => {
+      if (parametersOf(node)) return;
+      if (node.type === "macro_invocation") { index.itemMacros.push(node.text); return; }
+      if (node.type === "impl_item") {
+        const type = implTypeName(node);
+        const body = node.childForFieldName("body");
+        if (type) {
+          const members = index.members.get(type) ?? new Set<string>();
+          for (const item of body ? namedKids(body) : []) {
+            if (item.type === "macro_invocation") index.macroImpl.add(type);
+            const name = item.childForFieldName("name")?.text;
+            if (name) members.add(name.replace(/^r#/, ""));
+          }
+          index.members.set(type, members);
+          index.routines.set(type, [...(index.routines.get(type) ?? []), ...typeRoutineNames([node])]);
+        }
+        return;
+      }
+      for (let at = 0; at < node.childCount; at += 1) {
+        const child = node.child(at);
+        if (child) visit(child);
+      }
+    };
+    visit(tree.rootNode);
+  }
+  crateImpls_.set(files, index);
+  return index;
 }
 
 /** The 1-based lines a type's own code spans: its declaration, and each Rust `impl` of it in this file. */
@@ -7511,7 +7657,9 @@ export function callSitesIn(
   const bodies: BodyCallSites[] = [];
   /** Which class each routine is a member of (#353), read on the first body that is placed. */
   let holders: Map<number, Node> | undefined;
+  const tests = rustTestNamesakes(tree, side.language);
   each(tree.rootNode, (node) => {
+    if (tests?.has(node.id)) return;
     // A key in an object literal is a routine here exactly where `routinesNamed` finds it (#477).
     const name = node.type === "impl_item"
       ? node.childForFieldName("type")
