@@ -3382,7 +3382,9 @@ function listedCall(
     return { name, inside: from.routine, line, wrote: from.source.split("\n")[line - 1]!.trim() };
   }
   const first = routinesNamed(from.source, from.routine, "rust").routines[0];
-  return { name, inside: from.routine, line: first ? lineOf(from.source, first.startIndex) : 1, wrote: `${name}(..), in rustc's call list` };
+  // A struct at the tail (batch 7) has no routine of its name: its declaration's line.
+  const line = typeTailOf(from.source, from.language, from.routine)?.line ?? (first ? lineOf(from.source, first.startIndex) : 1);
+  return { name, inside: from.routine, line, wrote: `${name}(..), in rustc's call list` };
 }
 
 /**
