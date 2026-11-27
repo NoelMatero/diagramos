@@ -177,7 +177,11 @@ const RIGHT: Array<[string, string, string]> = [
 const LISTED: Array<[string, string]> = [[`${C}wrapped`, `${H}helper`], [`${C}bumped`, `${H}bump`]];
 const SAME_NAME_ELSEWHERE: [string, string] = [`${C}pushed`, `${H}push`];
 
-/** In the binary target, which `cargo rustc --lib` never compiles. */
+/**
+ * In the binary target. `cargo rustc --lib` never compiled it, and until
+ * batch 7 this wrong arrow stayed quiet; the program is now built too, so its
+ * list judges it (`rustc-list-decides.test.ts`).
+ */
 const IN_A_BINARY: [string, string] = ["src/main.rs#run", `${H}unrelated`];
 
 let repo: string;
@@ -275,12 +279,13 @@ describe.skipIf(!HAS_CARGO)("Rust @calls, read through the compiler's own call l
     }
   });
 
-  it("stays quiet on a routine in a binary target, which the library build never compiles", () => {
-    expect(redOf(withCompiler)).not.toContain(`${IN_A_BINARY[0]} -> ${IN_A_BINARY[1]}`);
+  it("goes red on a wrong arrow from a routine in the binary target, which is built as well (batch 7)", () => {
+    expect(redOf(withCompiler)).toContain(`${IN_A_BINARY[0]} -> ${IN_A_BINARY[1]}`);
+    expect(redOf(textOnly)).not.toContain(`${IN_A_BINARY[0]} -> ${IN_A_BINARY[1]}`);
   });
 
   it("goes red on nothing else", () => {
-    const expected = new Set(WRONG.map(([from, to]) => `${from} -> ${to}`));
+    const expected = new Set([...WRONG, IN_A_BINARY].map(([from, to]) => `${from} -> ${to}`));
     expect([...redOf(withCompiler)].filter((one) => !expected.has(one))).toEqual([]);
   });
 
