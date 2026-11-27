@@ -76,6 +76,7 @@ import { declarationName, escapeName, NAME_END } from "./declared";
 import { providedByHost, providedByLanguage } from "./builtins";
 import { mayAccuse } from "./licence";
 import { each, incomplete, parametersOf, parseSource, type Language, type Node } from "./parse";
+import { runInNewContext } from "node:vm";
 
 /**
  * Why no verdict was reached. Every one of these is a reason to stay quiet, and
@@ -371,6 +372,217 @@ function madeIn(
 }
 
 /**
+ * Members every array, function or string already has: an interface that
+ * requires only these is met by one of those, which no literal spells.
+ */
+const BUILT_IN_MEMBERS = /^(length|name|toString|valueOf|push|pop|map|filter|forEach|slice|concat|join|indexOf|includes|find|some|every|reduce|keys|values|entries|call|apply|bind|then|catch|finally|constructor|prototype)$/;
+
+/**
+ * The members a TypeScript interface requires (class-calls research, rule
+ * 4; owner decision 3): what an object must write to be one. `undefined`
+ * unless every declaration of the one name in the head's file is an
+ * interface whose body is property and method signatures only -- a call,
+ * construct or index signature, or a class merged with it, and anything
+ * may be one -- and at least one required member is not one every array or
+ * function has. Members an interface inherits (`extends`) are not read, so
+ * the set is never more than the compiler's.
+ */
+function requiredMembers(source: string, language: Language, names: string[]): Set<string> | undefined {
+  if (names.length !== 1) return undefined;
+  const tree = parseSource(source, language);
+  if (!tree) return undefined;
+  const wanted = names[0]!;
+  const required = new Set<string>();
+  let interfaces = 0;
+  let doubt = false;
+  each(tree.rootNode, (node) => {
+    if (node.type.startsWith("jsx_") || writtenAsUse(node)) return;
+    const name = node.childForFieldName("name");
+    if (!name || name.childCount !== 0 || name.text !== wanted || parametersOf(node)) return;
+    // A member or a key that happens to share the name declares nothing of the type.
+    if (/^(property_signature|public_field_definition|pair|enum_assignment|shorthand_property_identifier)$/.test(node.type)) return;
+    const body = node.childForFieldName("body");
+    if (node.type !== "interface_declaration" || !body) { doubt = true; return; }
+    interfaces += 1;
+    for (let at = 0; at < body.childCount; at += 1) {
+      const member = body.child(at);
+      if (!member || !member.isNamed || /comment/.test(member.type)) continue;
+      if (member.type !== "property_signature" && member.type !== "method_signature") { doubt = true; continue; }
+      const key = member.childForFieldName("name");
+      if (!key || key.type === "computed_property_name") { doubt = true; continue; }
+      let optional = false;
+      for (let part = 0; part < member.childCount; part += 1) if (member.child(part)?.type === "?") optional = true;
+      const spelt = key.text.replace(/^['"]|['"]$/g, "");
+      if (!optional && !BUILT_IN_MEMBERS.test(spelt)) required.add(spelt);
+    }
+  });
+  return !doubt && interfaces > 0 && required.size > 0 ? required : undefined;
+}
+
+/** The language's own routines that write members into an object they are given or make. */
+const BUILDS_OBJECTS = /^Object\.(assign|create|fromEntries|defineProperty|defineProperties|setPrototypeOf)$/;
+
+/**
+ * Whether these routines may write an object of an interface requiring
+ * `required` (rule 4): a literal that writes every required member, or
+ * spreads another into itself, or writes a member under a computed key; a
+ * literal handed to one of the language's own object builders
+ * (`Object.assign({ name }, base)`); a value given a required member after
+ * it was made (`o.area = ..`); or anything made with `new` or JSX that is
+ * not a class of this repository whose own text lacks a required member --
+ * TypeScript is structural, so a class with every member is one whatever
+ * its header says, and so may be `new Error()` for `{ name; message }`.
+ */
+function mayWriteOne(
+  routines: Node[], source: string, language: Language, required: Set<string>, names: ConstructsNames | undefined,
+): boolean {
+  const bindings = bindingsIn(source, language);
+  if (!bindings) return true;
+  let may = false;
+  for (const routine of routines) {
+    each(routine, (node) => {
+      if (may) return;
+      if (node.type === "object") {
+        const keys = new Set<string>();
+        for (let at = 0; at < node.childCount; at += 1) {
+          const part = node.child(at);
+          if (!part || !part.isNamed || /comment/.test(part.type)) continue;
+          if (part.type === "spread_element") { may = true; return; }
+          const key = part.type === "shorthand_property_identifier" ? part : part.childForFieldName("key") ?? part.childForFieldName("name");
+          if (!key || key.type === "computed_property_name") { may = true; return; }
+          keys.add(key.text.replace(/^['"]|['"]$/g, ""));
+        }
+        if ([...required].every((one) => keys.has(one))) may = true;
+        return;
+      }
+      if (node.type === "call_expression") {
+        const callee = node.childForFieldName("function")?.text.replace(/\s+/g, "") ?? "";
+        if (BUILDS_OBJECTS.test(callee)) may = true;
+        return;
+      }
+      if (node.type === "assignment_expression" || node.type === "augmented_assignment_expression") {
+        const left = node.childForFieldName("left");
+        const member = left?.childForFieldName("property") ?? left?.childForFieldName("index");
+        if (member && required.has(member.text.replace(/^['"]|['"]$/g, ""))) may = true;
+        if (left?.type === "subscript_expression" && member?.type !== "string") may = true;
+        return;
+      }
+      if (MAKES.test(node.type) && !classLacksAMember(node, source, language, bindings, required, names)) may = true;
+    });
+    if (may) return true;
+  }
+  return false;
+}
+
+/**
+ * Every member an object made by one of the language's own classes can
+ * have, asked of the language itself, as `builtins.ts` asks it for names: a
+ * bare ECMAScript realm, nothing the host added. Its prototype chain, and
+ * what a new one gets of its own (`stack`; `cause` when given one).
+ * `undefined` when the realm has no such class or will not make one.
+ */
+const languageMembers_ = new Map<string, Set<string> | undefined>();
+function languageMembers(name: string): Set<string> | undefined {
+  if (languageMembers_.has(name)) return languageMembers_.get(name);
+  let found: Set<string> | undefined;
+  try {
+    const realm = runInNewContext("globalThis") as Record<string, unknown>;
+    const made = realm[name];
+    if (typeof made === "function" && made.prototype) {
+      found = new Set<string>();
+      for (let at: object | null = made.prototype as object; at; at = Object.getPrototypeOf(at)) {
+        for (const one of Object.getOwnPropertyNames(at)) found.add(one);
+      }
+      const Made = made as new (...args: unknown[]) => object;
+      for (const one of Object.getOwnPropertyNames(new Made())) found.add(one);
+      for (const one of Object.getOwnPropertyNames(new Made(undefined, { cause: undefined }))) found.add(one);
+    }
+  } catch {
+    found = undefined;
+  }
+  languageMembers_.set(name, found);
+  return found;
+}
+
+/**
+ * Whether `new C(..)` makes a class of this repository that is no kind of
+ * anything (no `extends` or `implements`) and whose own text never spells
+ * one of the required members: then the value it makes is not of the
+ * interface; and so does one of the language's own classes that lacks a
+ * required member (`languageMembers`: `throw new Error(..)` makes no
+ * `Router`). Anything else -- a JSX element, a qualified or computed
+ * constructor, a host class, a name not followed to a class declaration --
+ * may be.
+ */
+function classLacksAMember(
+  node: Node, source: string, language: Language, bindings: Bindings, required: Set<string>, names: ConstructsNames | undefined,
+): boolean {
+  if (node.type.startsWith("jsx_")) return false;
+  const made = madeBy(node);
+  if (!made || made.childCount !== 0 || !TYPE_NAME.test(made.type)) return false;
+  let far: { source: string; language: Language } | undefined;
+  let as = made.text;
+  if (bindings.imported.has(made.text)) {
+    if (!names) return false;
+    const placed = placeName(made.text, names.side, bindings);
+    if ("why" in placed || placed.as === undefined) return false;
+    as = placed.as;
+    far = placed.file === names.side.file ? { source, language } : names.side.open?.(placed.file);
+  } else if (bindings.local.has(made.text)) {
+    far = { source, language };
+  } else if (providedApart(made.text, source, language, new Set())) {
+    // The language's own class (`throw new Error(..)`): its members are the language's to say.
+    const members = languageMembers(made.text);
+    return members !== undefined && [...required].some((member) => !members.has(member));
+  }
+  if (!far || !isTypeScript(far.language)) return false;
+  const tree = parseSource(far.source, far.language);
+  if (!tree) return false;
+  let declared = 0;
+  let lacks = true;
+  each(tree.rootNode, (one) => {
+    if (one.type.startsWith("jsx_") || writtenAsUse(one)) return;
+    const name = one.childForFieldName("name");
+    if (!name || name.childCount !== 0 || name.text !== as || parametersOf(one)) return;
+    if (/^(property_signature|public_field_definition|pair|method_definition|shorthand_property_identifier)$/.test(one.type)) return;
+    const body = one.childForFieldName("body");
+    if (!/class_declaration$/.test(one.type) || !body) { lacks = false; return; }
+    declared += 1;
+    for (let at = 0; at < one.childCount; at += 1) if (one.child(at)?.type === "class_heritage") lacks = false;
+    if ([...required].every((member) => new RegExp(`(^|[^\\w$])${escapeName(member)}([^\\w$]|$)`).test(one.text))) lacks = false;
+  });
+  return lacks && declared > 0;
+}
+
+/**
+ * Whether every one of these names is declared in this Rust source as a
+ * trait and only as one, and no `impl` is written for it as a type (`impl
+ * dyn Walks { .. }`). Nothing makes a trait (rule 5): it is only ever
+ * called through the methods it declares.
+ */
+function onlyTraits(source: string, names: string[]): boolean {
+  if (names.length === 0) return false;
+  const tree = parseSource(source, "rust");
+  if (!tree) return false;
+  const wanted = new Set(names);
+  const traits = new Set<string>();
+  let other = false;
+  each(tree.rootNode, (node) => {
+    if (node.type === "impl_item") {
+      const type = node.childForFieldName("type")?.text.replace(/^dyn\s+/, "").replace(/<[\s\S]*$/, "").split("::").pop();
+      if (type !== undefined && wanted.has(type) && !node.childForFieldName("trait")) other = true;
+      return;
+    }
+    if (!/_item$/.test(node.type) || writtenAsUse(node)) return;
+    const name = node.childForFieldName("name");
+    if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
+    if (node.type === "trait_item") traits.add(name.text);
+    else if (node.type !== "function_item" && node.type !== "function_signature_item") other = true;
+  });
+  return !other && names.every((name) => traits.has(name));
+}
+
+/**
  * Whether every one of these types is one a body can only create by naming it
  * (#362), so that a body naming none of them has created none.
  *
@@ -550,6 +762,8 @@ function namesTheHead(
   head?: { source: string; language: Language },
   /** Where the routine's calls were placed, for a value handed to code outside the repository (#432). */
   placed?: CallSide,
+  /** Keep a return type and a local's type a mention (an interface at the head: a literal is made under such a type). */
+  typesCount = false,
 ): boolean {
   const spelt = new Set(wanted);
   let outside: Set<number> | undefined;
@@ -573,6 +787,20 @@ function namesTheHead(
      */
     const handedIn = handedInTypes(routine, language)
       .filter((span) => !handedInCounts || !runsUnwritten(routine, span.name, wanted, head, outsideCalls));
+    /*
+     * And for `@calls` into a class, a type written where only a type can go
+     * makes nothing either (class-calls research, rule 3; owner decision 2):
+     * what the routine says it returns, and the type a local is declared
+     * with. `def current_clock(self) -> Clock: return self.clock` makes no
+     * Clock. Each stands for a value -- what is returned, the local -- so it
+     * is skipped on the terms a handed-in value is: the body runs none of the
+     * class's methods through that value unwritten. Rust's types are rustc's
+     * to read. An interface keeps them (`typesCount`): one is made by a
+     * literal, and such a type may be what says the literal is one.
+     */
+    if (handedInCounts && language !== "rust" && !typesCount) {
+      handedIn.push(...typedValues(routine, language, wanted, head, outsideCalls));
+    }
     each(routine, (node) => {
       if (named || node.childCount !== 0 || !node.isNamed) return;
       if (own && node.id === own.id) return;
@@ -582,6 +810,62 @@ function namesTheHead(
     if (named) return true;
   }
   return false;
+}
+
+/**
+ * The spans of a routine's return type and of its locals' declared types
+ * that stand for a value nothing runs the head's code through unwritten
+ * (`runsUnwritten`, #432). A return type counts only when every value
+ * returned is a plain name that passes that test: an operator on the way out
+ * (`return a + b`) runs a method of what it is applied to, and a value a
+ * call hands back is that call's to answer for (`aCallMayCreateTheHead`,
+ * `everyConstructionIsSomethingElse`). A maker type -- a function or
+ * constructor type, `type[W]` -- is never skipped: calling one makes a W.
+ */
+function typedValues(
+  routine: Node, language: Language, wanted: Set<string>, head: { source: string; language: Language } | undefined,
+  outside: () => Set<number>,
+): Array<{ start: number; end: number; name?: string }> {
+  const spans: Array<{ start: number; end: number; name?: string }> = [];
+  const body = routine.childForFieldName("body") ?? routine;
+  const returns = routine.childForFieldName("return_type");
+  if (returns && !makerType(returns, language)) {
+    const returned: string[] = [];
+    let plain = true;
+    each(body, (node) => {
+      if (!/^(return_statement|yield|yield_expression)$/.test(node.type)) return;
+      for (let at = 0; at < node.childCount; at += 1) {
+        const value = node.child(at)!;
+        if (!value.isNamed) continue;
+        if (value.childCount === 0) returned.push(value.text);
+        else if (/binary|unary|comparison|boolean_operator|not_operator|subscript|template|concatenated/.test(value.type)) plain = false;
+      }
+    });
+    if (plain && returned.every((name) => !runsUnwritten(routine, name, wanted, head, outside))) {
+      spans.push({ start: returns.startIndex, end: returns.endIndex });
+    }
+  }
+  each(body, (node) => {
+    if (!/^(assignment|variable_declarator)$/.test(node.type)) return;
+    const type = node.childForFieldName("type");
+    const named = node.childForFieldName("name") ?? node.childForFieldName("left");
+    if (!type || !named || named.childCount !== 0 || makerType(type, language)) return;
+    if (runsUnwritten(routine, named.text, wanted, head, outside)) return;
+    spans.push({ start: type.startIndex, end: type.endIndex, name: named.text });
+  });
+  return spans;
+}
+
+/** Whether a written type makes one when called: a function or constructor type, or a word in `MAKER_WORDS`. */
+function makerType(written: Node, language: Language): boolean {
+  const maker = MAKER_WORDS[language];
+  let makes = false;
+  each(written, (inner) => {
+    if (makes) return;
+    if (parametersOf(inner)) makes = true;
+    else if (inner.childCount === 0 && maker?.test(inner.text)) makes = true;
+  });
+  return makes;
 }
 
 /**
@@ -1573,6 +1857,16 @@ export function constructions(
     return { verdict: "withheld", why: declared ? "no-body" : "not-declared" };
   }
 
+  /*
+   * `@calls` into a Rust trait (rule 5): nothing makes a trait, so whether the
+   * body "makes one" needs no reading -- it makes none. The arrow is then
+   * decided by the calls alone (`callsIntoType`), as it always was for a
+   * trait's methods.
+   */
+  if (forCalls && language === "rust" && reverse?.language === "rust" && onlyTraits(reverse.source, targets)) {
+    return { verdict: "refuted", evidence: { routine, line: lineOf(source, routines[0]!.startIndex), made: [] } };
+  }
+
   const wanted = new Set(targets);
   let withheld: ConstructsWithheld | undefined;
   const madeInstead = new Map<string, ConstructsEvidence>();
@@ -1651,6 +1945,24 @@ export function constructions(
    * it. No `reverse` means a planned arrow or a head nothing could read, and
    * both stay quiet.
    */
+  /*
+   * `@calls` into a TypeScript interface (rule 4; owner decision 3). One is
+   * made by writing an object with every member it requires, and an object
+   * that leaves one out is not one -- the compiler enforces exactly this. So
+   * a body that names the interface nowhere a value could be said to be one
+   * (a parameter's type hands one in, and makes none), and may write no
+   * object of it (`mayWriteOne`), makes none.
+   */
+  if (forCalls && reverse !== undefined && isTypeScript(language) && isTypeScript(reverse.language)
+    && mayAccuse("builds", language, "absence")) {
+    const required = requiredMembers(reverse.source, reverse.language, targets);
+    if (required
+      && !namesTheHead(routines, source, language, wanted, false, reverse, names?.calls ?? names?.side, true)
+      && !mayWriteOne(routines, source, language, required, names)) {
+      return { verdict: "refuted", evidence: { routine, line: lineOf(source, routines[0]!.startIndex), made: [...madeInstead.values()] } };
+    }
+  }
+
   /*
    * `@calls` into a Rust type, with rustc's exact list of the body on hand
    * (batch 7, rule 7): what the body makes is the list's word -- every value

@@ -161,9 +161,14 @@ describe("TypeScript", () => {
     heldForTheAlias(await ask("main.ts#viaNamed", "types.ts#Named"));
   }, 120_000);
 
-  it("answers the alias as it answers the interface it stands beside", async () => {
-    // Withheld at the interface for its own reason (a literal may make one); never red at either.
-    expect((await ask("main.ts#viaNothing", "types.ts#Shape")).said).not.toBe("red");
+  it("holds the alias back where the interface it stands beside is answered", async () => {
+    /*
+     * The interface used to be withheld for its own reason (a literal may make
+     * one). Since the class-calls rules (owner decision 3) an interface is made
+     * only by an object writing every member it requires, and `viaNothing`
+     * writes none and calls nothing: wrong. The alias is still never red.
+     */
+    expect((await ask("main.ts#viaNothing", "types.ts#Shape")).said).toBe("red");
     heldForTheAlias(await ask("main.ts#viaNothing", "types.ts#Plain"));
   }, 120_000);
 
