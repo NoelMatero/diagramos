@@ -81,7 +81,8 @@ const FILES: Record<string, string> = {
     "iter_for!(PatternIter);",
     "",
   ].join("\n\n"),
-  "src/main.rs": "fn run() -> u8 {\n    1\n}\n\nfn main() {\n    println!(\"{}\", run());\n}\n",
+  // A program: built too since batch 7, so its own list judges it. `run` makes a Widget through the library.
+  "src/main.rs": "fn run() -> u8 {\n    let w: makes::widget::Widget = 3.into();\n    w.x\n}\n\nfn main() {\n    println!(\"{}\", run());\n}\n",
 };
 
 const W = "src/widget.rs#";
@@ -167,7 +168,7 @@ const RIGHT: Array<[string, string, string]> = [
   ["a construction only a `cfg` feature compiles", `${M}switched`, `${W}Widget`],
   ["a construction inside a macro", `${M}by_macro`, `${W}Widget`],
   ["`Self::default()` in a trait's default method", `${M}fresh`, `${W}Widget`],
-  ["a binary target, which the library build never compiles", "src/main.rs#run", `${W}Widget`],
+  ["a program's routine making one with `.into()`, read from the program's own build", "src/main.rs#run", `${W}Widget`],
   /*
    * regex's `primitives.rs`: a macro in the file generates a `fn new` that
    * creates the iterator, and the only `fn new` the text can see creates

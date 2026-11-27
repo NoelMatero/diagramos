@@ -135,6 +135,27 @@ export interface CompiledBody {
    * A constant read, `= const StateID::ZERO;`, builds nothing and is left out.
    */
   built: Set<string>;
+  /**
+   * Every identifier written on a line rustc writes as a call: the callee's
+   * path, its type arguments, `<T as Trait>` (batch 7). Everything a body
+   * runs of a type's own code is on such a line -- `Widget::run(..)`,
+   * `<Widget as ToString>::to_string(..)`, `<Pair as PartialEq>::eq(..)` --
+   * or is a `drop` of a value whose type writes `Drop`. A type named only
+   * off them (a local's type, what the routine returns) runs nothing here.
+   */
+  callWords: Set<string>;
+  /**
+   * Whether every basic block of the body (and of each closure folded into
+   * it) ends in a terminator this reader recognises. rustc says its printed
+   * format may change; if it ever prints a call in a shape `TERMINATOR` does
+   * not match, the call would vanish from `calls` and `callWords`, and a body
+   * that makes calls would read as one that makes none. A block ending in
+   * anything unrecognised makes this false, and the list is then not read at
+   * all (`compiledBodiesFor`): every reader falls back to the text. Across
+   * the 253 dumps of the corpus on rustc 1.99 every block ends in a
+   * recognised line (`terminate(abi);` closes some cleanup blocks).
+   */
+  listWhole: boolean;
 }
 
 /** One crate's bodies, indexed the two ways a declaration can be found. */
@@ -337,29 +358,48 @@ function bodiesIn(mir: string): CompiledBody[] {
   let locals = new Map<string, string>();
   let skipping = false;
   let ctfe = false;
+  /** Inside a `bbN: {` block, and the last line read in it: the block's terminator. */
+  let block = false;
+  let last: string | undefined;
+  const fresh = (path: string, params: number): CompiledBody => ({
+    path, params, calls: [], drops: 0, words: new Set(), mentions: new Set(), made: new Set(), built: new Set(),
+    callWords: new Set(), listWhole: true,
+  });
   for (const line of mir.split("\n")) {
     if (open || skipping) {
-      if (line === "}") { open = undefined; skipping = false; continue; }
+      if (line === "}") { open = undefined; skipping = false; block = false; continue; }
       if (!open) continue;
+      if (BLOCK_OPENS.test(line)) { block = true; last = undefined; continue; }
+      if (block && /^\s+\}$/.test(line)) {
+        if (last === undefined || !ENDS_A_BLOCK.test(last)) open.listWhole = false;
+        block = false;
+        continue;
+      }
+      if (block && line.trim() !== "") last = line;
       readBodyLine(line, open, locals);
       continue;
     }
     if (line.startsWith("// MIR FOR CTFE")) { ctfe = true; continue; }
     if (line.startsWith(" ") || line.startsWith("//") || !line.endsWith("{")) continue;
+    /*
+     * `const f::promoted[0]: &Option<Kind> = {`: a constant rustc lifted out
+     * of `f`'s body -- `c == Some(Kind::A)` compares against one. It is part
+     * of what `f` writes (its aggregates, its names), so it is folded into
+     * `f` like a closure is. It holds no calls: a call is never promoted out
+     * of a function body.
+     */
+    const promoted = !ctfe ? line.match(/^const (.+)::promoted\[(\d+)\]: .* = \{$/) : null;
+    if (promoted) {
+      open = fresh(`${promoted[1]}::{promoted#${promoted[2]}}`, 0);
+      locals = new Map();
+      all.push(open);
+      continue;
+    }
     const header = line.match(/^(?:const )?fn (.*)$/);
     if (!header || ctfe) { skipping = true; ctfe = false; continue; }
     const split = splitHeader(header[1]!);
     if (!split) { skipping = true; continue; }
-    open = {
-      path: split.path,
-      params: (split.params.match(/(?:^|, )_\d+: /g) ?? []).length,
-      calls: [],
-      drops: 0,
-      words: new Set(),
-      mentions: new Set(),
-      made: new Set(),
-      built: new Set(),
-    };
+    open = fresh(split.path, (split.params.match(/(?:^|, )_\d+: /g) ?? []).length);
     locals = new Map();
     all.push(open);
   }
@@ -383,6 +423,8 @@ function bodiesIn(mir: string): CompiledBody[] {
       for (const word of body.mentions ?? body.words) (owner.mentions ??= new Set()).add(word);
       for (const type of body.made) owner.made.add(type);
       for (const type of body.built) owner.built.add(type);
+      for (const word of body.callWords) owner.callWords.add(word);
+      owner.listWhole &&= body.listWhole;
     }
   }
   return kept;
@@ -444,6 +486,10 @@ function segmentsOf(written: string): string[] {
 const TERMINATOR = /^\s+(.*) -> (?:\[[^\]]*\]|unwind [^;]*|bb\d+);$/;
 /** Terminators that are not calls. `drop` is counted apart; the rest move control and run nothing. */
 const NOT_A_CALL = /^(?:goto|switchInt|assert|falseEdge|falseUnwind|yield|drop)\b/;
+/** `    bb3: {`, `    bb7 (cleanup): {`: a basic block, which always ends in one terminator. */
+const BLOCK_OPENS = /^\s+bb\d+(?: \(cleanup\))?: \{$/;
+/** A recognised last line of a block: a terminator `TERMINATOR` reads, or one that leaves the body. */
+const ENDS_A_BLOCK = new RegExp(`${TERMINATOR.source}|^\\s+(?:return|unreachable|resume|abort|coroutine_drop|terminate(?:\\([^)]*\\))?);$`);
 
 /** `let mut _3: std::vec::Vec<Widget>;` -- a local and its type, which MIR declares before any statement. */
 const LOCAL = /^\s+let (?:mut )?(_\d+): (.+);$/;
@@ -489,6 +535,7 @@ function readBodyLine(line: string, body: CompiledBody, locals: Map<string, stri
   const written = terminator[1]!.replace(/^_\d+ = /, "");
   if (/^drop\(/.test(written)) { body.drops += 1; return; }
   if (NOT_A_CALL.test(written)) return;
+  for (const word of written.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) body.callWords.add(word);
   const call = callOf(written);
   if (call) body.calls.push(call);
 }
@@ -664,6 +711,98 @@ export function compiledBodiesOf(
   return { bodies, generics, unbuilt };
 }
 
+/**
+ * A struct, enum or union read as a caller (batch 7): the bodies of every
+ * function written inside these `impl` blocks of one file, each matched to
+ * its one body by `compiledBodiesOf`'s own rules. One that cannot be matched,
+ * a function declared inside another, or a `cfg` that reaches one, and there
+ * is no saying for the whole type. Whether the `impl`s here are the whole of
+ * the type is the caller's question (`crateNotWhole`).
+ */
+export function compiledBodiesOfImpls(
+  crate: CompiledCrate,
+  file: string,
+  source: string,
+  impls: readonly Node[],
+  heads?: readonly string[],
+): CompiledReading {
+  if (!crate.files.has(file)) return { why: "not-compiled" };
+  const tree = parseSource(source, "rust");
+  if (!tree || impls.length === 0) return { why: "not-matched" };
+  const inside = (node: Node) => impls.some((impl) => node.startIndex >= impl.startIndex && node.endIndex <= impl.endIndex);
+  const names = new Set<string>();
+  let nested = false;
+  const walk = (node: Node, inFunction: boolean): void => {
+    const isFunction = node.type === "function_item";
+    if (isFunction && node.childForFieldName("body")) {
+      if (inFunction) nested = true;
+      const name = node.childForFieldName("name")?.text;
+      if (name) names.add(name);
+    }
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child) walk(child, inFunction || isFunction);
+    }
+  };
+  for (const impl of impls) walk(impl, false);
+  if (nested || names.size === 0) return { why: "not-matched" };
+  const bodies: CompiledBody[] = [];
+  const generics = new Set<string>();
+  const unbuilt: Array<{ start: number; end: number }> = [];
+  const couldCall = (region: Node): boolean => heads === undefined || region.text.includes("!")
+    || /\bSelf\b/.test(region.text)
+    || heads.some((name) => new RegExp(`(?<![\\w$])${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w$])`).test(region.text));
+  for (const name of names) {
+    for (const declaration of declarationsNamed(tree.rootNode, name).filter((one) => inside(one.node))) {
+      if (declaration.switchedOff || declaration.gated) return { why: "switched-off" };
+      if (declaration.regions.some(couldCall)) return { why: "switched-off" };
+      for (const region of declaration.regions) unbuilt.push({ start: region.startIndex, end: region.startIndex + region.text.length });
+      const body = bodyOf(crate, file, source, declaration, name);
+      if (!body || body.params !== parameterCount(declaration.node)) return { why: "not-matched" };
+      bodies.push(body);
+      for (const holder of [...declaration.ancestors, declaration.node]) {
+        const parameters = holder.childForFieldName("type_parameters")?.text ?? "";
+        for (const match of parameters.matchAll(/(?:^<|,)\s*(?:const\s+)?([A-Za-z_]\w*)/g)) generics.add(match[1]!);
+      }
+    }
+  }
+  return { bodies, generics, unbuilt };
+}
+
+/**
+ * The `#[test]` functions of a Rust file that share their name with one that
+ * is not a test, by node id: what `withoutTestNamesakes` leaves out, for the
+ * text readers. `#[test]` (or `#[tokio::test]`) on the function, or
+ * `#[cfg(test)]` on it or on what holds it.
+ */
+export function testNamesakes(root: Node): Set<number> {
+  const byName = new Map<string, Array<{ id: number; test: boolean }>>();
+  const visit = (node: Node, testOnly: boolean) => {
+    let tested = false;
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (!child?.isNamed) continue;
+      if (child.type === "attribute_item") {
+        tested ||= TEST_ATTRIBUTE.test(child.text.trim()) || CFG_TEST.test(child.text.trim());
+        continue;
+      }
+      if (child.type === "line_comment" || child.type === "block_comment") continue;
+      const childTest = testOnly || tested;
+      tested = false;
+      const name = child.type === "function_item" ? child.childForFieldName("name")?.text : undefined;
+      if (name && child.childForFieldName("body")) byName.set(name, [...(byName.get(name) ?? []), { id: child.id, test: childTest }]);
+      visit(child, childTest);
+    }
+  };
+  visit(root, false);
+  const out = new Set<number>();
+  for (const found of byName.values()) {
+    if (!found.some((one) => !one.test)) continue;
+    for (const one of found) if (one.test) out.add(one.id);
+  }
+  return out;
+}
+
 /** A function declaration, what holds it (outermost first), and whether `cfg` reaches it. */
 interface Declaration {
   node: Node;
@@ -674,6 +813,26 @@ interface Declaration {
   switchedOff: boolean;
   /** Each statement, field or expression inside the body that one `#[cfg(..)]` switches on or off. */
   regions: Node[];
+  /** `#[test]` on it, or `#[cfg(test)]` on it or on what holds it: code only a test build has. */
+  test: boolean;
+}
+
+/** `#[test]`, `#[tokio::test]`: a test function. */
+const TEST_ATTRIBUTE = /^#\[\s*(?:[A-Za-z_]\w*::)*test\s*\]$/;
+/** `#[cfg(test)]`: an item only a test build compiles. */
+const CFG_TEST = /^#\[\s*cfg\s*\(\s*test\s*\)\s*\]$/;
+
+/**
+ * Leave out the test functions that share the routine's name with one that
+ * is not a test (batch 7; owner decision: tests are not product calls).
+ * regex-syntax's `parse_set_class` has a `#[test] fn parse_set_class` in the
+ * same file. Read as one routine, the test's calls were the routine's, and
+ * rustc's list -- which a library build compiles without tests -- was
+ * refused because two functions matched. A routine that is only ever a test
+ * keeps every declaration.
+ */
+export function withoutTestNamesakes<T extends { test: boolean }>(found: T[]): T[] {
+  return found.some((one) => !one.test) ? found.filter((one) => !one.test) : found;
 }
 
 const CFG = /\bcfg(?:_attr)?\b/;
@@ -739,7 +898,7 @@ function cfgRegions(fn: Node): Node[] | undefined {
  */
 function declarationsNamed(root: Node, routine: string): Declaration[] {
   const found: Declaration[] = [];
-  const visit = (node: Node, ancestors: Node[], off: boolean) => {
+  const visit = (node: Node, ancestors: Node[], off: boolean, testOnly: boolean) => {
     const children: Node[] = [];
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
@@ -748,21 +907,30 @@ function declarationsNamed(root: Node, routine: string): Declaration[] {
     const inner = off || children.some((child) => child.type === "inner_attribute_item" && CFG.test(child.text));
     const holding = [...ancestors, node];
     let attributed = false;
+    let tested = false;
     for (const child of children) {
-      if (child.type === "attribute_item") { attributed ||= CFG.test(child.text); continue; }
+      if (child.type === "attribute_item") {
+        attributed ||= CFG.test(child.text);
+        tested ||= TEST_ATTRIBUTE.test(child.text.trim()) || CFG_TEST.test(child.text.trim());
+        continue;
+      }
       if (child.type === "line_comment" || child.type === "block_comment") continue;
       const childOff = inner || attributed;
+      const childTest = testOnly || tested;
       attributed = false;
+      tested = false;
       if (child.type === "function_item" && child.childForFieldName("name")?.text === routine
         && child.childForFieldName("body")) {
         const regions = cfgRegions(child);
-        found.push({ node: child, ancestors: holding, gated: childOff, switchedOff: regions === undefined, regions: regions ?? [] });
+        found.push({
+          node: child, ancestors: holding, gated: childOff, switchedOff: regions === undefined, regions: regions ?? [], test: childTest,
+        });
       }
-      visit(child, holding, childOff);
+      visit(child, holding, childOff, childTest);
     }
   };
-  visit(root, [], false);
-  return found;
+  visit(root, [], false, false);
+  return withoutTestNamesakes(found);
 }
 
 function bodyOf(

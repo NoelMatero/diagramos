@@ -6340,6 +6340,20 @@ export function checkDrift(
                 const own = callsIntoType({ ...tail, routine }, { ...head, names: toEnd.symbols }, inherits);
                 const made = own.verdict === "confirmed" ? undefined
                   : readConstructions(tail.language, head.language, true, tail, over).verdict;
+                /*
+                 * Rule 7 (batch 7): rustc's exact list says no call of the
+                 * tail's is the type's, and it makes none. The old reading's
+                 * doubt was about calls the text could not place, each of which
+                 * that list has placed, so it no longer keeps the arrow open.
+                 */
+                if (own.verdict === "closed" && own.exact && made?.verdict === "refuted" && verdict.verdict === "absent") {
+                  verdict = { verdict: "refuted", evidence: { routine, line: own.line, sites: own.sites } };
+                }
+                // The crate is built for such an arrow, so a live check can ask rustc's list (rule 7).
+                if (claimed && counting && tail.language === "rust" && !tail.compiled?.() && own.verdict !== "confirmed"
+                  && made?.verdict !== "confirmed") {
+                  claims.callsCompilable += 1;
+                }
                 if (own.verdict === "confirmed") {
                   verdict = { verdict: "confirmed", evidence: own.evidence };
                 } else if (made?.verdict === "confirmed") {
@@ -6382,7 +6396,15 @@ export function checkDrift(
                    * writes none (#374, `measure:builds-absent --word=calls`).
                    */
                   const compiled = tail.language === "rust" ? compiledBodiesFor({ ...tail, routine }, toEnd.symbols) : undefined;
-                  const named = compiled?.bodies.some((body) => toEnd.symbols.some((name) => body.words.has(name)
+                  /*
+                   * With the exact list (batch 7, rule 7), what runs is on the
+                   * call lines, and a `drop` of a type that writes `Drop`
+                   * (`closedByRustc` asked that already, for `own` to close):
+                   * a type the body only names -- a local's, a return type --
+                   * runs nothing. Without it, any word of the body still counts.
+                   */
+                  const named = compiled?.bodies.some((body) => toEnd.symbols.some((name) => (compiled.exact && own.exact
+                    ? body.callWords.has(name) : body.words.has(name))
                     || body.calls.some((call) => call.kind === "named" && call.through === name)));
                   verdict = named
                     ? { verdict: "absent", notClosed: "called-implicitly" }

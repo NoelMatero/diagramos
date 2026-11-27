@@ -79,7 +79,7 @@ describe("why a Rust build failed", () => {
     it("says it built a crate that built", async () => {
       const { repo, cache } = crate(false);
       const crates = await compileCrates(repo, ["src/lib.rs"], { until: Date.now() + 120_000, cacheDir: cache });
-      expect(crates.crates).toEqual([{ manifest: "Cargo.toml", built: true }]);
+      expect(crates.crates).toEqual([{ manifest: "Cargo.toml", built: true, dump: expect.stringMatching(/calls\.mir$/) }]);
     }, 180_000);
   });
 });
