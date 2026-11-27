@@ -67,6 +67,7 @@
  * Python remains the whole of why this word cannot be trusted with an absence
  * even in the languages where the syntax is clear.
  */
+import { holdersIn } from "./overrides";
 import {
   bindingsIn, callsBetween, callSitesIn, compiledBodiesFor, EXTERNAL_RECEIVER, JSX_TAG, placeName,
   type Bindings, type CallSide, type CallsNotClosed,
@@ -599,6 +600,51 @@ const MAKER_WORDS: Partial<Record<Language, RegExp>> = {
   rust: /^(fn|Fn|FnMut|FnOnce|impl|dyn)$/,
 };
 
+/**
+ * Whether a routine named `routine` uses its own object (`self`, `this`) in a
+ * way that runs one of the head's methods with no call written: `with self:`
+ * enters it, `for x in self` iterates it, `self + other` adds it, a library
+ * routine handed `self` may format or compare it. The same reading #432 gives
+ * a value handed in, given to the method's own object.
+ *
+ * Asked before a `@calls` arrow to a class is called wrong. rich's
+ * `Console.control` does `with self:`, which runs `Console.__enter__`: the
+ * arrow "`control` calls `Console`" is true, and was red (calls recorded at run
+ * time, class-calls research 2026-11). Only a routine whose own class may be
+ * one of the head counts -- `related` says so for the class it is written in:
+ * the head itself, a kind of it, or something it is a kind of. In Rust `self`
+ * is the type the `impl` is written for and nothing else.
+ *
+ * `id(self)`, `type(self)`, `isinstance(self, C)` run nothing of `self` and
+ * do not count. A head whose unwritten methods cannot be listed still needs
+ * one of these uses to be there: inheriting such a method is not enough.
+ */
+export function ownObjectRunsUnwritten(
+  source: string, routine: string, language: Language, wanted: string[],
+  head: { source: string; language: Language }, placed: CallSide | undefined,
+  related: (holder: string) => boolean,
+): boolean {
+  const { routines } = routinesNamed(source, routine, language);
+  let outside: Set<number> | undefined;
+  const outsideCalls = () => outside ??= placedOutside(placed);
+  const own = language === "python" ? ["self", "cls"] : language === "rust" ? ["self"] : ["this"];
+  const tree = parseSource(source, language);
+  if (!tree) return true;
+  const holders = holdersIn(tree.rootNode);
+  const mayBeTheHead = (routineNode: Node): boolean => {
+    const holder = parametersOf(routineNode) ? holders.get(routineNode.id) : routineNode;
+    if (!holder) return false;
+    const named = (holder.childForFieldName("name") ?? holder.childForFieldName("type"))?.text.replace(/<[\s\S]*$/, "").split("::").pop();
+    if (named === undefined) return true;
+    if (wanted.includes(named)) return true;
+    if (language === "rust") return false;
+    return related(named);
+  };
+  // Rust: the uses that run a trait's code are not all read here, so any head with such code counts.
+  return routines.some((one) => mayBeTheHead(one)
+    && own.some((name) => runsUnwritten(one, name, new Set(wanted), head, outsideCalls, language !== "rust")));
+}
+
 /** The spans of every parameter type under this routine that hands in a value, not a maker (#417), with the parameter's name. */
 function handedInTypes(routine: Node, language: Language): Array<{ start: number; end: number; name?: string }> {
   const spans: Array<{ start: number; end: number; name?: string }> = [];
@@ -651,6 +697,8 @@ const UNWRITTEN: Record<"iterate" | "format" | "hash" | "truth" | "with" | "awai
 const ITERATES = /^(list|tuple|set|frozenset|sorted|sum|min|max|any|all|enumerate|zip|iter|next|len|dict|map|filter|reversed|Array\.from|Promise\.all)$/;
 const FORMATS = /^(str|repr|format|print|String|JSON\.stringify|console\.\w+)$/;
 const HASHES = /(^hash|\.(add|discard))$/;
+/** The language's own routines that run nothing of the value handed to them. */
+const INERT = /^(id|type|isinstance|issubclass|callable)$/;
 
 /**
  * Whether a body runs one of the head's methods through a value handed in
@@ -672,12 +720,14 @@ const HASHES = /(^hash|\.(add|discard))$/;
 function runsUnwritten(
   routine: Node, name: string | undefined, wanted: Set<string>, head: { source: string; language: Language } | undefined,
   outside: () => Set<number>,
+  /** A head whose unwritten methods cannot be listed still needs the value used in one of these ways (`ownObjectRunsUnwritten`). */
+  needsUse = false,
 ): boolean {
   if (!name || !head) return true;
   const declared = unwrittenMethods(head.source, head.language, wanted);
-  if (declared === "any") return true;
-  if (declared.length === 0) return false;
-  const runs = (use: Use) => declared.some((method) => use === "library"
+  if (declared === "any" && !needsUse) return true;
+  if (declared !== "any" && declared.length === 0) return false;
+  const runs = (use: Use) => declared === "any" || declared.some((method) => use === "library"
     ? Object.values(UNWRITTEN).some((one) => one.test(method))
     : UNWRITTEN[use].test(method));
   let found = false;
@@ -688,9 +738,12 @@ function runsUnwritten(
       return;
     }
     const call = calledBy(node, outside);
+    // Python's own `id(x)`, `type(x)`, `isinstance(x, C)` run nothing of `x`.
+    const inert = needsUse && head.language === "python" && node.type === "argument_list" && INERT.test(callee?.text ?? "");
     for (let at = 0; at < node.childCount; at += 1) {
       const child = node.child(at)!;
-      visit(child, useOf(node, node.fieldNameForChild(at), use, callee), call ?? callee);
+      const next = useOf(node, node.fieldNameForChild(at), use, callee);
+      visit(child, inert && next === "library" ? undefined : next, call ?? callee);
     }
   };
   visit(routine.childForFieldName("body") ?? routine, undefined);
