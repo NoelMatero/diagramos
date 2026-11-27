@@ -3841,11 +3841,48 @@ function classKept(from: CallSide, to: CallSide, type: string): string | undefin
 }
 
 /** Whether every mention of `type` on this 1-based line only names the class and does not hand the class itself on. */
+const namesOnly_ = new WeakMap<Tree, Map<string, Map<number, boolean>>>();
+
 function onlyNamesTheClass(source: string, language: Language, type: string, line: number): boolean {
   const tree = parseSource(source, language);
   if (!tree) return false;
-  let all = true;
-  let seen = 0;
+  const known = namesOnly_.get(tree) ?? new Map<string, Map<number, boolean>>();
+  namesOnly_.set(tree, known);
+  let lines = known.get(type);
+  if (!lines) {
+    lines = linesOnlyNaming(tree, source, language, type);
+    known.set(type, lines);
+  }
+  return lines.get(line) ?? false;
+}
+
+/**
+ * Per 1-based line of this tree that mentions `type`, whether every mention
+ * there only names the class (`onlyNamesTheClass`). One walk per tree and
+ * type, into the parts of the tree that hold a mention: asked once per
+ * stored finding of every arrow, a walk per question was most of a Rust
+ * referee's time.
+ */
+function linesOnlyNaming(tree: Tree, source: string, language: Language, type: string): Map<number, boolean> {
+  const lines = new Map<number, boolean>();
+  const at: number[] = [];
+  for (const match of source.matchAll(new RegExp(`(?<![\\w$])${escapeName(type)}(?![\\w$])`, "g"))) at.push(match.index!);
+  if (at.length === 0) return lines;
+  const holds = (node: Node): boolean => {
+    let low = 0;
+    let high = at.length;
+    while (low < high) { const mid = (low + high) >> 1; if (at[mid]! < node.startIndex) low = mid + 1; else high = mid; }
+    return low < at.length && at[low]! < node.endIndex;
+  };
+  const breaks: number[] = [];
+  for (let index = source.indexOf("\n"); index !== -1; index = source.indexOf("\n", index + 1)) breaks.push(index);
+  // 1-based: one more than the newlines before it.
+  const lineAt = (index: number): number => {
+    let low = 0;
+    let high = breaks.length;
+    while (low < high) { const mid = (low + high) >> 1; if (breaks[mid]! < index) low = mid + 1; else high = mid; }
+    return low + 1;
+  };
   const stack: Node[] = [];
   const fieldIs = (parent: Node, field: string, node: Node) => parent.childForFieldName(field)?.id === node.id;
   const judge = (leaf: Node): boolean => {
@@ -3879,12 +3916,12 @@ function onlyNamesTheClass(source: string, language: Language, type: string, lin
     return false;
   };
   const visit = (node: Node): void => {
-    if (!all) return;
-    const first = lineOf(source, node.startIndex);
-    const last = lineOf(source, node.endIndex);
-    if (last < line || first > line) return;
+    if (!holds(node)) return;
     if (node.childCount === 0) {
-      if (node.text === type && first === line && /identifier$|string_content|string_fragment/.test(node.type)) { seen += 1; if (!judge(node)) all = false; }
+      if (node.text === type && /identifier$|string_content|string_fragment/.test(node.type)) {
+        const line = lineAt(node.startIndex);
+        lines.set(line, (lines.get(line) ?? true) && judge(node));
+      }
       return;
     }
     stack.push(node);
@@ -3892,7 +3929,7 @@ function onlyNamesTheClass(source: string, language: Language, type: string, lin
     stack.pop();
   };
   visit(tree.rootNode);
-  return all && seen > 0;
+  return lines;
 }
 
 /**
