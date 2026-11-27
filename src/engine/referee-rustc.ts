@@ -53,6 +53,8 @@ export function rustcCacheDir(): string {
 /** Crates by repo-relative file, for the files one check asked about. */
 export interface CompiledCrates {
   crateOf(file: string): CompiledCrate | undefined;
+  /** The dump the file's crate was read from, absolute: for a referee that reads rustc's raw bodies itself. */
+  dumpOf(file: string): string | undefined;
   /** Whether any crate was read, so a board can say what checked it. */
   answered: boolean;
   /**
@@ -67,7 +69,11 @@ export interface CompiledCrates {
 export interface CrateOutcome {
   /** The package's `Cargo.toml`, repo-relative. */
   manifest: string;
+  /** Which of the package's targets: absent for its library, `bin <name>` for a program. */
+  target?: string;
   built: boolean;
+  /** The dump read, absolute: what a referee reads rustc's raw bodies from. */
+  dump?: string;
   /** Not a failure: the package has no library target, so there is nothing to build. */
   nothingToBuild?: boolean;
   why?: string;
@@ -80,7 +86,7 @@ export interface CompileOptions {
   cacheDir?: string;
 }
 
-const none = (crates: CrateOutcome[] = []): CompiledCrates => ({ crateOf: () => undefined, answered: false, crates });
+const none = (crates: CrateOutcome[] = []): CompiledCrates => ({ crateOf: () => undefined, dumpOf: () => undefined, answered: false, crates });
 
 /** Why a directory walk stops: a build's output, a dependency's tree, a VCS's. */
 const SKIP = new Set(["target", "node_modules", ".git"]);
@@ -108,20 +114,56 @@ export async function compileCrates(
   }
 
   const found = new Map<string, CompiledCrate>();
+  const dumps = new Map<string, string>();
   const crates: CrateOutcome[] = [];
   await Promise.all([...byManifest].map(async ([manifest, owned]) => {
-    const got = await crateFor(manifest, root, cache, options.until);
     const where = path.relative(root, manifest);
-    if ("crate" in got) {
-      for (const file of owned) found.set(file, got.crate);
-      crates.push({ manifest: where, built: true });
-    } else {
-      crates.push({ manifest: where, built: false, why: got.why, ...(got.nothingToBuild ? { nothingToBuild: true } : {}) });
+    const known = packageOf(manifest);
+    if (!known) {
+      crates.push({ manifest: where, built: false, why: "`cargo metadata` could not read its Cargo.toml" });
+      return;
+    }
+    /*
+     * The library first, as always. A file it does not hold may be a
+     * program's (batch 7): fd is nothing but a program, so before this it had
+     * no list at all, and bat's `main.rs` and ripgrep's `crates/core` none
+     * either. A program is built only when a file asked about sits under its
+     * root's directory and the library did not hold it, and in the order
+     * `cargo metadata` lists them: a file two programs both hold is read in
+     * the first, which compiled the same text.
+     */
+    let left = [...owned];
+    const targets: Target[] = [
+      ...(known.lib ? [{ kind: "lib" as const, src: known.lib }] : []),
+      ...known.bins.map((bin) => ({ kind: "bin" as const, name: bin.name, src: bin.src })),
+    ];
+    if (targets.length === 0) {
+      crates.push({ manifest: where, built: false, why: "no library or program target, so nothing to build", nothingToBuild: true });
+      return;
+    }
+    for (const target of targets) {
+      if (left.length === 0) break;
+      if (target.kind === "bin") {
+        const home = path.dirname(target.src);
+        if (!left.some((file) => !path.relative(home, path.resolve(root, file)).startsWith(".."))) continue;
+      }
+      const got = await crateFor(manifest, known, target, root, cache, options.until);
+      const label = target.kind === "bin" ? { target: `bin ${target.name}` } : {};
+      if ("crate" in got) {
+        const held = left.filter((file) => got.crate.files.has(file));
+        for (const file of held) { found.set(file, got.crate); dumps.set(file, got.dump); }
+        // A file no target holds is still the library's to answer for: it says "not compiled".
+        if (target.kind === "lib") for (const file of left) if (!found.has(file)) found.set(file, got.crate);
+        left = left.filter((file) => !got.crate.files.has(file));
+        crates.push({ manifest: where, ...label, built: true, dump: got.dump });
+      } else {
+        crates.push({ manifest: where, ...label, built: false, why: got.why });
+      }
     }
   }));
   crates.sort((a, b) => a.manifest.localeCompare(b.manifest));
   if (found.size === 0) return none(crates);
-  return { crateOf: (file) => found.get(file), answered: true, crates };
+  return { crateOf: (file) => found.get(file), dumpOf: (file) => dumps.get(file), answered: true, crates };
 }
 
 /**
@@ -158,7 +200,12 @@ interface Package {
   workspace: string;
   /** The library target's root file, absolute. Absent for a binary-only package. */
   lib?: string;
+  /** The program targets, by name and root file (absolute), in the order cargo lists them. */
+  bins: Array<{ name: string; src: string }>;
 }
+
+/** One target of a package: what `cargo rustc` is told to build. */
+type Target = { kind: "lib"; src: string } | { kind: "bin"; name: string; src: string };
 
 const packages = new Map<string, { stamp: string; package: Package | undefined }>();
 
@@ -176,11 +223,13 @@ function packageOf(manifest: string): Package | undefined {
     try {
       const metadata = JSON.parse(ran.stdout) as {
         workspace_root: string;
-        packages: Array<{ manifest_path: string; targets: Array<{ kind: string[]; src_path: string }> }>;
+        packages: Array<{ manifest_path: string; targets: Array<{ kind: string[]; name: string; src_path: string }> }>;
       };
       const own = metadata.packages.find((one) => path.resolve(one.manifest_path) === path.resolve(manifest));
       const lib = own?.targets.find((target) => target.kind.some((kind) => /lib|proc-macro/.test(kind)));
-      if (own) found = { workspace: metadata.workspace_root, ...(lib ? { lib: lib.src_path } : {}) };
+      const bins = (own?.targets ?? []).filter((target) => target.kind.includes("bin"))
+        .map((target) => ({ name: target.name, src: target.src_path }));
+      if (own) found = { workspace: metadata.workspace_root, ...(lib ? { lib: lib.src_path } : {}), bins };
     } catch {
       found = undefined;
     }
@@ -192,15 +241,12 @@ function packageOf(manifest: string): Package | undefined {
 /** Parsed dumps, by dump path and its modification time: a 3 MB dump is worth reading once. */
 const parsed = new Map<string, { stamp: string; crate: CompiledCrate }>();
 
-type Got = { crate: CompiledCrate } | { why: string; nothingToBuild?: boolean };
+type Got = { crate: CompiledCrate; dump: string } | { why: string };
 
-async function crateFor(manifest: string, root: string, cache: string, until: number): Promise<Got> {
-  const found = packageOf(manifest);
-  if (!found) return { why: "`cargo metadata` could not read its Cargo.toml" };
-  if (!found.lib) return { why: "no library target, so nothing to build", nothingToBuild: true };
-  const lib = found.lib;
-
-  const key = hash(manifest);
+async function crateFor(manifest: string, found: Package, target: Target, root: string, cache: string, until: number): Promise<Got> {
+  const lib = target.src;
+  // The library's directory is the one it always had; a program's is its own, beside it.
+  const key = target.kind === "lib" ? hash(manifest) : hash(`${manifest}\u0000bin:${target.name}`);
   const directory = path.join(cache, key);
   mkdirSync(directory, { recursive: true });
   const dump = path.join(directory, "calls.mir");
@@ -209,7 +255,8 @@ async function crateFor(manifest: string, root: string, cache: string, until: nu
   const failedFile = path.join(directory, "failed.json");
   const lock = path.join(directory, "building");
 
-  const inputs = inputsOf(path.dirname(manifest), found.workspace);
+  const flags = flagsFor(target);
+  const inputs = inputsOf(path.dirname(manifest), found.workspace, flags);
   const read = (): CompiledCrate | undefined => {
     if (readText(stampFile) !== inputs || !existsSync(dump) || !existsSync(depInfo)) return undefined;
     const stamp = statStamp(dump);
@@ -228,17 +275,17 @@ async function crateFor(manifest: string, root: string, cache: string, until: nu
 
   const failed = (): Got => ({ why: buildFailureReason(readText(path.join(directory, "build.log"))) });
   const ready = read();
-  if (ready) return { crate: ready };
+  if (ready) return { crate: ready, dump };
   if (readText(failedFile) === inputs) return failed();
-  if (!building(lock)) start(manifest, found.workspace, directory, inputs, lock);
+  if (!building(lock)) start(manifest, found.workspace, directory, inputs, lock, flags);
 
   while (Date.now() < until) {
     await new Promise((resolve) => setTimeout(resolve, 100));
     const crate = read();
-    if (crate) return { crate };
+    if (crate) return { crate, dump };
     if (!building(lock)) {
       const last = read();
-      return last ? { crate: last } : failed();
+      return last ? { crate: last, dump } : failed();
     }
   }
   return { why: "still building when the check's time ran out" };
@@ -254,9 +301,18 @@ async function crateFor(manifest: string, root: string, cache: string, until: nu
  * 16 s. A crate that really needs a newer compiler still fails to build, and
  * a failed build is no answer -- the safe direction.
  */
-const CARGO_FLAGS = ["--lib", "--offline", "--quiet", "--ignore-rust-version"];
+const CARGO_FLAGS = ["--offline", "--quiet", "--ignore-rust-version"];
 const RUSTC_FLAGS = ["-C", "opt-level=0"];
-const RECIPE = [...CARGO_FLAGS, "--", "--emit=mir,dep-info", ...RUSTC_FLAGS].join(" ");
+
+/** Which target to build: `--lib`, or `--bin <name>` for a program (batch 7). */
+function flagsFor(target: Target): string[] {
+  return [...(target.kind === "lib" ? ["--lib"] : ["--bin", target.name]), ...CARGO_FLAGS];
+}
+
+/** The build command as remembered: the library's is the same string it always was. */
+function recipeOf(flags: readonly string[]): string {
+  return [...flags, "--", "--emit=mir,dep-info", ...RUSTC_FLAGS].join(" ");
+}
 
 /**
  * Start the build, detached, so it outlives this check if it has to.
@@ -271,7 +327,7 @@ const RECIPE = [...CARGO_FLAGS, "--", "--emit=mir,dep-info", ...RUSTC_FLAGS].joi
  * `-C opt-level=0` because a profile that optimises may inline a call away,
  * and a call that is not in the list is exactly the mistake this cannot make.
  */
-function start(manifest: string, workspace: string, directory: string, inputs: string, lock: string): void {
+function start(manifest: string, workspace: string, directory: string, inputs: string, lock: string, flags: readonly string[]): void {
   const quote = (text: string) => `'${text.replace(/'/g, `'\\''`)}'`;
   const target = path.join(path.dirname(directory), `target-${hash(workspace)}`);
   const partialDump = path.join(directory, "calls.mir.partial");
@@ -280,7 +336,7 @@ function start(manifest: string, workspace: string, directory: string, inputs: s
   writeFileSync(next, inputs);
   const nonce = `${Date.now()}`;
   const cargo = [
-    "cargo", "rustc", ...CARGO_FLAGS,
+    "cargo", "rustc", ...flags.map((flag) => (flag.startsWith("-") ? flag : quote(flag))),
     "--manifest-path", quote(manifest),
     "--target-dir", quote(target),
     "--",
@@ -326,10 +382,10 @@ function building(lock: string): boolean {
 /**
  * The files a dump depends on, as one string: every `.rs` under the package,
  * its manifest, and the workspace's lockfile, each by size and mtime -- and
- * the build command, `RECIPE`, so a result the old command produced is not
+ * the build command (`recipeOf`), so a result the old command produced is not
  * read as this one's.
  */
-function inputsOf(packageDirectory: string, workspace: string): string {
+function inputsOf(packageDirectory: string, workspace: string, flags: readonly string[]): string {
   const rows: string[] = [];
   const walk = (directory: string) => {
     let entries: string[];
@@ -347,7 +403,7 @@ function inputsOf(packageDirectory: string, workspace: string): string {
   rows.sort();
   rows.push(`${path.join(packageDirectory, "Cargo.toml")}:${statStamp(path.join(packageDirectory, "Cargo.toml"))}`);
   rows.push(`${path.join(workspace, "Cargo.lock")}:${statStamp(path.join(workspace, "Cargo.lock"))}`);
-  rows.push(`recipe:${RECIPE}`);
+  rows.push(`recipe:${recipeOf(flags)}`);
   return hash(rows.join("\n"));
 }
 
