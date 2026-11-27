@@ -63,12 +63,12 @@ import { ledgerAdditions, type Ledger } from "./ledger";
 import { checkNeeds, type NeedsWithheld } from "./needs";
 import {
   callImports, type CallSide, type CallSitePlaced, type CallsNotClosed, type CallsRefutedEvidence, type CallsVerdict, type CallsWithheld, EXTERNAL_RECEIVER,
-  type ReceiverResolution, bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
+  classNamesRuledOut, mayBeAKindOf, typeTailRoutineCount, type ReceiverResolution, bindingsIn, callSitesIn, callsBetween, callsIntoType, compiledBodiesFor, isTypeName, placeName,
   routineDeclaredOn, spelledLikeARunner,
 } from "./calls";
 import type { CompiledCrate } from "./compiled-calls";
 import { newReachCache, reachBetween, type ReachCache, type ReachHop } from "./reach";
-import { constructions, routineNamesIn, type ConstructsNames, type ConstructsWithheld } from "./constructs";
+import { constructions, ownObjectRunsUnwritten, routineNamesIn, type ConstructsNames, type ConstructsWithheld } from "./constructs";
 import {
   type AccessesWithheld, type NotReadEvidence, declaresMember, memberAccesses, memberNamed, membersReadAt,
   membersReadByName, readsMember, routineReadAt, routinesReadByName,
@@ -6060,7 +6060,8 @@ export function checkDrift(
            * builds them: the second opinion, "go to definition" on the
            * tail, and the overridden methods.
            */
-          const tail = callSide(fromAnchor, over, importCache.configs, options?.closedBodyReferee, true, overrides);
+          // `@calls`' borrowed reading asks the stored index too, as `@calls`' own tail does: a class may be kept under another name.
+          const tail = callSide(fromAnchor, over, importCache.configs, options?.closedBodyReferee, true, overrides, forCalls ? stored : undefined);
           const head = callSide(toAnchor, over, importCache.configs, options?.closedBodyReferee);
           if (tail) names = { side: tail, target: toAnchor, ancestors, ...(head ? { head } : {}) };
         } else if (language === "python" || language === "ts" || language === "tsx") {
@@ -6284,6 +6285,7 @@ export function checkDrift(
               tail: CallSide, head: CallSide & { ownerOnly?: boolean }, over: Workspace, counting: boolean,
             ): CallsVerdict => {
               const owner = ownerOf(toNode, toPath);
+              const ruledBefore = classNamesRuledOut.count;
               let verdict: CallsVerdict = callsBetween(
                 { ...tail, routine: fromEnd.symbols[0]! },
                 { ...head, names: toEnd.symbols, ...(owner ? { owner } : {}) },
@@ -6383,7 +6385,9 @@ export function checkDrift(
                    */
                   const answerable = own.why === "receiver" || own.why === "abstract-receiver";
                   if (verdict.verdict !== "withheld" || answerable) verdict = { verdict: "absent", notClosed: own.why };
-                } else if (made?.verdict !== "refuted") {
+                } else if (made?.verdict !== "refuted"
+                  // A class at the tail with no routine of its own (its whole code was read: `own` closed) creates nothing.
+                  && !(own.verdict === "closed" && made?.verdict === "withheld" && made.why === "no-body" && typeTailRoutineCount(tail.source, tail.language, routine) === 0)) {
                   if (verdict.verdict !== "withheld") verdict = { verdict: "absent", notClosed: "may-create" };
                 } else if (verdict.verdict === "refuted") {
                   /*
@@ -6406,13 +6410,38 @@ export function checkDrift(
                   const named = compiled?.bodies.some((body) => toEnd.symbols.some((name) => (compiled.exact && own.exact
                     ? body.callWords.has(name) : body.words.has(name))
                     || body.calls.some((call) => call.kind === "named" && call.through === name)));
+                  // A red that read calls by their names keeps the places, so the compilers are asked before it shows.
+                  const untypedAt = [...(verdict.evidence.untypedAt ?? []), ...(verdict.evidence.ruledOutAt ?? []), ...(own.untypedAt ?? [])];
                   verdict = named
                     ? { verdict: "absent", notClosed: "called-implicitly" }
-                    : { verdict: "refuted", evidence: { routine, line: own.line, sites: own.sites } };
+                    : { verdict: "refuted", evidence: { routine, line: own.line, sites: own.sites, ...(untypedAt.length > 0 ? { untypedAt } : {}) } };
+                }
+                /*
+                 * About to accuse, and the tail is a method that uses its own
+                 * object in a way that runs one of the class's methods with no
+                 * call written: `with self:` enters it. Then the class is what
+                 * runs. rich's `Console.control -> Console` was red so.
+                 */
+                if ((verdict.verdict === "refuted" || verdict.verdict === "backwards" || verdict.verdict === "wrong-routine")
+                  && ownObjectRunsUnwritten(tail.source, routine, tail.language, toEnd.symbols, head, tail, (holder) => mayBeAKindOf(tail, holder, head, toEnd.symbols))) {
+                  verdict = { verdict: "absent", notClosed: "called-implicitly" };
                 }
                 // "Creates none" in Rust waits on the compiler, which a live check starts only when asked.
                 if (claimed && own.verdict === "closed" && made?.verdict === "absent" && made.awaitsCompiler) {
                   if (counting) claims.callsCompilable += 1;
+                }
+                /*
+                 * A reading the name test helped close, on a pass with no
+                 * compiler, still has questions for one -- where the calls it
+                 * read by their names go, and (Rust) what the body makes --
+                 * whatever reason it now shows. Without this the arrow stops at
+                 * "may still create one" and no compiler is ever started
+                 * (`wouldHelp` reads the reason shown, not the reasons passed).
+                 */
+                if (claimed && counting && verdict.verdict !== "confirmed") {
+                  const rested = classNamesRuledOut.count > ruledBefore || (own.verdict === "closed" && (own.untypedAt?.length ?? 0) > 0);
+                  if (rested && !options?.closedBodyReferee) claims.callsTypeAskable += 1;
+                  if (tail.language === "rust" && !tail.compiled?.() && verdict.verdict === "absent" && own.verdict !== "open") claims.callsCompilable += 1;
                 }
               }
 
@@ -6565,6 +6594,11 @@ export function checkDrift(
                   const landed = routineDeclaredOn(head.source, head.language, placed.line);
                   if (landed && toEnd.symbols.includes(landed.name)) {
                     return { does: true, said: `the compiler places a call on an untyped value at ${landed.name}, ${toPath} line ${placed.line}` };
+                  }
+                  // A class at the head is reached by a call placed on a routine it holds.
+                  const holderName = landed?.holder ? (landed.holder.childForFieldName("name") ?? landed.holder.childForFieldName("type"))?.text : undefined;
+                  if (landed && holderName !== undefined && toEnd.symbols.some((name) => holderName === name || new RegExp(`(^|[^\\w$])${name}([^\\w$]|$)`).test(holderName))) {
+                    return { does: true, said: `the compiler places a call on an untyped value at ${holderName}.${landed.name}, ${toPath} line ${placed.line}` };
                   }
                 }
                 return { does: undefined, said: "the compiler places none of the calls on untyped values at the far end" };

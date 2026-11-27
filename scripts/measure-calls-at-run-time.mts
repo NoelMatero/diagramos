@@ -8,6 +8,7 @@
  *   ... --names=qualified    draw a method as `file#Class.method` (default: `file#method`, as the research did)
  *   ... --out=<file.jsonl>   every arrow and its verdict, one line each, to compare two runs
  *   ... --fresh              record again even when a recording of this clone is kept
+ *   ... --ends=class-head    draw each call as "the caller calls the callee's class" (class-tail, class-both: see `classEnds`)
  *
  * Each set's projects are read where `bench:planted --set=<set>` reads them, so a
  * worktree needs that set's folder (`bench-holdout-b/` is not on main: copy it in).
@@ -60,6 +61,13 @@ const args = process.argv.slice(2);
 const flag = (name: string) => args.find((one) => one.startsWith(`--${name}=`))?.slice(name.length + 3);
 const only = flag("one");
 const qualified = flag("names") === "qualified";
+/**
+ * Class ends (class-calls research 2026-11): `--ends=class-head` draws each call of a method as "the caller calls the
+ * method's class" (the class the function is written in); `--ends=class-tail` draws each call made by a method as
+ * "the method's class calls it"; `--ends=class-both` both ends at their classes. Every one is true by the meaning
+ * of a class end (#374, #346).
+ */
+const classEnds = flag("ends") ?? "";
 
 /** The projects whose tests run here, with where their source and tests are. httpx and black recorded nothing in 2026-11. */
 const PROJECTS: Array<{ project: string; set: string; src: string; tests: string }> = [
@@ -242,8 +250,22 @@ function pairsOf(edges: Edge[], root: string): Pair[] {
     if (NOT_SOURCE.test(edge.file) || NOT_SOURCE.test(edge.calleeFile)) continue;
     const caller = edge.caller.split(".<locals>")[0]!;
     if (caller.includes("<") || edge.callee.includes("<")) continue;
-    const from = `${edge.file}#${drawn(caller)}`;
-    const to = `${edge.calleeFile}#${drawn(edge.callee)}`;
+    const classOf = (qualname: string): string | undefined => {
+      const parts = qualname.split(".<locals>")[0]!.split(".");
+      return parts.length >= 2 ? parts[parts.length - 2] : undefined;
+    };
+    let from = `${edge.file}#${drawn(caller)}`;
+    let to = `${edge.calleeFile}#${drawn(edge.callee)}`;
+    if (classEnds === "class-head" || classEnds === "class-both") {
+      const owner = classOf(edge.callee);
+      if (!owner) continue;
+      to = `${edge.calleeFile}#${owner}`;
+    }
+    if (classEnds === "class-tail" || classEnds === "class-both") {
+      const owner = classOf(caller);
+      if (!owner) continue;
+      from = `${edge.file}#${owner}`;
+    }
     if (from === to) continue;
     const source = linesOf(edge.file);
     const at = edge.line ?? 0;

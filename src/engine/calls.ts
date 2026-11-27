@@ -3482,6 +3482,11 @@ function runsItsOwnName(
   for (const name of to.names) {
     const head = plain(name);
     if (runsAs.includes(head) || head === "constructor" || /^__\w+__$/.test(head)) return false;
+    // A type at the head runs under the names it declares (class-calls research 2026-11, rule 1).
+    if (isTypeName(to.source, name, to.language)) {
+      if (!typeCannotRun(site, from, to, name, runsAs)) return false;
+      continue;
+    }
     if (!isRoutine(to.source, name, to.language)) return false;
     if (rustNamesWhatRuns(site, from, to, called)) continue;
     if (from.runsUnderAnotherName(head, onlyAMethod(to.source, to.language, name), to.language)) return false;
@@ -3513,6 +3518,467 @@ function rustNamesWhatRuns(site: CallSitePlaced, from: CallSide, to: CallSide & 
   const stored = storedFor(from, to);
   return stored !== undefined && !stored.some((one) => one.how === "renamed" || one.how === "unread");
 }
+
+/* ------------------------------------------------------------------ a type at the head (class-calls research 2026-11) */
+
+/**
+ * Whether a type may declare a name: `declares` when it, or a base this
+ * repository writes, does; `unknown` when part of it could not be read.
+ * `routines`: the names of the routines its own code writes.
+ */
+type MayDeclare = { declares: boolean; routines: string[] } | { unknown: string };
+type TypeSide = { file: string; source: string; language: Language; imports: CallSide["imports"]; open?: CallSide["open"] };
+
+/** Methods each std derive writes. */
+const STD_DERIVE_METHODS: Record<string, string[]> = {
+  Clone: ["clone", "clone_from"], PartialEq: ["eq", "ne"], Eq: [], PartialOrd: ["partial_cmp", "lt", "le", "gt", "ge"],
+  Ord: ["cmp", "max", "min", "clamp"], Hash: ["hash", "hash_slice"], Default: ["default"], Debug: ["fmt"], Copy: [],
+};
+
+/** The declarations of a type named `type` in a tree: a class, an interface, a struct, an enum, a trait -- and each Rust `impl` of it. */
+function typeDeclNodes(tree: Tree, type: string): { declarations: Node[]; impls: Node[] } {
+  const declarations: Node[] = [];
+  const impls: Node[] = [];
+  each(tree.rootNode, (node) => {
+    if (node.type === "impl_item") { if (implTypeName(node) === type) impls.push(node); return; }
+    if (declarationName(node)?.text !== type || parametersOf(node) || node.childForFieldName("value") || node.childForFieldName("right")) return;
+    if (/expression$|^generic_type$|^type_identifier$/.test(node.type)) return;
+    if (/^(struct_item|enum_item|union_item|trait_item)$/.test(node.type) || node.childForFieldName("body")) {
+      // Not a member of another type that happens to share the name (an enum's variant, a field).
+      if (node.type === "enum_variant" || node.type === "field_declaration") return;
+      declarations.push(node);
+    }
+  });
+  return { declarations, impls };
+}
+
+/** The names of the routines written inside these nodes (not a property: reading one is not handing it on). */
+function typeRoutineNames(nodes: Node[]): string[] {
+  const names = new Set<string>();
+  for (const node of nodes) {
+    each(node, (inner) => {
+      if (inner.id === node.id) return;
+      const value = inner.childForFieldName("value") ?? inner.childForFieldName("right");
+      if (!(parametersOf(inner) ?? (value ? parametersOf(value) : null))) return;
+      const named = declarationName(inner) ?? inner.childForFieldName("name") ?? inner.childForFieldName("left");
+      if (!named || named.childCount !== 0) return;
+      // A property is read, not handed on: `x.transport` is a call of the getter, never a store of it.
+      const holder = parentOf(inner);
+      const decorators = [
+        ...namedKids(inner).filter((one) => one.type === "decorator"),
+        ...(holder?.type === "decorated_definition" ? namedKids(holder).filter((one) => one.type === "decorator") : []),
+      ];
+      if (decorators.some((one) => /^@\s*((functools\.)?cached_property|property|\w+\.(setter|getter|deleter))\b/.test(one.text.trim()))) return;
+      let accessor = false;
+      for (let index = 0; index < inner.childCount; index += 1) {
+        const child = inner.child(index);
+        if (child && !child.isNamed && (child.type === "get" || child.type === "set")) accessor = true;
+      }
+      if (accessor) return;
+      names.add(named.text);
+    });
+  }
+  return [...names];
+}
+
+/**
+ * The names a type declares, read where a declaration writes one: a member of the class body
+ * (a method, a field, a property, a signature, a Python class-level name), `self.x = ..` / `this.x = ..` anywhere
+ * inside it, a constructor's parameters (TypeScript writes fields there), in Rust every function, constant and
+ * type of an `impl` or a trait. `undefined` when a member is written under a name that is not in the text:
+ * `setattr(self, name, ..)`, `self.__dict__`, `this[key] = ..`, `Object.defineProperty(this, ..)`, a computed key.
+ */
+function declaredMemberNames(nodes: Node[], language: Language): Set<string> | undefined {
+  const names = new Set<string>();
+  let dynamic = false;
+  // `this`, `self`, `cls`, and the same behind a cast or brackets: `(this as any)`, `(<any>this)`.
+  const own = /^\(*\s*(?:<[^>]+>\s*)?(?:self|this|cls)(?:\s+as\s+[^)]+)?\s*\)*$/;
+  const walk = (node: Node, inRoutine: boolean, top: boolean): void => {
+    if (dynamic) return;
+    const routine = !top && (parametersOf(node) !== null || parametersOf(node.childForFieldName("value") ?? node.childForFieldName("right")) !== null);
+    if (!inRoutine) {
+      const named = declarationName(node) ?? node.childForFieldName("name") ?? (ASSIGNS.has(node.type) || node.type === "assignment" ? node.childForFieldName("left") : null);
+      if (!top && named) {
+        if (named.childCount === 0) names.add(named.text.replace(/^(#|r#)/, ""));
+        else if (named.type === "computed_property_name") { dynamic = true; return; }
+        else if (/string/.test(named.type)) names.add(named.text.replace(/^['"`]|['"`]$/g, ""));
+      }
+      // A constructor's parameters: `constructor(private store: Store)` declares `store`.
+      if (routine && (named?.text === "constructor")) {
+        const list = node.childForFieldName("parameters");
+        if (list) each(list, (leaf) => { if (leaf.childCount === 0 && /identifier$/.test(leaf.type)) names.add(leaf.text); });
+      }
+    }
+    // `self.x = ..`, `this.x = ..`, `self.x: T = ..` anywhere inside.
+    if (ASSIGNS.has(node.type) || node.type === "assignment") {
+      const left = node.childForFieldName("left");
+      const object = left?.childForFieldName("object");
+      const member = left?.childForFieldName("attribute") ?? left?.childForFieldName("property");
+      if (left && object && own.test(object.text)) {
+        if (member && member.childCount === 0) names.add(member.text.replace(/^#/, ""));
+        else dynamic = true;
+      }
+      // `self.a, self.b = ..`
+      if (left && !object) each(left, (inner) => {
+        const o = inner.childForFieldName("object");
+        const m = inner.childForFieldName("attribute") ?? inner.childForFieldName("property");
+        if (o && m && own.test(o.text) && m.childCount === 0) names.add(m.text.replace(/^#/, ""));
+        if (inner.type === "subscript" || inner.type === "subscript_expression") {
+          const held = inner.childForFieldName("value") ?? inner.childForFieldName("object");
+          if (held && own.test(held.text)) dynamic = true;
+        }
+      });
+      if (left && (left.type === "subscript" || left.type === "subscript_expression")) {
+        const held = left.childForFieldName("value") ?? left.childForFieldName("object");
+        if (held && (own.test(held.text) || /^(self|cls)\.__dict__$/.test(held.text))) dynamic = true;
+      }
+    }
+    const callee = node.childForFieldName("arguments") ? node.childForFieldName("function") : null;
+    if (callee) {
+      const first = namedKids(node.childForFieldName("arguments")!)[0];
+      if (/^(setattr|Object\.defineProperty|Object\.defineProperties|Object\.assign|Reflect\.defineProperty|Reflect\.set)$/.test(callee.text.replace(/\s+/g, ""))
+        && first && (own.test(first.text) || /^(this|self|cls)\./.test(first.text) || /prototype/.test(first.text))) dynamic = true;
+      if (/^(self|cls)\.__dict__\.(update|setdefault|__setitem__)$/.test(callee.text.replace(/\s+/g, "")) || /^(vars|globals|locals)$/.test(callee.text)) dynamic = true;
+    }
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index);
+      if (child) walk(child, inRoutine || routine, false);
+    }
+  };
+  for (const node of nodes) {
+    if (language === "rust") {
+      // The items an `impl` or a trait writes: functions, constants, types. A macro written where an item goes may write more.
+      const body = node.childForFieldName("body");
+      for (const item of body ? namedKids(body) : []) {
+        if (item.type === "macro_invocation") { dynamic = true; continue; }
+        const named = item.childForFieldName("name");
+        if (named && /^(function_item|function_signature_item|const_item|associated_type|type_item)$/.test(item.type)) names.add(named.text.replace(/^r#/, ""));
+      }
+      continue;
+    }
+    walk(node, false, true);
+  }
+  return dynamic ? undefined : names;
+}
+
+/** What an interface extends, as names. */
+function interfaceBases(declaration: Node): BaseRead[] {
+  const out: BaseRead[] = [];
+  for (const clause of namedKids(declaration)) {
+    if (clause.type !== "extends_type_clause") continue;
+    for (const one of namedKids(clause)) {
+      const held = one.childForFieldName("name") ?? one;
+      if (held.childCount === 0) out.push({ kind: "local", name: held.text });
+      else if (one.type === "nested_type_identifier" || held.type === "nested_type_identifier") out.push({ kind: "name", name: held.text });
+      else if (one.type === "type_arguments") continue;
+      else out.push({ kind: "other" });
+    }
+  }
+  return out;
+}
+
+/** A crate's files: rustc's list of its modules, or every `.rs` file of its package. */
+type CrateFiles = ReadonlySet<string> | readonly string[];
+
+function hasFile(files: CrateFiles, file: string): boolean {
+  return "has" in files ? files.has(file) : files.includes(file);
+}
+
+/**
+ * Whether a type declares anything called `called`, itself or through a base
+ * this repository declares (owner decision 1, 2026-11-27: a method a class
+ * only inherits from a library is the library's). Exact member names
+ * (`declaredMemberNames`), not every word the type's code writes: a class
+ * whose own method calls `x.walk()` declares no `walk`. `unknown` when part of
+ * the type could not be read: a base nothing places, a base built by a call,
+ * a Rust crate with no file list, a macro or a derive that may write members,
+ * a member written under a computed name.
+ */
+function typeMayDeclare(
+  to: TypeSide, type: string, called: string[],
+  crateFiles: (() => CrateFiles | undefined) | undefined,
+  depth = 0, seen = new Set<string>(),
+): MayDeclare {
+  const key = `${to.file}\u0000${type}`;
+  if (seen.has(key)) return { declares: false, routines: [] };
+  seen.add(key);
+  if (depth > 6) return { unknown: "deep" };
+  const tree = parseSource(to.source, to.language);
+  if (!tree) return { unknown: "unparsed" };
+  const { declarations, impls } = typeDeclNodes(tree, type);
+  if (declarations.length === 0) return { unknown: "not-declared" };
+  const bindings = bindingsIn(to.source, to.language);
+  if (!bindings) return { unknown: "unparsed" };
+  const code = codeOnly(to.source, to.language);
+  const textOf = (node: Node) => code.slice(node.startIndex, node.endIndex);
+  const own = [...declarations, ...impls];
+  if (own.some((node) => incomplete(node))) return { unknown: "incomplete" };
+  const routines = typeRoutineNames(own);
+  const members = declaredMemberNames(own, to.language);
+  if (!members) return { unknown: "computed-member" };
+  if (called.some((one) => members.has(one.replace(/^(#|r#)/, "")))) return { declares: true, routines };
+  // A hook that answers for any name.
+  // Or a value of the class that is itself called, or handed out by a descriptor: `holder.validate(x)` with `validate = Validator()`.
+  if (to.language === "python" && own.some((node) => /\b__(getattr(ibute)?|call|get)__\b/.test(textOf(node)))) return { declares: true, routines };
+  if (JAVASCRIPT.has(to.language) && own.some((node) => /\bnew\s+Proxy\b|\[\s*\w+\s*:\s*string\s*\]\s*:/.test(textOf(node)))) return { declares: true, routines };
+
+  if (to.language === "rust") {
+    for (const item of declarations) {
+      // Attributes before the item: std derives write known methods; anything else may write any.
+      const siblings = namedKids(parentOf(item) ?? item);
+      for (let at = siblings.findIndex((one) => one.id === item.id) - 1; at >= 0; at -= 1) {
+        const before = siblings[at]!;
+        if (before.type !== "attribute_item") { if (/comment/.test(before.type)) continue; break; }
+        const inner = namedKids(before)[0];
+        const attribute = inner ? firstNamed(inner) : undefined;
+        if (!inner || !attribute) return { unknown: "attribute" };
+        if (attribute.text === "derive") {
+          const list = namedKids(inner).find((one) => one.type === "token_tree");
+          for (const one of list ? namedKids(list).map((each_) => each_.text.split("::").pop()!) : []) {
+            const methods = STD_DERIVE_METHODS[one];
+            if (!methods) return { unknown: `derive ${one}` };
+            if (methods.some((method) => called.includes(method))) return { declares: true, routines };
+          }
+          continue;
+        }
+        if (!INERT_RUST_ATTRIBUTES.test(attribute.text)) return { unknown: `attribute ${attribute.text}` };
+      }
+    }
+    if (itemMacroNames(tree.rootNode, type)) return { unknown: "macro-impl" };
+    if (declarations.some((one) => one.type === "trait_item")) return { declares: false, routines };
+    const files = crateFiles?.();
+    if (!files || !hasFile(files, to.file) || !to.open) return { unknown: "no-crate-list" };
+    const index = crateImplsOf(files, to);
+    if (index.unread) return { unknown: "crate-file-unread" };
+    if (index.macroImpl.has(type)) return { unknown: "macro-impl" };
+    const typeWord = wholeName(type);
+    if (index.itemMacros.some((text) => typeWord.test(text))) return { unknown: "macro-impl" };
+    routines.push(...(index.routines.get(type) ?? []));
+    if (called.some((one) => index.members.get(type)?.has(one.replace(/^r#/, "")) ?? false)) return { declares: true, routines };
+    return { declares: false, routines };
+  }
+
+  // A member set on the class from outside it, in this file: `C.prototype.walk = ..`, `setattr(C, ..)`.
+  if (setFromOutside(tree.rootNode, declarations, type, to.language)) return { unknown: "set-from-outside" };
+  // The bases, wherever this repository declares them.
+  for (const declaration of declarations) {
+    const bases = declaration.type === "interface_declaration" ? interfaceBases(declaration) : basesOf(declaration, to.language);
+    for (const base of bases) {
+      if (base.kind === "plain") continue;
+      if (base.kind === "other") {
+        // Python's `metaclass=M` is not a base: its methods are the class object's, not a value's.
+        const list = declaration.childForFieldName("superclasses");
+        const computed = list ? namedKids(list).some((one) => !(one.childForFieldName("name") && one.childForFieldName("value"))
+          && !/comment/.test(one.type) && one.childCount !== 0 && !one.childForFieldName("attribute") && one.type !== "subscript") : true;
+        if (computed) return { unknown: "computed-base" };
+        continue;
+      }
+      const root = base.name.split(".")[0]!;
+      const last = base.name.split(".").pop()!;
+      if (base.kind === "local" && typeDeclNodes(tree, base.name).declarations.length > 0) {
+        const up = typeMayDeclare(to, base.name, called, crateFiles, depth + 1, seen);
+        if ("unknown" in up) return up;
+        if (up.declares) return { declares: true, routines };
+        continue;
+      }
+      const imported = bindings.imported.get(root);
+      if (!imported) {
+        if (base.kind === "local" && !bindings.local.has(root) && providedByLanguage(root, to.language)) continue;
+        if (harmlessBase(base.name, to.language, bindings)) continue;
+        return { unknown: `base ${base.name}` };
+      }
+      if (harmlessBase(base.name, to.language, bindings)) continue;
+      const where = filesFor(imported.specifier, to.imports);
+      if (where.library) continue;
+      if (!where.known || where.files.size === 0 || !to.open) return { unknown: `base ${base.name} unplaced` };
+      let found = false;
+      for (const file of where.files) {
+        const opened = to.open(file);
+        if (!opened) return { unknown: `base ${base.name} unread` };
+        const there: TypeSide = { file, source: opened.source, language: opened.language, imports: opened.imports, open: to.open };
+        const far = base.kind === "name" ? last : imported.name ?? last;
+        const up = typeMayDeclare(there, far, called, crateFiles, depth + 1, seen);
+        if ("unknown" in up) { if (up.unknown === "not-declared") continue; return up; }
+        found = true;
+        if (up.declares) return { declares: true, routines };
+      }
+      if (!found) return { unknown: `base ${base.name} not found` };
+    }
+  }
+  return { declares: false, routines };
+}
+
+const mayDeclare_ = new WeakMap<object, Map<string, MayDeclare>>();
+
+/** How many routines a class or struct at the tail writes in this file, or `undefined` when it is not read as one. */
+export function typeTailRoutineCount(source: string, language: Language, name: string): number | undefined {
+  return typeTailOf(source, language, name)?.routines.length;
+}
+
+/**
+ * Where the product keeps the class itself as a value, so
+ * that a call of another name could be making one: assigned, put in a
+ * literal, handed to a call, returned. Not a mention that only names it: a
+ * base in a class header, `isinstance(x, C)`, `x instanceof C`, `except C`,
+ * `C.member`, `C::path`, a subscript's index. `undefined` when nowhere.
+ */
+function classKept(from: CallSide, to: CallSide, type: string): string | undefined {
+  const findings = from.storedFindings?.(type, false, to.language);
+  if (!findings) return "no-index";
+  const judged = new Map<string, boolean>();
+  for (const one of findings) {
+    if (one.how !== "value" && one.how !== "by-name") return `${one.how}@${one.file}:${one.line}`;
+    const key = `${one.file}:${one.line}`;
+    let harmless = judged.get(key);
+    if (harmless === undefined) {
+      const side = one.file === from.file ? from : one.file === to.file ? to : from.open?.(one.file);
+      harmless = side ? onlyNamesTheClass(side.source, side.language, type, one.line) : false;
+      judged.set(key, harmless);
+    }
+    if (!harmless) return `${one.how}@${key}`;
+  }
+  return undefined;
+}
+
+/** Whether every mention of `type` on this 1-based line only names the class and does not hand the class itself on. */
+const namesOnly_ = new WeakMap<Tree, Map<string, Map<number, boolean>>>();
+
+function onlyNamesTheClass(source: string, language: Language, type: string, line: number): boolean {
+  const tree = parseSource(source, language);
+  if (!tree) return false;
+  const known = namesOnly_.get(tree) ?? new Map<string, Map<number, boolean>>();
+  namesOnly_.set(tree, known);
+  let lines = known.get(type);
+  if (!lines) {
+    lines = linesOnlyNaming(tree, source, language, type);
+    known.set(type, lines);
+  }
+  return lines.get(line) ?? false;
+}
+
+/**
+ * Per 1-based line of this tree that mentions `type`, whether every mention
+ * there only names the class (`onlyNamesTheClass`). One walk per tree and
+ * type, into the parts of the tree that hold a mention: asked once per
+ * stored finding of every arrow, a walk per question was most of a Rust
+ * referee's time.
+ */
+function linesOnlyNaming(tree: Tree, source: string, language: Language, type: string): Map<number, boolean> {
+  const lines = new Map<number, boolean>();
+  const at: number[] = [];
+  for (const match of source.matchAll(new RegExp(`(?<![\\w$])${escapeName(type)}(?![\\w$])`, "g"))) at.push(match.index!);
+  if (at.length === 0) return lines;
+  const holds = (node: Node): boolean => {
+    let low = 0;
+    let high = at.length;
+    while (low < high) { const mid = (low + high) >> 1; if (at[mid]! < node.startIndex) low = mid + 1; else high = mid; }
+    return low < at.length && at[low]! < node.endIndex;
+  };
+  const breaks: number[] = [];
+  for (let index = source.indexOf("\n"); index !== -1; index = source.indexOf("\n", index + 1)) breaks.push(index);
+  // 1-based: one more than the newlines before it.
+  const lineAt = (index: number): number => {
+    let low = 0;
+    let high = breaks.length;
+    while (low < high) { const mid = (low + high) >> 1; if (breaks[mid]! < index) low = mid + 1; else high = mid; }
+    return low + 1;
+  };
+  const stack: Node[] = [];
+  const fieldIs = (parent: Node, field: string, node: Node) => parent.childForFieldName(field)?.id === node.id;
+  const judge = (leaf: Node): boolean => {
+    const parent = stack[stack.length - 1];
+    if (!parent) return false;
+    // `C.member`, `C::path`: reading something of the class.
+    if (fieldIs(parent, "object", leaf) || fieldIs(parent, "path", leaf)) return true;
+    if (language === "rust" && (parent.type === "scoped_identifier" || parent.type === "scoped_type_identifier")) return true;
+    for (let at = stack.length - 1; at >= 0; at -= 1) {
+      const up = stack[at]!;
+      const below = at + 1 < stack.length ? stack[at + 1]! : leaf;
+      // A base in a class header.
+      if (/^(class_heritage|extends_clause|implements_clause|extends_type_clause)$/.test(up.type)) return true;
+      if (up.childForFieldName("superclasses")?.id === below.id) return true;
+      // A subscript's index: `Iterable[C]`, `table[C]`.
+      if (up.type === "subscript" && !fieldIs(up, "value", below)) return true;
+      // `isinstance(x, C)`, `issubclass(x, C)`.
+      if (up.childForFieldName("arguments")?.id === below.id && /^(isinstance|issubclass)$/.test(up.childForFieldName("function")?.text ?? "")) return true;
+      // `x instanceof C`.
+      if (up.type === "binary_expression" && up.childForFieldName("operator")?.type === "instanceof") return true;
+      if (up.type === "except_clause" || up.type === "raise_statement") {
+        // `except C:` names it; `raise C` makes one, which is not keeping it.
+        if (!parametersOf(below) && below.type !== "block") return true;
+      }
+      if (/^(type_annotation|type_arguments|type_query|generic_type|type_alias_declaration)$/.test(up.type)) return true;
+      // A Python annotation, written as a name or as a string: `x: "C"`, `-> C`.
+      if (up.childForFieldName("type")?.id === below.id || up.childForFieldName("return_type")?.id === below.id) return true;
+      // Stop at a statement: nothing above it changes what this mention is.
+      if (/statement$|declaration$|definition$|_item$/.test(up.type) && up.type !== "expression_statement") break;
+    }
+    return false;
+  };
+  const visit = (node: Node): void => {
+    if (!holds(node)) return;
+    if (node.childCount === 0) {
+      if (node.text === type && /identifier$|string_content|string_fragment/.test(node.type)) {
+        const line = lineAt(node.startIndex);
+        lines.set(line, (lines.get(line) ?? true) && judge(node));
+      }
+      return;
+    }
+    stack.push(node);
+    for (let index = 0; index < node.childCount; index += 1) { const child = node.child(index); if (child) visit(child); }
+    stack.pop();
+  };
+  visit(tree.rootNode);
+  return lines;
+}
+
+/**
+ * Whether a call that runs a routine of the name it calls
+ * (`runsAs`) cannot be anything the type `type` declares, and cannot create
+ * one: the type declares nothing of that name, itself or through a base of
+ * this repository; the type is not kept under another name; none of its
+ * routines is.
+ */
+function typeCannotRun(
+  site: CallSitePlaced, from: CallSide, to: CallSide & { names: string[] }, type: string, runsAs: string[],
+): boolean {
+  const crate = (): CrateFiles | undefined => from.compiled?.()?.files ?? from.packageFiles?.();
+  // Kept per reading (one tail, one pass): what a type declares depends on other files of its repository too.
+  const known = mayDeclare_.get(from) ?? new Map<string, MayDeclare>();
+  mayDeclare_.set(from, known);
+  const cacheKey = `${to.file}\u0000${type}\u0000${runsAs.join("\u0000")}`;
+  const may = known.get(cacheKey) ?? typeMayDeclare(to, type, runsAs, crate);
+  known.set(cacheKey, may);
+  if ("unknown" in may || may.declares) return false;
+  // Rust: `x.walk()` runs a method declared `walk`; a struct declares none, so it is not one of the type's.
+  if (from.language === "rust" && to.language === "rust" && site.passes?.written === "dot") {
+    classNamesRuledOut.count += 1;
+    return true;
+  }
+  if (from.language === "rust" && to.language === "rust" && site.passes?.written !== "path") return false;
+  const tree = parseSource(to.source, to.language);
+  const isShape = tree ? typeDeclNodes(tree, type).declarations.every((one) => /^(interface_declaration|trait_item)$/.test(one.type)) : false;
+  if (!isShape) {
+    // The class itself kept under another name: `{ make: Widget }`, `response_class = Response`.
+    if (classKept(from, to, type)) return false;
+    // One of its methods kept under another name: `timer.on_fire = self.run`.
+    if (from.language !== "rust") {
+      for (const routine of may.routines) {
+        if (routine === "constructor" || DUNDER.test(routine)) continue;
+        if (from.runsUnderAnotherName!(routine, true, to.language)) return false;
+      }
+    }
+  }
+  classNamesRuledOut.count += 1;
+  return true;
+}
+
+/**
+ * How many calls `typeCannotRun` has ruled out, ever. `drift.ts` compares it
+ * before and after one reading to tell a reading that rested on the name test:
+ * such a reading still has questions for a compiler, whatever reason it shows.
+ */
+export const classNamesRuledOut = { count: 0 };
 
 /** Whether every routine of this name in the file is a method of a class, an `impl` or a trait. */
 function onlyAMethod(source: string, language: Language, name: string): boolean {
@@ -4646,6 +5112,16 @@ function textClosed(
           continue;
         }
         /*
+         * The head is a class, and a compiler landed this call on a routine another class of the
+         * file holds -- one the head neither is nor derives from. It is that class's, whatever name the two share.
+         */
+        if (site.declaredIn !== undefined && to.names.every((name) => isTypeName(to.source, name, to.language))
+          && to.names.every((name) => name !== site.declaredIn && lineageWhole(to, name) && !lineageOf(to, name).has(site.declaredIn!))) {
+          elsewhere.push({ name: site.declaredAs, line: site.line });
+          sites += 1;
+          continue;
+        }
+        /*
          * It made one of a class there, which runs its constructor and not
          * the head; or it called a value kept there with arguments the head
          * does not take (`ruledOut`).
@@ -4748,6 +5224,8 @@ export type TypeCallsReading =
   | { verdict: "confirmed"; evidence: CallsEvidence }
   | {
     verdict: "closed"; sites: number; line: number;
+    /** Where a call was ruled out by the name it calls alone: a compiler is asked about each before a red shows. */
+    untypedAt?: Array<{ start: number; end: number }>;
     /** Closed on rustc's own list of the tail's calls, which no text doubt reopens (batch 7, rule 7). */
     exact?: true;
   }
@@ -4764,14 +5242,20 @@ export function callsIntoType(
   let bodies = reading.bodies.filter((body) => body.routine === from.routine);
   /*
    * A class at the tail too: read through the routines written inside it, or
-   * inside a Rust `impl` of it in this file -- #346's reading. Confirm-only:
-   * an accusation would need every one of its routines closed, and an
-   * inherited one is written somewhere else.
+   * inside a Rust `impl` of it in this file -- #346's reading. It closes only
+   * when the class's own code is the whole of what it runs (#459's
+   * `typeTailOf`: every routine, the type-level code, no base written
+   * elsewhere, in Rust every `impl` across the crate); a Rust trait is read
+   * through its default methods. Otherwise it confirms and never accuses.
    */
   const typeTail = bodies.length === 0;
   if (typeTail) {
     const spans = typeSpans(from.source, from.language, from.routine);
     bodies = reading.bodies.filter((body) => spans.some(([first, last]) => first <= body.line && body.line <= last));
+    if (typeTailOf(from.source, from.language, from.routine)) {
+      const own = ownBodies(from);
+      if (own.read) bodies = own.bodies;
+    }
   }
   if (bodies.length === 0) return { verdict: "open", why: "routine-not-found" };
   const names = new Set(to.names);
@@ -4788,21 +5272,59 @@ export function callsIntoType(
   const stopped = (one: CallsNotClosed): void => { if (!why || (!answerable(why) && answerable(one))) why = one; };
   let sites = 0;
   let hooked: boolean | undefined;
+  const untypedAt: Array<{ start: number; end: number }> = [];
+  /*
+   * A call by a name the class does not declare is not a call of anything the
+   * class declares (rule 1): `x.startswith(d)` cannot be a method of a class
+   * that, with every base this repository writes, declares no `startswith`.
+   * The place is kept, for a compiler to be asked before a red shows.
+   */
+  const named = (site: CallSitePlaced): boolean => {
+    if (!runsItsOwnName(site, from, to)) return false;
+    if (site.nameAt) untypedAt.push(site.nameAt);
+    return true;
+  };
   for (const body of bodies) {
     for (const site of body.sites) {
       sites += 1;
-      if (site.file === undefined) { stopped(site.why ?? "unplaced"); continue; }
+      if (site.file === undefined) {
+        /*
+         * Only a method call on a value nobody could type. A function value
+         * (`handler(x)`) may hold one of the class's *methods*, which the name
+         * says nothing about: no rule here for it.
+         */
+        if (site.why === "receiver" && !site.handsOn && named(site)) continue;
+        stopped(site.why ?? "unplaced"); continue;
+      }
       if (site.byName && (hooked ??= runsOnRead(to, to.names))) { stopped("dynamic"); continue; }
-      if (site.concrete === false) { stopped("abstract-receiver"); continue; }
-      if (site.overridden) { stopped("overridden"); continue; }
+      if (site.concrete === false) { if (named(site)) continue; stopped("abstract-receiver"); continue; }
+      if (site.overridden) { if (named(site)) continue; stopped("overridden"); continue; }
       const landed = site.file === to.file ? to
         : site.file === from.file ? from
           : from.open?.(site.file);
       if (site.declaredAs === undefined || !landed) {
         if (site.file === to.file) stopped("reaches-the-file");
+        /*
+         * A call a compiler placed outside the repository, on a library type's method -- `file.write(..)`
+         * with `file: IO[str]` -- runs the class's own `write` when the class is a kind of that library type and writes one.
+         * rich's `NullFile(IO[str])` is; found by calls recorded at run time. Kept a doubt, as the answer key keeps it.
+         * Only a call on a value: `new Map()` makes a Map, and runs nothing of a class that extends Map.
+         */
+        else if (site.file === EXTERNAL_RECEIVER && site.name && site.receiver
+          && to.names.some((name) => overridesALibraryMethod(to, name, site.name.replace(/^(#|r#)/, "")))) {
+          stopped("abstract-receiver");
+        }
         continue;
       }
-      const holders = holdersOfRoutine(landed.source, landed.language, site.declaredAs);
+      let holders = holdersOfRoutine(landed.source, landed.language, site.declaredAs);
+      /*
+       * A compiler said which declaration the call landed on (rule 2): two
+       * classes of one file sharing a method's name are no longer one answer.
+       */
+      if (site.declaredIn !== undefined) {
+        const exact = holders.filter((one) => one.name === site.declaredIn);
+        if (exact.length > 0 && exact.length < holders.length) holders = exact;
+      }
       /*
        * The class's own, by name *and* by where the name comes from: its own
        * file, or a file that imports it from there -- `impl Parser` two files
@@ -4821,7 +5343,10 @@ export function callsIntoType(
       if (spelt.length > 0) { stopped("reaches-the-file"); continue; }
       if (!site.receiver) continue;
       if (holders.some((one) => one.dispatched)) { stopped("abstract-receiver"); continue; }
-      if (inherits && holders.some((one) => one.name !== undefined)) stopped("inherits");
+      // Landed, on a compiler's word, in a class the head does not derive from: not a method the head inherits.
+      if (site.declaredIn !== undefined && holders.length > 0 && holders.every((one) => one.name === site.declaredIn)
+        && to.names.every((name) => name !== site.declaredIn && lineageWhole(to, name) && !lineageOf(to, name).has(site.declaredIn!))) continue;
+      if (inherits && holders.some((one) => one.name !== undefined)) { if (named(site)) continue; stopped("inherits"); }
     }
   }
   /*
@@ -4831,8 +5356,15 @@ export function callsIntoType(
    */
   const byRustc = closedByRustc(from, to);
   if (byRustc) return byRustc;
+  // A class at the tail closes when its own code is the whole of what it runs (rule 6).
+  if (!why && typeTail) {
+    const tail = typeTailOf(from.source, from.language, from.routine);
+    const notWhole = tail ? tail.notWhole ?? (from.language === "rust" ? crateNotWhole(from, tail) : undefined) : "tail-elsewhere" as const;
+    if (notWhole) return { verdict: "open", why: notWhole };
+    return { verdict: "closed", sites, line: tail!.line, ...(untypedAt.length > 0 ? { untypedAt } : {}) };
+  }
   if (why || typeTail) return { verdict: "open", why: why ?? "routine-not-found" };
-  return { verdict: "closed", sites, line: bodies[0]!.line };
+  return { verdict: "closed", sites, line: bodies[0]!.line, ...(untypedAt.length > 0 ? { untypedAt } : {}) };
 }
 
 /**
@@ -4891,6 +5423,8 @@ function closedByRustc(
 /** What every `impl` in one crate declares, by the type it is for: read once per crate. */
 interface CrateImpls {
   members: Map<string, Set<string>>;
+  /** The names of the routines each type's `impl`s write. */
+  routines: Map<string, string[]>;
   /** Types with a macro inside one of their `impl`s, which may write any member. */
   macroImpl: Set<string>;
   /** The text of each macro written where an item goes: one naming a type may write an `impl` of it. */
@@ -4909,11 +5443,10 @@ const crateImpls_ = new WeakMap<object, CrateImpls>();
  * anything, a macro inside an `impl` of it or one naming it where an item
  * goes, no list of the crate's files.
  *
- * Kept small and behind this one function on purpose: batch 7's step 1
- * builds the general per-crate list of what a type declares, and this
- * should become a call to it. The index is built once per crate, never per
- * arrow: the prototype re-read every `impl` of the crate for each arrow, and
- * one referee took twice as long for it.
+ * Rule 7's question put to `typeMayDeclare`, the same reading rule 1 uses,
+ * over the crate's index of `impl`s (`crateImplsOf`), which is built once per
+ * crate, never per arrow: the prototype re-read every `impl` of the crate for
+ * each arrow, and one referee took twice as long for it.
  */
 function rustTypeMayDeclare(
   from: CallSide,
@@ -4922,66 +5455,16 @@ function rustTypeMayDeclare(
   called: readonly string[],
 ): boolean | "unknown" {
   const crate = from.compiled?.();
-  if (!crate || !crate.files.has(to.file) || !to.open) return "unknown";
-  const tree = parseSource(to.source, "rust");
-  if (!tree) return "unknown";
-  // The declaration, and what its attributes write.
-  let declared = false;
-  let attributesUnknown = false;
-  const derived = new Set<string>();
-  each(tree.rootNode, (node) => {
-    if (!/^(struct_item|enum_item|union_item|trait_item)$/.test(node.type) || node.childForFieldName("name")?.text !== type) return;
-    declared = true;
-    if (node.type === "trait_item") {
-      const body = node.childForFieldName("body");
-      for (const item of body ? namedKids(body) : []) {
-        const name = item.childForFieldName("name")?.text;
-        if (name) derived.add(name.replace(/^r#/, ""));
-        if (item.type === "macro_invocation") attributesUnknown = true;
-      }
-      return;
-    }
-    const siblings = namedKids(parentOf(node) ?? node);
-    for (let at = siblings.findIndex((one) => one.id === node.id) - 1; at >= 0; at -= 1) {
-      const before = siblings[at]!;
-      if (before.type !== "attribute_item") { if (/comment/.test(before.type)) continue; break; }
-      const inner = namedKids(before)[0];
-      const path = inner ? firstNamed(inner) : undefined;
-      if (!inner || !path) { attributesUnknown = true; continue; }
-      if (path.text === "derive") {
-        const list = namedKids(inner).find((one) => one.type === "token_tree");
-        for (const one of list ? namedKids(list).map((each_) => each_.text.split("::").pop()!) : []) {
-          const methods = STD_DERIVE_METHODS[one];
-          if (!methods) attributesUnknown = true;
-          else for (const method of methods) derived.add(method);
-        }
-        continue;
-      }
-      if (!INERT_RUST_ATTRIBUTES.test(path.text)) attributesUnknown = true;
-    }
-  });
-  if (!declared) return "unknown";
-  if (called.some((one) => derived.has(one))) return true;
-  if (attributesUnknown) return "unknown";
-  const index = crateImplsOf(crate, to);
-  if (index.unread || index.macroImpl.has(type)) return "unknown";
-  const word = wholeName(type);
-  if (index.itemMacros.some((text) => word.test(text))) return "unknown";
-  const members = index.members.get(type);
-  return called.some((one) => members?.has(one.replace(/^r#/, "")) ?? false);
+  if (!crate) return "unknown";
+  const may = typeMayDeclare(to, type, [...called], () => crate.files);
+  return "unknown" in may ? "unknown" : may.declares;
 }
 
-/** Methods each std derive writes. */
-const STD_DERIVE_METHODS: Record<string, string[]> = {
-  Clone: ["clone", "clone_from"], PartialEq: ["eq", "ne"], Eq: [], PartialOrd: ["partial_cmp", "lt", "le", "gt", "ge"],
-  Ord: ["cmp", "max", "min", "clamp"], Hash: ["hash", "hash_slice"], Default: ["default"], Debug: ["fmt"], Copy: [],
-};
-
-function crateImplsOf(crate: CompiledCrate, side: CallSide): CrateImpls {
-  const known = crateImpls_.get(crate.files);
+function crateImplsOf(files: CrateFiles, side: TypeSide): CrateImpls {
+  const known = crateImpls_.get(files);
   if (known) return known;
-  const index: CrateImpls = { members: new Map(), macroImpl: new Set(), itemMacros: [], unread: false };
-  for (const file of crate.files) {
+  const index: CrateImpls = { members: new Map(), routines: new Map(), macroImpl: new Set(), itemMacros: [], unread: false };
+  for (const file of files) {
     const source = file === side.file ? side.source : side.open?.(file)?.source;
     const tree = source === undefined ? undefined : parseSource(source, "rust");
     if (!tree) { index.unread = true; break; }
@@ -4999,6 +5482,7 @@ function crateImplsOf(crate: CompiledCrate, side: CallSide): CrateImpls {
             if (name) members.add(name.replace(/^r#/, ""));
           }
           index.members.set(type, members);
+          index.routines.set(type, [...(index.routines.get(type) ?? []), ...typeRoutineNames([node])]);
         }
         return;
       }
@@ -5009,7 +5493,7 @@ function crateImplsOf(crate: CompiledCrate, side: CallSide): CrateImpls {
     };
     visit(tree.rootNode);
   }
-  crateImpls_.set(crate.files, index);
+  crateImpls_.set(files, index);
   return index;
 }
 
@@ -5099,6 +5583,8 @@ function typeDeclaration(tree: Tree, name: string): Node | undefined {
   each(tree.rootNode, (node) => {
     if (node.type === "impl_item" || declarationName(node)?.text !== name) return;
     if (TYPE_TAIL.test(node.type)) { found.push(node); return; }
+    // A Rust trait is read as a caller through the default bodies it writes, as the answer key reads it (#346).
+    if (node.type === "trait_item") { found.push(node); return; }
     // Something else declared under the name: a routine, a value, an interface, a variant. Not a use of it (`Reader { n: 0 }`).
     if (parametersOf(node) || node.childForFieldName("value") || node.childForFieldName("right")
       || /(declaration|_item|_definition|_signature|^enum_variant)$/.test(node.type)) other = true;
@@ -5734,6 +6220,80 @@ function lineageOf(side: CallSide, type: string): Set<string> {
   return seen;
 }
 
+/**
+ * Whether the type writes a member called `called` and is a kind of something declared outside the
+ * repository (a library base or interface, a built-in, a base nothing places; in Rust any trait it implements), so a
+ * call a compiler placed on the library's `called` may be running the type's.
+ */
+function overridesALibraryMethod(to: CallSide, type: string, called: string): boolean {
+  const tree = parseSource(to.source, to.language);
+  const bindings = bindingsIn(to.source, to.language);
+  if (!tree || !bindings) return true;
+  const { declarations, impls } = typeDeclNodes(tree, type);
+  if (declarations.length === 0) return false;
+  const members = declaredMemberNames([...declarations, ...impls], to.language);
+  if (members && !members.has(called)) return false;
+  if (to.language === "rust") return true;
+  for (const declaration of declarations) {
+    const bases = declaration.type === "interface_declaration" ? interfaceBases(declaration) : basesOf(declaration, to.language);
+    // TypeScript's `implements` names what the class is a kind of, too.
+    for (const heritage of namedKids(declaration)) {
+      for (const clause of namedKids(heritage)) {
+        if (clause.type !== "implements_clause") continue;
+        for (const one of namedKids(clause)) bases.push({ kind: "local", name: (one.childForFieldName("name") ?? one).text.replace(/<.*$/s, "") });
+      }
+    }
+    for (const base of bases) {
+      if (base.kind === "other") return true;
+      if (base.kind === "plain") continue;
+      const root = base.name.split(".")[0]!;
+      if (base.kind === "local" && typeDeclNodes(tree, base.name).declarations.length > 0) continue;
+      const imported = bindings.imported.get(root);
+      if (!imported) return true;
+      const where = filesFor(imported.specifier, to.imports);
+      if (where.library || !where.known || where.files.size === 0) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Whether a value of the class `type` (declared on `side`) may be one of the head's classes: the same
+ * class, a kind of it (the head is on its way up), or something the head is a kind of (so the value may be a head). A
+ * way up that leaves the file for somewhere in the repository may lead anywhere, and is a yes.
+ */
+export function mayBeAKindOf(side: CallSide, type: string, head: CallSide, names: string[]): boolean {
+  if (names.includes(type)) return true;
+  const up = lineageOf(side, type);
+  if (names.some((name) => up.has(name))) return true;
+  if (names.some((name) => lineageOf(head, name).has(type))) return true;
+  if (!lineageWhole(side, type)) return true;
+  return names.some((name) => !lineageWhole(head, name));
+}
+
+/** Whether every base on a type's way up is declared in this file, so `lineageOf` is the whole of it (Rust has none). */
+function lineageWhole(side: CallSide, type: string): boolean {
+  if (side.language === "rust") return true;
+  const tree = parseSource(side.source, side.language);
+  const bindings = bindingsIn(side.source, side.language);
+  if (!tree || !bindings) return false;
+  for (const one of lineageOf(side, type)) {
+    for (const declaration of typeDeclNodes(tree, one).declarations) {
+      const bases = declaration.type === "interface_declaration" ? interfaceBases(declaration) : basesOf(declaration, side.language);
+      for (const base of bases) {
+        if (base.kind === "plain") continue;
+        if (base.kind === "other") return false;
+        if (base.kind === "local" && typeDeclNodes(tree, base.name).declarations.length > 0) continue;
+        if (harmlessBase(base.name, side.language, bindings)) continue;
+        const imported = bindings.imported.get(base.name.split(".")[0]!);
+        if (imported && filesFor(imported.specifier, side.imports).library) continue;
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 /** Whether this source binds `head` to `landed` under another name. */
 function aliases(source: string, head: string, landed: string): boolean {
   const h = escapeName(head);
@@ -6031,6 +6591,8 @@ export interface CallSitePlaced {
   calleeAt?: { start: number; end: number };
   /** What the call passes, and how its callee is written, where the node is a call written with arguments (`passesOf`). */
   passes?: CallPasses;
+  /** What holds the routine a compiler placed this call at (`Placement.in`): rule 2 of the class-calls research. */
+  declaredIn?: string;
   /**
    * For a `macro` site: where the macro call is written, and whether its
    * arguments were read as code (`readMacro`), each call in them a site of
@@ -6237,7 +6799,10 @@ function throughWildcards(
 }
 
 /** Where one call site's callee lives, when it can be placed at all. */
-export type Placement = { file: string; concrete?: boolean; as?: string; overridden?: boolean };
+export type Placement = { file: string; concrete?: boolean; as?: string; overridden?: boolean;
+  /** The class, `impl` type or trait the routine a compiler landed on is written in. */
+  in?: string;
+};
 
 /**
  * A name's resting place: the file it settles in, and what that file calls it.
@@ -6393,7 +6958,16 @@ function placeThroughDefinition(
     concrete: found.concrete ?? false,
     ...(landed ? { as: landed.name } : {}),
     ...(landed?.holder && overriddenBelow(landed.holder, landed.name, side) ? { overridden: true } : {}),
+    ...(landed?.holder && holderName(landed.holder) !== undefined ? { in: holderName(landed.holder)! } : {}),
   };
+}
+
+/** The name of what holds a routine -- a class's, or the type a Rust `impl` is for; a trait's own for a default method. */
+function holderName(holder: Node): string | undefined {
+  if (parametersOf(holder)) return undefined;
+  if (holder.type === "impl_item") return implTypeName(holder);
+  const name = holder.childForFieldName("name");
+  return name && name.childCount === 0 ? name.text : undefined;
 }
 
 /**
@@ -7138,6 +7712,7 @@ function siteOf(callee: Callee, side: { source: string; language: Language }, at
           ...(where.concrete !== undefined ? { concrete: where.concrete } : {}),
           ...(where.as !== undefined ? { declaredAs: where.as } : {}),
           ...(where.overridden ? { overridden: true } : {}),
+          ...(where.in !== undefined ? { declaredIn: where.in } : {}),
         }
       : { why: where.why }),
   };
