@@ -8,6 +8,10 @@
  * turned the whole file into a single `ERROR` node, and every function below
  * it was lost: `runInAction` could not be found, so no arrow at it was read.
  *
+ * Those two, and `export type *`, are now rewritten before this runs (`rewrite.ts`), as TypeScript
+ * reads them, and are not unread. What is left -- syntax no rewrite knows --
+ * is handled here.
+ *
  * So what the parser could not read is blanked and the file parsed again,
  * until it parses. Blanking keeps every other character where it was: spaces
  * for text, newlines kept, so every offset and line number in the new tree is

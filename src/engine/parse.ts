@@ -34,6 +34,7 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 
 import { blankUnreadable, type ParseError } from "./recover";
+import { rewriteKnownSyntax } from "./rewrite";
 
 /** The whole language table. */
 const GRAMMARS = {
@@ -344,9 +345,19 @@ const unreadOf = new WeakMap<Tree, readonly Unread[]>();
  * and all, as it always did.
  */
 function readable(parser: Parser, source: string, language: Language): Tree {
-  const tree = parser.parse(source);
+  let tree = parser.parse(source);
   if (!tree.rootNode.hasError) return tree;
-  const repaired = blankUnreadable(source, language, (text) => errorIn(parser, text));
+  // TypeScript the grammar misreads, written as TypeScript reads it (`rewrite.ts`): not unread.
+  let text = source;
+  const rewritten = language === "ts" || language === "tsx" ? rewriteKnownSyntax(source) : undefined;
+  if (rewritten) {
+    const again = parser.parse(rewritten);
+    if (!again.rootNode.hasError) { tree.delete(); return again; }
+    tree.delete();
+    tree = again;
+    text = rewritten;
+  }
+  const repaired = blankUnreadable(text, language, (attempt) => errorIn(parser, attempt));
   if (!repaired) return tree;
   tree.delete();
   const read = parser.parse(repaired.text);
