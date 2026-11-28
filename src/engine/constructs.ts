@@ -670,6 +670,8 @@ function onlyStructs(source: string, names: string[]): boolean {
     if (!name || name.childCount !== 0 || !wanted.has(name.text)) return;
     if (parametersOf(node)) return;
     if (/^(struct|enum|union)_item$/.test(node.type)) buildable.add(name.text);
+    // An enum variant is made only by writing it (batch 8): `compiledCreatesNone` asks rustc's list for it.
+    else if (node.type === "enum_variant") buildable.add(name.text);
     else doubt = true;
   });
   return !doubt && names.every((name) => buildable.has(name));
@@ -710,7 +712,13 @@ function macroDeclares(source: string, routine: string): boolean {
  * that cannot be matched to exactly one declaration (`compiledBodiesFor`,
  * #357's rules).
  */
-function compiledCreatesNone(routine: string, wanted: Set<string>, names: ConstructsNames | undefined): boolean {
+function compiledCreatesNone(
+  routine: string,
+  wanted: Set<string>,
+  names: ConstructsNames | undefined,
+  /** The head's file: where a name the head stands for is an enum variant, and of which enum. */
+  headSource?: string,
+): boolean {
   if (!names?.side.compiled) return false;
   const compiled = compiledBodiesFor({ ...names.side, routine }, [...wanted]);
   if (!compiled || compiled.bodies.length === 0) return false;
@@ -722,7 +730,33 @@ function compiledCreatesNone(routine: string, wanted: Set<string>, names: Constr
    * call nothing, so they don't block (#396).
    */
   if (compiled.unbuilt.some((region) => names.side.source.slice(region.start, region.end).includes("("))) return false;
-  return compiled.bodies.every((body) => ![...wanted].some((name) => body.made.has(name)));
+  /*
+   * An enum variant at the head (batch 8; actix-router's `PatternType::Dynamic`).
+   * rustc writes one built in place as an aggregate naming it, which `made`
+   * holds. Two more ways stay quiet: the variant handed on as its own
+   * constructor (`.map(Kind::Dynamic)`, which builds it inside `map`) names it
+   * somewhere in the body, and a call handing back a value of its enum may
+   * hand back that variant.
+   */
+  const variants = headSource ? variantOwners(headSource, wanted) : new Map<string, Set<string>>();
+  return compiled.bodies.every((body) => ![...wanted].some((name) => body.made.has(name)
+    || (variants.has(name) && (body.words.has(name) || [...variants.get(name)!].some((owner) => (body.handedBack?.has(owner) ?? true))))));
+}
+
+/** Each of `names` declared as an enum variant in this Rust source, with the enums declaring it. */
+function variantOwners(source: string, names: Set<string>): Map<string, Set<string>> {
+  const owners = new Map<string, Set<string>>();
+  const tree = parseSource(source, "rust");
+  if (!tree) return owners;
+  each(tree.rootNode, (node) => {
+    if (node.type !== "enum_item") return;
+    const enumName = node.childForFieldName("name")?.text;
+    each(node, (inner) => {
+      const variant = inner.type === "enum_variant" ? inner.childForFieldName("name")?.text : undefined;
+      if (enumName && variant && names.has(variant)) owners.set(variant, (owners.get(variant) ?? new Set()).add(enumName));
+    });
+  });
+  return owners;
 }
 
 /**
@@ -1981,7 +2015,7 @@ export function constructions(
     return { verdict: "absent", awaitsCompiler: true };
   }
   if (byText && (language === "rust"
-    ? compiledCreatesNone(routine, wanted, names)
+    ? compiledCreatesNone(routine, wanted, names, reverse?.source)
     : everyConstructionIsSomethingElse(routines, source, language, wanted, names))) {
     return { verdict: "refuted", evidence: {
       routine,

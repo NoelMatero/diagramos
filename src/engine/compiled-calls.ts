@@ -136,6 +136,12 @@ export interface CompiledBody {
    */
   built: Set<string>;
   /**
+   * The types of the values the body's calls hand back, by last segment
+   * (batch 8): `made` less the aggregates. An enum variant at the head may be
+   * in a value of its enum a call hands back.
+   */
+  handedBack?: Set<string>;
+  /**
    * Every identifier written on a line rustc writes as a call: the callee's
    * path, its type arguments, `<T as Trait>` (batch 7). Everything a body
    * runs of a type's own code is on such a line -- `Widget::run(..)`,
@@ -362,7 +368,7 @@ function bodiesIn(mir: string): CompiledBody[] {
   let block = false;
   let last: string | undefined;
   const fresh = (path: string, params: number): CompiledBody => ({
-    path, params, calls: [], drops: 0, words: new Set(), mentions: new Set(), made: new Set(), built: new Set(),
+    path, params, calls: [], drops: 0, words: new Set(), mentions: new Set(), made: new Set(), built: new Set(), handedBack: new Set(),
     callWords: new Set(), listWhole: true,
   });
   for (const line of mir.split("\n")) {
@@ -423,6 +429,7 @@ function bodiesIn(mir: string): CompiledBody[] {
       for (const word of body.mentions ?? body.words) (owner.mentions ??= new Set()).add(word);
       for (const type of body.made) owner.made.add(type);
       for (const type of body.built) owner.built.add(type);
+      for (const type of body.handedBack ?? []) (owner.handedBack ??= new Set()).add(type);
       for (const word of body.callWords) owner.callWords.add(word);
       owner.listWhole &&= body.listWhole;
     }
@@ -531,7 +538,10 @@ function readBodyLine(line: string, body: CompiledBody, locals: Map<string, stri
   // Whatever a call writes into is a value it handed back.
   const destination = terminator[1]!.match(/^(_\d+) = /);
   const type = destination ? locals.get(destination[1]!) : undefined;
-  if (type) body.made.add(baseTypeOf(type));
+  if (type) {
+    body.made.add(baseTypeOf(type));
+    (body.handedBack ??= new Set()).add(baseTypeOf(type));
+  }
   const written = terminator[1]!.replace(/^_\d+ = /, "");
   if (/^drop\(/.test(written)) { body.drops += 1; return; }
   if (NOT_A_CALL.test(written)) return;
@@ -622,8 +632,8 @@ function stripGenerics(written: string): string {
  *                 module a feature left out. Never "calls nothing".
  * `not-matched`   no single body is the declaration, or one is and its
  *                 parameter count disagrees. A function declared inside
- *                 another is always this -- rustc prints it as if it stood on
- *                 its own.
+ *                 another is matched under the path of the one holding it,
+ *                 or bare when its name is unique (batch 8).
  * `switched-off`  `cfg` on the routine, on what holds it, or inside it. What
  *                 rustc read is one setting's body, and a call in another
  *                 setting's is not in it. Since #366 a `#[cfg(..)]` on one
@@ -684,9 +694,7 @@ export function compiledBodiesOf(
   const generics = new Set<string>();
   const unbuilt: Array<{ start: number; end: number }> = [];
   // `Self` too: `Self { .. }` builds the head without naming it, for `@builds`' use of this list.
-  const couldCall = (region: Node): boolean => heads === undefined || region.text.includes("!")
-    || /\bSelf\b/.test(region.text)
-    || heads.some((name) => new RegExp(`(?<![\\w$])${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w$])`).test(region.text));
+  const couldCall = (region: Node): boolean => regionCouldCall(region, heads);
   for (const declaration of declarations) {
     if (declaration.switchedOff) return { why: "switched-off" };
     /*
@@ -749,9 +757,7 @@ export function compiledBodiesOfImpls(
   const bodies: CompiledBody[] = [];
   const generics = new Set<string>();
   const unbuilt: Array<{ start: number; end: number }> = [];
-  const couldCall = (region: Node): boolean => heads === undefined || region.text.includes("!")
-    || /\bSelf\b/.test(region.text)
-    || heads.some((name) => new RegExp(`(?<![\\w$])${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w$])`).test(region.text));
+  const couldCall = (region: Node): boolean => regionCouldCall(region, heads);
   for (const name of names) {
     for (const declaration of declarationsNamed(tree.rootNode, name).filter((one) => inside(one.node))) {
       if (declaration.switchedOff || declaration.gated) return { why: "switched-off" };
@@ -838,6 +844,58 @@ export function withoutTestNamesakes<T extends { test: boolean }>(found: T[]): T
 const CFG = /\bcfg(?:_attr)?\b/;
 /** An attribute that is exactly one `cfg(..)`: it switches the next item off or on, and nothing else. */
 const CFG_ATTRIBUTE = /^#\[\s*cfg\s*\(/;
+/**
+ * What switches code in Rust, written in a function's text (batch 8): the
+ * attributes `#[cfg(..)]` and `#[cfg_attr(..)]`, and the macro `cfg!(..)`.
+ * Nothing else does. A local or a parameter called `cfg` is a name --
+ * actix-web's `App::configure` has `let mut cfg = ServiceConfig::new()`, and
+ * reading that word as a switch threw rustc's list of the whole struct away.
+ * A macro needs a bracket after its `!`, so `cfg != x` is not one.
+ */
+const SWITCHES = /#\s*!?\s*\[\s*cfg(?:_attr)?\b|\bcfg_attr\b|\bcfg\s*!\s*[([{]/;
+
+/** Whether a macro is invoked anywhere under `node`: `name!(..)`, or a `macro_rules!` written there. */
+function holdsMacro(node: Node): boolean {
+  // `cfg!(..)` expands to `true` or `false`: it runs nothing.
+  if (isCfgMacro(node)) return false;
+  if (node.type === "macro_invocation" || node.type === "macro_definition") return true;
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (child && holdsMacro(child)) return true;
+  }
+  return false;
+}
+
+/**
+ * Whether a region switched off by `cfg` could run the head: it names one,
+ * names `Self` (which builds or calls the head without naming it), or holds
+ * a macro, whose expansion nobody compiled. A macro is a `macro_invocation`
+ * in the syntax (batch 8): the `!` of `!flag` and of `a != b` is not one, and
+ * reading it as one kept fd's `WorkerState` and bat's `print_input` from
+ * their lists.
+ */
+function regionCouldCall(region: Node, heads: readonly string[] | undefined): boolean {
+  return heads === undefined || holdsMacro(region)
+    || /\bSelf\b/.test(region.text)
+    || heads.some((name) => new RegExp(`(?<![\\w$])${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w$])`).test(region.text));
+}
+
+/** Whether `node` is the macro `cfg!(..)`. */
+function isCfgMacro(node: Node): boolean {
+  if (node.type !== "macro_invocation") return false;
+  const written = node.childForFieldName("macro")?.text.replace(/\s+/g, "") ?? "";
+  return written === "cfg" || /^(?:::)?(?:std|core)::cfg$/.test(written);
+}
+
+/** Whether `cfg!(..)` is written anywhere under `node`. */
+function holdsCfgMacro(node: Node): boolean {
+  if (isCfgMacro(node)) return true;
+  for (let index = 0; index < node.childCount; index += 1) {
+    const child = node.child(index);
+    if (child && holdsCfgMacro(child)) return true;
+  }
+  return false;
+}
 
 /**
  * The regions `#[cfg(..)]` attributes switch inside one function, or
@@ -845,7 +903,9 @@ const CFG_ATTRIBUTE = /^#\[\s*cfg\s*\(/;
  * an attribute with nothing after it. Each region is the next named sibling
  * of its attribute, read from the structure rather than a list of node types
  * (docs/reading-a-grammar.md), and what is left once every region and its
- * attribute is cut out must say `cfg` nowhere.
+ * attribute is cut out must write no switch (`SWITCHES`): a `cfg` that is a
+ * name, not an attribute or `cfg!`, switches nothing (batch 8). An `if`
+ * whose condition holds `cfg!(..)` is a region too.
  */
 function cfgRegions(fn: Node): Node[] | undefined {
   const regions: Node[] = [];
@@ -869,6 +929,23 @@ function cfgRegions(fn: Node): Node[] | undefined {
         cut.push([child.startIndex, child.startIndex + child.text.length], [region.startIndex, region.startIndex + region.text.length]);
         continue;
       }
+      /*
+       * `if cfg!(..) .. { .. } else { .. }` (batch 8). `cfg!` is a constant,
+       * `true` or `false`, and both branches are compiled -- but rustc drops
+       * the branch the constant rules out from the body it prints (clap's
+       * `_build_self` has `if !cfg!(feature = "help") && ..`). So the whole
+       * `if` is a region, like a `#[cfg]` statement: its calls may be missing
+       * from the list, and the rest of the body is read as usual. `cfg!`
+       * anywhere else -- a `let`, an argument -- still switches the routine off.
+       */
+      if (child.type === "if_expression") {
+        const condition = child.childForFieldName("condition");
+        if (condition && holdsCfgMacro(condition)) {
+          regions.push(child);
+          cut.push([child.startIndex, child.startIndex + child.text.length]);
+          continue;
+        }
+      }
       visit(child);
     }
   };
@@ -883,7 +960,7 @@ function cfgRegions(fn: Node): Node[] | undefined {
     at = end;
   }
   rest += fn.text.slice(at - offset);
-  return CFG.test(rest) ? undefined : regions;
+  return SWITCHES.test(rest) ? undefined : regions;
 }
 
 /**
@@ -942,11 +1019,13 @@ function bodyOf(
 ): CompiledBody | undefined {
   const modules: string[] = [];
   let holder: Node | undefined;
-  for (const up of [...declaration.ancestors].reverse()) {
+  const upward = [...declaration.ancestors].reverse();
+  if (upward[0]?.type === "block" && upward[1]?.type === "function_item") return nestedBodyOf(crate, file, source, declaration, routine);
+  for (const up of upward) {
     /*
-     * A function declared inside another's body. rustc prints it as though
-     * it stood on its own -- `inner`, not `outer::inner` -- so its path says
-     * nothing about where it is.
+     * Held by something other than a function's own block -- a closure, a
+     * block inside the body: no answer. A function declared straight in
+     * another's body is `nestedBodyOf`'s (batch 8).
      */
     if (up.type === "function_item" || up.type === "block" || up.type === "closure_expression") return undefined;
     if ((up.type === "impl_item" || up.type === "trait_item") && !holder) { holder = up; continue; }
@@ -977,6 +1056,43 @@ function bodyOf(
   if (exact.length > 0) return only(exact);
   // The bare name: rustc trimmed the path because nothing else in the crate shares it.
   return named.length === 1 && segmentsOf(named[0]!.path).length === 1 ? named[0] : undefined;
+}
+
+/**
+ * A function declared in another function's body (batch 8). rustc prints it
+ * under the path of the function holding it -- `top::inner` -- or, like any
+ * item whose name is unique among every crate it read, bare: `helper`, which
+ * is how rayon's `bridge_producer_consumer::helper` and `join_context::call_a`
+ * are printed. Before this, every such routine was "not matched".
+ *
+ * The holder's own body is found first, by the same rules; then the one body
+ * printed under its path, or else the only body in the crate of that bare name
+ * -- and only if the holder's body names it, so the bare one is not another
+ * function of the name the build compiled instead. One under `cfg`, or held
+ * by something other than a function's own block (a closure, an inner block),
+ * is no answer.
+ */
+function nestedBodyOf(
+  crate: CompiledCrate,
+  file: string,
+  source: string,
+  declaration: Declaration,
+  routine: string,
+): CompiledBody | undefined {
+  if (declaration.gated) return undefined;
+  const holderNode = declaration.ancestors[declaration.ancestors.length - 2]!;
+  const holderName = holderNode.childForFieldName("name")?.text;
+  if (!holderName) return undefined;
+  const holder = bodyOf(crate, file, source, {
+    node: holderNode, ancestors: declaration.ancestors.slice(0, -2), gated: false, switchedOff: false, regions: [], test: false,
+  }, holderName);
+  if (!holder) return undefined;
+  const named = crate.byName.get(routine) ?? [];
+  const expected = [...segmentsOf(holder.path), routine].join("::");
+  const exact = named.filter((body) => segmentsOf(body.path).join("::") === expected);
+  if (exact.length > 0) return exact.length === 1 ? exact[0] : undefined;
+  if (named.length === 1 && segmentsOf(named[0]!.path).length === 1 && holder.words.has(routine)) return named[0];
+  return undefined;
 }
 
 /** `src/parser/mod.rs` under `src/lib.rs` -> `["parser"]`; `undefined` for a file outside the crate's tree. */
@@ -1046,8 +1162,20 @@ export function compiledRefutes(
     const bare = through.replace(/^&(?:mut )?/, "").replace(/^'\w+ /, "");
     return /^(?:dyn|impl) /.test(bare) || bare.startsWith("<") || generics.has(bare.match(/^[A-Za-z_]\w*/)?.[0] ?? "");
   };
+  /*
+   * Only by a name the head has (batch 8). In Rust a call through a trait
+   * runs a method of the name it calls -- `x.walk()` and `<T as Walks>::walk`
+   * run a `walk`, inherent or a trait's, never a function of another name
+   * (a function kept in a value is called through `Fn`, which is `opaque`
+   * above). It is #351's rule for an interface, and `rustNamesWhatRuns`'s,
+   * applied to rustc's list: fd's `CommandSet::new` iterates a type parameter
+   * and was never a doubt about `job`. What the implementation then calls is
+   * one level further, and a library's code running the head on the body's
+   * behalf is `called-implicitly`'s, below.
+   */
   for (const body of bodies) {
-    if (body.calls.some((call) => call.kind === "named" && call.through !== undefined && dispatched(call.through))) {
+    if (body.calls.some((call) => call.kind === "named" && call.through !== undefined && dispatched(call.through)
+      && names.has(call.name))) {
       return { why: "abstract-receiver" };
     }
   }

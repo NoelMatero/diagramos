@@ -2717,11 +2717,16 @@ export function compiledVerdict(
   compiled: CompiledTail,
   to: CallSide & { names: string[] },
 ): ReturnType<typeof compiledRefutes> {
-  return compiledRefutes(compiled.bodies, {
-    names: to.names,
-    source: to.source,
-    ownTrait: (written) => traitDeclaredHere(to, written),
-  }, compiled.generics);
+  const ownTrait = (written: string) => traitDeclaredHere(to, written);
+  /*
+   * A `#[cfg]` region the build left out is in no list (batch 8). One that
+   * names no head may still run a head that is a library trait's method
+   * without its name: `x?` runs `from`, `a == b` runs `eq`, a value going out
+   * of scope runs `drop`. So such a head stays a doubt past one.
+   */
+  if (compiled.unbuilt.length > 0
+    && traitImplsOf(to.source, new Set(to.names)).some((one) => !ownTrait(one.trait))) return { why: "called-implicitly" };
+  return compiledRefutes(compiled.bodies, { names: to.names, source: to.source, ownTrait }, compiled.generics);
 }
 
 /** What `compiledBodiesFor` found: the bodies, and the type parameters in scope where they were declared. */
@@ -5396,6 +5401,13 @@ function closedByRustc(
   if (from.language !== "rust" || to.language !== "rust") return undefined;
   const compiled = compiledBodiesFor(from, to.names);
   if (!compiled || !compiled.exact || compiled.bodies.length === 0) return undefined;
+  /*
+   * Code a `#[cfg]` switched off is in no list, and it can run the type's own
+   * code without naming the type: `w.run()`, `a == b`, a value dropped
+   * (batch 8). The regions `compiledBodiesFor` lets through name no head, so
+   * for a type they say nothing either way: no answer.
+   */
+  if (compiled.unbuilt.length > 0) return undefined;
   const tailText = ownNodes(from).map((node) => node.text).join("\n");
   if (/\b(const|static)\s+[A-Z_][A-Z0-9_]*\s*:/.test(tailText)) return undefined;
   const bare = (through: string) => through.replace(/^&(?:mut )?/, "").replace(/^'\w+ /, "");
@@ -5832,12 +5844,24 @@ function inertAttributes(item: Node): boolean {
   });
 }
 
-/** Whether a macro written where an item goes (not inside a routine) names the type: it may write an `impl` of it. */
+/**
+ * Whether a macro written where an item goes (not inside a routine) names the type: it may write an `impl` of it.
+ *
+ * Not std's `thread_local!` (batch 8): it declares `static`s and nothing
+ * else, so a type it names is the type of a value it keeps -- rayon's
+ * `WORKER_THREAD_STATE` holds a pointer to a `WorkerThread`. Unless the crate
+ * writes a `macro_rules! thread_local` of its own.
+ */
 function itemMacroNames(root: Node, type: string): boolean {
   const word = wholeName(type);
+  const ownThreadLocal = /\bmacro_rules!\s*thread_local\b/.test(root.text);
   const visit = (node: Node): boolean => {
     if (parametersOf(node)) return false;
-    if (node.type === "macro_invocation") return word.test(node.text);
+    if (node.type === "macro_invocation") {
+      const written = node.childForFieldName("macro")?.text.replace(/\s+/g, "") ?? "";
+      if (!ownThreadLocal && /^(?:(?:::)?std::)?thread_local$/.test(written)) return false;
+      return word.test(node.text);
+    }
     for (let index = 0; index < node.childCount; index += 1) {
       const child = node.child(index);
       if (child && visit(child)) return true;
