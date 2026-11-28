@@ -135,7 +135,8 @@ describe("refusals: finding more never finds the wrong thing", () => {
         "export function helper(): number { return 1; }",
         "export function other(): number { return 2; }",
         "export function go(): number {",
-        "  type P<in out T> = T; const n: P<number> = helper();",
+        // `import("..").T[]` in a type is syntax the grammar still misreads; `in out` was, until #462's rewrite.
+        "  const n: import(\"./p\").T[] = helper();",
         "  return n;",
         "}",
         "",
@@ -150,8 +151,8 @@ describe("refusals: finding more never finds the wrong thing", () => {
       ...TSCONFIG,
       "shape.ts": "export interface Shape { n: number }\n",
       "app.ts": [
-        "import type { Shape } from \"./shape\"; type P<in out T> = T;",
-        "export function area(s: P<Shape>): number { return s.n; }",
+        "import type { Shape } from \"./shape\"; type P = import(\"./p\").T[];",
+        "export function area(s: Shape): number { return s.n; }",
         "",
       ].join("\n"),
     });
